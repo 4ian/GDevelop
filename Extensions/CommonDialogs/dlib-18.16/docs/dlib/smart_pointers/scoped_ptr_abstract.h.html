@@ -1,0 +1,175 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - scoped_ptr_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SCOPED_PTr_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_SCOPED_PTr_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../noncopyable.h.html'>../noncopyable.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='default_deleter'></a>default_deleter</b>
+    <b>{</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>*</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (T is an array type (e.g. int[])) then
+                    - performs "delete [] item;"
+                - else
+                    - performs "delete item;"
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> deleter <font color='#5555FF'>=</font> default_deleter<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>
+        <font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>class</font> <b><a name='scoped_ptr'></a>scoped_ptr</b> : noncopyable 
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON deleter
+                Must be a function object that performs deallocation of a pointer
+                of type T.  For example, see the default_deleter type defined above.
+                It must also not throw when constructed or when performing a delete.
+
+            INITIAL VALUE
+                defined by constructor
+
+            WHAT THIS OBJECT REPRESENTS
+                This is a smart pointer class inspired by the implementation of the scoped_ptr 
+                class found in the Boost C++ library.  So this is a simple smart pointer 
+                class which guarantees that the pointer contained within it will always be 
+                deleted.   
+                
+                The class does not permit copying and so does not do any kind of 
+                reference counting.  Thus it is very simply and quite fast.
+                
+                Note that this class allows you to use pointers to arrays as well as 
+                pointers to single items.  To let it know that it is supposed to point
+                to an array you have to declare it using the bracket syntax.  Consider
+                the following examples:
+
+                    // This is how you make a scoped pointer to a single thing
+                    scoped_ptr&lt;int&gt; single_item(new int);
+                    
+                    // This is how you can use a scoped pointer to contain array pointers.
+                    // Note the use of [].  This ensures that the proper version of delete
+                    // is called.
+                    scoped_ptr&lt;int[]&gt; array_of_ints(new int[50]);
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> T element_type;
+        <font color='#0000FF'>typedef</font> deleter deleter_type;
+
+        <font color='#0000FF'>explicit</font> <b><a name='scoped_ptr'></a>scoped_ptr</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>*</font> p <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get() == p
+        !*/</font>
+
+        ~<b><a name='scoped_ptr'></a>scoped_ptr</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (get() != 0) then
+                    - calls deleter()(get())
+                      (i.e. uses the deleter type to delete the pointer that is
+                      contained in this scoped pointer)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>*</font> p <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (get() != 0) then
+                    - calls deleter()(get())
+                      (i.e. uses the deleter type to delete the pointer that is
+                      contained in this scoped pointer)
+                - #get() == p
+                  (i.e. makes this object contain a pointer to p instead of whatever it 
+                  used to contain)
+        !*/</font>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - get() != 0
+                - T is NOT an array type (e.g. not int[])
+            ensures
+                - returns a reference to *get()
+        !*/</font>
+
+        T<font color='#5555FF'>*</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - get() != 0
+                - T is NOT an array type (e.g. not int[])
+            ensures
+                - returns the pointer contained in this object
+        !*/</font>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[]<font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - get() != 0
+                - T is an array type (e.g. int[])
+            ensures
+                - returns get()[idx] 
+        !*/</font>
+
+        T<font color='#5555FF'>*</font> <b><a name='get'></a>get</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the pointer contained in this object
+        !*/</font>
+
+        <b><a name='operator'></a>operator</b> <font color='#0000FF'><u>bool</u></font><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns get() != 0
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+            scoped_ptr<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+        scoped_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        scoped_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SCOPED_PTr_ABSTRACT_
+</font>
+
+
+</pre></body></html>

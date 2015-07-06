@@ -1,0 +1,182 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - make_mfp.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MAKE_MFp_H_
+<font color='#0000FF'>#define</font> DLIB_MAKE_MFp_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='member_function_pointer_kernel_1.h.html'>member_function_pointer_kernel_1.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='make_mfp_abstract.h.html'>make_mfp_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    member_function_pointer<font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <b><a name='make_mfp'></a>make_mfp</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> object,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>cb<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        member_function_pointer<font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> temp;
+        temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object, cb<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    member_function_pointer<font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <b><a name='make_mfp'></a>make_mfp</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>cb<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#0000FF'>const</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        member_function_pointer<font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> temp;
+        temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object, cb<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> A1
+        <font color='#5555FF'>&gt;</font>
+    member_function_pointer<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font> <b><a name='make_mfp'></a>make_mfp</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> object,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>cb<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A1<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        member_function_pointer<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font> temp;
+        temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object, cb<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> A1
+        <font color='#5555FF'>&gt;</font>
+    member_function_pointer<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font> <b><a name='make_mfp'></a>make_mfp</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>cb<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A1<font face='Lucida Console'>)</font><font color='#0000FF'>const</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        member_function_pointer<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font> temp;
+        temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object, cb<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> A1,
+        <font color='#0000FF'>typename</font> A2
+        <font color='#5555FF'>&gt;</font>
+    member_function_pointer<font color='#5555FF'>&lt;</font>A1,A2<font color='#5555FF'>&gt;</font> <b><a name='make_mfp'></a>make_mfp</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> object,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>cb<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A1,A2<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        member_function_pointer<font color='#5555FF'>&lt;</font>A1,A2<font color='#5555FF'>&gt;</font> temp;
+        temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object, cb<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> A1,
+        <font color='#0000FF'>typename</font> A2
+        <font color='#5555FF'>&gt;</font>
+    member_function_pointer<font color='#5555FF'>&lt;</font>A1,A2<font color='#5555FF'>&gt;</font> <b><a name='make_mfp'></a>make_mfp</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>cb<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A1,A2<font face='Lucida Console'>)</font><font color='#0000FF'>const</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        member_function_pointer<font color='#5555FF'>&lt;</font>A1,A2<font color='#5555FF'>&gt;</font> temp;
+        temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object, cb<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> A1,
+        <font color='#0000FF'>typename</font> A2,
+        <font color='#0000FF'>typename</font> A3
+        <font color='#5555FF'>&gt;</font>
+    member_function_pointer<font color='#5555FF'>&lt;</font>A1,A2,A3<font color='#5555FF'>&gt;</font> <b><a name='make_mfp'></a>make_mfp</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> object,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>cb<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A1,A2,A3<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        member_function_pointer<font color='#5555FF'>&lt;</font>A1,A2,A3<font color='#5555FF'>&gt;</font> temp;
+        temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object, cb<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> A1,
+        <font color='#0000FF'>typename</font> A2,
+        <font color='#0000FF'>typename</font> A3
+        <font color='#5555FF'>&gt;</font>
+    member_function_pointer<font color='#5555FF'>&lt;</font>A1,A2,A3<font color='#5555FF'>&gt;</font> <b><a name='make_mfp'></a>make_mfp</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>cb<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A1,A2,A3<font face='Lucida Console'>)</font><font color='#0000FF'>const</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        member_function_pointer<font color='#5555FF'>&lt;</font>A1,A2,A3<font color='#5555FF'>&gt;</font> temp;
+        temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object, cb<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> A1,
+        <font color='#0000FF'>typename</font> A2,
+        <font color='#0000FF'>typename</font> A3,
+        <font color='#0000FF'>typename</font> A4
+        <font color='#5555FF'>&gt;</font>
+    member_function_pointer<font color='#5555FF'>&lt;</font>A1,A2,A3,A4<font color='#5555FF'>&gt;</font> <b><a name='make_mfp'></a>make_mfp</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> object,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>cb<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A1,A2,A3,A4<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        member_function_pointer<font color='#5555FF'>&lt;</font>A1,A2,A3,A4<font color='#5555FF'>&gt;</font> temp;
+        temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object, cb<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> A1,
+        <font color='#0000FF'>typename</font> A2,
+        <font color='#0000FF'>typename</font> A3,
+        <font color='#0000FF'>typename</font> A4
+        <font color='#5555FF'>&gt;</font>
+    member_function_pointer<font color='#5555FF'>&lt;</font>A1,A2,A3,A4<font color='#5555FF'>&gt;</font> <b><a name='make_mfp'></a>make_mfp</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>cb<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A1,A2,A3,A4<font face='Lucida Console'>)</font><font color='#0000FF'>const</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        member_function_pointer<font color='#5555FF'>&lt;</font>A1,A2,A3,A4<font color='#5555FF'>&gt;</font> temp;
+        temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object, cb<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MAKE_MFp_H_
+</font>
+
+
+
+</pre></body></html>

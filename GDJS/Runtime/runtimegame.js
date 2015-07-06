@@ -394,14 +394,15 @@ gdjs.RuntimeGame.prototype._resizeCanvas = function() {
  */
 gdjs.RuntimeGame.prototype.loadAllAssets = function(callback) {
 
-    //Load all assets
-    var loadingStage = new PIXI.Stage();
+    //Prepare the progress text
+    var loadingScreen = new PIXI.Container();
     var text = new PIXI.Text(" ", {font: "bold 60px Arial", fill: "#FFFFFF", align: "center"});
-    loadingStage.addChild(text);
+    loadingScreen.addChild(text);
     text.position.x = this._renderer.width/2-50;
     text.position.y = this._renderer.height/2;
     var loadingCount = 0;
 
+    //Load all assets
     var assets = [];
     gdjs.iterateOverArray(gdjs.projectData.resources.resources, function(res) {
         if ( res.file ) assets.push(res.file);
@@ -409,23 +410,24 @@ gdjs.RuntimeGame.prototype.loadAllAssets = function(callback) {
 
     var game = this;
     if ( assets.length !== 0 ) {
-        var assetLoader = new PIXI.AssetLoader(assets, true);
-        assetLoader.onComplete = onAssetsLoaded;
-        assetLoader.onProgress = onAssetsLoadingProgress;
-        assetLoader.load();
+        var loader = PIXI.loader;
+        loader.once('complete', callback);
+        loader.on('progress', onAssetsLoadingProgress);
+
+        for(var i = 0;i < assets.length; ++i) {
+            loader.add(assets[i], assets[i]);
+        }
+
+        loader.load();
     }
     else {
-        onAssetsLoaded();
-    }
-
-    function onAssetsLoaded() {
         callback();
     }
 
     function onAssetsLoadingProgress() {
-        game._renderer.render(loadingStage);
+        game._renderer.render(loadingScreen);
         loadingCount++;
-        text.setText(Math.floor(loadingCount/assets.length*100) + "%");
+        text.text = Math.floor(loadingCount/assets.length*100) + "%";
     }
 };
 
@@ -457,7 +459,7 @@ gdjs.RuntimeGame.prototype.startStandardGameLoop = function() {
     console.profileEnd();
     return;*/
 
-    requestAnimFrame(gameLoop);
+    requestAnimationFrame(gameLoop);
 
     //The standard game loop
     var game = this;
@@ -478,12 +480,12 @@ gdjs.RuntimeGame.prototype.startStandardGameLoop = function() {
                 var nextSceneName = currentScene.getRequestedScene();
                 currentScene = new gdjs.RuntimeScene(game, game._renderer);
                 currentScene.loadFromScene(game.getSceneData(nextSceneName));
-                requestAnimFrame( gameLoop );
+                requestAnimationFrame(gameLoop);
                 game.getInputManager().onFrameEnded();
             }
         }
         else {
-            requestAnimFrame( gameLoop );
+            requestAnimationFrame(gameLoop);
             game.getInputManager().onFrameEnded();
         }
     }

@@ -1,0 +1,450 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - shape_predictor_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2014  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SHAPE_PREDICToR_ABSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_SHAPE_PREDICToR_ABSTRACT_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='full_object_detection_abstract.h.html'>full_object_detection_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='shape_predictor'></a>shape_predictor</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool that takes in an image region containing some object
+                and outputs a set of point locations that define the pose of the object.
+                The classic example of this is human face pose prediction, where you take
+                an image of a human face as input and are expected to identify the
+                locations of important facial landmarks such as the corners of the mouth
+                and eyes, tip of the nose, and so forth.
+
+                To create useful instantiations of this object you need to use the
+                shape_predictor_trainer object defined below to train a shape_predictor
+                using a set of training images, each annotated with shapes you want to
+                predict.
+
+            THREAD SAFETY
+                No synchronization is required when using this object.  In particular, a
+                single instance of this object can be used from multiple threads at the
+                same time.  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='shape_predictor'></a>shape_predictor</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #num_parts() == 0
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_parts'></a>num_parts</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of parts in the shapes predicted by this object.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+        full_object_detection <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+            ensures
+                - Runs the shape prediction algorithm on the part of the image contained in
+                  the given bounding rectangle.  So it will try and fit the shape model to
+                  the contents of the given rectangle in the image.  For example, if there
+                  is a human face inside the rectangle and you use a face landmarking shape
+                  model then this function will return the locations of the face landmarks
+                  as the parts.  So the return value is a full_object_detection DET such
+                  that:
+                    - DET.get_rect() == rect
+                    - DET.num_parts() == num_parts()
+                    - for all valid i:
+                        - DET.part(i) == the location in img for the i-th part of the shape
+                          predicted by this object.
+        !*/</font>
+
+    <b>}</b>;
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> shape_predictor<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>shape_predictor<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='shape_predictor_trainer'></a>shape_predictor_trainer</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for training shape_predictors based on annotated training
+                images.  Its implementation uses the algorithm described in:
+                    One Millisecond Face Alignment with an Ensemble of Regression Trees
+                    by Vahid Kazemi and Josephine Sullivan, CVPR 2014
+
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='shape_predictor_trainer'></a>shape_predictor_trainer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_cascade_depth() == 10
+                - #get_tree_depth() == 4
+                - #get_num_trees_per_cascade_level() == 500
+                - #get_nu() == 0.1
+                - #get_oversampling_amount() == 20
+                - #get_feature_pool_size() == 400
+                - #get_lambda() == 0.1
+                - #get_num_test_splits() == 20
+                - #get_feature_pool_region_padding() == 0
+                - #get_random_seed() == ""
+                - This object will not be verbose
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_cascade_depth'></a>get_cascade_depth</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of cascades created when you train a model.  This
+                  means that the total number of trees in the learned model is equal to
+                  get_cascade_depth()*get_num_trees_per_cascade_level().
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_cascade_depth'></a>set_cascade_depth</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> depth
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - depth &gt; 0
+            ensures
+                - #get_cascade_depth() == depth
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_tree_depth'></a>get_tree_depth</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the depth of the trees used in the cascade.  In particular, there
+                  are pow(2,get_tree_depth()) leaves in each tree.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_tree_depth'></a>set_tree_depth</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> depth
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - depth &gt; 0
+            ensures
+                - #get_tree_depth() == depth
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_trees_per_cascade_level'></a>get_num_trees_per_cascade_level</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of trees created for each cascade.  This means that
+                  the total number of trees in the learned model is equal to
+                  get_cascade_depth()*get_num_trees_per_cascade_level().  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_num_trees_per_cascade_level'></a>set_num_trees_per_cascade_level</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - num &gt; 0
+            ensures
+                - #get_num_trees_per_cascade_level() == num
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_nu'></a>get_nu</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the regularization parameter.  Larger values of this parameter
+                  will cause the algorithm to fit the training data better but may also
+                  cause overfitting.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_nu'></a>set_nu</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> nu
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt; nu &lt;= 1
+            ensures
+                - #get_nu() == nu
+        !*/</font>
+
+        std::string <b><a name='get_random_seed'></a>get_random_seed</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the random seed used by the internal random number generator.
+                  Since this algorithm is a random forest style algorithm it relies on a
+                  random number generator for generating the trees.  So each setting of the
+                  random seed will produce slightly different outputs.  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_random_seed'></a>set_random_seed</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> seed
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_random_seed() == seed
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_oversampling_amount'></a>get_oversampling_amount</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - You give annotated images to this object as training examples.  You
+                  can effectively increase the amount of training data by adding in each
+                  training example multiple times but with a randomly selected deformation
+                  applied to it.  That is what this parameter controls.  That is, if you
+                  supply N training samples to train() then the algorithm runs internally
+                  with N*get_oversampling_amount() training samples.  So the bigger this
+                  parameter the better (excepting that larger values make training take
+                  longer).  In terms of the Kazemi paper, this parameter is the number of
+                  randomly selected initial starting points sampled for each training
+                  example.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_oversampling_amount'></a>set_oversampling_amount</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> amount
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - amount &gt; 0
+            ensures
+                - #get_oversampling_amount() == amount
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_feature_pool_size'></a>get_feature_pool_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - At each level of the cascade we randomly sample get_feature_pool_size()
+                  pixels from the image.  These pixels are used to generate features for
+                  the random trees.  So in general larger settings of this parameter give
+                  better accuracy but make the algorithm run slower.  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_feature_pool_size'></a>set_feature_pool_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - size &gt; 1
+            ensures
+                - #get_feature_pool_size() == size
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_feature_pool_region_padding'></a>get_feature_pool_region_padding</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - When we randomly sample the pixels for the feature pool we do so in a box
+                  fit around the provided training landmarks.  By default, this box is the
+                  tightest box that contains the landmarks (i.e. this is what happens when
+                  get_feature_pool_region_padding()==0).  However, you can expand or shrink
+                  the size of the pixel sampling region by setting a different value of
+                  get_feature_pool_region_padding().  
+
+                  To explain this precisely, for a padding of 0 we say that the pixels are
+                  sampled from a box of size 1x1.  The padding value is added to each side
+                  of the box.  So a padding of 0.5 would cause the algorithm to sample
+                  pixels from a box that was 2x2, effectively multiplying the area pixels
+                  are sampled from by 4.  Similarly, setting the padding to -0.2 would
+                  cause it to sample from a box 0.6x0.6 in size.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_feature_pool_region_padding'></a>set_feature_pool_region_padding</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> padding 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_feature_pool_region_padding() == padding
+        !*/</font>
+
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_lambda'></a>get_lambda</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - To decide how to split nodes in the regression trees the algorithm looks
+                  at pairs of pixels in the image.  These pixel pairs are sampled randomly
+                  but with a preference for selecting pixels that are near each other.
+                  get_lambda() controls this "nearness" preference.  In particular, smaller
+                  values of get_lambda() will make the algorithm prefer to select pixels
+                  close together and larger values of get_lambda() will make it care less
+                  about picking nearby pixel pairs.  
+
+                  Note that this is the inverse of how it is defined in the Kazemi paper.
+                  For this object, you should think of lambda as "the fraction of the
+                  bounding box will we traverse to find a neighboring pixel".  Nominally,
+                  this is normalized between 0 and 1.  So reasonable settings of lambda are
+                  values in the range 0 &lt; lambda &lt; 1.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_lambda'></a>set_lambda</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> lambda
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - lambda &gt; 0
+            ensures
+                - #get_lambda() == lambda
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_test_splits'></a>get_num_test_splits</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - When generating the random trees we randomly sample get_num_test_splits()
+                  possible split features at each node and pick the one that gives the best
+                  split.  Larger values of this parameter will usually give more accurate
+                  outputs but take longer to train.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_num_test_splits'></a>set_num_test_splits</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - num &gt; 0
+            ensures
+                - #get_num_test_splits() == num
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_verbose'></a>be_verbose</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object will print status messages to standard out so that a 
+                  user can observe the progress of the algorithm.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_quiet'></a>be_quiet</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object will not print anything to standard out
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_array<font color='#5555FF'>&gt;</font>
+        shape_predictor <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_array<font color='#5555FF'>&amp;</font> images,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> objects
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - image_array is a dlib::array of image objects where each image object
+                  implements the interface defined in dlib/image_processing/generic_image.h 
+                - images.size() == objects.size()
+                - images.size() &gt; 0
+                - for some i: objects[i].size() != 0
+                  (i.e. there has to be at least one full_object_detection in the training set)
+                - for all valid i,j,k,l:
+                    - objects[i][j].num_parts() == objects[k][l].num_parts()
+                      (i.e. all objects must agree on the number of parts)
+                    - objects[i][j].num_parts() &gt; 0
+            ensures
+                - This object will try to learn to predict the locations of an object's parts 
+                  based on the object bounding box (i.e.  full_object_detection::get_rect()) 
+                  and the image pixels in that box.  That is, we will try to learn a
+                  shape_predictor, SP, such that:
+                    SP(images[i], objects[i][j].get_rect()) == objects[i][j]
+                  This learned SP object is then returned.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_array
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='test_shape_predictor'></a>test_shape_predictor</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> shape_predictor<font color='#5555FF'>&amp;</font> sp,
+        <font color='#0000FF'>const</font> image_array<font color='#5555FF'>&amp;</font> images,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> objects,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> scales
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_array is a dlib::array of image objects where each image object
+              implements the interface defined in dlib/image_processing/generic_image.h 
+            - images.size() == objects.size()
+            - for all valid i and j:
+                - objects[i][j].num_parts() == sp.num_parts()
+            - if (scales.size() != 0) then
+                - There must be a scale value for each full_object_detection in objects.
+                  That is, it must be the case that:
+                    - scales.size() == objects.size()
+                    - for all valid i:
+                        - scales[i].size() == objects[i].size()
+        ensures
+            - Tests the given shape_predictor by running it on each of the given objects and
+              checking how well it recovers the part positions.  In particular, for all 
+              valid i and j we perform:
+                sp(images[i], objects[i][j].get_rect())
+              and compare the result with the truth part positions in objects[i][j].  We
+              then return the average distance (measured in pixels) between a predicted
+              part location and its true position.  
+            - if (scales.size() != 0) then
+                - Each time we compute the distance between a predicted part location and
+                  its true location in objects[i][j] we divide the distance by
+                  scales[i][j].  Therefore, if you want the reported error to be the
+                  average pixel distance then give an empty scales vector, but if you want
+                  the returned value to be something else like the average distance
+                  normalized by some feature of each object (e.g. the interocular distance)
+                  then you can supply those normalizing values via scales.
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_array
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='test_shape_predictor'></a>test_shape_predictor</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> shape_predictor<font color='#5555FF'>&amp;</font> sp,
+        <font color='#0000FF'>const</font> image_array<font color='#5555FF'>&amp;</font> images,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> objects
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_array is a dlib::array of image objects where each image object
+              implements the interface defined in dlib/image_processing/generic_image.h 
+            - images.size() == objects.size()
+            - for all valid i and j:
+                - objects[i][j].num_parts() == sp.num_parts()
+        ensures
+            - returns test_shape_predictor(sp, images, objects, no_scales) where no_scales
+              is an empty vector.  So this is just a convenience function for calling the
+              above test_shape_predictor() routine without a scales argument.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SHAPE_PREDICToR_ABSTRACT_H_
+</font>
+
+</pre></body></html>

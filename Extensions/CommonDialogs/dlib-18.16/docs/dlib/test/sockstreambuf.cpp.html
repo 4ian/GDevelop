@@ -1,0 +1,256 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sockstreambuf.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>sockets.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>misc_api.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>sockstreambuf.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>smart_pointers.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+    dlib::mutex m;
+    dlib::signaler <b><a name='s'></a>s</b><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>bool</u></font> thread_running;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.sockstreambuf</font>"<font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> ssb<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='thread_proc_struct'></a>thread_proc_struct</b>
+    <b>{</b>
+    <font color='#0000FF'>static</font> <font color='#0000FF'><u>void</u></font> <b><a name='thread_proc'></a>thread_proc</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> param
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        
+        listener<font color='#5555FF'>&amp;</font> list <font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>listener<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>param<font face='Lucida Console'>)</font>;
+        connection<font color='#5555FF'>*</font> con;
+        list.<font color='#BB00BB'>accept</font><font face='Lucida Console'>(</font>con<font face='Lucida Console'>)</font>;
+
+        ssb <font color='#BB00BB'>buf</font><font face='Lucida Console'>(</font>con<font face='Lucida Console'>)</font>;
+        ostream <font color='#BB00BB'>out</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>buf<font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'><u>char</u></font> ch;
+        <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> bigbuf <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#0000FF'><u>char</u></font>[<font color='#979000'>1000000</font>];
+
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> '<font color='#FF0000'>a</font>'; i <font color='#5555FF'>&lt;</font> '<font color='#FF0000'>z</font>'; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            ch <font color='#5555FF'>=</font> i;
+            out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> ch <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> </font>";
+        <b>}</b>
+
+        out.<font color='#BB00BB'>put</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>A</font>'<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>256</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            ch <font color='#5555FF'>=</font> i;
+            out.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>ch,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>100</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>25600</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> </font>";
+        <b>}</b>
+
+        out.<font color='#BB00BB'>put</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>A</font>'<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>100</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>25600</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            out.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>i,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>1000000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            bigbuf[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        out.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font>bigbuf,<font color='#979000'>1000000</font><font face='Lucida Console'>)</font>;
+
+        out.<font color='#BB00BB'>put</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>d</font>'<font face='Lucida Console'>)</font>;
+        out.<font color='#BB00BB'>put</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>a</font>'<font face='Lucida Console'>)</font>;
+        out.<font color='#BB00BB'>put</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>v</font>'<font face='Lucida Console'>)</font>;
+        out.<font color='#BB00BB'>put</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>i</font>'<font face='Lucida Console'>)</font>;
+        out.<font color='#BB00BB'>put</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>s</font>'<font face='Lucida Console'>)</font>;
+
+
+        string tstring <font color='#5555FF'>=</font> "<font color='#CC0000'>this is a test</font>";
+        <font color='#0000FF'><u>int</u></font> tint <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>853</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> tuint <font color='#5555FF'>=</font> <font color='#979000'>89</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>tstring,out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>tint,out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>tuint,out<font face='Lucida Console'>)</font>;
+
+
+        out.<font color='#BB00BB'>flush</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        thread_running <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        s.<font color='#BB00BB'>signal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>300</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>delete</font> con;
+        <font color='#0000FF'>delete</font> <font color='#5555FF'>&amp;</font>list;
+
+        <font color='#0000FF'>delete</font> [] bigbuf;
+    <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> ssb<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='sockstreambuf_test'></a>sockstreambuf_test</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - ssb is an implementation of sockstreambuf/sockstreambuf_kernel_abstract.h 
+        ensures
+            - runs tests on ssb for compliance with the specs
+    !*/</font>
+    <b>{</b>        
+        <font color='#0000FF'><u>char</u></font> ch;
+        vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> vbuf;
+        vbuf.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>1000000</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> bigbuf <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>vbuf[<font color='#979000'>0</font>];
+        connection<font color='#5555FF'>*</font> con;
+
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        thread_running <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        listener<font color='#5555FF'>*</font> list;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>create_listener</font><font face='Lucida Console'>(</font>list,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#979000'>false</font>, "<font color='#CC0000'>Unable to create a listener</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#BB00BB'>create_new_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>thread_proc_struct<font color='#5555FF'>&lt;</font>ssb<font color='#5555FF'>&gt;</font>::thread_proc,list<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>create_connection</font><font face='Lucida Console'>(</font>con,list<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_listening_port</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,"<font color='#CC0000'>127.0.0.1</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#979000'>false</font>, "<font color='#CC0000'>Unable to create a connection</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// make sure con gets deleted
+</font>        scoped_ptr<font color='#5555FF'>&lt;</font>connection<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>del_con</font><font face='Lucida Console'>(</font>con<font face='Lucida Console'>)</font>;
+
+        ssb <font color='#BB00BB'>buf</font><font face='Lucida Console'>(</font>con<font face='Lucida Console'>)</font>;
+        istream <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>buf<font face='Lucida Console'>)</font>;
+
+
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> '<font color='#FF0000'>a</font>'; i <font color='#5555FF'>&lt;</font> '<font color='#FF0000'>z</font>'; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            in <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> ch;
+            <font color='#0000FF'><u>char</u></font> c <font color='#5555FF'>=</font> i;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> c,"<font color='#CC0000'>ch: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>ch <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  c: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>c<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>A</font>', "<font color='#CC0000'>*</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>*</font>"<font face='Lucida Console'>)</font>;
+        in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>256</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            in.<font color='#BB00BB'>read</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>ch,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>char</u></font> c <font color='#5555FF'>=</font> i;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> c,"<font color='#CC0000'>ch: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>ch <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  c: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>c <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>100</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>25600</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            in <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> n;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i,"<font color='#CC0000'>n: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   i:</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>A</font>', "<font color='#CC0000'>*</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>*</font>"<font face='Lucida Console'>)</font>;
+        in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>100</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>25600</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> n;
+            in.<font color='#BB00BB'>read</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>n,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i,"<font color='#CC0000'>n: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   i:</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        in.<font color='#BB00BB'>read</font><font face='Lucida Console'>(</font>bigbuf,<font color='#979000'>1000000</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>1000000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>bigbuf[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>d</font>'<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>a</font>'<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>v</font>'<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>i</font>'<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>s</font>'<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>s</font>'<font face='Lucida Console'>)</font>;
+
+        in.<font color='#BB00BB'>putback</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>s</font>'<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>s</font>'<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>s</font>'<font face='Lucida Console'>)</font>;
+
+
+        string tstring;
+        <font color='#0000FF'><u>int</u></font> tint;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> tuint;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>tstring,in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>tint,in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>tuint,in<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>tstring <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>this is a test</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>tint <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>853</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>tuint <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>89</font><font face='Lucida Console'>)</font>;
+
+
+
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>thread_running<font face='Lucida Console'>)</font>
+            s.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+    <font color='#0000FF'>class</font> <b><a name='sockstreambuf_tester'></a>sockstreambuf_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='sockstreambuf_tester'></a>sockstreambuf_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_sockstreambuf</font>",
+                    "<font color='#CC0000'>Runs tests on the sockstreambuf component.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing sockstreambuf</font>";
+            sockstreambuf_test<font color='#5555FF'>&lt;</font>sockstreambuf<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing sockstreambuf_unbuffered</font>";
+            sockstreambuf_test<font color='#5555FF'>&lt;</font>sockstreambuf_unbuffered<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> a;
+
+<b>}</b>
+
+
+
+</pre></body></html>

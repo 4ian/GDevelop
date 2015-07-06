@@ -1,0 +1,163 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - svm_pegasos_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use of the dlib C++ library's
+    implementation of the pegasos algorithm for online training of support 
+    vector machines.   
+
+    This example creates a simple binary classification problem and shows
+    you how to train a support vector machine on that data.
+
+    The data used in this example will be 2 dimensional data and will
+    come from a distribution where points with a distance less than 10
+    from the origin are labeled +1 and all other points are labeled
+    as -1.
+        
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// The svm functions use column vectors to contain a lot of the data on which they 
+</font>    <font color='#009900'>// operate. So the first thing we do here is declare a convenient typedef.  
+</font>
+    <font color='#009900'>// This typedef declares a matrix with 2 rows and 1 column.  It will be the
+</font>    <font color='#009900'>// object that contains each of our 2 dimensional samples.   (Note that if you wanted 
+</font>    <font color='#009900'>// more than 2 features in this vector you can simply change the 2 to something else.
+</font>    <font color='#009900'>// Or if you don't know how many features you want until runtime then you can put a 0
+</font>    <font color='#009900'>// here and use the matrix.set_size() member function)
+</font>    <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, <font color='#979000'>2</font>, <font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample_type;
+
+
+    <font color='#009900'>// This is a typedef for the type of kernel we are going to use in this example.
+</font>    <font color='#009900'>// In this case I have selected the radial basis kernel that can operate on our
+</font>    <font color='#009900'>// 2D sample_type objects
+</font>    <font color='#0000FF'>typedef</font> radial_basis_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> kernel_type;
+
+
+    <font color='#009900'>// Here we create an instance of the pegasos svm trainer object we will be using.
+</font>    svm_pegasos<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> trainer;
+    <font color='#009900'>// Here we setup the parameters to this object.  See the dlib documentation for a 
+</font>    <font color='#009900'>// description of what these parameters are. 
+</font>    trainer.<font color='#BB00BB'>set_lambda</font><font face='Lucida Console'>(</font><font color='#979000'>0.00001</font><font face='Lucida Console'>)</font>;
+    trainer.<font color='#BB00BB'>set_kernel</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_type</font><font face='Lucida Console'>(</font><font color='#979000'>0.005</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Set the maximum number of support vectors we want the trainer object to use
+</font>    <font color='#009900'>// in representing the decision function it is going to learn.  In general, 
+</font>    <font color='#009900'>// supplying a bigger number here will only ever give you a more accurate
+</font>    <font color='#009900'>// answer.  However, giving a smaller number will make the algorithm run
+</font>    <font color='#009900'>// faster and decision rules that involve fewer support vectors also take
+</font>    <font color='#009900'>// less time to evaluate.  
+</font>    trainer.<font color='#BB00BB'>set_max_num_sv</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samples;
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> labels;
+
+    <font color='#009900'>// make an instance of a sample matrix so we can use it below
+</font>    sample_type sample, center;
+
+    center <font color='#5555FF'>=</font> <font color='#979000'>20</font>, <font color='#979000'>20</font>;
+
+    <font color='#009900'>// Now let's go into a loop and randomly generate 1000 samples.
+</font>    <font color='#BB00BB'>srand</font><font face='Lucida Console'>(</font><font color='#BB00BB'>time</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// Make a random sample vector. 
+</font>        sample <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>40</font> <font color='#5555FF'>-</font> center;
+
+        <font color='#009900'>// Now if that random vector is less than 10 units from the origin then it is in 
+</font>        <font color='#009900'>// the +1 class.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// let the svm_pegasos learn about this sample
+</font>            trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>sample,<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// save this sample so we can use it with the batch training examples below
+</font>            samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font>;
+            labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// let the svm_pegasos learn about this sample
+</font>            trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>sample,<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// save this sample so we can use it with the batch training examples below
+</font>            samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font>;
+            labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#009900'>// Now we have trained our SVM.  Let's see how well it did.  
+</font>    <font color='#009900'>// Each of these statements prints out the output of the SVM given a particular sample.  
+</font>    <font color='#009900'>// The SVM outputs a number &gt; 0 if a sample is predicted to be in the +1 class and &lt; 0 
+</font>    <font color='#009900'>// if a sample is predicted to be in the -1 class.
+</font>
+    <font color='#BB00BB'>sample</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>3.123</font>;
+    <font color='#BB00BB'>sample</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>This is a +1 example, its SVM output is: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trainer</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#BB00BB'>sample</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>13.123</font>;
+    <font color='#BB00BB'>sample</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>9.3545</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>This is a -1 example, its SVM output is: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trainer</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#BB00BB'>sample</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>13.123</font>;
+    <font color='#BB00BB'>sample</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>This is a -1 example, its SVM output is: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trainer</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+
+
+
+    <font color='#009900'>// The previous part of this example program showed you how to perform online training
+</font>    <font color='#009900'>// with the pegasos algorithm.  But it is often the case that you have a dataset and you 
+</font>    <font color='#009900'>// just want to perform batch learning on that dataset and get the resulting decision
+</font>    <font color='#009900'>// function.  To support this the dlib library provides functions for converting an online
+</font>    <font color='#009900'>// training object like svm_pegasos into a batch training object.  
+</font>
+    <font color='#009900'>// First let's clear out anything in the trainer object.
+</font>    trainer.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Now to begin with, you might want to compute the cross validation score of a trainer object
+</font>    <font color='#009900'>// on your data.  To do this you should use the batch_cached() function to convert the svm_pegasos object
+</font>    <font color='#009900'>// into a batch training object.  Note that the second argument to batch_cached() is the minimum 
+</font>    <font color='#009900'>// learning rate the trainer object must report for the batch_cached() function to consider training
+</font>    <font color='#009900'>// complete.  So smaller values of this parameter cause training to take longer but may result
+</font>    <font color='#009900'>// in a more accurate solution. 
+</font>    <font color='#009900'>// Here we perform 4-fold cross validation and print the results
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>cross validation: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>cross_validate_trainer</font><font face='Lucida Console'>(</font><font color='#BB00BB'>batch_cached</font><font face='Lucida Console'>(</font>trainer,<font color='#979000'>0.1</font><font face='Lucida Console'>)</font>, samples, labels, <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Here is an example of creating a decision function.  Note that we have used the verbose_batch_cached()
+</font>    <font color='#009900'>// function instead of batch_cached() as above.  They do the same things except verbose_batch_cached() will
+</font>    <font color='#009900'>// print status messages to standard output while training is under way.
+</font>    decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> df <font color='#5555FF'>=</font> <font color='#BB00BB'>verbose_batch_cached</font><font face='Lucida Console'>(</font>trainer,<font color='#979000'>0.1</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// At this point we have obtained a decision function from the above batch mode training.
+</font>    <font color='#009900'>// Now we can use it on some test samples exactly as we did above.
+</font>
+    <font color='#BB00BB'>sample</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>3.123</font>;
+    <font color='#BB00BB'>sample</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>This is a +1 example, its SVM output is: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#BB00BB'>sample</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>13.123</font>;
+    <font color='#BB00BB'>sample</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>9.3545</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>This is a -1 example, its SVM output is: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#BB00BB'>sample</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>13.123</font>;
+    <font color='#BB00BB'>sample</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>This is a -1 example, its SVM output is: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+<b>}</b>
+
+
+</pre></body></html>

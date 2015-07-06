@@ -1,0 +1,50 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - iosockstream_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use of the iosockstream object from the
+    dlib C++ Library.
+
+    This program simply connects to www.google.com at port 80 and requests the
+    main Google web page.  It then prints what it gets back from Google to the
+    screen.
+
+
+    For those of you curious about HTTP check out the excellent introduction at
+    http://www.jmarshall.com/easy/http/
+*/</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>iosockstream.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// Connect to Google's web server which listens on port 80.  If this
+</font>        <font color='#009900'>// fails it will throw a dlib::socket_error exception.  
+</font>        iosockstream <font color='#BB00BB'>stream</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>www.google.com:80</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// At this point, we can use stream the same way we would use any other
+</font>        <font color='#009900'>// C++ iostream object.  So to test it out, let's make a HTTP GET request
+</font>        <font color='#009900'>// for the main Google page.
+</font>        stream <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>GET / HTTP/1.0\r\n\r\n</font>";
+
+        <font color='#009900'>// Here we print each character we get back one at a time. 
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>stream.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font>stream.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+
+
+</pre></body></html>

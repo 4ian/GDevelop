@@ -1,0 +1,991 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bayes_net_gui_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+    This is a rather involved example illustrating the use of the GUI api from 
+    the dlib C++ Library.   This program is a fully functional utility for
+    creating Bayesian Networks.  It allows the user to graphically draw the network,
+    save/load the network to/from disk, and also to calculate the posterior 
+    probability of any node in the network given a set of evidence.
+
+    This is not the first dlib example program you should be looking at.  If you
+    want to see a simpler GUI example please look at the <a href="gui_api_ex.cpp.html">gui_api_ex.cpp</a> or
+    <a href="image_ex.cpp.html">image_ex.cpp</a> example.  
+
+    If you want to understand how to use the Bayesian Network utilities in the library
+    you should definitely look at the <a href="bayes_net_ex.cpp.html">bayes_net_ex.cpp</a> example program.  It gives a
+    comprehensive introduction to creating and manipulating Bayesian Networks.  If you
+    want to see how to load a saved network from disk and use it in a non-GUI application
+    then look at the <a href="bayes_net_from_disk_ex.cpp.html">bayes_net_from_disk_ex.cpp</a> example.
+
+
+    Now all of that being said, if you have already looked at the other relevant 
+    examples and want to see a more in-depth example then by all means, continue reading. :)
+*/</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>gui_widgets.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>directed_graph.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>string.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>bayes_utils.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>smart_pointers.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>set.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>graph_utils.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>stl_checked.h<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib::bayes_node_utils;
+
+<font color='#009900'>//  ----------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>typedef</font> directed_graph<font color='#5555FF'>&lt;</font>bayes_node<font color='#5555FF'>&gt;</font>::kernel_1a_c directed_graph_type;
+<font color='#0000FF'>typedef</font> directed_graph<font color='#5555FF'>&lt;</font>bayes_node<font color='#5555FF'>&gt;</font>::kernel_1a_c::node_type node_type;
+<font color='#0000FF'>typedef</font> graph<font color='#5555FF'>&lt;</font>dlib::set<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::compare_1b_c, dlib::set<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::compare_1b_c<font color='#5555FF'>&gt;</font>::kernel_1a_c join_tree_type;
+
+<font color='#009900'>//  ----------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>class</font> <b><a name='main_window'></a>main_window</b> : <font color='#0000FF'>public</font> drawable_window 
+<b>{</b>
+    <font color='#009900'>/*!
+        INITIAL VALUE
+            This window starts out hidden and with an empty Bayesian Network
+
+        WHAT THIS OBJECT REPRESENTS
+            This object is the main window of a utility for drawing Bayesian Networks.
+            It allows you to draw a directed graph and to set the conditional probability 
+            tables up for each node in the network.  It also allows you to compute the 
+            posterior probability of each node.  And finally, it lets you save and load
+            networks from file
+    !*/</font>
+<font color='#0000FF'>public</font>:
+    <b><a name='main_window'></a>main_window</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    ~<b><a name='main_window'></a>main_window</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>private</font>:
+
+    <font color='#009900'>// Private helper methods
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='initialize_node_cpt_if_necessary'></a>initialize_node_cpt_if_necessary</b> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index <font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='load_selected_node_tables_into_cpt_grid'></a>load_selected_node_tables_into_cpt_grid</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='load_selected_node_tables_into_ppt_grid'></a>load_selected_node_tables_into_ppt_grid</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='no_node_selected'></a>no_node_selected</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// Event handlers 
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_cpt_grid_modified'></a>on_cpt_grid_modified</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> row, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> col<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_evidence_toggled'></a>on_evidence_toggled</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_graph_modified'></a>on_graph_modified</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_menu_file_open'></a>on_menu_file_open</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_menu_file_quit'></a>on_menu_file_quit</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_menu_file_save'></a>on_menu_file_save</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_menu_file_save_as'></a>on_menu_file_save_as</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_menu_help_about'></a>on_menu_help_about</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_menu_help_help'></a>on_menu_help_help</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_node_deleted'></a>on_node_deleted</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_node_deselected'></a>on_node_deselected</b> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n <font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_node_selected'></a>on_node_selected</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_open_file_selected'></a>on_open_file_selected</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_save_file_selected'></a>on_save_file_selected</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_sel_node_evidence_modified'></a>on_sel_node_evidence_modified</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_sel_node_num_values_modified'></a>on_sel_node_num_values_modified</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_sel_node_text_modified'></a>on_sel_node_text_modified</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_window_resized'></a>on_window_resized</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>void</u></font> <b><a name='recalculate_probabilities'></a>recalculate_probabilities</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Member data
+</font>
+    <font color='#0000FF'>const</font> rgb_pixel color_non_evidence;
+    <font color='#0000FF'>const</font> rgb_pixel color_default_bg;
+    <font color='#0000FF'>const</font> rgb_pixel color_evidence;
+    <font color='#0000FF'>const</font> rgb_pixel color_error;
+    <font color='#0000FF'>const</font> rgb_pixel color_gray;
+    <font color='#0000FF'><u>bool</u></font> graph_modified_since_last_recalc;
+
+    button btn_calculate;
+    check_box sel_node_is_evidence;
+    directed_graph_drawer<font color='#5555FF'>&lt;</font>directed_graph_type<font color='#5555FF'>&gt;</font> graph_drawer;
+    label sel_node_index;
+    label sel_node_num_values_label; 
+    label sel_node_text_label;
+    label sel_node_evidence_label;
+    menu_bar mbar;
+    named_rectangle selected_node_rect;
+    tabbed_display tables;
+    text_field sel_node_num_values;
+    text_field sel_node_text;
+    text_field sel_node_evidence;
+    text_grid cpt_grid;
+    text_grid ppt_grid;
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> selected_node_index;
+    <font color='#0000FF'><u>bool</u></font> node_is_selected;
+    widget_group cpt_group;
+    widget_group ppt_group;
+
+    scoped_ptr<font color='#5555FF'>&lt;</font>bayesian_network_join_tree<font color='#5555FF'>&gt;</font> solution;
+    join_tree_type join_tree;
+    <font color='#009900'>// The std_vector_c is an object identical to the std::vector except that it checks
+</font>    <font color='#009900'>// all its preconditions and throws a dlib::fatal_error if they are violated.
+</font>    std_vector_c<font color='#5555FF'>&lt;</font>assignment<font color='#5555FF'>&gt;</font> cpt_grid_assignments;
+    std::string graph_file_name;
+<b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// create our window
+</font>    main_window my_window;
+
+    <font color='#009900'>// tell our window to put itself on the screen
+</font>    my_window.<font color='#BB00BB'>show</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// wait until the user closes this window before we let the program 
+</font>    <font color='#009900'>// terminate.
+</font>    my_window.<font color='#BB00BB'>wait_until_closed</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#ifdef</font> WIN32
+<font color='#009900'>//  If you use main() as your entry point when building a program on MS Windows then
+</font><font color='#009900'>//  there will be a black console window associated with your application.  If you
+</font><font color='#009900'>//  want your application to not have this console window then you need to build
+</font><font color='#009900'>//  using the WinMain() entry point as shown below and also set your compiler to 
+</font><font color='#009900'>//  produce a "Windows" project instead of a "Console" project.  In visual studio
+</font><font color='#009900'>//  this can be accomplished by going to project-&gt;properties-&gt;general configuration-&gt;
+</font><font color='#009900'>//  Linker-&gt;System-&gt;SubSystem and selecting Windows instead of Console.  
+</font><font color='#009900'>// 
+</font><font color='#0000FF'><u>int</u></font> WINAPI <b><a name='WinMain'></a>WinMain</b> <font face='Lucida Console'>(</font>HINSTANCE, HINSTANCE, PSTR cmds, <font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#BB00BB'>main</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+<b>}</b>
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//               Methods from the main_window object
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+main_window::
+<b><a name='main_window'></a>main_window</b><font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font> : 
+    color_non_evidence<font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+    color_default_bg<font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>255</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font>,
+    color_evidence<font face='Lucida Console'>(</font><font color='#979000'>100</font>,<font color='#979000'>200</font>,<font color='#979000'>100</font><font face='Lucida Console'>)</font>,
+    color_error<font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+    color_gray<font face='Lucida Console'>(</font><font color='#979000'>210</font>,<font color='#979000'>210</font>,<font color='#979000'>210</font><font face='Lucida Console'>)</font>,
+    graph_modified_since_last_recalc<font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>,
+    btn_calculate<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+    sel_node_is_evidence<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+    graph_drawer<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+    sel_node_index<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+    sel_node_num_values_label <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+    sel_node_text_label<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+    sel_node_evidence_label<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+    mbar<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+    selected_node_rect<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+    tables<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+    sel_node_num_values<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+    sel_node_text<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+    sel_node_evidence<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+    cpt_grid<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+    ppt_grid<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+    selected_node_index<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+    node_is_selected<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+    cpt_group<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+    ppt_group<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// Note that all the GUI widgets take a reference to the window that contains them
+</font>    <font color='#009900'>// as their constructor argument.  This is a universal feature of GUI widgets in the
+</font>    <font color='#009900'>// dlib library.
+</font>
+    <font color='#BB00BB'>set_title</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Bayesian Network Utility</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// position the widget that is responsible for drawing the directed graph, the graph_drawer, 
+</font>    <font color='#009900'>// just below the mbar (menu bar) widget.
+</font>    graph_drawer.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>5</font>,mbar.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>750</font>,<font color='#979000'>400</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// register the event handlers with their respective widgets
+</font>    btn_calculate.<font color='#BB00BB'>set_click_handler</font>              <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>main_window::recalculate_probabilities<font face='Lucida Console'>)</font>;
+    cpt_grid.<font color='#BB00BB'>set_text_modified_handler</font>           <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>main_window::on_cpt_grid_modified<font face='Lucida Console'>)</font>;
+    graph_drawer.<font color='#BB00BB'>set_graph_modified_handler</font>      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>main_window::on_graph_modified<font face='Lucida Console'>)</font>;
+    graph_drawer.<font color='#BB00BB'>set_node_deleted_handler</font>        <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>main_window::on_node_deleted<font face='Lucida Console'>)</font>;
+    graph_drawer.<font color='#BB00BB'>set_node_deselected_handler</font>     <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>main_window::on_node_deselected<font face='Lucida Console'>)</font>;
+    graph_drawer.<font color='#BB00BB'>set_node_selected_handler</font>       <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>main_window::on_node_selected<font face='Lucida Console'>)</font>;
+    sel_node_evidence.<font color='#BB00BB'>set_text_modified_handler</font>  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>main_window::on_sel_node_evidence_modified<font face='Lucida Console'>)</font>;
+    sel_node_is_evidence.<font color='#BB00BB'>set_click_handler</font>       <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>main_window::on_evidence_toggled<font face='Lucida Console'>)</font>;
+    sel_node_num_values.<font color='#BB00BB'>set_text_modified_handler</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>main_window::on_sel_node_num_values_modified<font face='Lucida Console'>)</font>;
+    sel_node_text.<font color='#BB00BB'>set_text_modified_handler</font>      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>main_window::on_sel_node_text_modified<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// now set the text of some of our buttons and labels
+</font>    btn_calculate.<font color='#BB00BB'>set_name</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Recalculate posterior probability table</font>"<font face='Lucida Console'>)</font>;
+    selected_node_rect.<font color='#BB00BB'>set_name</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Selected node</font>"<font face='Lucida Console'>)</font>;
+    sel_node_evidence_label.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>evidence value:</font>"<font face='Lucida Console'>)</font>;
+    sel_node_is_evidence.<font color='#BB00BB'>set_name</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>is evidence</font>"<font face='Lucida Console'>)</font>;
+    sel_node_num_values_label.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Number of values: </font>"<font face='Lucida Console'>)</font>;
+    sel_node_text_label.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Node label:</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Now setup the tabbed display.  It will have two tabs, one for the conditional
+</font>    <font color='#009900'>// probability table and one for the posterior probability table.
+</font>    tables.<font color='#BB00BB'>set_number_of_tabs</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    tables.<font color='#BB00BB'>set_tab_name</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,"<font color='#CC0000'>Conditional probability table</font>"<font face='Lucida Console'>)</font>;
+    tables.<font color='#BB00BB'>set_tab_name</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,"<font color='#CC0000'>Posterior probability table</font>"<font face='Lucida Console'>)</font>;
+    cpt_group.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>cpt_grid,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    ppt_group.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>ppt_grid,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    tables.<font color='#BB00BB'>set_tab_group</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,cpt_group<font face='Lucida Console'>)</font>;
+    tables.<font color='#BB00BB'>set_tab_group</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,ppt_group<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Now setup the menu bar.  We will have two menus.  A File and Help menu.
+</font>    mbar.<font color='#BB00BB'>set_number_of_menus</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    mbar.<font color='#BB00BB'>set_menu_name</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,"<font color='#CC0000'>File</font>",'<font color='#FF0000'>F</font>'<font face='Lucida Console'>)</font>;
+    mbar.<font color='#BB00BB'>set_menu_name</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,"<font color='#CC0000'>Help</font>",'<font color='#FF0000'>H</font>'<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// add the entries to the File menu.
+</font>    mbar.<font color='#BB00BB'>menu</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Open</font>",   <font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>main_window::on_menu_file_open,    '<font color='#FF0000'>O</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    mbar.<font color='#BB00BB'>menu</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_separator</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    mbar.<font color='#BB00BB'>menu</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Save</font>",   <font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>main_window::on_menu_file_save,    '<font color='#FF0000'>S</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    mbar.<font color='#BB00BB'>menu</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Save As</font>",<font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>main_window::on_menu_file_save_as, '<font color='#FF0000'>a</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    mbar.<font color='#BB00BB'>menu</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_separator</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    mbar.<font color='#BB00BB'>menu</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Quit</font>",   <font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>main_window::on_menu_file_quit,    '<font color='#FF0000'>Q</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Add the entries to the Help menu.
+</font>    mbar.<font color='#BB00BB'>menu</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Help</font>",   <font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>main_window::on_menu_help_help,    '<font color='#FF0000'>e</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    mbar.<font color='#BB00BB'>menu</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>About</font>",  <font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>main_window::on_menu_help_about,   '<font color='#FF0000'>A</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// call our helper functions and window resize event to get the widgets
+</font>    <font color='#009900'>// to all arrange themselves correctly in our window.
+</font>    <font color='#BB00BB'>no_node_selected</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>on_window_resized</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<b>}</b> 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+main_window::
+~<b><a name='main_window'></a>main_window</b><font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// You should always call close_window() in the destructor of window
+</font>    <font color='#009900'>// objects to ensure that no events will be sent to this window while 
+</font>    <font color='#009900'>// it is being destructed.  
+</font>    <font color='#BB00BB'>close_window</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//               Private methods from the main_window object
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='load_selected_node_tables_into_ppt_grid'></a>load_selected_node_tables_into_ppt_grid</b> <font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// This function just takes the currently selected graph node and loads
+</font>    <font color='#009900'>// its posterior probabilities into the ppt_graph widget.
+</font>    node_type<font color='#5555FF'>&amp;</font> node <font color='#5555FF'>=</font> graph_drawer.<font color='#BB00BB'>graph_node</font><font face='Lucida Console'>(</font>selected_node_index<font face='Lucida Console'>)</font>;
+    ppt_grid.<font color='#BB00BB'>set_grid_size</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// load the top row of the table into the grid.  This row is the "title bar" row
+</font>    <font color='#009900'>// that tells you what each column contains.
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> col <font color='#5555FF'>=</font> <font color='#979000'>0</font>; col <font color='#5555FF'>&lt;</font> node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>col<font face='Lucida Console'>)</font>
+    <b>{</b>
+        ppt_grid.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,col,"<font color='#CC0000'>P(node=</font>" <font color='#5555FF'>+</font> <font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>col<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> "<font color='#CC0000'>)</font>"<font face='Lucida Console'>)</font>;
+        ppt_grid.<font color='#BB00BB'>set_background_color</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,col,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>150</font>,<font color='#979000'>150</font>,<font color='#979000'>250</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        ppt_grid.<font color='#BB00BB'>set_editable</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,col,<font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>// If we have a solution to the network on hand then load the probabilities
+</font>    <font color='#009900'>// from that into the table
+</font>    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>solution<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// get the probability distribution for the currently selected node out
+</font>        <font color='#009900'>// of the solution.
+</font>        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> prob <font color='#5555FF'>=</font> solution<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>selected_node_index<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now load the probabilities into the ppt_grid so the user can see them.
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> col <font color='#5555FF'>=</font> <font color='#979000'>0</font>; col <font color='#5555FF'>&lt;</font> node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>col<font face='Lucida Console'>)</font>
+        <b>{</b>
+            ppt_grid.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,col,<font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font><font color='#BB00BB'>prob</font><font face='Lucida Console'>(</font>col<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#009900'>// make the second row of the table non-editable have a color that indicates
+</font>    <font color='#009900'>// that to the user
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> col <font color='#5555FF'>=</font> <font color='#979000'>0</font>; col <font color='#5555FF'>&lt;</font> node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>col<font face='Lucida Console'>)</font>
+    <b>{</b>
+        ppt_grid.<font color='#BB00BB'>set_background_color</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,col,color_gray<font face='Lucida Console'>)</font>;
+        ppt_grid.<font color='#BB00BB'>set_editable</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,col,<font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='load_selected_node_tables_into_cpt_grid'></a>load_selected_node_tables_into_cpt_grid</b> <font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// This function just takes the conditional probability table in the 
+</font>    <font color='#009900'>// currently selected graph node and puts it into the cpt_grid widget.
+</font>    
+    node_type<font color='#5555FF'>&amp;</font> node <font color='#5555FF'>=</font> graph_drawer.<font color='#BB00BB'>graph_node</font><font face='Lucida Console'>(</font>selected_node_index<font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>initialize_node_cpt_if_necessary</font><font face='Lucida Console'>(</font>selected_node_index<font face='Lucida Console'>)</font>;
+    cpt_grid_assignments.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// figure out how many rows there should be in the cpt
+</font>    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> cpt_rows <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> node.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cpt_rows <font color='#5555FF'>*</font><font color='#5555FF'>=</font> node.<font color='#BB00BB'>parent</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> cpt_cols <font color='#5555FF'>=</font> node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    cpt_grid.<font color='#BB00BB'>set_grid_size</font><font face='Lucida Console'>(</font>cpt_rows<font color='#5555FF'>+</font><font color='#979000'>1</font>, cpt_cols<font color='#5555FF'>+</font> node.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_cols <font color='#5555FF'>=</font> cpt_grid.<font color='#BB00BB'>number_of_columns</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// fill in the top row of the grid that shows which parent node the left hand columns go with
+</font>    assignment <font color='#BB00BB'>a</font><font face='Lucida Console'>(</font><font color='#BB00BB'>node_first_parent_assignment</font><font face='Lucida Console'>(</font>graph_drawer.<font color='#BB00BB'>graph</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,selected_node_index<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> col <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    a.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        cpt_grid.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,col,<font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> "<font color='#CC0000'>: </font>" <font color='#5555FF'>+</font> graph_drawer.<font color='#BB00BB'>node_label</font><font face='Lucida Console'>(</font>a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+        cpt_grid.<font color='#BB00BB'>set_background_color</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,col,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>120</font>,<font color='#979000'>210</font>,<font color='#979000'>210</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        cpt_grid.<font color='#BB00BB'>set_editable</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,col,<font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>col;
+    <b>}</b>
+
+    <font color='#009900'>// fill in the top row of the grid that shows which probability the right hand columns go with
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>col <font color='#5555FF'>=</font> node.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; col <font color='#5555FF'>&lt;</font> num_cols; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>col<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cpt_grid.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,col,"<font color='#CC0000'>P(node=</font>" <font color='#5555FF'>+</font> <font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>col<font color='#5555FF'>-</font>node.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> "<font color='#CC0000'>)</font>"<font face='Lucida Console'>)</font>;
+        cpt_grid.<font color='#BB00BB'>set_background_color</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,col,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>150</font>,<font color='#979000'>150</font>,<font color='#979000'>250</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        cpt_grid.<font color='#BB00BB'>set_editable</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,col,<font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>// now loop over all the possible parent assignments for this node
+</font>    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_values <font color='#5555FF'>=</font> node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> row <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <font color='#0000FF'>do</font>
+    <b>{</b>
+        col <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#009900'>// fill in the left side of the grid row that shows what the parent assignment is
+</font>        a.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cpt_grid.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>row,col,<font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            cpt_grid.<font color='#BB00BB'>set_background_color</font><font face='Lucida Console'>(</font>row,col,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>180</font>,<font color='#979000'>255</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            cpt_grid.<font color='#BB00BB'>set_editable</font><font face='Lucida Console'>(</font>row,col,<font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>col;
+        <b>}</b>
+
+        <font color='#009900'>// fill in the right side of the grid row that shows what the conditional probabilities are
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>0</font>; value <font color='#5555FF'>&lt;</font> num_values; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>value<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> prob <font color='#5555FF'>=</font> node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>value,a<font face='Lucida Console'>)</font>;
+            cpt_grid.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>row,col,<font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>prob<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>col;
+        <b>}</b>
+
+        <font color='#009900'>// save this assignment so we can use it later to modify the node's
+</font>        <font color='#009900'>// conditional probability table if the user modifies the cpt_grid
+</font>        cpt_grid_assignments.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>row;
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>node_next_parent_assignment</font><font face='Lucida Console'>(</font>graph_drawer.<font color='#BB00BB'>graph</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,selected_node_index,a<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='initialize_node_cpt_if_necessary'></a>initialize_node_cpt_if_necessary</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index 
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    node_type<font color='#5555FF'>&amp;</font> node <font color='#5555FF'>=</font> graph_drawer.<font color='#BB00BB'>graph_node</font><font face='Lucida Console'>(</font>index<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// if the cpt for this node isn't properly filled out then let's clear it out
+</font>    <font color='#009900'>// and populate it with some reasonable default values
+</font>    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>node_cpt_filled_out</font><font face='Lucida Console'>(</font>graph_drawer.<font color='#BB00BB'>graph</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, index<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>empty_table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_values <font color='#5555FF'>=</font> node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// loop over all the possible parent assignments for this node and fill them out 
+</font>        <font color='#009900'>// with reasonable default values
+</font>        assignment <font color='#BB00BB'>a</font><font face='Lucida Console'>(</font><font color='#BB00BB'>node_first_parent_assignment</font><font face='Lucida Console'>(</font>graph_drawer.<font color='#BB00BB'>graph</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, index<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>do</font>
+        <b>{</b>
+            <font color='#009900'>// set the first value to have probability 1
+</font>            node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>set_probability</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, a, <font color='#979000'>1.0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// set all the other values to have probability 0
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>1</font>; value <font color='#5555FF'>&lt;</font> num_values; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>value<font face='Lucida Console'>)</font>
+                node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>set_probability</font><font face='Lucida Console'>(</font>value, a, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>node_next_parent_assignment</font><font face='Lucida Console'>(</font>graph_drawer.<font color='#BB00BB'>graph</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, index,a<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='no_node_selected'></a>no_node_selected</b> <font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// Make it so that no node is selected on the gui.  Do this by disabling things
+</font>    <font color='#009900'>// and clearing out text fields and so forth.
+</font>
+
+    node_is_selected <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+    tables.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sel_node_evidence.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sel_node_is_evidence.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sel_node_index.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sel_node_evidence_label.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sel_node_text_label.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sel_node_text.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sel_node_index.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>index:</font>"<font face='Lucida Console'>)</font>;
+    sel_node_num_values_label.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sel_node_num_values.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    cpt_grid.<font color='#BB00BB'>set_grid_size</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    ppt_grid.<font color='#BB00BB'>set_grid_size</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+    sel_node_is_evidence.<font color='#BB00BB'>set_unchecked</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sel_node_text.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+    sel_node_num_values.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+    sel_node_evidence.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+    sel_node_num_values.<font color='#BB00BB'>set_background_color</font><font face='Lucida Console'>(</font>color_default_bg<font face='Lucida Console'>)</font>;
+    sel_node_evidence.<font color='#BB00BB'>set_background_color</font><font face='Lucida Console'>(</font>color_default_bg<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='recalculate_probabilities'></a>recalculate_probabilities</b> <font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// clear out the current solution 
+</font>    solution.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>graph_is_connected</font><font face='Lucida Console'>(</font>graph_drawer.<font color='#BB00BB'>graph</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>message_box</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error</font>","<font color='#CC0000'>Your graph has nodes that are completely disconnected from the other nodes.\n</font>" 
+                    "<font color='#CC0000'>You must connect them somehow</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>graph_drawer.<font color='#BB00BB'>graph</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>graph_modified_since_last_recalc<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure all the cpts are filled out
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_nodes <font color='#5555FF'>=</font> graph_drawer.<font color='#BB00BB'>graph</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num_nodes; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>initialize_node_cpt_if_necessary</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>// remake the join tree for this graph
+</font>            <font color='#BB00BB'>create_moral_graph</font><font face='Lucida Console'>(</font>graph_drawer.<font color='#BB00BB'>graph</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, join_tree<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>create_join_tree</font><font face='Lucida Console'>(</font>join_tree, join_tree<font face='Lucida Console'>)</font>;
+            graph_modified_since_last_recalc <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#009900'>// create a solution to this bayesian network using the join tree algorithm
+</font>        solution.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> <font color='#BB00BB'>bayesian_network_join_tree</font><font face='Lucida Console'>(</font>graph_drawer.<font color='#BB00BB'>graph</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, join_tree<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>node_is_selected<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>load_selected_node_tables_into_ppt_grid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//               Event handling methods from the main_window object
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This event is called when the user selects a file with a saved 
+</font><font color='#009900'>// bayesian network in it.
+</font><font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='on_open_file_selected'></a>on_open_file_selected</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#BB00BB'>no_node_selected</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        ifstream <font color='#BB00BB'>fin</font><font face='Lucida Console'>(</font>file_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, ios::binary<font face='Lucida Console'>)</font>;
+        graph_drawer.<font color='#BB00BB'>load_graph</font><font face='Lucida Console'>(</font>fin<font face='Lucida Console'>)</font>;
+        graph_file_name <font color='#5555FF'>=</font> file_name;
+        <font color='#BB00BB'>set_title</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Bayesian Network Utility - </font>" <font color='#5555FF'>+</font> <font color='#BB00BB'>right_substr</font><font face='Lucida Console'>(</font>file_name,"<font color='#CC0000'>\\/</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>message_box</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error</font>", "<font color='#CC0000'>Unable to load graph file </font>" <font color='#5555FF'>+</font> file_name<font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This event is called when the user selects from the menu bar File-&gt;Open
+</font><font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='on_menu_file_open'></a>on_menu_file_open</b> <font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// display a file chooser window and when the user choses a file
+</font>    <font color='#009900'>// call the on_open_file_selected() function
+</font>    <font color='#BB00BB'>open_existing_file_box</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>main_window::on_open_file_selected<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This event is called when the user selects from the menu bar File-&gt;Save
+</font><font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='on_menu_file_save'></a>on_menu_file_save</b> <font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// if we don't currently have any file name associated with our graph
+</font>    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>graph_file_name.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// display a file chooser window and when the user choses a file
+</font>        <font color='#009900'>// call the on_save_file_selected() function
+</font>        <font color='#BB00BB'>save_file_box</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>main_window::on_save_file_selected<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>else</font>
+    <b>{</b>
+        <font color='#009900'>// we know what file to open so just do that and save the graph to it
+</font>        ofstream <font color='#BB00BB'>fout</font><font face='Lucida Console'>(</font>graph_file_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, ios::binary<font face='Lucida Console'>)</font>;
+        graph_drawer.<font color='#BB00BB'>save_graph</font><font face='Lucida Console'>(</font>fout<font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This event is called when the user choses which file to save the graph to
+</font><font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='on_save_file_selected'></a>on_save_file_selected</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    ofstream <font color='#BB00BB'>fout</font><font face='Lucida Console'>(</font>file_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, ios::binary<font face='Lucida Console'>)</font>;
+    graph_drawer.<font color='#BB00BB'>save_graph</font><font face='Lucida Console'>(</font>fout<font face='Lucida Console'>)</font>;
+    graph_file_name <font color='#5555FF'>=</font> file_name;
+    <font color='#BB00BB'>set_title</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Bayesian Network Utility - </font>" <font color='#5555FF'>+</font> <font color='#BB00BB'>right_substr</font><font face='Lucida Console'>(</font>file_name,"<font color='#CC0000'>\\/</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This event is called when the user selects from the menu bar File-&gt;Save As
+</font><font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='on_menu_file_save_as'></a>on_menu_file_save_as</b> <font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// display a file chooser window and when the user choses a file
+</font>    <font color='#009900'>// call the on_save_file_selected() function
+</font>    <font color='#BB00BB'>save_file_box</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>main_window::on_save_file_selected<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This event is called when the user selects from the menu bar File-&gt;Quit
+</font><font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='on_menu_file_quit'></a>on_menu_file_quit</b> <font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#BB00BB'>close_window</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This event is called when the user selects from the menu bar Help-&gt;Help
+</font><font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='on_menu_help_help'></a>on_menu_help_help</b> <font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#BB00BB'>message_box</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Help</font>", 
+                "<font color='#CC0000'>To create new nodes right click on the drawing area.\n</font>"
+                "<font color='#CC0000'>To create edges select the parent node and then shift+left click on the child node.\n</font>"
+                "<font color='#CC0000'>To remove nodes or edges select them by left clicking and then press the delete key.</font>"<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This event is called when the user selects from the menu bar Help-&gt;About
+</font><font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='on_menu_help_about'></a>on_menu_help_about</b> <font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#BB00BB'>message_box</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>About</font>","<font color='#CC0000'>This application is the GUI front end to the dlib C++ Library's\n</font>"
+                "<font color='#CC0000'>Bayesian Network inference utilities\n\n</font>"
+                "<font color='#CC0000'>Version 1.2\n\n</font>"
+                "<font color='#CC0000'>See http://dlib.net for updates</font>"<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This event is called when the user modifies the graph_drawer widget.  That is,
+</font><font color='#009900'>// when the user adds or removes an edge or node in the graph.
+</font><font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='on_graph_modified'></a>on_graph_modified</b> <font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// make note of the modification
+</font>    graph_modified_since_last_recalc <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    <font color='#009900'>// clear out the solution object since we will need to recalculate it
+</font>    <font color='#009900'>// since the graph changed
+</font>    solution.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This event is called when the user modifies the evidence value for a node
+</font><font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='on_sel_node_evidence_modified'></a>on_sel_node_evidence_modified</b> <font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// make a reference to the node in the graph that is currently selected
+</font>    node_type<font color='#5555FF'>&amp;</font> node <font color='#5555FF'>=</font> graph_drawer.<font color='#BB00BB'>graph_node</font><font face='Lucida Console'>(</font>selected_node_index<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value;
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// get the numerical value of the new evidence value.  Here we are taking
+</font>        <font color='#009900'>// the string from the text field and casting it to an unsigned long.
+</font>        value <font color='#5555FF'>=</font> sa <font color='#5555FF'>=</font> <font color='#BB00BB'>trim</font><font face='Lucida Console'>(</font>sel_node_evidence.<font color='#BB00BB'>text</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>string_cast_error<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// if the user put something that isn't an integer into the 
+</font>        <font color='#009900'>// text field then make it have a different background color
+</font>        <font color='#009900'>// so that they can easily see this.
+</font>        sel_node_evidence.<font color='#BB00BB'>set_background_color</font><font face='Lucida Console'>(</font>color_error<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font>;
+    <b>}</b>
+
+    <font color='#009900'>// validate the input from the user and store it in the selected node
+</font>    <font color='#009900'>// if it is ok
+</font>    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>value <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        sel_node_evidence.<font color='#BB00BB'>set_background_color</font><font face='Lucida Console'>(</font>color_error<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>else</font>
+    <b>{</b>
+        node.data.<font color='#BB00BB'>set_value</font><font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font>;
+        sel_node_evidence.<font color='#BB00BB'>set_background_color</font><font face='Lucida Console'>(</font>color_default_bg<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>// clear out the solution to the graph since we now need
+</font>    <font color='#009900'>// to recalculate it.
+</font>    solution.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This event is called when the user modifies the number of evidence values for
+</font><font color='#009900'>// a node.
+</font><font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='on_sel_node_num_values_modified'></a>on_sel_node_num_values_modified</b> <font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// make a reference to the node in the graph that is currently selected
+</font>    node_type<font color='#5555FF'>&amp;</font> node <font color='#5555FF'>=</font> graph_drawer.<font color='#BB00BB'>graph_node</font><font face='Lucida Console'>(</font>selected_node_index<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_values;
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// get the number of values out of the text field.  
+</font>        num_values <font color='#5555FF'>=</font> sa <font color='#5555FF'>=</font> <font color='#BB00BB'>trim</font><font face='Lucida Console'>(</font>sel_node_num_values.<font color='#BB00BB'>text</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>string_cast_error<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        sel_node_num_values.<font color='#BB00BB'>set_background_color</font><font face='Lucida Console'>(</font>color_error<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font>;
+    <b>}</b>
+
+    <font color='#009900'>// validate the input from the user to make sure it is something reasonable
+</font>    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_values <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> num_values <font color='#5555FF'>&gt;</font> <font color='#979000'>100</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        sel_node_num_values.<font color='#BB00BB'>set_background_color</font><font face='Lucida Console'>(</font>color_error<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>else</font>
+    <b>{</b>
+        <font color='#009900'>// update the graph
+</font>        node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>set_num_values</font><font face='Lucida Console'>(</font>num_values<font face='Lucida Console'>)</font>;
+        graph_modified_since_last_recalc <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        sel_node_num_values.<font color='#BB00BB'>set_background_color</font><font face='Lucida Console'>(</font>color_default_bg<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>on_sel_node_evidence_modified</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// also make sure the evidence value of this node makes sense still
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>node.data.<font color='#BB00BB'>is_evidence</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> node.data.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> num_values<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// just set it to zero
+</font>            node.data.<font color='#BB00BB'>set_value</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+    solution.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// call these functions so that the conditional and posterior probability
+</font>    <font color='#009900'>// tables get updated
+</font>    <font color='#BB00BB'>load_selected_node_tables_into_cpt_grid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>load_selected_node_tables_into_ppt_grid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This event is called when the user modifies the cpt_grid (i.e. the conditional
+</font><font color='#009900'>// probability table widget)
+</font><font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='on_cpt_grid_modified'></a>on_cpt_grid_modified</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> row, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> col<font face='Lucida Console'>)</font>
+<b>{</b>
+    node_type<font color='#5555FF'>&amp;</font> node <font color='#5555FF'>=</font> graph_drawer.<font color='#BB00BB'>graph_node</font><font face='Lucida Console'>(</font>selected_node_index<font face='Lucida Console'>)</font>;
+    solution.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'><u>double</u></font> prob;
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// get the new value out of the table
+</font>        prob <font color='#5555FF'>=</font> sa <font color='#5555FF'>=</font> cpt_grid.<font color='#BB00BB'>text</font><font face='Lucida Console'>(</font>row,col<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>string_cast_error<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        cpt_grid.<font color='#BB00BB'>set_background_color</font><font face='Lucida Console'>(</font>row,col,color_error<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font>;
+    <b>}</b>
+
+    <font color='#009900'>// validate the value
+</font>    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>prob <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> prob <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        cpt_grid.<font color='#BB00BB'>set_background_color</font><font face='Lucida Console'>(</font>row,col,color_error<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font>;
+    <b>}</b>
+
+    <font color='#009900'>// the value of this node that is having its conditional probability
+</font>    <font color='#009900'>// updated
+</font>    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> cur_val <font color='#5555FF'>=</font> col<font color='#5555FF'>-</font>node.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>set_probability</font><font face='Lucida Console'>(</font>cur_val, cpt_grid_assignments[row<font color='#5555FF'>-</font><font color='#979000'>1</font>], prob<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// sum the probabilities in the cpt and modify the last one such that they all 
+</font>    <font color='#009900'>// sum to 1.  We are excluding either the first or last element from the sum
+</font>    <font color='#009900'>// because we are going to set it equal to 1-sum below.
+</font>    <font color='#0000FF'><u>double</u></font> sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cur_val <font color='#5555FF'>!</font><font color='#5555FF'>=</font> node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>i, cpt_grid_assignments[row<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>else</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>i, cpt_grid_assignments[row<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>// make sure all the probabilities sum to 1
+</font>    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sum <font color='#5555FF'>&gt;</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        cpt_grid.<font color='#BB00BB'>set_background_color</font><font face='Lucida Console'>(</font>row,cpt_grid.<font color='#BB00BB'>number_of_columns</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>,color_error<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>else</font>
+    <b>{</b>
+        <font color='#009900'>// edit one of the other elements in the table to ensure that the probabilities still sum to 1
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cur_val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>set_probability</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, cpt_grid_assignments[row<font color='#5555FF'>-</font><font color='#979000'>1</font>], <font color='#979000'>1</font><font color='#5555FF'>-</font>sum<font face='Lucida Console'>)</font>;
+            cpt_grid.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>row,node.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>-</font>sum<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>set_probability</font><font face='Lucida Console'>(</font>node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>, cpt_grid_assignments[row<font color='#5555FF'>-</font><font color='#979000'>1</font>], <font color='#979000'>1</font><font color='#5555FF'>-</font>sum<font face='Lucida Console'>)</font>;
+            cpt_grid.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>row,cpt_grid.<font color='#BB00BB'>number_of_columns</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>,<font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>-</font>sum<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        cpt_grid.<font color='#BB00BB'>set_background_color</font><font face='Lucida Console'>(</font>row,cpt_grid.<font color='#BB00BB'>number_of_columns</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>,color_default_bg<font face='Lucida Console'>)</font>;
+        cpt_grid.<font color='#BB00BB'>set_background_color</font><font face='Lucida Console'>(</font>row,col,color_default_bg<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This event is called when the user resizes the main_window.  Note that unlike the other
+</font><font color='#009900'>// events, this event is part of the drawable_window base class that main_window inherits from.
+</font><font color='#009900'>// So you won't see any statements in the constructor that say "register the main_window::on_window_resized function"
+</font><font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='on_window_resized'></a>on_window_resized</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// when you override any of the drawable_window events you have to make sure you 
+</font>    <font color='#009900'>// call the drawable_window's version of them because it needs to process
+</font>    <font color='#009900'>// the events as well.  So we do that here.
+</font>    drawable_window::<font color='#BB00BB'>on_window_resized</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// The rest of this function positions the widgets on the window 
+</font>    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width,height;
+    <font color='#BB00BB'>get_size</font><font face='Lucida Console'>(</font>width,height<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Don't do anything if the user just made the window too small.  That is, leave
+</font>    <font color='#009900'>// the widgets where they are.
+</font>    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>width <font color='#5555FF'>&lt;</font> <font color='#979000'>500</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> height <font color='#5555FF'>&lt;</font> <font color='#979000'>350</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font>;
+
+    <font color='#009900'>// Set the size of the probability tables and the drawing area for the graph
+</font>    graph_drawer.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>width<font color='#5555FF'>-</font><font color='#979000'>370</font>,height<font color='#5555FF'>-</font><font color='#979000'>10</font><font color='#5555FF'>-</font>mbar.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    cpt_grid.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>width<font color='#5555FF'>-</font>graph_drawer.<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>35</font>,height<font color='#5555FF'>-</font><font color='#979000'>237</font><font face='Lucida Console'>)</font>;
+    ppt_grid.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>width<font color='#5555FF'>-</font>graph_drawer.<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>35</font>,height<font color='#5555FF'>-</font><font color='#979000'>237</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// tell the tabbed display to make itself just the right size to contain
+</font>    <font color='#009900'>// the two probability tables.
+</font>    tables.<font color='#BB00BB'>fit_to_contents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// Now position all the widgets in the window.  Note that much of the positioning
+</font>    <font color='#009900'>// is relative to other widgets.  This part of the code I just figured out by
+</font>    <font color='#009900'>// trying stuff and rerunning the program to see if it looked nice. 
+</font>    sel_node_index.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font>graph_drawer.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>14</font>,graph_drawer.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>18</font><font face='Lucida Console'>)</font>;
+    sel_node_text_label.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font>sel_node_index.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,sel_node_index.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+    sel_node_text.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font>sel_node_text_label.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font>,sel_node_index.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    sel_node_num_values_label.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font>sel_node_index.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, sel_node_text.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+    sel_node_num_values.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font>sel_node_num_values_label.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, sel_node_text.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+    sel_node_is_evidence.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font>sel_node_index.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,sel_node_num_values.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+    sel_node_evidence_label.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font>sel_node_index.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,sel_node_is_evidence.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+    sel_node_evidence.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font>sel_node_evidence_label.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font>,sel_node_is_evidence.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    tables.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font>sel_node_index.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,sel_node_evidence.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+    sel_node_evidence.<font color='#BB00BB'>set_width</font><font face='Lucida Console'>(</font>tables.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>sel_node_evidence.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    sel_node_text.<font color='#BB00BB'>set_width</font><font face='Lucida Console'>(</font>tables.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>sel_node_text.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    sel_node_num_values.<font color='#BB00BB'>set_width</font><font face='Lucida Console'>(</font>tables.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>sel_node_num_values.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+
+    <font color='#009900'>// Tell the named rectangle to position itself such that it fits around the 
+</font>    <font color='#009900'>// tabbed display that contains the probability tables and the label at the top of the
+</font>    <font color='#009900'>// screen.
+</font>    selected_node_rect.<font color='#BB00BB'>wrap_around</font><font face='Lucida Console'>(</font>sel_node_index.<font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>
+                                   tables.<font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// finally set the button to be at the bottom of the named rectangle 
+</font>    btn_calculate.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font>selected_node_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, selected_node_rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This event is called by the graph_drawer widget when the user selects a node
+</font><font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='on_node_selected'></a>on_node_selected</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// make a reference to the selected node
+</font>    node_type<font color='#5555FF'>&amp;</font> node <font color='#5555FF'>=</font> graph_drawer.<font color='#BB00BB'>graph_node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// enable all the widgets related to the selected node
+</font>    selected_node_index <font color='#5555FF'>=</font> n;
+    node_is_selected <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    tables.<font color='#BB00BB'>enable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sel_node_is_evidence.<font color='#BB00BB'>enable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sel_node_index.<font color='#BB00BB'>enable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sel_node_evidence_label.<font color='#BB00BB'>enable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sel_node_text_label.<font color='#BB00BB'>enable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sel_node_text.<font color='#BB00BB'>enable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sel_node_num_values_label.<font color='#BB00BB'>enable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sel_node_num_values.<font color='#BB00BB'>enable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// make sure the num_values field of the node's cpt is set to something valid. 
+</font>    <font color='#009900'>// So default it to 2 if it isn't set already.
+</font>    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        node.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>set_num_values</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        graph_modified_since_last_recalc <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+    <font color='#009900'>// setup the evidence check box and input field
+</font>    sel_node_index.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>index: </font>" <font color='#5555FF'>+</font> <font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>graph_drawer.<font color='#BB00BB'>graph_node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>is_evidence</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        sel_node_is_evidence.<font color='#BB00BB'>set_checked</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sel_node_evidence.<font color='#BB00BB'>enable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sel_node_evidence.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font><font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>graph_drawer.<font color='#BB00BB'>graph_node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>else</font>
+    <b>{</b>
+        sel_node_is_evidence.<font color='#BB00BB'>set_unchecked</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sel_node_evidence.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sel_node_evidence.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    sel_node_num_values.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font><font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font><font color='#BB00BB'>node_num_values</font><font face='Lucida Console'>(</font>graph_drawer.<font color='#BB00BB'>graph</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    sel_node_text.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>graph_drawer.<font color='#BB00BB'>node_label</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>load_selected_node_tables_into_cpt_grid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>load_selected_node_tables_into_ppt_grid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This event is called when the user toggles the "is evidence" check box
+</font><font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='on_evidence_toggled'></a>on_evidence_toggled</b> <font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sel_node_is_evidence.<font color='#BB00BB'>is_checked</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        graph_drawer.<font color='#BB00BB'>graph_node</font><font face='Lucida Console'>(</font>selected_node_index<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>set_as_evidence</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sel_node_evidence.<font color='#BB00BB'>enable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sel_node_evidence.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font><font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>graph_drawer.<font color='#BB00BB'>graph_node</font><font face='Lucida Console'>(</font>selected_node_index<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        graph_drawer.<font color='#BB00BB'>set_node_color</font><font face='Lucida Console'>(</font>selected_node_index, color_evidence<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>else</font>
+    <b>{</b>
+        graph_drawer.<font color='#BB00BB'>graph_node</font><font face='Lucida Console'>(</font>selected_node_index<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>set_as_nonevidence</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sel_node_evidence.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sel_node_evidence.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+        sel_node_evidence.<font color='#BB00BB'>set_background_color</font><font face='Lucida Console'>(</font>color_default_bg<font face='Lucida Console'>)</font>;
+        graph_drawer.<font color='#BB00BB'>set_node_color</font><font face='Lucida Console'>(</font>selected_node_index, color_non_evidence<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    solution.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This event is called when the user causes no node to be selected 
+</font><font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='on_node_deselected'></a>on_node_deselected</b> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>  <font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#BB00BB'>no_node_selected</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This event is called when the user causes a node to be deleted 
+</font><font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='on_node_deleted'></a>on_node_deleted</b> <font face='Lucida Console'>(</font>  <font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#BB00BB'>no_node_selected</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This event is called when the user changes the text in the "node label" text field
+</font><font color='#0000FF'><u>void</u></font> main_window::
+<b><a name='on_sel_node_text_modified'></a>on_sel_node_text_modified</b> <font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// set the selected node's text to match whatever the user just typed in
+</font>    graph_drawer.<font color='#BB00BB'>set_node_label</font><font face='Lucida Console'>(</font>selected_node_index,sel_node_text.<font color='#BB00BB'>text</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #ifndef TIMEDEVENTEDITORDLG_H
 #define TIMEDEVENTEDITORDLG_H
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 //(*Headers(TimedEventEditorDlg)
 #include <wx/sizer.h>

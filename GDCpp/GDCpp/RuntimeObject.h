@@ -81,7 +81,7 @@ public:
     /**
      * \brief Called by RuntimeScene when creating the RuntimeObject from an initial instance.
      *
-     * \note The RuntimeScene already takes care of setting common properties ( Position, Angle... )
+     * \note The RuntimeScene already takes care of setting common properties (position, angle... )
      * according to the InitialInstance. You only need to initialize extra properties specific to your object.
      */
     virtual bool ExtraInitializationFromInitialInstance(const gd::InitialInstance & position) {return true;}
@@ -223,18 +223,18 @@ public:
     virtual bool CursorOnObject(RuntimeScene & scene, bool accurate);
 
     /**
-     * \brief Called at each frame so as to update internal object's things using time ( Such as animation for a sprite ).
+     * \brief Called at each frame so as to update internal object's things using time (such as animation for a sprite).
      * \note The default implementation does nothing.
      */
     virtual void UpdateTime(float timeElapsed) {};
 
     /**
-     * \brief Get the width of the object
+     * \brief Get the width of the object, in pixels.
      */
     virtual float GetWidth() const {return 0;};
 
     /**
-     * \brief Get the height of the object
+     * \brief Get the height of the object, in pixels.
      */
     virtual float GetHeight() const {return 0;};
 
@@ -449,13 +449,13 @@ protected:
 
     /**
      * \brief Initialize object using another object. Used by copy-ctor and assign-op.
-     * \warning Don't forget to update me if members were changed !
+     * \warning Don't forget to update me if members were changed!
      */
     void Init(const RuntimeObject & object);
 };
 
 /**
- * As extensions, a function used to create an object. ( Simply a "return new RuntimeObject(name);" )
+ * As extensions, a function used to create an object ("return new RuntimeObject(name);").
  */
 RuntimeObject * CreateBaseRuntimeObject(RuntimeScene & scene, const gd::Object & object);
 

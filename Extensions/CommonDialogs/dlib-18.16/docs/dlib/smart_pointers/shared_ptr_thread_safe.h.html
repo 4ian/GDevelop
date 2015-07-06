@@ -1,0 +1,500 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - shared_ptr_thread_safe.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SHARED_THREAD_SAFE_PTr_
+<font color='#0000FF'>#define</font> DLIB_SHARED_THREAD_SAFE_PTr_ 
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>algorithm<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>memory<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>typeinfo<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>       <font color='#009900'>// for the exceptions
+</font><font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='shared_ptr_thread_safe_abstract.h.html'>shared_ptr_thread_safe_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads/threads_kernel.h.html'>../threads/threads_kernel.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib 
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='shared_ptr_thread_safe_deleter'></a>shared_ptr_thread_safe_deleter</b>
+    <b>{</b>
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='del'></a>del</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> p<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>virtual</font> ~<b><a name='shared_ptr_thread_safe_deleter'></a>shared_ptr_thread_safe_deleter</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> <b><a name='get_deleter_void'></a>get_deleter_void</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::type_info<font color='#5555FF'>&amp;</font> t<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (the deleter in this object has typeid() == t) then
+                    - returns a pointer to the deleter
+                - else
+                    - return 0
+        !*/</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>struct</font> <b><a name='shared_ptr_thread_safe_node'></a>shared_ptr_thread_safe_node</b>
+    <b>{</b>
+        <b><a name='shared_ptr_thread_safe_node'></a>shared_ptr_thread_safe_node</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> : 
+            ref_count<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,
+            del<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        dlib::mutex m;
+        <font color='#0000FF'><u>long</u></font> ref_count;
+        shared_ptr_thread_safe_deleter<font color='#5555FF'>*</font> del;
+    <b>}</b>;
+
+    <font color='#0000FF'>struct</font> <b><a name='shared_ptr_ts_static_cast'></a>shared_ptr_ts_static_cast</b> <b>{</b><b>}</b>;
+    <font color='#0000FF'>struct</font> <b><a name='shared_ptr_ts_const_cast'></a>shared_ptr_ts_const_cast</b> <b>{</b><b>}</b>;
+    <font color='#0000FF'>struct</font> <b><a name='shared_ptr_ts_dynamic_cast'></a>shared_ptr_ts_dynamic_cast</b> <b>{</b><b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>class</font> <b><a name='shared_ptr_thread_safe'></a>shared_ptr_thread_safe</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            CONVENTION
+                - get() == data
+                - unique() == (shared_node != 0) &amp;&amp; (shared_node-&gt;ref_count == 1)
+                - if (shared_node != 0) then
+                    - use_count() == shared_node-&gt;ref_count
+                    - get() == a valid pointer
+                    - if (we are supposed to use the deleter) then
+                        - shared_node-&gt;del == the deleter to use
+                    - else
+                        - shared_node-&gt;del == 0
+                - else
+                    - use_count() == 0
+                    - get() == 0
+
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> D<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='deleter_template'></a>deleter_template</b> : <font color='#0000FF'>public</font> shared_ptr_thread_safe_deleter
+        <b>{</b>
+            <b><a name='deleter_template'></a>deleter_template</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> D<font color='#5555FF'>&amp;</font> d_<font face='Lucida Console'>)</font> : d<font face='Lucida Console'>(</font>d_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'><u>void</u></font> <b><a name='del'></a>del</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> p<font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>T<font color='#5555FF'>*</font><font face='Lucida Console'>)</font>p<font face='Lucida Console'>)</font>; <b>}</b>
+            D d;
+
+            <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> <b><a name='get_deleter_void'></a>get_deleter_void</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::type_info<font color='#5555FF'>&amp;</font> t<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typeid</font><font face='Lucida Console'>(</font>D<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> t<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>d;
+                <font color='#0000FF'>else</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+            <b>}</b>
+        <b>}</b>;
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> T element_type;
+
+        <b><a name='shared_ptr_thread_safe'></a>shared_ptr_thread_safe</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> : data<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, shared_node<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b> 
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        <font color='#0000FF'>explicit</font> <b><a name='shared_ptr_thread_safe'></a>shared_ptr_thread_safe</b><font face='Lucida Console'>(</font>
+            Y<font color='#5555FF'>*</font> p
+        <font face='Lucida Console'>)</font> : data<font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>p <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\tshared_ptr::shared_ptr_thread_safe(p)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tp can't be null</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                shared_node <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> shared_ptr_thread_safe_node;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>delete</font> p;
+                <font color='#0000FF'>throw</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y, <font color='#0000FF'>typename</font> D<font color='#5555FF'>&gt;</font> 
+        <b><a name='shared_ptr_thread_safe'></a>shared_ptr_thread_safe</b><font face='Lucida Console'>(</font>
+            Y<font color='#5555FF'>*</font> p, 
+            <font color='#0000FF'>const</font> D<font color='#5555FF'>&amp;</font> d
+        <font face='Lucida Console'>)</font> : 
+            data<font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>p <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\tshared_ptr::shared_ptr_thread_safe(p,d)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tp can't be null</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                shared_node <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                shared_node <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> shared_ptr_thread_safe_node;
+                shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>del <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> deleter_template<font color='#5555FF'>&lt;</font>D<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>d<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>shared_node<font face='Lucida Console'>)</font> <font color='#0000FF'>delete</font> shared_node;
+                <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>throw</font>;
+            <b>}</b>
+        <b>}</b>
+
+        ~<b><a name='shared_ptr_thread_safe'></a>shared_ptr_thread_safe</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> shared_node <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ref_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// delete the data in the appropriate way
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>del<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>del<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>del</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+                        
+                        shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>delete</font> shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>del;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>delete</font> data;
+                    <b>}</b>
+
+                    <font color='#009900'>// finally delete the shared_node
+</font>                    <font color='#0000FF'>delete</font> shared_node;
+                <b>}</b>
+                <font color='#0000FF'>else</font> 
+                <b>{</b>
+                    shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ref_count <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                    shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <b><a name='shared_ptr_thread_safe'></a>shared_ptr_thread_safe</b><font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> shared_ptr_thread_safe<font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            data <font color='#5555FF'>=</font> r.data;
+            shared_node <font color='#5555FF'>=</font> r.shared_node;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>shared_node<font face='Lucida Console'>)</font>
+            <b>{</b>
+                auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m<font face='Lucida Console'>)</font>;
+                shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ref_count <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        <b><a name='shared_ptr_thread_safe'></a>shared_ptr_thread_safe</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r,
+            <font color='#0000FF'>const</font> shared_ptr_ts_static_cast<font color='#5555FF'>&amp;</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            data <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>r.data<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                shared_node <font color='#5555FF'>=</font> r.shared_node;
+                auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m<font face='Lucida Console'>)</font>;
+                shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ref_count <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                shared_node <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        <b><a name='shared_ptr_thread_safe'></a>shared_ptr_thread_safe</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r,
+            <font color='#0000FF'>const</font> shared_ptr_ts_const_cast<font color='#5555FF'>&amp;</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            data <font color='#5555FF'>=</font> <font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>r.data<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                shared_node <font color='#5555FF'>=</font> r.shared_node;
+                auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m<font face='Lucida Console'>)</font>;
+                shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ref_count <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                shared_node <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        <b><a name='shared_ptr_thread_safe'></a>shared_ptr_thread_safe</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r,
+            <font color='#0000FF'>const</font> shared_ptr_ts_dynamic_cast<font color='#5555FF'>&amp;</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            data <font color='#5555FF'>=</font> <font color='#0000FF'>dynamic_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>r.data<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                shared_node <font color='#5555FF'>=</font> r.shared_node;
+                auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m<font face='Lucida Console'>)</font>;
+                shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ref_count <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                shared_node <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        <b><a name='shared_ptr_thread_safe'></a>shared_ptr_thread_safe</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            data <font color='#5555FF'>=</font> r.data;
+            shared_node <font color='#5555FF'>=</font> r.shared_node;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>shared_node<font face='Lucida Console'>)</font>
+            <b>{</b>
+                auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m<font face='Lucida Console'>)</font>;
+                shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ref_count <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <b>}</b>
+        <b>}</b>
+
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>explicit</font> <b><a name='shared_ptr_thread_safe'></a>shared_ptr_thread_safe</b><font face='Lucida Console'>(</font>
+            std::auto_ptr<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>r.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\tshared_ptr::shared_ptr_thread_safe(auto_ptr r)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tr.get() can't be null</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+            shared_node <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> shared_ptr_thread_safe_node;
+            data <font color='#5555FF'>=</font> r.<font color='#BB00BB'>release</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        shared_ptr_thread_safe<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> shared_ptr_thread_safe<font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>shared_ptr_thread_safe</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        shared_ptr_thread_safe<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>shared_ptr_thread_safe</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        shared_ptr_thread_safe<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            std::auto_ptr<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>r.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\tshared_ptr::operator=(auto_ptr r)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tr.get() can't be null</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            shared_node <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> shared_ptr_thread_safe_node;
+            data <font color='#5555FF'>=</font> r.<font color='#BB00BB'>release</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>shared_ptr_thread_safe</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b><font face='Lucida Console'>(</font>Y<font color='#5555FF'>*</font> p<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>p <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\tshared_ptr::reset(p)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tp can't be null</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>shared_ptr_thread_safe</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y, <font color='#0000FF'>typename</font> D<font color='#5555FF'>&gt;</font> 
+        <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b><font face='Lucida Console'>(</font>
+            Y<font color='#5555FF'>*</font> p, 
+            <font color='#0000FF'>const</font> D<font color='#5555FF'>&amp;</font> d
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>p <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\tshared_ptr::reset(p,d)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tp can't be null</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>shared_ptr_thread_safe</font><font face='Lucida Console'>(</font>p,d<font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\tshared_ptr::operator*()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tget() can't be null if you are going to dereference it</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>data; 
+        <b>}</b> 
+
+        T<font color='#5555FF'>*</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\tshared_ptr::operator-&gt;()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tget() can't be null</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> data; 
+        <b>}</b> 
+        
+        T<font color='#5555FF'>*</font> <b><a name='get'></a>get</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data; <b>}</b> 
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='unique'></a>unique</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>  
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>use_count</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='use_count'></a>use_count</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>shared_node <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ref_count;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <b><a name='operator'></a>operator</b> <font color='#0000FF'><u>bool</u></font><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; <b>}</b>  
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>shared_ptr_thread_safe<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>data, b.data<font face='Lucida Console'>)</font>;
+            std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>shared_node, b.shared_node<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> D<font color='#5555FF'>&gt;</font>
+        D<font color='#5555FF'>*</font> <b><a name='_get_deleter'></a>_get_deleter</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>shared_node<font face='Lucida Console'>)</font>
+            <b>{</b>
+                auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>del<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>D<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>del<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_deleter_void</font><font face='Lucida Console'>(</font><font color='#0000FF'>typeid</font><font face='Lucida Console'>(</font>D<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='_private_less'></a>_private_less</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> shared_node <font color='#5555FF'>&lt;</font> rhs.shared_node;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> shared_ptr_thread_safe;
+
+        T<font color='#5555FF'>*</font> data;
+        shared_ptr_thread_safe_node<font color='#5555FF'>*</font> shared_node;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        <font color='#0000FF'>const</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        <font color='#0000FF'>const</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        <font color='#0000FF'>const</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> a.<font color='#BB00BB'>_private_less</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+        shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='static_pointer_cast'></a>static_pointer_cast</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>r, <font color='#BB00BB'>shared_ptr_ts_static_cast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='const_pointer_cast'></a>const_pointer_cast</b><font face='Lucida Console'>(</font>
+        shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font> <font color='#0000FF'>const</font> <font color='#5555FF'>&amp;</font> r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>r, <font color='#BB00BB'>shared_ptr_ts_const_cast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='dynamic_pointer_cast'></a>dynamic_pointer_cast</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>r, <font color='#BB00BB'>shared_ptr_ts_dynamic_cast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> E, <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font>
+    std::basic_ostream<font color='#5555FF'>&lt;</font>E, T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>std::basic_ostream<font color='#5555FF'>&lt;</font>E, T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&amp;</font> os, shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font> <font color='#0000FF'>const</font> <font color='#5555FF'>&amp;</font> p<font face='Lucida Console'>)</font>
+    <b>{</b>
+        os <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> p.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> os;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> D, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    D<font color='#5555FF'>*</font> <b><a name='get_deleter'></a>get_deleter</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> p.<font color='#0000FF'>template</font> _get_deleter<font color='#5555FF'>&lt;</font>D<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SHARED_THREAD_SAFE_PTr_
+</font>
+
+</pre></body></html>

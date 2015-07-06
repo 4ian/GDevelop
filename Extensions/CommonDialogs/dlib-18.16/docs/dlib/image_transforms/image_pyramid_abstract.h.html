@@ -1,0 +1,207 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - image_pyramid_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_IMAGE_PYRaMID_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_IMAGE_PYRaMID_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array2d.h.html'>../array2d.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/generic_image.h.html'>../image_processing/generic_image.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> N
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='pyramid_down'></a>pyramid_down</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON N
+                N &gt; 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple functor to help create image pyramids.  In particular, it
+                downsamples images at a ratio of N to N-1.
+
+                Note that setting N to 1 means that this object functions like
+                pyramid_disable (defined at the bottom of this file).  
+
+                WARNING, when mapping rectangles from one layer of a pyramid
+                to another you might end up with rectangles which extend slightly 
+                outside your images.  This is because points on the border of an 
+                image at a higher pyramid layer might correspond to points outside 
+                images at lower layers.  So just keep this in mind.  Note also
+                that it's easy to deal with.  Just say something like this:
+                    rect = rect.intersect(get_rect(my_image)); // keep rect inside my_image 
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_image_type,
+            <font color='#0000FF'>typename</font> out_image_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> original,
+            out_image_type<font color='#5555FF'>&amp;</font> down
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_same_object(original, down) == false
+                - in_image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+                - out_image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+                - for both pixel types P in the input and output images, we require:
+                    - pixel_traits&lt;P&gt;::has_alpha == false
+            ensures
+                - #down will contain an image that is roughly (N-1)/N times the size of the
+                  original image.  
+                - If both input and output images contain RGB pixels then the downsampled image will
+                  be in color.  Otherwise, the downsampling will be performed in a grayscale mode.
+                - The location of a point P in original image will show up at point point_down(P)
+                  in the #down image.  
+                - Note that some points on the border of the original image might correspond to 
+                  points outside the #down image.  
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            image_type<font color='#5555FF'>&amp;</font> img
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+                - pixel_traits&lt;typename image_traits&lt;image_type&gt;::pixel_type&gt;::has_alpha == false
+            ensures
+                - This function downsamples the given image and stores the results in #img.
+                  In particular, it is equivalent to performing: 
+                    (*this)(img, temp); 
+                    swap(img, temp);
+        !*/</font>
+
+    <font color='#009900'>// -------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='point_down'></a>point_down</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - interprets p as a point in a parent image and returns the
+                  point in a downsampled image which corresponds to p.
+                - This function is the inverse of point_up().  I.e. for a point P:
+                  point_down(point_up(P)) == P
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='point_up'></a>point_up</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - interprets p as a point in a downsampled image and returns the
+                  point in a parent image which corresponds to p.
+                - This function is the inverse of point_down().  I.e. for a point P:
+                  point_up(point_down(P)) == P
+        !*/</font>
+
+        drectangle <b><a name='rect_down'></a>rect_down</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns drectangle(point_down(rect.tl_corner()), point_down(rect.br_corner()));
+                  (i.e. maps rect into a downsampled)
+        !*/</font>
+
+        drectangle <b><a name='rect_up'></a>rect_up</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns drectangle(point_up(rect.tl_corner()), point_up(rect.br_corner()));
+                  (i.e. maps rect into a parent image)
+        !*/</font>
+
+    <font color='#009900'>// -------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='point_down'></a>point_down</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> levels
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - applies point_down() to p levels times and returns the result.
+                  (i.e. point_down(p,2) == point_down(point_down(p)),
+                        point_down(p,1) == point_down(p),
+                        point_down(p,0) == p,  etc. )
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='point_up'></a>point_up</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> levels
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - applies point_up() to p levels times and returns the result.
+                  (i.e. point_up(p,2) == point_up(point_up(p)),
+                        point_up(p,1) == point_up(p),
+                        point_up(p,0) == p,  etc. )
+        !*/</font>
+
+        drectangle <b><a name='rect_down'></a>rect_down</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> levels
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns drectangle(point_down(rect.tl_corner(),levels), point_down(rect.br_corner(),levels));
+                  (i.e. Basically applies rect_down() to rect levels times and returns the result.)
+        !*/</font>
+
+        drectangle <b><a name='rect_up'></a>rect_up</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> levels
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns drectangle(point_up(rect.tl_corner(),levels), point_up(rect.br_corner(),levels));
+                  (i.e. Basically applies rect_up() to rect levels times and returns the result.)
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='pyramid_disable'></a>pyramid_disable</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a function object with an interface identical to pyramid_down (defined
+                at the top of this file) except that it downsamples images at a ratio of infinity
+                to 1.  That means it always outputs images of size 0 regardless of the size
+                of the inputs.  
+                
+                This is useful because it can be supplied to routines which take a pyramid_down 
+                function object and it will essentially disable pyramid processing.  This way, 
+                a pyramid oriented function can be turned into a regular routine which processes
+                just the original undownsampled image.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_IMAGE_PYRaMID_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

@@ -1,0 +1,70 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - array2d_generic_image.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2014  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_ARRAY2D_GENERIC_iMAGE_Hh_
+<font color='#0000FF'>#define</font> DLIB_ARRAY2D_GENERIC_iMAGE_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='array2d_kernel.h.html'>array2d_kernel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/generic_image.h.html'>../image_processing/generic_image.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> mm<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='image_traits'></a>image_traits</b><font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font>T,mm<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> T pixel_type;
+    <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> mm<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='image_traits'></a>image_traits</b><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> array2d<font color='#5555FF'>&lt;</font>T,mm<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> T pixel_type;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> mm<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='num_rows'></a>num_rows</b><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> array2d<font color='#5555FF'>&lt;</font>T,mm<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> img<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> mm<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='num_columns'></a>num_columns</b><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> array2d<font color='#5555FF'>&lt;</font>T,mm<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> img<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> mm<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='set_image_size'></a>set_image_size</b><font face='Lucida Console'>(</font>
+        array2d<font color='#5555FF'>&lt;</font>T,mm<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'><u>long</u></font> rows,
+        <font color='#0000FF'><u>long</u></font> cols 
+    <font face='Lucida Console'>)</font> <b>{</b> img.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>rows,cols<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> mm<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> <b><a name='image_data'></a>image_data</b><font face='Lucida Console'>(</font>
+        array2d<font color='#5555FF'>&lt;</font>T,mm<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>img.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>&amp;</font>img[<font color='#979000'>0</font>][<font color='#979000'>0</font>];
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> mm<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> <b><a name='image_data'></a>image_data</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> array2d<font color='#5555FF'>&lt;</font>T,mm<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>img.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>&amp;</font>img[<font color='#979000'>0</font>][<font color='#979000'>0</font>];
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> mm<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='width_step'></a>width_step</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> array2d<font color='#5555FF'>&lt;</font>T,mm<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#0000FF'>return</font> img.<font color='#BB00BB'>width_step</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+    <b>}</b>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ARRAY2D_GENERIC_iMAGE_Hh_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,86 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - md5_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_MD5_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_MD5_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iosfwd<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#009900'>/*!
+        NOTE:
+        This is the RSA Data Security, Inc. MD5 Message-Digest Algorithm
+        as described in rfc1321
+
+        For the functions which return a unsigned char*.  The array contains 
+        the 16 bytes of the digest and are in the correct order.  
+        i.e.  output[0], output[1], output[2], ...
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> std::string <b><a name='md5'></a>md5</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> input
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns the md5 digest of input as a hexadecimal string
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='md5'></a>md5</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> input,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> len,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> output
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - input  == pointer to len bytes 
+            - output == pointer to 16 bytes 
+            - input != output
+        ensures
+            - #output == the md5 digest of input.  
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> std::string <b><a name='md5'></a>md5</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> input
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - input.fail() == false
+        ensures
+            - returns the md5 digest of input as a hexadecimal string
+            - #input.eof()     == true 
+            - #input.fail()    == false
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='md5'></a>md5</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> input
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> output
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - input.fail() == false
+            - output       == pointer to 16 bytes
+        ensures
+            - #output       == the md5 digest of input 
+            - #input.eof()  == true 
+            - #input.fail() == false
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MD5_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

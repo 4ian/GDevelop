@@ -1,0 +1,221 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - syev.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_LAPACk_EV_Hh_
+<font color='#0000FF'>#define</font> DLIB_LAPACk_EV_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='fortran_id.h.html'>fortran_id.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>namespace</font> lapack
+    <b>{</b>
+        <font color='#0000FF'>namespace</font> binding
+        <b>{</b>
+            <font color='#0000FF'>extern</font> "<font color='#CC0000'>C</font>"
+            <b>{</b>
+                <font color='#0000FF'><u>void</u></font> <b><a name='DLIB_FORTRAN_ID'></a>DLIB_FORTRAN_ID</b><font face='Lucida Console'>(</font>dsyev<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>jobz, <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>uplo, integer <font color='#5555FF'>*</font>n, <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>a,
+                                             integer <font color='#5555FF'>*</font>lda, <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>w, <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>work, integer <font color='#5555FF'>*</font>lwork, 
+                                             integer <font color='#5555FF'>*</font>info<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'><u>void</u></font> <b><a name='DLIB_FORTRAN_ID'></a>DLIB_FORTRAN_ID</b><font face='Lucida Console'>(</font>ssyev<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>jobz, <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>uplo, integer <font color='#5555FF'>*</font>n, <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>a,
+                                             integer <font color='#5555FF'>*</font>lda, <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>w, <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>work, integer <font color='#5555FF'>*</font>lwork, 
+                                             integer <font color='#5555FF'>*</font>info<font face='Lucida Console'>)</font>;
+
+            <b>}</b>
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>int</u></font> <b><a name='syev'></a>syev</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> jobz, <font color='#0000FF'><u>char</u></font> uplo, integer n, <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>a,
+                             integer lda, <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>w, <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>work, integer lwork<font face='Lucida Console'>)</font>
+            <b>{</b>
+                integer info <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#BB00BB'>DLIB_FORTRAN_ID</font><font face='Lucida Console'>(</font>dsyev<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>jobz, <font color='#5555FF'>&amp;</font>uplo, <font color='#5555FF'>&amp;</font>n, a,
+                                       <font color='#5555FF'>&amp;</font>lda, w, work, <font color='#5555FF'>&amp;</font>lwork, <font color='#5555FF'>&amp;</font>info<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> info;
+            <b>}</b>
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>int</u></font> <b><a name='syev'></a>syev</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> jobz, <font color='#0000FF'><u>char</u></font> uplo, integer n, <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>a,
+                             integer lda, <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>w, <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>work, integer lwork<font face='Lucida Console'>)</font>
+            <b>{</b>
+                integer info <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#BB00BB'>DLIB_FORTRAN_ID</font><font face='Lucida Console'>(</font>ssyev<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>jobz, <font color='#5555FF'>&amp;</font>uplo, <font color='#5555FF'>&amp;</font>n, a,
+                                       <font color='#5555FF'>&amp;</font>lda, w, work, <font color='#5555FF'>&amp;</font>lwork, <font color='#5555FF'>&amp;</font>info<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> info;
+            <b>}</b>
+
+
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>/*  -- LAPACK driver routine (version 3.1) -- */</font>
+<font color='#009900'>/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */</font>
+<font color='#009900'>/*     November 2006 */</font>
+
+<font color='#009900'>/*     .. Scalar Arguments .. */</font>
+<font color='#009900'>/*     .. */</font>
+<font color='#009900'>/*     .. Array Arguments .. */</font>
+<font color='#009900'>/*     .. */</font>
+
+<font color='#009900'>/*  Purpose */</font>
+<font color='#009900'>/*  ======= */</font>
+
+<font color='#009900'>/*  DSYEV computes all eigenvalues and, optionally, eigenvectors of a */</font>
+<font color='#009900'>/*  real symmetric matrix A. */</font>
+
+<font color='#009900'>/*  Arguments */</font>
+<font color='#009900'>/*  ========= */</font>
+
+<font color='#009900'>/*  JOBZ    (input) CHARACTER*1 */</font>
+<font color='#009900'>/*          = 'N':  Compute eigenvalues only; */</font>
+<font color='#009900'>/*          = 'V':  Compute eigenvalues and eigenvectors. */</font>
+
+<font color='#009900'>/*  UPLO    (input) CHARACTER*1 */</font>
+<font color='#009900'>/*          = 'U':  Upper triangle of A is stored; */</font>
+<font color='#009900'>/*          = 'L':  Lower triangle of A is stored. */</font>
+
+<font color='#009900'>/*  N       (input) INTEGER */</font>
+<font color='#009900'>/*          The order of the matrix A.  N &gt;= 0. */</font>
+
+<font color='#009900'>/*  A       (input/output) DOUBLE PRECISION array, dimension (LDA, N) */</font>
+<font color='#009900'>/*          On entry, the symmetric matrix A.  If UPLO = 'U', the */</font>
+<font color='#009900'>/*          leading N-by-N upper triangular part of A contains the */</font>
+<font color='#009900'>/*          upper triangular part of the matrix A.  If UPLO = 'L', */</font>
+<font color='#009900'>/*          the leading N-by-N lower triangular part of A contains */</font>
+<font color='#009900'>/*          the lower triangular part of the matrix A. */</font>
+<font color='#009900'>/*          On exit, if JOBZ = 'V', then if INFO = 0, A contains the */</font>
+<font color='#009900'>/*          orthonormal eigenvectors of the matrix A. */</font>
+<font color='#009900'>/*          If JOBZ = 'N', then on exit the lower triangle (if UPLO='L') */</font>
+<font color='#009900'>/*          or the upper triangle (if UPLO='U') of A, including the */</font>
+<font color='#009900'>/*          diagonal, is destroyed. */</font>
+
+<font color='#009900'>/*  LDA     (input) INTEGER */</font>
+<font color='#009900'>/*          The leading dimension of the array A.  LDA &gt;= max(1,N). */</font>
+
+<font color='#009900'>/*  W       (output) DOUBLE PRECISION array, dimension (N) */</font>
+<font color='#009900'>/*          If INFO = 0, the eigenvalues in ascending order. */</font>
+
+<font color='#009900'>/*  WORK    (workspace/output) DOUBLE PRECISION array, dimension (MAX(1,LWORK)) */</font>
+<font color='#009900'>/*          On exit, if INFO = 0, WORK(1) returns the optimal LWORK. */</font>
+
+<font color='#009900'>/*  LWORK   (input) INTEGER */</font>
+<font color='#009900'>/*          The length of the array WORK.  LWORK &gt;= max(1,3*N-1). */</font>
+<font color='#009900'>/*          For optimal efficiency, LWORK &gt;= (NB+2)*N, */</font>
+<font color='#009900'>/*          where NB is the blocksize for DSYTRD returned by ILAENV. */</font>
+
+<font color='#009900'>/*          If LWORK = -1, then a workspace query is assumed; the routine */</font>
+<font color='#009900'>/*          only calculates the optimal size of the WORK array, returns */</font>
+<font color='#009900'>/*          this value as the first entry of the WORK array, and no error */</font>
+<font color='#009900'>/*          message related to LWORK is issued by XERBLA. */</font>
+
+<font color='#009900'>/*  INFO    (output) INTEGER */</font>
+<font color='#009900'>/*          = 0:  successful exit */</font>
+<font color='#009900'>/*          &lt; 0:  if INFO = -i, the i-th argument had an illegal value */</font>
+<font color='#009900'>/*          &gt; 0:  if INFO = i, the algorithm failed to converge; i */</font>
+<font color='#009900'>/*                off-diagonal elements of an intermediate tridiagonal */</font>
+<font color='#009900'>/*                form did not converge to zero. */</font>
+
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T, 
+            <font color='#0000FF'><u>long</u></font> NR1, <font color='#0000FF'><u>long</u></font> NR2, 
+            <font color='#0000FF'><u>long</u></font> NC1, <font color='#0000FF'><u>long</u></font> NC2,
+            <font color='#0000FF'>typename</font> MM
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>int</u></font> <b><a name='syev'></a>syev</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> jobz,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> uplo,
+            matrix<font color='#5555FF'>&lt;</font>T,NR1,NC1,MM,column_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+            matrix<font color='#5555FF'>&lt;</font>T,NR2,NC2,MM,column_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> w
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>0</font>,<font color='#979000'>1</font>,MM,column_major_layout<font color='#5555FF'>&gt;</font> work;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> a.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            w.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>n,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// figure out how big the workspace needs to be.
+</font>            T work_size <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'><u>int</u></font> info <font color='#5555FF'>=</font> binding::<font color='#BB00BB'>syev</font><font face='Lucida Console'>(</font>jobz, uplo, n, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>a</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                                     a.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>work_size, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>info <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> info;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>work.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> work_size<font face='Lucida Console'>)</font>
+                work.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>work_size<font face='Lucida Console'>)</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// compute the actual decomposition 
+</font>            info <font color='#5555FF'>=</font> binding::<font color='#BB00BB'>syev</font><font face='Lucida Console'>(</font>jobz, uplo, n, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>a</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                                 a.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>work</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, work.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> info;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T, 
+            <font color='#0000FF'><u>long</u></font> NR1, <font color='#0000FF'><u>long</u></font> NR2, 
+            <font color='#0000FF'><u>long</u></font> NC1, <font color='#0000FF'><u>long</u></font> NC2,
+            <font color='#0000FF'>typename</font> MM
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>int</u></font> <b><a name='syev'></a>syev</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>char</u></font> jobz,
+            <font color='#0000FF'><u>char</u></font> uplo,
+            matrix<font color='#5555FF'>&lt;</font>T,NR1,NC1,MM,row_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+            matrix<font color='#5555FF'>&lt;</font>T,NR2,NC2,MM,row_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> w
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>0</font>,<font color='#979000'>1</font>,MM,row_major_layout<font color='#5555FF'>&gt;</font> work;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>uplo <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>L</font>'<font face='Lucida Console'>)</font>
+                uplo <font color='#5555FF'>=</font> '<font color='#FF0000'>U</font>';
+            <font color='#0000FF'>else</font>
+                uplo <font color='#5555FF'>=</font> '<font color='#FF0000'>L</font>';
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> a.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            w.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>n,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// figure out how big the workspace needs to be.
+</font>            T work_size <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'><u>int</u></font> info <font color='#5555FF'>=</font> binding::<font color='#BB00BB'>syev</font><font face='Lucida Console'>(</font>jobz, uplo, n, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>a</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                                     a.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>work_size, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>info <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> info;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>work.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> work_size<font face='Lucida Console'>)</font>
+                work.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>work_size<font face='Lucida Console'>)</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// compute the actual decomposition 
+</font>            info <font color='#5555FF'>=</font> binding::<font color='#BB00BB'>syev</font><font face='Lucida Console'>(</font>jobz, uplo, n, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>a</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                                 a.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>work</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, work.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+            a <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> info;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <b>}</b>
+
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LAPACk_EV_Hh_
+</font>
+
+
+
+
+</pre></body></html>

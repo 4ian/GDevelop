@@ -1,0 +1,750 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - pipe_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_PIPE_KERNEl_1_ 
+<font color='#0000FF'>#define</font> DLIB_PIPE_KERNEl_1_ 
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads.h.html'>../threads.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='pipe_kernel_abstract.h.html'>pipe_kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='pipe'></a>pipe</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - pipe_size == 0
+                - pipe_max_size == defined by constructor
+                - enabled == true
+                - data == a pointer to an array of ((pipe_max_size&gt;0)?pipe_max_size:1) T objects.
+                - dequeue_waiters == 0
+                - enqueue_waiters == 0
+                - first == 1
+                - last == 1
+                - unblock_sig_waiters == 0
+
+            CONVENTION
+                - size() == pipe_size
+                - max_size() == pipe_max_size
+                - is_enabled() == enabled
+
+                - m == the mutex used to lock access to all the members of this class
+
+                - dequeue_waiters == the number of threads blocked on calls to dequeue()
+                - enqueue_waiters == the number of threads blocked on calls to enqueue() and 
+                  wait_until_empty()
+                - unblock_sig_waiters == the number of threads blocked on calls to 
+                  wait_for_num_blocked_dequeues() and the destructor.  (i.e. the number of
+                  blocking calls to unblock_sig.wait())
+
+                - dequeue_sig == the signaler that threads blocked on calls to dequeue() wait on
+                - enqueue_sig == the signaler that threads blocked on calls to enqueue() 
+                  or wait_until_empty() wait on.
+                - unblock_sig == the signaler that is signaled when a thread stops blocking on a call
+                  to enqueue() or dequeue().  It is also signaled when a dequeue that will probably
+                  block is called.  The destructor and wait_for_num_blocked_dequeues are the only 
+                  things that will wait on this signaler.
+
+                - if (pipe_size &gt; 0) then
+                    - data[first] == the next item to dequeue
+                    - data[last] == the item most recently added via enqueue, so the last to dequeue.
+                - else if (pipe_max_size == 0)
+                    - if (first == 0 &amp;&amp; last == 0) then
+                        - data[0] == the next item to dequeue
+                    - else if (first == 0 &amp;&amp; last == 1) then 
+                        - data[0] has been taken out already by a dequeue
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#009900'>// this is here for backwards compatibility with older versions of dlib.
+</font>        <font color='#0000FF'>typedef</font> pipe kernel_1a;
+
+        <font color='#0000FF'>typedef</font> T type;
+
+        <font color='#0000FF'>explicit</font> <b><a name='pipe'></a>pipe</b> <font face='Lucida Console'>(</font>  
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> maximum_size
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='pipe'></a>pipe</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='empty'></a>empty</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='wait_until_empty'></a>wait_until_empty</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='wait_for_num_blocked_dequeues'></a>wait_for_num_blocked_dequeues</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font><font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='enable'></a>enable</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='disable'></a>disable</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_enqueue_enabled'></a>is_enqueue_enabled</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='disable_enqueue'></a>disable_enqueue</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='enable_enqueue'></a>enable_enqueue</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_dequeue_enabled'></a>is_dequeue_enabled</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='disable_dequeue'></a>disable_dequeue</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='enable_dequeue'></a>enable_dequeue</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_enabled'></a>is_enabled</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='max_size'></a>max_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='enqueue'></a>enqueue</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='dequeue'></a>dequeue</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='enqueue_or_timeout'></a>enqueue_or_timeout</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> item,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='dequeue_or_timeout'></a>dequeue_or_timeout</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> item,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout
+        <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pipe_size;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pipe_max_size;
+        <font color='#0000FF'><u>bool</u></font> enabled;
+
+        T<font color='#5555FF'>*</font> <font color='#0000FF'>const</font> data;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> first;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> last;
+
+        mutex m;
+        signaler dequeue_sig;
+        signaler enqueue_sig;
+        signaler unblock_sig;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> dequeue_waiters;
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> enqueue_waiters;
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> unblock_sig_waiters;
+        <font color='#0000FF'><u>bool</u></font> enqueue_enabled;
+        <font color='#0000FF'><u>bool</u></font> dequeue_enabled;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='pipe'></a>pipe</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> pipe<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        pipe<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> pipe<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;    
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                      member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    pipe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='pipe'></a>pipe</b> <font face='Lucida Console'>(</font>  
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> maximum_size
+    <font face='Lucida Console'>)</font> : 
+        pipe_size<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        pipe_max_size<font face='Lucida Console'>(</font>maximum_size<font face='Lucida Console'>)</font>,
+        enabled<font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>,
+        data<font face='Lucida Console'>(</font><font color='#0000FF'>new</font> T[<font face='Lucida Console'>(</font>maximum_size<font color='#5555FF'>&gt;</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> ? maximum_size : <font color='#979000'>1</font>]<font face='Lucida Console'>)</font>,
+        first<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,
+        last<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,
+        dequeue_sig<font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>,
+        enqueue_sig<font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>,
+        unblock_sig<font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>,
+        dequeue_waiters<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        enqueue_waiters<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        unblock_sig_waiters<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        enqueue_enabled<font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>,
+        dequeue_enabled<font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    pipe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    ~<b><a name='pipe'></a>pipe</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>unblock_sig_waiters;
+
+        <font color='#009900'>// first make sure no one is blocked on any calls to enqueue() or dequeue()
+</font>        enabled <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        dequeue_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        enqueue_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        unblock_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// wait for all threads to unblock
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>dequeue_waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> enqueue_waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> unblock_sig_waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            unblock_sig.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>delete</font> [] data;
+        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>unblock_sig_waiters;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> pipe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='empty'></a>empty</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        pipe_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#009900'>// let any calls to enqueue() know that the pipe is now empty
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enqueue_waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            enqueue_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> pipe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='wait_until_empty'></a>wait_until_empty</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// this function is sort of like a call to enqueue so treat it like that
+</font>        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>enqueue_waiters;
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>pipe_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> enabled <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> dequeue_enabled <font face='Lucida Console'>)</font>
+            enqueue_sig.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// let the destructor know we are ending if it is blocked waiting
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            unblock_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>enqueue_waiters;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> pipe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='enable'></a>enable</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        enabled <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> pipe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='disable'></a>disable</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        enabled <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        dequeue_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        enqueue_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        unblock_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> pipe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='is_enabled'></a>is_enabled</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> enabled;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pipe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='max_size'></a>max_size</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> pipe_max_size;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pipe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> pipe_size;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> pipe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='enqueue'></a>enqueue</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>enqueue_waiters;
+
+        <font color='#009900'>// wait until there is room or we are disabled 
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>pipe_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> pipe_max_size <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> enabled <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> enqueue_enabled <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+               <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>pipe_max_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> first <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+            enqueue_sig.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> enqueue_enabled <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>enqueue_waiters;
+            <font color='#009900'>// let the destructor know we are unblocking
+</font>            unblock_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#009900'>// set the appropriate values for first and last
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pipe_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            first <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            last <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            last <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>last<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>pipe_max_size;
+        <b>}</b>
+
+
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>item,data[last]<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// wake up a call to dequeue() if there are any currently blocked
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dequeue_waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            dequeue_sig.<font color='#BB00BB'>signal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pipe_max_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>pipe_size;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// wait for a dequeue to take the item out
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>last <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> enabled <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> enqueue_enabled<font face='Lucida Console'>)</font>
+                enqueue_sig.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>last <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>enabled <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> enqueue_enabled <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                last <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                first <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+                <font color='#009900'>// no one dequeued this object to put it back into item
+</font>                <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>item,data[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+
+                <font color='#5555FF'>-</font><font color='#5555FF'>-</font>enqueue_waiters;
+                <font color='#009900'>// let the destructor know we are unblocking
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>unblock_sig_waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    unblock_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+
+            last <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            first <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            <font color='#009900'>// tell any waiting calls to enqueue() that one of them can proceed
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enqueue_waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                enqueue_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// let the destructor know we are unblocking
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> unblock_sig_waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                unblock_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>enqueue_waiters;
+        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> pipe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='dequeue'></a>dequeue</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>dequeue_waiters;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pipe_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// notify wait_for_num_blocked_dequeues()
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>unblock_sig_waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                unblock_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// notify any blocked enqueue_or_timeout() calls
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enqueue_waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                enqueue_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// wait until there is something in the pipe or we are disabled 
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>pipe_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> enabled <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> dequeue_enabled <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+               <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>pipe_max_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> first <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> last <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+            dequeue_sig.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> dequeue_enabled <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>dequeue_waiters;
+            <font color='#009900'>// let the destructor know we are unblocking
+</font>            unblock_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>item,data[first]<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pipe_max_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// set the appropriate values for first 
+</font>            first <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>first<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>pipe_max_size;
+
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>pipe_size;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// let the enqueue waiting on us know that we took the 
+</font>            <font color='#009900'>// item out already.
+</font>            last <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#009900'>// wake up a call to enqueue() if there are any currently blocked
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enqueue_waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            enqueue_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>dequeue_waiters;
+        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> pipe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='enqueue_or_timeout'></a>enqueue_or_timeout</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> item,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>enqueue_waiters;
+
+        <font color='#009900'>// wait until there is room or we are disabled or 
+</font>        <font color='#009900'>// we run out of time.
+</font>        <font color='#0000FF'><u>bool</u></font> timed_out <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>pipe_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> pipe_max_size <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> enabled <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> enqueue_enabled <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+               <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>pipe_max_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> dequeue_waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> first <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>timeout <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> enqueue_sig.<font color='#BB00BB'>wait_or_timeout</font><font face='Lucida Console'>(</font>timeout<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                timed_out <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> timed_out <font color='#5555FF'>|</font><font color='#5555FF'>|</font> enqueue_enabled <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>enqueue_waiters;
+            <font color='#009900'>// let the destructor know we are unblocking
+</font>            unblock_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#009900'>// set the appropriate values for first and last
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pipe_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            first <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            last <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            last <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>last<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>pipe_max_size;
+        <b>}</b>
+
+
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>item,data[last]<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// wake up a call to dequeue() if there are any currently blocked
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dequeue_waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            dequeue_sig.<font color='#BB00BB'>signal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pipe_max_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>pipe_size;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// wait for a dequeue to take the item out
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>last <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> enabled <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> enqueue_enabled<font face='Lucida Console'>)</font>
+                enqueue_sig.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>last <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>enabled <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> enqueue_enabled <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                last <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                first <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+                <font color='#009900'>// no one dequeued this object to put it back into item
+</font>                <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>item,data[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+
+                <font color='#5555FF'>-</font><font color='#5555FF'>-</font>enqueue_waiters;
+                <font color='#009900'>// let the destructor know we are unblocking
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>unblock_sig_waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    unblock_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+
+            last <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            first <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            <font color='#009900'>// tell any waiting calls to enqueue() that one of them can proceed
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enqueue_waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                enqueue_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// let the destructor know we are unblocking
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> unblock_sig_waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                unblock_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>enqueue_waiters;
+        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> pipe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='dequeue_or_timeout'></a>dequeue_or_timeout</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> item,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>dequeue_waiters;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pipe_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// notify wait_for_num_blocked_dequeues()
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>unblock_sig_waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                unblock_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// notify any blocked enqueue_or_timeout() calls
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enqueue_waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                enqueue_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> timed_out <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#009900'>// wait until there is something in the pipe or we are disabled or we timeout.
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>pipe_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> enabled <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> dequeue_enabled <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+               <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>pipe_max_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> first <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> last <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>timeout <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> dequeue_sig.<font color='#BB00BB'>wait_or_timeout</font><font face='Lucida Console'>(</font>timeout<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                timed_out <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> timed_out <font color='#5555FF'>|</font><font color='#5555FF'>|</font> dequeue_enabled <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>dequeue_waiters;
+            <font color='#009900'>// let the destructor know we are unblocking
+</font>            unblock_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>item,data[first]<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pipe_max_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// set the appropriate values for first 
+</font>            first <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>first<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>pipe_max_size;
+
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>pipe_size;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// let the enqueue waiting on us know that we took the 
+</font>            <font color='#009900'>// item out already.
+</font>            last <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#009900'>// wake up a call to enqueue() if there are any currently blocked
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enqueue_waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            enqueue_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>dequeue_waiters;
+        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> pipe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='wait_for_num_blocked_dequeues'></a>wait_for_num_blocked_dequeues</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+    <font face='Lucida Console'>)</font><font color='#0000FF'>const</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>unblock_sig_waiters;
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>dequeue_waiters <font color='#5555FF'>&lt;</font> num <font color='#5555FF'>|</font><font color='#5555FF'>|</font> pipe_size <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> enabled <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> dequeue_enabled<font face='Lucida Console'>)</font>
+            unblock_sig.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// let the destructor know we are ending if it is blocked waiting
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            unblock_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>unblock_sig_waiters;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> pipe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='is_enqueue_enabled'></a>is_enqueue_enabled</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> enqueue_enabled;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> pipe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='disable_enqueue'></a>disable_enqueue</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        enqueue_enabled <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        enqueue_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> pipe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='enable_enqueue'></a>enable_enqueue</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        enqueue_enabled <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> pipe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='is_dequeue_enabled'></a>is_dequeue_enabled</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> dequeue_enabled;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> pipe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='disable_dequeue'></a>disable_dequeue</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        dequeue_enabled <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        dequeue_sig.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> pipe<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='enable_dequeue'></a>enable_dequeue</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        dequeue_enabled <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_PIPE_KERNEl_1_
+</font>
+
+</pre></body></html>

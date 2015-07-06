@@ -1,0 +1,102 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - cross_validate_multiclass_trainer_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_CROSS_VALIDATE_MULTICLASS_TRaINER_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_CROSS_VALIDATE_MULTICLASS_TRaINER_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> dec_funct_type,
+        <font color='#0000FF'>typename</font> sample_type,
+        <font color='#0000FF'>typename</font> label_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <b><a name='test_multiclass_decision_function'></a>test_multiclass_decision_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> dec_funct_type<font color='#5555FF'>&amp;</font> dec_funct,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x_test,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> y_test
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is_learning_problem(x_test, y_test)
+            - dec_funct_type == some kind of multiclass decision function object 
+              (e.g. one_vs_one_decision_function)
+        ensures
+            - Tests dec_funct against the given samples in x_test and labels in y_test
+              and returns a confusion matrix summarizing the results.
+            - let L = dec_funct.get_labels().  Then the confusion matrix C returned 
+              by this function has the following properties.
+                - C.nr() == C.nc() == L.size()
+                - C(r,c) == the number of times a sample with label L(r) was predicted
+                  to have a label of L(c)
+            - Any samples with a y_test value not in L are ignored.  That is, samples
+              with labels the decision function hasn't ever seen before are ignored.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='cross_validation_error'></a>cross_validation_error</b> : <font color='#0000FF'>public</font> dlib::error 
+    <b>{</b> 
+        <font color='#009900'>/*!
+            This is the exception class used by the cross_validate_multiclass_trainer() 
+            routine.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type,
+        <font color='#0000FF'>typename</font> sample_type,
+        <font color='#0000FF'>typename</font> label_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <b><a name='cross_validate_multiclass_trainer'></a>cross_validate_multiclass_trainer</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> y,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> folds
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is_learning_problem(x,y)
+            - 1 &lt; folds &lt;= x.size()
+            - trainer_type == some kind of multiclass classification trainer object (e.g. one_vs_one_trainer)
+        ensures
+            - performs k-fold cross validation by using the given trainer to solve the
+              given multiclass classification problem for the given number of folds.
+              Each fold is tested using the output of the trainer and the confusion
+              matrix from all folds is summed and returned.
+            - The total confusion matrix is computed by running test_binary_decision_function()
+              on each fold and summing its output.
+            - The number of folds used is given by the folds argument.
+            - let L = select_all_distinct_labels(y).  Then the confusion matrix C returned 
+              by this function has the following properties.
+                - C.nr() == C.nc() == L.size()
+                - C(r,c) == the number of times a sample with label L(r) was predicted
+                  to have a label of L(c)
+
+              Note that sum(C) might be slightly less than x.size().  This happens if the number of 
+              samples in a class is not an even multiple of folds.  This is because each fold has the 
+              same number of test samples in it and so if the number of samples in a class isn't a 
+              multiple of folds then a few are not tested.  
+        throws
+            - cross_validation_error
+              This exception is thrown if one of the classes has fewer samples than
+              the number of requested folds.
+    !*/</font>
+
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CROSS_VALIDATE_MULTICLASS_TRaINER_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

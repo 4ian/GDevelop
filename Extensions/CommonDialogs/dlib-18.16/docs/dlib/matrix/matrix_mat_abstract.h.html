@@ -1,0 +1,217 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - matrix_mat_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_MATRIx_MAT_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_MATRIx_MAT_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_abstract.h.html'>matrix_abstract.h</a>"
+#inclue <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array/array_kernel_abstract.h.html'>../array/array_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array2d/array2d_kernel_abstract.h.html'>../array2d/array2d_kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> EXP
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='mat'></a>mat</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns m
+              (i.e. this function just returns the input matrix without any modifications)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='mat'></a>mat</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h or image_type is a image_view or
+              const_image_view object.
+        ensures
+            - This function converts any kind of generic image object into a dlib::matrix
+              expression.  Therefore, it is capable of converting objects like dlib::array2d
+              of dlib::cv_image.
+            - returns a matrix R such that:
+                - R.nr() == array.nr() 
+                - R.nc() == array.nc()
+                - for all valid r and c:
+                  R(r, c) == array[r][c]
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> MM
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='mat'></a>mat</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> array<font color='#5555FF'>&lt;</font>T,MM<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a matrix R such that:
+                - is_col_vector(R) == true 
+                - R.size() == m.size()
+                - for all valid r:
+                  R(r) == m[r]
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> value_type,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='mat'></a>mat</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>value_type,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vector
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a matrix R such that:
+                - is_col_vector(R) == true 
+                - R.size() == vector.size()
+                - for all valid r:
+                  R(r) == vector[r]
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> value_type,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='mat'></a>mat</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std_vector_c<font color='#5555FF'>&lt;</font>value_type,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vector
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a matrix R such that:
+                - is_col_vector(R) == true 
+                - R.size() == vector.size()
+                - for all valid r:
+                  R(r) == vector[r]
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='mat'></a>mat</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>*</font> ptr,
+        <font color='#0000FF'><u>long</u></font> nr
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - nr &gt; 0
+            - ptr == a pointer to at least nr T objects
+        ensures
+            - returns a matrix M such that:
+                - M.nr() == nr
+                - m.nc() == 1
+                - for all valid i:
+                  M(i) == ptr[i]
+            - Note that the returned matrix doesn't take "ownership" of
+              the pointer and thus will not delete or free it.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='mat'></a>mat</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>*</font> ptr,
+        <font color='#0000FF'><u>long</u></font> nr,
+        <font color='#0000FF'><u>long</u></font> nc
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - nr &gt; 0
+            - nc &gt; 0
+            - ptr == a pointer to at least nr*nc T objects
+        ensures
+            - returns a matrix M such that:
+                - M.nr() == nr
+                - m.nc() == nc 
+                - for all valid r and c:
+                  M(r,c) == ptr[r*nc + c]
+                  (i.e. the pointer is interpreted as a matrix laid out in memory
+                  in row major order)
+            - Note that the returned matrix doesn't take "ownership" of
+              the pointer and thus will not delete or free it.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='mat'></a>mat</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> ::arma::Mat<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - Converts a matrix from the Armadillo library into a dlib matrix.
+            - returns a matrix R such that:
+                - R.nr() == m.n_rows 
+                - R.nc() == m.n_cols
+                - for all valid r:
+                  R(r,c) == m(r,c)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> _Scalar, 
+        <font color='#0000FF'><u>int</u></font> _Rows, 
+        <font color='#0000FF'><u>int</u></font> _Cols, 
+        <font color='#0000FF'><u>int</u></font> _Options, 
+        <font color='#0000FF'><u>int</u></font> _MaxRows, 
+        <font color='#0000FF'><u>int</u></font> _MaxCols
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='mat'></a>mat</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> ::Eigen::Matrix<font color='#5555FF'>&lt;</font>_Scalar,_Rows,_Cols,_Options,_MaxRows,_MaxCols<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - Converts a matrix from the Eigen library into a dlib matrix.
+            - returns a matrix R such that:
+                - R.nr() == m.rows()
+                - R.nc() == m.cols()
+                - for all valid r:
+                  R(r,c) == m(r,c)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font>      <b><a name='mat'></a>mat</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> value<font face='Lucida Console'>)</font>;
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>1</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font>       <b><a name='mat'></a>mat</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>float</u></font> value<font face='Lucida Console'>)</font>;
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='mat'></a>mat</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> value<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - Converts a scalar into a matrix containing just that scalar and returns the
+              results.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MATRIx_MAT_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

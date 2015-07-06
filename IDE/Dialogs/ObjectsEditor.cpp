@@ -395,8 +395,8 @@ void ObjectsEditor::CreateRibbonPage(wxRibbonPage * page)
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Selection"), gd::SkinHelper::GetRibbonIcon("edit"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         selectionRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        selectionRibbonBar->AddButton(idRibbonModProp, !hideLabels ? _("Edition") : gd::String(), gd::SkinHelper::GetRibbonIcon("editprop"), _("Edit the selected object"));
-        selectionRibbonBar->AddButton(idRibbonModName, !hideLabels ? _("Rename") : gd::String(), gd::SkinHelper::GetRibbonIcon("editname"), _("Rename the selected item"));
+        selectionRibbonBar->AddButton(idRibbonModProp, !hideLabels ? _("Edit") : gd::String(""), gd::SkinHelper::GetRibbonIcon("editprop"), _("Edit the selected object"));
+        selectionRibbonBar->AddButton(idRibbonModName, !hideLabels ? _("Rename") : gd::String(""), gd::SkinHelper::GetRibbonIcon("editname"), _("Rename the selected item"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Clipboard"), gd::SkinHelper::GetRibbonIcon("copy"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);

@@ -1,0 +1,160 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - pngdebug.h</title></head><body bgcolor='white'><pre>
+
+<font color='#009900'>/* pngdebug.h - Debugging macros for libpng, also used in pngtest.c
+ *
+ * Copyright (c) 1998-2011 Glenn Randers-Pehrson
+ * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
+ * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ *
+ * Last changed in libpng 1.5.0 [January 6, 2011]
+ *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
+ */</font>
+
+<font color='#009900'>/* Define PNG_DEBUG at compile time for debugging information.  Higher
+ * numbers for PNG_DEBUG mean more debugging information.  This has
+ * only been added since version 0.95 so it is not implemented throughout
+ * libpng yet, but more support will be added as needed.
+ *
+ * png_debug[1-2]?(level, message ,arg{0-2})
+ *   Expands to a statement (either a simple expression or a compound
+ *   do..while(0) statement) that outputs a message with parameter
+ *   substitution if PNG_DEBUG is defined to 2 or more.  If PNG_DEBUG
+ *   is undefined, 0 or 1 every png_debug expands to a simple expression
+ *   (actually ((void)0)).
+ *
+ *   level: level of detail of message, starting at 0.  A level 'n'
+ *          message is preceded by 'n' tab characters (not implemented
+ *          on Microsoft compilers unless PNG_DEBUG_FILE is also
+ *          defined, to allow debug DLL compilation with no standard IO).
+ *   message: a printf(3) style text string.  A trailing '\n' is added
+ *            to the message.
+ *   arg: 0 to 2 arguments for printf(3) style substitution in message.
+ */</font>
+<font color='#0000FF'>#ifndef</font> PNGDEBUG_H
+<font color='#0000FF'>#define</font> PNGDEBUG_H
+<font color='#009900'>/* These settings control the formatting of messages in png.c and pngerror.c */</font>
+<font color='#009900'>/* Moved to pngdebug.h at 1.5.0 */</font>
+#  ifndef PNG_LITERAL_SHARP
+#    define PNG_LITERAL_SHARP <font color='#979000'>0x23</font>
+#  endif
+#  ifndef PNG_LITERAL_LEFT_SQUARE_BRACKET
+#    define PNG_LITERAL_LEFT_SQUARE_BRACKET <font color='#979000'>0x5b</font>
+#  endif
+#  ifndef PNG_LITERAL_RIGHT_SQUARE_BRACKET
+#    define PNG_LITERAL_RIGHT_SQUARE_BRACKET <font color='#979000'>0x5d</font>
+#  endif
+#  ifndef PNG_STRING_NEWLINE
+#    define PNG_STRING_NEWLINE "<font color='#CC0000'>\n</font>"
+#  endif
+
+<font color='#0000FF'>#ifdef</font> PNG_DEBUG
+#  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>PNG_DEBUG <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+#    <font color='#0000FF'>if</font> <font color='#5555FF'>!</font><b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>PNG_DEBUG_FILE<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>_MSC_VER<font face='Lucida Console'>)</font>
+#      include <font color='#5555FF'>&lt;</font>crtdbg.h<font color='#5555FF'>&gt;</font>
+#      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>PNG_DEBUG <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+#        ifndef _DEBUG
+#          define _DEBUG
+#        endif
+#        ifndef png_debug
+#          define <b><a name='png_debug'></a>png_debug</b><font face='Lucida Console'>(</font>l,m<font face='Lucida Console'>)</font>  <b><a name='_RPT0'></a>_RPT0</b><font face='Lucida Console'>(</font>_CRT_WARN,m PNG_STRING_NEWLINE<font face='Lucida Console'>)</font>
+#        endif
+#        ifndef png_debug1
+#          define <b><a name='png_debug1'></a>png_debug1</b><font face='Lucida Console'>(</font>l,m,p1<font face='Lucida Console'>)</font>  <b><a name='_RPT1'></a>_RPT1</b><font face='Lucida Console'>(</font>_CRT_WARN,m PNG_STRING_NEWLINE,p1<font face='Lucida Console'>)</font>
+#        endif
+#        ifndef png_debug2
+#          define <b><a name='png_debug2'></a>png_debug2</b><font face='Lucida Console'>(</font>l,m,p1,p2<font face='Lucida Console'>)</font> \
+             <b><a name='_RPT2'></a>_RPT2</b><font face='Lucida Console'>(</font>_CRT_WARN,m PNG_STRING_NEWLINE,p1,p2<font face='Lucida Console'>)</font>
+#        endif
+#      endif
+#    <font color='#0000FF'>else</font> <font color='#009900'>/* PNG_DEBUG_FILE || !_MSC_VER */</font>
+#      ifndef PNG_STDIO_SUPPORTED
+#        include <font color='#5555FF'>&lt;</font>stdio.h<font color='#5555FF'>&gt;</font> <font color='#009900'>/* not included yet */</font>
+#      endif
+#      ifndef PNG_DEBUG_FILE
+#        define PNG_DEBUG_FILE stderr
+#      endif <font color='#009900'>/* PNG_DEBUG_FILE */</font>
+
+#      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>PNG_DEBUG <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+<font color='#009900'>/* Note: ["%s"m PNG_STRING_NEWLINE] probably does not work on
+ * non-ISO compilers
+ */</font>
+#        ifdef __STDC__
+#          ifndef png_debug
+#            define <b><a name='png_debug'></a>png_debug</b><font face='Lucida Console'>(</font>l,m<font face='Lucida Console'>)</font> \
+       <font color='#0000FF'>do</font> <b>{</b> \
+       <font color='#0000FF'><u>int</u></font> num_tabs<font color='#5555FF'>=</font>l; \
+       <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>PNG_DEBUG_FILE,"<font color='#CC0000'>%s</font>"m PNG_STRING_NEWLINE,<font face='Lucida Console'>(</font>num_tabs<font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>1</font> ? "<font color='#CC0000'>\t</font>" : \
+         <font face='Lucida Console'>(</font>num_tabs<font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>2</font> ? "<font color='#CC0000'>\t\t</font>":<font face='Lucida Console'>(</font>num_tabs<font color='#5555FF'>&gt;</font><font color='#979000'>2</font> ? "<font color='#CC0000'>\t\t\t</font>":"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; \
+       <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+#          endif
+#          ifndef png_debug1
+#            define <b><a name='png_debug1'></a>png_debug1</b><font face='Lucida Console'>(</font>l,m,p1<font face='Lucida Console'>)</font> \
+       <font color='#0000FF'>do</font> <b>{</b> \
+       <font color='#0000FF'><u>int</u></font> num_tabs<font color='#5555FF'>=</font>l; \
+       <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>PNG_DEBUG_FILE,"<font color='#CC0000'>%s</font>"m PNG_STRING_NEWLINE,<font face='Lucida Console'>(</font>num_tabs<font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>1</font> ? "<font color='#CC0000'>\t</font>" : \
+         <font face='Lucida Console'>(</font>num_tabs<font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>2</font> ? "<font color='#CC0000'>\t\t</font>":<font face='Lucida Console'>(</font>num_tabs<font color='#5555FF'>&gt;</font><font color='#979000'>2</font> ? "<font color='#CC0000'>\t\t\t</font>":"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,p1<font face='Lucida Console'>)</font>; \
+       <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+#          endif
+#          ifndef png_debug2
+#            define <b><a name='png_debug2'></a>png_debug2</b><font face='Lucida Console'>(</font>l,m,p1,p2<font face='Lucida Console'>)</font> \
+       <font color='#0000FF'>do</font> <b>{</b> \
+       <font color='#0000FF'><u>int</u></font> num_tabs<font color='#5555FF'>=</font>l; \
+       <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>PNG_DEBUG_FILE,"<font color='#CC0000'>%s</font>"m PNG_STRING_NEWLINE,<font face='Lucida Console'>(</font>num_tabs<font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>1</font> ? "<font color='#CC0000'>\t</font>" : \
+         <font face='Lucida Console'>(</font>num_tabs<font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>2</font> ? "<font color='#CC0000'>\t\t</font>":<font face='Lucida Console'>(</font>num_tabs<font color='#5555FF'>&gt;</font><font color='#979000'>2</font> ? "<font color='#CC0000'>\t\t\t</font>":"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,p1,p2<font face='Lucida Console'>)</font>; \
+       <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+#          endif
+#        <font color='#0000FF'>else</font> <font color='#009900'>/* __STDC __ */</font>
+#          ifndef png_debug
+#            define <b><a name='png_debug'></a>png_debug</b><font face='Lucida Console'>(</font>l,m<font face='Lucida Console'>)</font> \
+       <font color='#0000FF'>do</font> <b>{</b> \
+       <font color='#0000FF'><u>int</u></font> num_tabs<font color='#5555FF'>=</font>l; \
+       <font color='#0000FF'><u>char</u></font> format[<font color='#979000'>256</font>]; \
+       <font color='#BB00BB'>snprintf</font><font face='Lucida Console'>(</font>format,<font color='#979000'>256</font>,"<font color='#CC0000'>%s%s%s</font>",<font face='Lucida Console'>(</font>num_tabs<font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>1</font> ? "<font color='#CC0000'>\t</font>" : \
+         <font face='Lucida Console'>(</font>num_tabs<font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>2</font> ? "<font color='#CC0000'>\t\t</font>":<font face='Lucida Console'>(</font>num_tabs<font color='#5555FF'>&gt;</font><font color='#979000'>2</font> ? "<font color='#CC0000'>\t\t\t</font>":"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, \
+         m,PNG_STRING_NEWLINE<font face='Lucida Console'>)</font>; \
+       <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>PNG_DEBUG_FILE,format<font face='Lucida Console'>)</font>; \
+       <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+#          endif
+#          ifndef png_debug1
+#            define <b><a name='png_debug1'></a>png_debug1</b><font face='Lucida Console'>(</font>l,m,p1<font face='Lucida Console'>)</font> \
+       <font color='#0000FF'>do</font> <b>{</b> \
+       <font color='#0000FF'><u>int</u></font> num_tabs<font color='#5555FF'>=</font>l; \
+       <font color='#0000FF'><u>char</u></font> format[<font color='#979000'>256</font>]; \
+       <font color='#BB00BB'>snprintf</font><font face='Lucida Console'>(</font>format,<font color='#979000'>256</font>,"<font color='#CC0000'>%s%s%s</font>",<font face='Lucida Console'>(</font>num_tabs<font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>1</font> ? "<font color='#CC0000'>\t</font>" : \
+         <font face='Lucida Console'>(</font>num_tabs<font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>2</font> ? "<font color='#CC0000'>\t\t</font>":<font face='Lucida Console'>(</font>num_tabs<font color='#5555FF'>&gt;</font><font color='#979000'>2</font> ? "<font color='#CC0000'>\t\t\t</font>":"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, \
+         m,PNG_STRING_NEWLINE<font face='Lucida Console'>)</font>; \
+       <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>PNG_DEBUG_FILE,format,p1<font face='Lucida Console'>)</font>; \
+       <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+#          endif
+#          ifndef png_debug2
+#            define <b><a name='png_debug2'></a>png_debug2</b><font face='Lucida Console'>(</font>l,m,p1,p2<font face='Lucida Console'>)</font> \
+       <font color='#0000FF'>do</font> <b>{</b> \
+       <font color='#0000FF'><u>int</u></font> num_tabs<font color='#5555FF'>=</font>l; \
+       <font color='#0000FF'><u>char</u></font> format[<font color='#979000'>256</font>]; \
+       <font color='#BB00BB'>snprintf</font><font face='Lucida Console'>(</font>format,<font color='#979000'>256</font>,"<font color='#CC0000'>%s%s%s</font>",<font face='Lucida Console'>(</font>num_tabs<font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>1</font> ? "<font color='#CC0000'>\t</font>" : \
+         <font face='Lucida Console'>(</font>num_tabs<font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>2</font> ? "<font color='#CC0000'>\t\t</font>":<font face='Lucida Console'>(</font>num_tabs<font color='#5555FF'>&gt;</font><font color='#979000'>2</font> ? "<font color='#CC0000'>\t\t\t</font>":"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, \
+         m,PNG_STRING_NEWLINE<font face='Lucida Console'>)</font>; \
+       <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>PNG_DEBUG_FILE,format,p1,p2<font face='Lucida Console'>)</font>; \
+       <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+#          endif
+#        endif <font color='#009900'>/* __STDC __ */</font>
+#      endif <font color='#009900'>/* (PNG_DEBUG &gt; 1) */</font>
+
+#    endif <font color='#009900'>/* _MSC_VER */</font>
+#  endif <font color='#009900'>/* (PNG_DEBUG &gt; 0) */</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNG_DEBUG */</font>
+<font color='#0000FF'>#ifndef</font> png_debug
+#  define <b><a name='png_debug'></a>png_debug</b><font face='Lucida Console'>(</font>l, m<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifndef</font> png_debug1
+#  define <b><a name='png_debug1'></a>png_debug1</b><font face='Lucida Console'>(</font>l, m, p1<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifndef</font> png_debug2
+#  define <b><a name='png_debug2'></a>png_debug2</b><font face='Lucida Console'>(</font>l, m, p1, p2<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNGDEBUG_H */</font>
+
+</pre></body></html>

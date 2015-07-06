@@ -1,0 +1,152 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - roc_trainer.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_ROC_TRAINEr_H_
+<font color='#0000FF'>#define</font> DLIB_ROC_TRAINEr_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='roc_trainer_abstract.h.html'>roc_trainer_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='roc_trainer_type'></a>roc_trainer_type</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::kernel_type kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::trained_function_type trained_function_type;
+
+        <b><a name='roc_trainer_type'></a>roc_trainer_type</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> : desired_accuracy<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, class_selection<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+        <b><a name='roc_trainer_type'></a>roc_trainer_type</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer_,
+            <font color='#0000FF'>const</font> scalar_type<font color='#5555FF'>&amp;</font> desired_accuracy_,
+            <font color='#0000FF'>const</font> scalar_type<font color='#5555FF'>&amp;</font> class_selection_
+        <font face='Lucida Console'>)</font> : trainer<font face='Lucida Console'>(</font>trainer_<font face='Lucida Console'>)</font>, desired_accuracy<font face='Lucida Console'>(</font>desired_accuracy_<font face='Lucida Console'>)</font>, class_selection<font face='Lucida Console'>(</font>class_selection_<font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> desired_accuracy <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> desired_accuracy <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                         <font face='Lucida Console'>(</font>class_selection <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> class_selection <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>, 
+                        "<font color='#CC0000'>\t roc_trainer_type::roc_trainer_type()</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t desired_accuracy: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> desired_accuracy 
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t class_selection:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> class_selection 
+                        <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> trained_function_type <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> labels
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <font color='#009900'>/*!
+            requires
+                - is_binary_classification_problem(samples, labels) == true
+        !*/</font>
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_binary_classification_problem</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>, 
+                        "<font color='#CC0000'>\t roc_trainer_type::train()</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                        <font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>do_train</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>labels<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> trained_function_type <b><a name='do_train'></a>do_train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> labels
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            trained_function_type df <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// clear out the old bias
+</font>            df.b <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#009900'>// obtain all the scores from the df using all the class_selection labeled samples
+</font>            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> scores;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>labels</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> class_selection<font face='Lucida Console'>)</font>
+                    scores.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>df</font><font face='Lucida Console'>(</font><font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>class_selection <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>scores.<font color='#BB00BB'>rbegin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, scores.<font color='#BB00BB'>rend</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>scores.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, scores.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now pick out the index that gives us the desired accuracy with regards to selected class 
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>desired_accuracy<font color='#5555FF'>*</font>scores.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> scores.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                idx <font color='#5555FF'>=</font> scores.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+            df.b <font color='#5555FF'>=</font> scores[idx];
+
+            <font color='#009900'>// In this case add a very small extra amount to the bias so that all the samples
+</font>            <font color='#009900'>// with the class_selection label are classified correctly.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>desired_accuracy <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>class_selection <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                    df.b <font color='#5555FF'>-</font><font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>df.b;
+                <font color='#0000FF'>else</font>
+                    df.b <font color='#5555FF'>+</font><font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>df.b;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> df;
+        <b>}</b>
+
+        trainer_type trainer;
+        scalar_type desired_accuracy;
+        scalar_type class_selection;
+    <b>}</b>; 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> roc_trainer_type<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font> <b><a name='roc_c1_trainer'></a>roc_c1_trainer</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> trainer_type::scalar_type<font color='#5555FF'>&amp;</font> desired_accuracy
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> roc_trainer_type<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>trainer, desired_accuracy, <font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> roc_trainer_type<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font> <b><a name='roc_c2_trainer'></a>roc_c2_trainer</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> trainer_type::scalar_type<font color='#5555FF'>&amp;</font> desired_accuracy
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> roc_trainer_type<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>trainer, desired_accuracy, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ROC_TRAINEr_H_
+</font>
+
+
+</pre></body></html>

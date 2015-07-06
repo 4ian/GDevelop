@@ -1,0 +1,81 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - member_function_pointer_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font>
+<font color='#009900'>/*
+    This is an example illustrating the use of the member_function_pointer object 
+    from the dlib C++ Library.
+
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>member_function_pointer.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>class</font> <b><a name='example_object'></a>example_object</b> 
+<b>{</b>
+<font color='#0000FF'>public</font>:
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='do_something'></a>do_something</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hello world</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='print_this_number'></a>print_this_number</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>int</u></font> num
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>number you gave me = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+<b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// create a pointer that can point to member functions that take no arguments
+</font>    member_function_pointer<font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> mfp1;
+
+    <font color='#009900'>// create a pointer that can point to member functions that take a single int argument
+</font>    member_function_pointer<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> mfp2;
+
+    example_object obj;
+
+    <font color='#009900'>// now we set the mfp1 pointer to point to the member function do_something() 
+</font>    <font color='#009900'>// on the obj object.
+</font>    mfp1.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>obj, <font color='#5555FF'>&amp;</font>example_object::do_something<font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// now we set the mfp1 pointer to point to the member function print_this_number() 
+</font>    <font color='#009900'>// on the obj object.
+</font>    mfp2.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>obj, <font color='#5555FF'>&amp;</font>example_object::print_this_number<font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// Now we can call the function this pointer points to.  This calls the function
+</font>    <font color='#009900'>// obj.do_something() via our member function pointer.
+</font>    <font color='#BB00BB'>mfp1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Now we can call the function this pointer points to.  This calls the function
+</font>    <font color='#009900'>// obj.print_this_number(5) via our member function pointer.
+</font>    <font color='#BB00BB'>mfp2</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// The above example shows a very simple use of the member_function_pointer. 
+</font>    <font color='#009900'>// A more interesting use of the member_function_pointer is in the implementation
+</font>    <font color='#009900'>// of callbacks or event handlers.  For example, when you register an event
+</font>    <font color='#009900'>// handler for a dlib::button click it uses a member_function_pointer 
+</font>    <font color='#009900'>// internally to save and later call your event handler.  
+</font><b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+
+
+</pre></body></html>

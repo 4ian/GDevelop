@@ -1,0 +1,149 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - full_object_detection_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_FULL_OBJECT_DeTECTION_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_FULL_OBJECT_DeTECTION_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> point <b><a name='OBJECT_PART_NOT_PRESENT'></a>OBJECT_PART_NOT_PRESENT</b><font face='Lucida Console'>(</font><font color='#979000'>0x7FFFFFFF</font>,
+                                               <font color='#979000'>0x7FFFFFFF</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='full_object_detection'></a>full_object_detection</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents the location of an object in an image along with the
+                positions of each of its constituent parts.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='full_object_detection'></a>full_object_detection</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>point<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> parts
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_rect() == rect
+                - #num_parts() == parts.size()
+                - for all valid i:
+                    - part(i) == parts[i]
+        !*/</font>
+
+        <b><a name='full_object_detection'></a>full_object_detection</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_rect().is_empty() == true
+                - #num_parts() == 0
+        !*/</font>
+
+        <font color='#0000FF'>explicit</font> <b><a name='full_object_detection'></a>full_object_detection</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_rect() == rect
+                - #num_parts() == 0
+        !*/</font>
+
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> <b><a name='get_rect'></a>get_rect</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the rectangle that indicates where this object is.  In general,
+                  this should be the bounding box for the object.
+        !*/</font>
+
+        rectangle<font color='#5555FF'>&amp;</font> <b><a name='get_rect'></a>get_rect</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the rectangle that indicates where this object is.  In general,
+                  this should be the bounding box for the object.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_parts'></a>num_parts</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of parts in this object.  
+        !*/</font>
+
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> <b><a name='part'></a>part</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            requires
+                - idx &lt; num_parts()
+            ensures
+                - returns the location of the center of the idx-th part of this object.
+                  Note that it is valid for a part to be "not present".  This is indicated
+                  when the return value of part() is equal to OBJECT_PART_NOT_PRESENT. 
+                  This is useful for modeling object parts that are not always observed.
+        !*/</font>
+
+        point<font color='#5555FF'>&amp;</font> <b><a name='part'></a>part</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - idx &lt; num_parts()
+            ensures
+                - returns the location of the center of the idx-th part of this object.
+                  Note that it is valid for a part to be "not present".  This is indicated
+                  when the return value of part() is equal to OBJECT_PART_NOT_PRESENT. 
+                  This is useful for modeling object parts that are not always observed.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> full_object_detection<font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        full_object_detection<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='all_parts_in_rect'></a>all_parts_in_rect</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> full_object_detection<font color='#5555FF'>&amp;</font> obj
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns true if all the parts in obj are contained within obj.get_rect().
+              That is, returns true if and only if, for all valid i, the following is
+              always true:
+                obj.get_rect().contains(obj.part(i)) == true || obj.part(i) == OBJECT_PART_NOT_PRESENT
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_FULL_OBJECT_DeTECTION_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

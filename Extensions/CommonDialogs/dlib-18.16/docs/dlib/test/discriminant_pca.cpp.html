@@ -1,0 +1,368 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - discriminant_pca.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>rand.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>string.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+    dlib::logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.discriminant_pca</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>using</font> dlib::equal;
+
+    <font color='#0000FF'>class</font> <b><a name='discriminant_pca_tester'></a>discriminant_pca_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a unit test.  When it is constructed
+                it adds itself into the testing framework.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+        <b><a name='discriminant_pca_tester'></a>discriminant_pca_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>
+                "<font color='#CC0000'>test_discriminant_pca</font>",       <font color='#009900'>// the command line argument name for this test
+</font>                "<font color='#CC0000'>Run tests on the discriminant_pca object.</font>", <font color='#009900'>// the command line argument description
+</font>                <font color='#979000'>0</font>                     <font color='#009900'>// the number of command line arguments for this test
+</font>            <font face='Lucida Console'>)</font>
+        <b>{</b>
+            thetime <font color='#5555FF'>=</font> <font color='#BB00BB'>time</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        time_t thetime;
+        dlib::rand rnd;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> dpca_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='test1'></a>test1</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            dpca_type dpca, dpca2, dpca3;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>in_vector_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>between_class_weight</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>within_class_weight</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// generate a bunch of 4 dimensional vectors and compute the normal PCA transformation matrix
+</font>            <font color='#009900'>// and just make sure it is a unitary matrix as it should be.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>5000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dpca.<font color='#BB00BB'>add_to_total_variance</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>in_vector_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> mat <font color='#5555FF'>=</font> dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>mat<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>mat<font face='Lucida Console'>)</font>, identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            mat <font color='#5555FF'>=</font> dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>0.9</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>mat<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>mat<font face='Lucida Console'>)</font>, identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>mat.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> eig;
+            dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font>mat, eig, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>mat<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>mat<font face='Lucida Console'>)</font>, identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// check that all eigen values are grater than 0
+</font>            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>eig <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>eig.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> mat.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>eig<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// check that the eigenvalues are sorted
+</font>            <font color='#0000FF'><u>double</u></font> last <font color='#5555FF'>=</font> <font color='#BB00BB'>eig</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> eig.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>last <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>eig</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <b>{</b>
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> mat <font color='#5555FF'>=</font> dpca.<font color='#BB00BB'>dpca_matrix_of_size</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>mat<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>mat<font face='Lucida Console'>)</font>, identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <b>{</b>
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> mat <font color='#5555FF'>=</font> dpca.<font color='#BB00BB'>dpca_matrix_of_size</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>mat<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>mat<font face='Lucida Console'>)</font>, identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+            dpca.<font color='#BB00BB'>set_within_class_weight</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            dpca.<font color='#BB00BB'>set_between_class_weight</font><font face='Lucida Console'>(</font><font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>in_vector_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>within_class_weight</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>between_class_weight</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+
+
+            ostringstream sout;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>dpca, sout<font face='Lucida Console'>)</font>;
+            istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>dpca2, sin<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now make sure the serialization worked
+</font>            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>in_vector_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>within_class_weight</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>between_class_weight</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca2.<font color='#BB00BB'>in_vector_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca2.<font color='#BB00BB'>within_class_weight</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca2.<font color='#BB00BB'>between_class_weight</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, dpca2.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>mat, dpca2.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>, mat, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now test swap
+</font>            dpca2.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>dpca3<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca2.<font color='#BB00BB'>in_vector_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca2.<font color='#BB00BB'>between_class_weight</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca2.<font color='#BB00BB'>within_class_weight</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca3.<font color='#BB00BB'>in_vector_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca3.<font color='#BB00BB'>within_class_weight</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca3.<font color='#BB00BB'>between_class_weight</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>mat, dpca3.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>dpca3 <font color='#5555FF'>+</font> dpca3<font face='Lucida Console'>)</font>.<font color='#BB00BB'>in_vector_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>dpca3 <font color='#5555FF'>+</font> dpca3<font face='Lucida Console'>)</font>.<font color='#BB00BB'>within_class_weight</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>dpca3 <font color='#5555FF'>+</font> dpca3<font face='Lucida Console'>)</font>.<font color='#BB00BB'>between_class_weight</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+
+            dpca.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>in_vector_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>between_class_weight</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>within_class_weight</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> dpca_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='test2'></a>test2</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            dpca_type dpca, dpca2, dpca3;
+
+            <font color='#0000FF'>typename</font> dpca_type::column_matrix <font color='#BB00BB'>samp1</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>samp2</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>5000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dpca.<font color='#BB00BB'>add_to_total_variance</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>in_vector_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// do this to subtract out the variance along the 3rd axis 
+</font>                samp1 <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+                samp2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>;
+                dpca.<font color='#BB00BB'>add_to_within_class_variance</font><font face='Lucida Console'>(</font>samp1, samp2<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> mat;
+
+            dpca.<font color='#BB00BB'>set_within_class_weight</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            mat <font color='#5555FF'>=</font> dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>mat<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>mat<font face='Lucida Console'>)</font>, identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            dpca.<font color='#BB00BB'>set_within_class_weight</font><font face='Lucida Console'>(</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// the 3rd column of the transformation matrix should be all zero since
+</font>            <font color='#009900'>// we killed all the variation long the 3rd axis
+</font>            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+            mat <font color='#5555FF'>=</font> dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>mat<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>mat<font face='Lucida Console'>)</font>, identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> dpca_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='test3'></a>test3</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            dpca_type dpca, dpca2, dpca3;
+
+            <font color='#0000FF'>typename</font> dpca_type::column_matrix <font color='#BB00BB'>samp1</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>samp2</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>5000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dpca.<font color='#BB00BB'>add_to_total_variance</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>in_vector_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// do this to subtract out the variance along the 3rd axis 
+</font>                samp1 <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+                samp2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>;
+                dpca.<font color='#BB00BB'>add_to_within_class_variance</font><font face='Lucida Console'>(</font>samp1, samp2<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// do this to subtract out the variance along the 1st axis 
+</font>                samp1 <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+                samp2 <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+                dpca.<font color='#BB00BB'>add_to_within_class_variance</font><font face='Lucida Console'>(</font>samp1, samp2<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> mat;
+
+            dpca.<font color='#BB00BB'>set_within_class_weight</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            mat <font color='#5555FF'>=</font> dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>mat<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>mat<font face='Lucida Console'>)</font>, identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            dpca.<font color='#BB00BB'>set_within_class_weight</font><font face='Lucida Console'>(</font><font color='#979000'>10000</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// the 1st and 3rd columns of the transformation matrix should be all zero since
+</font>            <font color='#009900'>// we killed all the variation long the 1st and 3rd axes
+</font>            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+            mat <font color='#5555FF'>=</font> dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>mat<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>mat<font face='Lucida Console'>)</font>, identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> dpca_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='test4'></a>test4</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            dpca_type dpca, dpca2, dpca3;
+
+            dpca_type add_dpca1, add_dpca2, add_dpca3, add_dpca4, sum_dpca;
+
+            <font color='#0000FF'>typename</font> dpca_type::column_matrix <font color='#BB00BB'>samp1</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>samp2</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>, samp;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>5000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                samp <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font>;
+                dpca.<font color='#BB00BB'>add_to_total_variance</font><font face='Lucida Console'>(</font>samp<font face='Lucida Console'>)</font>;
+                add_dpca4.<font color='#BB00BB'>add_to_total_variance</font><font face='Lucida Console'>(</font>samp<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>in_vector_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// do this to subtract out the variance along the 3rd axis 
+</font>                samp1 <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+                samp2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>;
+                dpca.<font color='#BB00BB'>add_to_within_class_variance</font><font face='Lucida Console'>(</font>samp1, samp2<font face='Lucida Console'>)</font>;
+                add_dpca1.<font color='#BB00BB'>add_to_within_class_variance</font><font face='Lucida Console'>(</font>samp1, samp2<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// do this to subtract out the variance along the 1st axis 
+</font>                samp1 <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+                samp2 <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+                dpca.<font color='#BB00BB'>add_to_within_class_variance</font><font face='Lucida Console'>(</font>samp1, samp2<font face='Lucida Console'>)</font>;
+                add_dpca2.<font color='#BB00BB'>add_to_within_class_variance</font><font face='Lucida Console'>(</font>samp1, samp2<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// do this to add the variance along the 3rd axis back in
+</font>                samp1 <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+                samp2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>;
+                dpca.<font color='#BB00BB'>add_to_between_class_variance</font><font face='Lucida Console'>(</font>samp1, samp2<font face='Lucida Console'>)</font>;
+                add_dpca3.<font color='#BB00BB'>add_to_between_class_variance</font><font face='Lucida Console'>(</font>samp1, samp2<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> mat, mat2;
+
+            sum_dpca <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>dpca_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>dpca_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> add_dpca1 <font color='#5555FF'>+</font> <font color='#BB00BB'>dpca_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> add_dpca2 <font color='#5555FF'>+</font> add_dpca3 <font color='#5555FF'>+</font> add_dpca4;
+            dpca.<font color='#BB00BB'>set_within_class_weight</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            dpca.<font color='#BB00BB'>set_between_class_weight</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            sum_dpca.<font color='#BB00BB'>set_within_class_weight</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            sum_dpca.<font color='#BB00BB'>set_between_class_weight</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            mat <font color='#5555FF'>=</font> dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>mat, sum_dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>mat<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>mat<font face='Lucida Console'>)</font>, identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            dpca.<font color='#BB00BB'>set_within_class_weight</font><font face='Lucida Console'>(</font><font color='#979000'>10000</font><font face='Lucida Console'>)</font>;
+            sum_dpca.<font color='#BB00BB'>set_within_class_weight</font><font face='Lucida Console'>(</font><font color='#979000'>10000</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// the 1st and 3rd columns of the transformation matrix should be all zero since
+</font>            <font color='#009900'>// we killed all the variation long the 1st and 3rd axes
+</font>            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+            mat <font color='#5555FF'>=</font> dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>mat<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>mat<font face='Lucida Console'>)</font>, identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>mat, mat2<font color='#5555FF'>=</font>sum_dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>9</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>mat <font color='#5555FF'>-</font> mat2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// now add the variance back in using the between class weight
+</font>            dpca.<font color='#BB00BB'>set_within_class_weight</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            dpca.<font color='#BB00BB'>set_between_class_weight</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            mat <font color='#5555FF'>=</font> dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>mat<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>mat<font face='Lucida Console'>)</font>, identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            dpca.<font color='#BB00BB'>set_within_class_weight</font> <font face='Lucida Console'>(</font><font color='#979000'>10000</font><font face='Lucida Console'>)</font>;
+            dpca.<font color='#BB00BB'>set_between_class_weight</font><font face='Lucida Console'>(</font><font color='#979000'>100000</font><font face='Lucida Console'>)</font>;
+            sum_dpca.<font color='#BB00BB'>set_within_class_weight</font> <font face='Lucida Console'>(</font><font color='#979000'>10000</font><font face='Lucida Console'>)</font>;
+            sum_dpca.<font color='#BB00BB'>set_between_class_weight</font><font face='Lucida Console'>(</font><font color='#979000'>100000</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// the first column should be all zeros
+</font>            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+            mat <font color='#5555FF'>=</font> dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>mat<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>mat<font face='Lucida Console'>)</font>, identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>mat, sum_dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> dpca_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='test5'></a>test5</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            dpca_type dpca, dpca2;
+            <font color='#0000FF'>typename</font> dpca_type::column_matrix <font color='#BB00BB'>samp1</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>samp2</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+            samp1 <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+            samp2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>5000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dpca.<font color='#BB00BB'>add_to_between_class_variance</font><font face='Lucida Console'>(</font>samp1, samp2<font face='Lucida Console'>)</font>;
+                dpca2.<font color='#BB00BB'>add_to_total_variance</font><font face='Lucida Console'>(</font>samp1<font face='Lucida Console'>)</font>;
+                dpca2.<font color='#BB00BB'>add_to_total_variance</font><font face='Lucida Console'>(</font>samp2<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> mat, eig;
+            dpca.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font>mat, eig, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// make sure the eigenvalues come out the way they should for this simple data set
+</font>            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>eig.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>eig</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font>, <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>eig</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            dpca2.<font color='#BB00BB'>dpca_matrix</font><font face='Lucida Console'>(</font>mat, eig, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// make sure the eigenvalues come out the way they should for this simple data set
+</font>            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>eig.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>eig</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.25</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>thetime;
+            <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample_type;
+            <font color='#0000FF'>typedef</font> discriminant_pca<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> dpca_type;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>time seed: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> thetime;
+            rnd.<font color='#BB00BB'>set_seed</font><font face='Lucida Console'>(</font><font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>thetime<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            test5<font color='#5555FF'>&lt;</font>dpca_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                test1<font color='#5555FF'>&lt;</font>dpca_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                test2<font color='#5555FF'>&lt;</font>dpca_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                test3<font color='#5555FF'>&lt;</font>dpca_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                test4<font color='#5555FF'>&lt;</font>dpca_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#009900'>// Create an instance of this object.  Doing this causes this test
+</font>    <font color='#009900'>// to be automatically inserted into the testing framework whenever this cpp file
+</font>    <font color='#009900'>// is linked into the project.  Note that since we are inside an unnamed-namespace 
+</font>    <font color='#009900'>// we won't get any linker errors about the symbol a being defined multiple times. 
+</font>    discriminant_pca_tester a;
+
+<b>}</b>
+
+
+
+</pre></body></html>

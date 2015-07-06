@@ -1,0 +1,222 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - setup_hashed_features.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SETUP_HAShED_FEATURES_Hh_
+<font color='#0000FF'>#define</font> DLIB_SETUP_HAShED_FEATURES_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='setup_hashed_features_abstract.h.html'>setup_hashed_features_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='scan_image_pyramid.h.html'>scan_image_pyramid.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='scan_image_boxes.h.html'>scan_image_boxes.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../lsh.h.html'>../lsh.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../statistics.h.html'>../statistics.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_keypoint.h.html'>../image_keypoint.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='image_hash_construction_failure'></a>image_hash_construction_failure</b> : <font color='#0000FF'>public</font> error
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='image_hash_construction_failure'></a>image_hash_construction_failure</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_scanner
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='use_uniform_feature_weights'></a>use_uniform_feature_weights</b> <font face='Lucida Console'>(</font>
+        image_scanner<font color='#5555FF'>&amp;</font> scanner
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typename</font> image_scanner::feature_extractor_type fe;
+        fe.<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>scanner.<font color='#BB00BB'>get_feature_extractor</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        fe.<font color='#BB00BB'>use_uniform_feature_weights</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        scanner.<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>fe<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_scanner
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='use_relative_feature_weights'></a>use_relative_feature_weights</b> <font face='Lucida Console'>(</font>
+        image_scanner<font color='#5555FF'>&amp;</font> scanner
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typename</font> image_scanner::feature_extractor_type fe;
+        fe.<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>scanner.<font color='#BB00BB'>get_feature_extractor</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        fe.<font color='#BB00BB'>use_relative_feature_weights</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        scanner.<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>fe<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                                 stuff for scan_image_pyramid
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_array,
+        <font color='#0000FF'>typename</font> pyramid,
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> fe, <font color='#0000FF'>typename</font> hash<font color='#5555FF'>&gt;</font> <font color='#0000FF'>class</font> <b><a name='feature_image'></a>feature_image</b>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='setup_hashed_features'></a>setup_hashed_features</b> <font face='Lucida Console'>(</font>
+        scan_image_pyramid<font color='#5555FF'>&lt;</font>pyramid, feature_image<font color='#5555FF'>&lt;</font>feature_extractor, projection_hash<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> scanner,
+        <font color='#0000FF'>const</font> image_array<font color='#5555FF'>&amp;</font> images,
+        <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> fe,
+        <font color='#0000FF'><u>int</u></font> bits,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_samples <font color='#5555FF'>=</font> <font color='#979000'>200000</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font> bits <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bits <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>32</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    num_samples <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                    images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void setup_hashed_features()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function. </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t bits:          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bits 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_samples:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_samples 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t images.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+        pyramid pyr;
+
+        <font color='#0000FF'>const</font> random_subset_selector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> feature_extractor::descriptor_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samps <font color='#5555FF'>=</font> 
+            <font color='#BB00BB'>randomly_sample_image_features</font><font face='Lucida Console'>(</font>images, pyr, fe, num_samples<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>samps.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>image_hash_construction_failure</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Images too small, not able to gather enough samples to make hash</font>"<font face='Lucida Console'>)</font>;
+
+        projection_hash phash <font color='#5555FF'>=</font> <font color='#BB00BB'>create_random_projection_hash</font><font face='Lucida Console'>(</font>samps, bits<font face='Lucida Console'>)</font>;
+
+        feature_image<font color='#5555FF'>&lt;</font>feature_extractor, projection_hash<font color='#5555FF'>&gt;</font> hfe;
+        hfe.<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>scanner.<font color='#BB00BB'>get_feature_extractor</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        hfe.<font color='#BB00BB'>set_hash</font><font face='Lucida Console'>(</font>phash<font face='Lucida Console'>)</font>;
+        hfe.<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>fe<font face='Lucida Console'>)</font>;
+        scanner.<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>hfe<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_array,
+        <font color='#0000FF'>typename</font> pyramid,
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> fe, <font color='#0000FF'>typename</font> hash<font color='#5555FF'>&gt;</font> <font color='#0000FF'>class</font> <b><a name='feature_image'></a>feature_image</b>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='setup_hashed_features'></a>setup_hashed_features</b> <font face='Lucida Console'>(</font>
+        scan_image_pyramid<font color='#5555FF'>&lt;</font>pyramid, feature_image<font color='#5555FF'>&lt;</font>feature_extractor, projection_hash<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> scanner,
+        <font color='#0000FF'>const</font> image_array<font color='#5555FF'>&amp;</font> images,
+        <font color='#0000FF'><u>int</u></font> bits,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_samples <font color='#5555FF'>=</font> <font color='#979000'>200000</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font> bits <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bits <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>32</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    num_samples <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                    images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void setup_hashed_features()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function. </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t bits:          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bits 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_samples:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_samples 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t images.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+        feature_extractor fe;
+        <font color='#BB00BB'>setup_hashed_features</font><font face='Lucida Console'>(</font>scanner, images, fe, bits, num_samples<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                                 stuff for scan_image_boxes
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_array,
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> fe, <font color='#0000FF'>typename</font> hash<font color='#5555FF'>&gt;</font> <font color='#0000FF'>class</font> <b><a name='feature_image'></a>feature_image</b>,
+        <font color='#0000FF'>typename</font> box_generator
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='setup_hashed_features'></a>setup_hashed_features</b> <font face='Lucida Console'>(</font>
+        scan_image_boxes<font color='#5555FF'>&lt;</font>feature_image<font color='#5555FF'>&lt;</font>feature_extractor, projection_hash<font color='#5555FF'>&gt;</font>,box_generator <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> scanner,
+        <font color='#0000FF'>const</font> image_array<font color='#5555FF'>&amp;</font> images,
+        <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> fe,
+        <font color='#0000FF'><u>int</u></font> bits,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_samples <font color='#5555FF'>=</font> <font color='#979000'>200000</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font> bits <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bits <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>32</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    num_samples <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                    images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void setup_hashed_features()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function. </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t bits:          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bits 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_samples:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_samples 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t images.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+        pyramid_disable pyr;
+
+        <font color='#0000FF'>const</font> random_subset_selector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> feature_extractor::descriptor_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samps <font color='#5555FF'>=</font> 
+            <font color='#BB00BB'>randomly_sample_image_features</font><font face='Lucida Console'>(</font>images, pyr, fe, num_samples<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>samps.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>image_hash_construction_failure</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Images too small, not able to gather enough samples to make hash</font>"<font face='Lucida Console'>)</font>;
+
+        projection_hash phash <font color='#5555FF'>=</font> <font color='#BB00BB'>create_random_projection_hash</font><font face='Lucida Console'>(</font>samps, bits<font face='Lucida Console'>)</font>;
+
+        feature_image<font color='#5555FF'>&lt;</font>feature_extractor, projection_hash<font color='#5555FF'>&gt;</font> hfe;
+        hfe.<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>scanner.<font color='#BB00BB'>get_feature_extractor</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        hfe.<font color='#BB00BB'>set_hash</font><font face='Lucida Console'>(</font>phash<font face='Lucida Console'>)</font>;
+        hfe.<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>fe<font face='Lucida Console'>)</font>;
+        scanner.<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>hfe<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_array,
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> fe, <font color='#0000FF'>typename</font> hash<font color='#5555FF'>&gt;</font> <font color='#0000FF'>class</font> <b><a name='feature_image'></a>feature_image</b>,
+        <font color='#0000FF'>typename</font> box_generator
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='setup_hashed_features'></a>setup_hashed_features</b> <font face='Lucida Console'>(</font>
+        scan_image_boxes<font color='#5555FF'>&lt;</font>feature_image<font color='#5555FF'>&lt;</font>feature_extractor, projection_hash<font color='#5555FF'>&gt;</font>,box_generator<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> scanner,
+        <font color='#0000FF'>const</font> image_array<font color='#5555FF'>&amp;</font> images,
+        <font color='#0000FF'><u>int</u></font> bits,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_samples <font color='#5555FF'>=</font> <font color='#979000'>200000</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font> bits <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bits <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>32</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    num_samples <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                    images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void setup_hashed_features()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function. </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t bits:          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bits 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_samples:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_samples 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t images.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+        feature_extractor fe;
+        <font color='#BB00BB'>setup_hashed_features</font><font face='Lucida Console'>(</font>scanner, images, fe, bits, num_samples<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SETUP_HAShED_FEATURES_Hh_
+</font>
+
+
+</pre></body></html>

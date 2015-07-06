@@ -1,0 +1,216 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - one_vs_one_decision_function_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_ONE_VS_ONE_DECISION_FUnCTION_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_ONE_VS_ONE_DECISION_FUnCTION_ABSTRACT_Hh_
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>map<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../any/any_decision_function_abstract.h.html'>../any/any_decision_function_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../unordered_pair.h.html'>../unordered_pair.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='one_vs_one_trainer_abstract.h.html'>one_vs_one_trainer_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='null_df.h.html'>null_df.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> one_vs_one_trainer,
+        <font color='#0000FF'>typename</font> DF1 <font color='#5555FF'>=</font> null_df, <font color='#0000FF'>typename</font> DF2 <font color='#5555FF'>=</font> null_df, <font color='#0000FF'>typename</font> DF3 <font color='#5555FF'>=</font> null_df,
+        <font color='#0000FF'>typename</font> DF4 <font color='#5555FF'>=</font> null_df, <font color='#0000FF'>typename</font> DF5 <font color='#5555FF'>=</font> null_df, <font color='#0000FF'>typename</font> DF6 <font color='#5555FF'>=</font> null_df,
+        <font color='#0000FF'>typename</font> DF7 <font color='#5555FF'>=</font> null_df, <font color='#0000FF'>typename</font> DF8 <font color='#5555FF'>=</font> null_df, <font color='#0000FF'>typename</font> DF9 <font color='#5555FF'>=</font> null_df,
+        <font color='#0000FF'>typename</font> DF10 <font color='#5555FF'>=</font> null_df
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='one_vs_one_decision_function'></a>one_vs_one_decision_function</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON one_vs_one_trainer
+                This should be an instantiation of the one_vs_one_trainer template.  
+                It is used to infer which types are used for various things, such as 
+                representing labels.
+
+            REQUIREMENTS ON DF*
+                These types can either be left at their default values or set
+                to any kind of decision function object capable of being
+                stored in an any_decision_function&lt;sample_type,scalar_type&gt;
+                object.  These types should also be serializable.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a multiclass classifier built out
+                of a set of binary classifiers.  Each binary classifier
+                is used to vote for the correct multiclass label using a 
+                one vs. one strategy.  Therefore, if you have N classes then
+                there will be N*(N-1)/2 binary classifiers inside this object.
+
+                Note that the DF* template arguments are only used if you want
+                to serialize and deserialize one_vs_one_decision_function objects. 
+                Specifically, all the types of binary decision function contained
+                within a one_vs_one_decision_function must be listed in the
+                template arguments if serialization and deserialization is to
+                be used.
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    It is safe to call the const members of this object from multiple
+                    threads so long as all the decision functions contained in this object
+                    are also threadsafe.  This is because the const members are purely
+                    read-only operations.  However, any operation that modifies a
+                    one_vs_one_decision_function is not threadsafe.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> one_vs_one_trainer::label_type result_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> one_vs_one_trainer::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> one_vs_one_trainer::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> one_vs_one_trainer::mem_manager_type mem_manager_type;
+
+        <font color='#0000FF'>typedef</font> std::map<font color='#5555FF'>&lt;</font>unordered_pair<font color='#5555FF'>&lt;</font>result_type<font color='#5555FF'>&gt;</font>, any_decision_function<font color='#5555FF'>&lt;</font>sample_type, scalar_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> binary_function_table;
+
+        <b><a name='one_vs_one_decision_function'></a>one_vs_one_decision_function</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #number_of_classes() == 0
+                - #get_binary_decision_functions().size() == 0
+                - #get_labels().size() == 0
+        !*/</font>
+
+        <font color='#0000FF'>explicit</font> <b><a name='one_vs_one_decision_function'></a>one_vs_one_decision_function</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> binary_function_table<font color='#5555FF'>&amp;</font> decision_functions
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - find_missing_pairs(decision_functions).size() == 0
+                  (i.e. all pairs of labels have an associated decision function)
+            ensures
+                - #get_binary_decision_functions() == decision_functions
+                - #get_labels() == a list of all the labels which appear in the
+                  given set of decision functions
+                - #number_of_classes() == #get_labels().size() 
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> df1, <font color='#0000FF'>typename</font> df2, <font color='#0000FF'>typename</font> df3, <font color='#0000FF'>typename</font> df4, <font color='#0000FF'>typename</font> df5,
+            <font color='#0000FF'>typename</font> df6, <font color='#0000FF'>typename</font> df7, <font color='#0000FF'>typename</font> df8, <font color='#0000FF'>typename</font> df9, <font color='#0000FF'>typename</font> df10
+            <font color='#5555FF'>&gt;</font>
+        <b><a name='one_vs_one_decision_function'></a>one_vs_one_decision_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> one_vs_one_decision_function<font color='#5555FF'>&lt;</font>one_vs_one_trainer, 
+                                               df1, df2, df3, df4, df5,
+                                               df6, df7, df8, df9, df10<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #*this will be a copy of item
+                - #number_of_classes() == item.number_of_classes()
+                - #get_labels() == item.get_labels()
+                - #get_binary_decision_functions() == item.get_binary_decision_functions()
+        !*/</font>
+
+        <font color='#0000FF'>const</font> binary_function_table<font color='#5555FF'>&amp;</font> <b><a name='get_binary_decision_functions'></a>get_binary_decision_functions</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the table of binary decision functions used by this
+                  object.  The correspondence between binary decision functions
+                  and multiclass labels is the following:
+                    - for each element i of get_binary_decision_functions()
+                        - i-&gt;first == the label pair associated with binary decision
+                          function i-&gt;second.  
+                        - if (decision function i-&gt;second outputs a value &gt; 0) then
+                            - i-&gt;second is indicating that a test sample should
+                              receive a label of i-&gt;first.first
+                        - else
+                            - i-&gt;second is indicating that a test sample should
+                              receive a label of i-&gt;first.second
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>result_type<font color='#5555FF'>&gt;</font> <b><a name='get_labels'></a>get_labels</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a vector containing all the labels which can be
+                  predicted by this object.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_classes'></a>number_of_classes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns get_labels().size()
+                  (i.e. returns the number of different labels/classes predicted by
+                  this object)
+        !*/</font>
+
+        result_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> sample
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            requires
+                - number_of_classes() != 0
+            ensures
+                - evaluates all the decision functions in get_binary_decision_functions()
+                  and returns the label which received the most votes.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> DF1, <font color='#0000FF'>typename</font> DF2, <font color='#0000FF'>typename</font> DF3,
+        <font color='#0000FF'>typename</font> DF4, <font color='#0000FF'>typename</font> DF5, <font color='#0000FF'>typename</font> DF6,
+        <font color='#0000FF'>typename</font> DF7, <font color='#0000FF'>typename</font> DF8, <font color='#0000FF'>typename</font> DF9,
+        <font color='#0000FF'>typename</font> DF10 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> one_vs_one_decision_function<font color='#5555FF'>&lt;</font>T,DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - writes the given item to the output stream out.
+        throws
+            - serialization_error.  
+              This is thrown if there is a problem writing to the ostream or if item 
+              contains a type of decision function not listed among the DF* template 
+              arguments.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> DF1, <font color='#0000FF'>typename</font> DF2, <font color='#0000FF'>typename</font> DF3,
+        <font color='#0000FF'>typename</font> DF4, <font color='#0000FF'>typename</font> DF5, <font color='#0000FF'>typename</font> DF6,
+        <font color='#0000FF'>typename</font> DF7, <font color='#0000FF'>typename</font> DF8, <font color='#0000FF'>typename</font> DF9,
+        <font color='#0000FF'>typename</font> DF10 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>
+        one_vs_one_decision_function<font color='#5555FF'>&lt;</font>T,DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - deserializes a one_vs_one_decision_function from in and stores it in item.
+        throws
+            - serialization_error.  
+              This is thrown if there is a problem reading from the istream or if the
+              serialized data contains decision functions not listed among the DF*
+              template arguments.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ONE_VS_ONE_DECISION_FUnCTION_ABSTRACT_Hh_
+</font>
+
+
+
+</pre></body></html>

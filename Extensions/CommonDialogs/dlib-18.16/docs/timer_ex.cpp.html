@@ -1,0 +1,59 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - timer_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font>
+
+<font color='#009900'>/*
+    This is an example illustrating the use of the timer object from the dlib C++ Library.
+
+    The timer is an object that calls some user specified member function at regular
+    intervals from another thread.
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>timer.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>misc_api.h<font color='#5555FF'>&gt;</font> <font color='#009900'>// for dlib::sleep
+</font><font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>class</font> <b><a name='timer_example'></a>timer_example</b>
+<b>{</b>
+<font color='#0000FF'>public</font>:
+    <font color='#0000FF'><u>void</u></font> <b><a name='action_function'></a>action_function</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// print out a message so we can see that this function is being triggered
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>action_function() called</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    timer_example e;
+
+    <font color='#009900'>// Here we construct our timer object.  It needs two things.  The second argument is
+</font>    <font color='#009900'>// the member function it is going to call at regular intervals and the first argument
+</font>    <font color='#009900'>// is the object instance it will call that member function on.
+</font>    timer<font color='#5555FF'>&lt;</font>timer_example<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>t</font><font face='Lucida Console'>(</font>e, <font color='#5555FF'>&amp;</font>timer_example::action_function<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Set the timer object to trigger every second
+</font>    t.<font color='#BB00BB'>set_delay_time</font><font face='Lucida Console'>(</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Start the timer.  It will start calling the action function 1 second from this call
+</font>    <font color='#009900'>// to start.
+</font>    t.<font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Sleep for 10 seconds before letting the program end.  
+</font>    dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>10000</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// The timer will destruct itself properly and stop calling the action_function.
+</font><b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

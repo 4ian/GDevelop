@@ -1,0 +1,111 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - correlation_tracker_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2015  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_CORRELATION_TrACKER_ABSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_CORRELATION_TrACKER_ABSTRACT_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry/drectangle_abstract.h.html'>../geometry/drectangle_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='correlation_tracker'></a>correlation_tracker</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a tool for tracking moving objects in a video stream.  You give it
+                the bounding box of an object in the first frame and it attempts to track the
+                object in the box from frame to frame.  
+
+                This tool is an implementation of the method described in the following paper:
+                    Danelljan, Martin, et al. "Accurate scale estimation for robust visual
+                    tracking." Proceedings of the British Machine Vision Conference BMVC. 2014.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='correlation_tracker'></a>correlation_tracker</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_position().is_empty() == true
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='start_track'></a>start_track</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+            <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+                - p.is_empty() == false
+            ensures
+                - This object will start tracking the thing inside the bounding box in the
+                  given image.  That is, if you call update() with subsequent video frames 
+                  then it will try to keep track of the position of the object inside p.
+                - #get_position() == p
+        !*/</font>
+
+        drectangle <b><a name='get_position'></a>get_position</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the predicted position of the object under track.  
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>double</u></font> <b><a name='update'></a>update</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+            <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> guess
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+                - get_position().is_empty() == false
+                  (i.e. you must have started tracking by calling start_track())
+            ensures
+                - When searching for the object in img, we search in the area around the
+                  provided guess.
+                - #get_position() == the new predicted location of the object in img.  This
+                  location will be a copy of guess that has been translated and scaled
+                  appropriately based on the content of img so that it, hopefully, bounds
+                  the object in img.
+                - Returns the peak to side-lobe ratio.  This is a number that measures how
+                  confident the tracker is that the object is inside #get_position().
+                  Larger values indicate higher confidence.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>double</u></font> <b><a name='update'></a>update</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+                - get_position().is_empty() == false
+                  (i.e. you must have started tracking by calling start_track())
+            ensures
+                - performs: return update(img, get_position())
+        !*/</font>
+
+    <b>}</b>;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CORRELATION_TrACKER_ABSTRACT_H_
+</font>
+
+
+
+</pre></body></html>

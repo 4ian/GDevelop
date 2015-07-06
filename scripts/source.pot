@@ -12245,7 +12245,7 @@ msgid "Save image _PARAM2_ to file _PARAM1_"
 msgstr ""
 
 #: ../Extensions//PrimitiveDrawing/ShapePainterObjectEditor.cpp:58
-msgid "Edition of the Shape Painter object"
+msgid "Edit the Shape Painter object"
 msgstr ""
 
 #: ../Extensions//PrimitiveDrawing/ShapePainterObjectEditor.cpp:62
@@ -16432,11 +16432,11 @@ msgid "Expression 2"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:167
-msgid "Edition of a Sprite object"
+msgid "Edit the Sprite object"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:179
-msgid "Edit the collision masks ( Hit boxes )"
+msgid "Edit the collision masks (hitbox)"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:180
@@ -18030,7 +18030,7 @@ msgid "Help about variables"
 msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:161
-msgid "Variables edition"
+msgid "Edit the variables"
 msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:287
@@ -18341,7 +18341,7 @@ msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/ma
 msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/EditForEachEvent.cpp:55
-msgid "Edition of \"For each object\" event"
+msgid "Edit the \"For each object\" event"
 msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/EditForEachEvent.cpp:61
@@ -18450,7 +18450,7 @@ msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/ma
 msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/EditRepeatEvent.cpp:54
-msgid "Edition of \"Repeat\" event"
+msgid "Edit the \"Repeat\" event"
 msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/EditRepeatEvent.cpp:60

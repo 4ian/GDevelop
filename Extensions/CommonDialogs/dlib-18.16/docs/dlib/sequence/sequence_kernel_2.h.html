@@ -1,0 +1,685 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sequence_kernel_2.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SEQUENCE_KERNEl_2_
+<font color='#0000FF'>#define</font> DLIB_SEQUENCE_KERNEl_2_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sequence_kernel_abstract.h.html'>sequence_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/enumerable.h.html'>../interfaces/enumerable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/remover.h.html'>../interfaces/remover.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager <font color='#5555FF'>=</font> default_memory_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='sequence_kernel_2'></a>sequence_kernel_2</b> : <font color='#0000FF'>public</font> enumerable<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,
+                              <font color='#0000FF'>public</font> remover<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                sequence_size   == 0 
+                at_start_       == true
+                current_enumeration_node == 0
+
+            CONVENTION
+                sequence_size == the number of elements in the sequence
+
+                at_start_ == at_start()
+                (current_enumeration_node!=0) == current_element_valid()
+                if (current_enumeration_node!=0) then
+                    current_enumeration_node-&gt;item == element()
+                    current_enumeration_pos == the position of the node pointed to by
+                                               current_enumeration_node
+
+                if ( sequence_size &gt; 0 )
+                {
+                    current_node        == pointer to a node in the linked list and
+                    current_node-&gt;right-&gt;right-&gt;... eventually == current_node and
+                    current_node-&gt;left-&gt;left-&gt;... eventually == current_node and
+                    current_pos         == the position in the sequence of 
+                                           current_node-&gt;item
+                }
+
+        !*/</font>
+
+        <font color='#0000FF'>struct</font> <b><a name='node'></a>node</b> <b>{</b>
+            T item;
+            node<font color='#5555FF'>*</font> right;
+            node<font color='#5555FF'>*</font> left;
+        <b>}</b>;
+        
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'>typedef</font> T type;
+            <font color='#0000FF'>typedef</font> mem_manager mem_manager_type;
+
+            <b><a name='sequence_kernel_2'></a>sequence_kernel_2</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> :
+                sequence_size<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                at_start_<font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>,
+                current_enumeration_node<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b><b>}</b>
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='sequence_kernel_2'></a>sequence_kernel_2</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>; 
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos,
+                T<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='remove'></a>remove</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos,
+                T<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='cat'></a>cat</b> <font face='Lucida Console'>(</font>
+                sequence_kernel_2<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+                sequence_kernel_2<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+ 
+            <font color='#009900'>// functions from the remover interface
+</font>            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='remove_any'></a>remove_any</b> <font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// functions from the enumerable interface
+</font>            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='at_start'></a>at_start</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='current_element_valid'></a>current_element_valid</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='move_next'></a>move_next</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='delete_nodes'></a>delete_nodes</b> <font face='Lucida Console'>(</font>
+                node<font color='#5555FF'>*</font> current_node,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> sequence_size
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    CONVENTION IS CORRECT
+                ensures
+                    all memory associated with the ring of nodes has been freed
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='move_to_pos'></a>move_to_pos</b> <font face='Lucida Console'>(</font>
+                node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> current_node,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> current_pos,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                requires
+                    everything in the CONVENTION is correct and
+                    there is a node corresponding to pos in the CONVENTION and
+                    0 &lt;= pos &lt; size
+                ensures
+                    current_pos == pos and
+                    current_node-&gt;item is the item in the sequence associated with 
+                    position pos
+            !*/</font>
+
+            <font color='#009900'>// data members
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> sequence_size;
+            <font color='#0000FF'>mutable</font> node<font color='#5555FF'>*</font> current_node;
+            <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> current_pos;
+            <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>bool</u></font> at_start_;
+            <font color='#0000FF'>mutable</font> node<font color='#5555FF'>*</font> current_enumeration_node;
+            <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> current_enumeration_pos;
+
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='sequence_kernel_2'></a>sequence_kernel_2</b><font face='Lucida Console'>(</font>sequence_kernel_2<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>            sequence_kernel_2<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>sequence_kernel_2<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>; <font color='#009900'>// assignment operator        
+</font>
+    <b>}</b>;
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            item.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>size,in<font face='Lucida Console'>)</font>;
+            T temp;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>temp,in<font face='Lucida Console'>)</font>;
+                item.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>i,temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            item.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type sequence_kernel_2</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    ~<b><a name='sequence_kernel_2'></a>sequence_kernel_2</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>delete_nodes</font><font face='Lucida Console'>(</font>current_node,sequence_size<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sequence_size <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>delete_nodes</font><font face='Lucida Console'>(</font>current_node,sequence_size<font face='Lucida Console'>)</font>;
+            sequence_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#009900'>// reset the enumerator
+</font>        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos,
+        T<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make new node and swap item into it
+</font>        node<font color='#5555FF'>*</font> new_node <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> node;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>item,new_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sequence_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pos <font color='#5555FF'>=</font><font color='#5555FF'>=</font> sequence_size<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>move_to_pos</font><font face='Lucida Console'>(</font>current_node,current_pos,pos<font color='#5555FF'>-</font><font color='#979000'>1</font>,sequence_size<font face='Lucida Console'>)</font>;
+                
+                node<font color='#5555FF'>&amp;</font> n_node <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>new_node;
+                node<font color='#5555FF'>&amp;</font> c_node <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>current_node;
+
+                <font color='#009900'>// make new node point to the nodes to its left and right
+</font>                n_node.right <font color='#5555FF'>=</font> c_node.right;
+                n_node.left  <font color='#5555FF'>=</font> current_node;
+
+                <font color='#009900'>// make the left node point back to new_node
+</font>                c_node.right<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left <font color='#5555FF'>=</font> new_node;
+
+                <font color='#009900'>// make the right node point back to new_node
+</font>                c_node.right <font color='#5555FF'>=</font> new_node;
+                current_pos <font color='#5555FF'>=</font> pos;
+
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#BB00BB'>move_to_pos</font><font face='Lucida Console'>(</font>current_node,current_pos,pos,sequence_size<font face='Lucida Console'>)</font>;
+
+                node<font color='#5555FF'>&amp;</font> n_node <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>new_node;
+                node<font color='#5555FF'>&amp;</font> c_node <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>current_node;
+
+                <font color='#009900'>// make new node point to the nodes to its left and right
+</font>                n_node.right <font color='#5555FF'>=</font> current_node;
+                n_node.left  <font color='#5555FF'>=</font> c_node.left;
+
+                <font color='#009900'>// make the left node point back to new_node
+</font>                c_node.left<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right <font color='#5555FF'>=</font> new_node;
+
+                <font color='#009900'>// make the right node point back to new_node
+</font>                c_node.left <font color='#5555FF'>=</font> new_node;
+            <b>}</b>
+            
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            current_pos <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            new_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left <font color='#5555FF'>=</font> new_node;
+            new_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right <font color='#5555FF'>=</font> new_node;
+        <b>}</b>
+
+        <font color='#009900'>// make the new node the current node
+</font>        current_node <font color='#5555FF'>=</font> new_node;    
+    
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>sequence_size;
+        <font color='#009900'>// reset the enumerator
+</font>        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='remove'></a>remove</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos,
+        T<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>move_to_pos</font><font face='Lucida Console'>(</font>current_node,current_pos,pos,sequence_size<font face='Lucida Console'>)</font>;
+        node<font color='#5555FF'>&amp;</font> c_node <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>current_node;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>c_node.item,item<font face='Lucida Console'>)</font>;
+        
+        node<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> current_node;
+        
+        <font color='#009900'>// close up gap left by remove
+</font>        c_node.left<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right <font color='#5555FF'>=</font> c_node.right;
+        c_node.right<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left <font color='#5555FF'>=</font> c_node.left;
+
+        current_node <font color='#5555FF'>=</font> c_node.right;
+
+        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>sequence_size;
+
+        <font color='#0000FF'>delete</font> temp;
+        <font color='#009900'>// reset the enumerator
+</font>        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#BB00BB'>move_to_pos</font><font face='Lucida Console'>(</font>current_node,current_pos,pos,sequence_size<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> current_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='cat'></a>cat</b> <font face='Lucida Console'>(</font>
+        sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item.sequence_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sequence_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// move both sequences to a convenient location
+</font>                <font color='#BB00BB'>move_to_pos</font><font face='Lucida Console'>(</font>current_node,current_pos,<font color='#979000'>0</font>,sequence_size<font face='Lucida Console'>)</font>;
+                item.<font color='#BB00BB'>move_to_pos</font> <font face='Lucida Console'>(</font>
+                    item.current_node,
+                    item.current_pos,
+                    item.sequence_size<font color='#5555FF'>-</font><font color='#979000'>1</font>,
+                    item.sequence_size
+                <font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// make copies of poitners
+</font>                node<font color='#5555FF'>&amp;</font> item_right <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>item.current_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right;
+                node<font color='#5555FF'>&amp;</font> left <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>current_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left;
+
+
+                item.current_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right <font color='#5555FF'>=</font> current_node;
+                current_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left <font color='#5555FF'>=</font> item.current_node;
+
+                left.right <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>item_right;
+                item_right.left <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>left;
+
+                <font color='#009900'>// set sizes
+</font>                sequence_size <font color='#5555FF'>+</font><font color='#5555FF'>=</font> item.sequence_size;
+                item.sequence_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// *this is empty so just swap
+</font>                item.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;                
+            <b>}</b>
+        <b>}</b>
+        item.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// reset the enumerator
+</font>        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    T<font color='#5555FF'>&amp;</font> sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#BB00BB'>move_to_pos</font><font face='Lucida Console'>(</font>current_node,current_pos,pos,sequence_size<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> current_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> sequence_size;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>   sequence_size_temp         <font color='#5555FF'>=</font> item.sequence_size;
+        node<font color='#5555FF'>*</font>           current_node_temp          <font color='#5555FF'>=</font> item.current_node;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>   current_pos_temp           <font color='#5555FF'>=</font> item.current_pos;
+        <font color='#0000FF'><u>bool</u></font>            at_start_temp              <font color='#5555FF'>=</font> item.at_start_;
+        node<font color='#5555FF'>*</font>           current_enumeration_node_temp <font color='#5555FF'>=</font> item.current_enumeration_node;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>   current_enumeration_pos_temp <font color='#5555FF'>=</font> item.current_enumeration_pos;
+
+        item.sequence_size  <font color='#5555FF'>=</font> sequence_size;
+        item.current_node   <font color='#5555FF'>=</font> current_node;
+        item.current_pos    <font color='#5555FF'>=</font> current_pos;
+        item.at_start_      <font color='#5555FF'>=</font> at_start_;
+        item.current_enumeration_node <font color='#5555FF'>=</font> current_enumeration_node;
+        item.current_enumeration_pos <font color='#5555FF'>=</font> current_enumeration_pos;
+
+        sequence_size   <font color='#5555FF'>=</font> sequence_size_temp;
+        current_node    <font color='#5555FF'>=</font> current_node_temp;
+        current_pos     <font color='#5555FF'>=</font> current_pos_temp;
+        at_start_       <font color='#5555FF'>=</font> at_start_temp;
+        current_enumeration_node <font color='#5555FF'>=</font> current_enumeration_node_temp;
+        current_enumeration_pos <font color='#5555FF'>=</font> current_enumeration_pos_temp;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// enumerable function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='at_start'></a>at_start</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> at_start_;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        at_start_ <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        current_enumeration_node <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='current_element_valid'></a>current_element_valid</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>current_enumeration_node<font color='#5555FF'>!</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> current_enumeration_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    T<font color='#5555FF'>&amp;</font> sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> current_enumeration_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='move_next'></a>move_next</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>at_start_ <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> sequence_size<font color='#5555FF'>&gt;</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>            
+            <font color='#BB00BB'>move_to_pos</font><font face='Lucida Console'>(</font>current_node,current_pos,<font color='#979000'>0</font>,sequence_size<font face='Lucida Console'>)</font>;            
+            current_enumeration_node <font color='#5555FF'>=</font> current_node;
+            current_enumeration_pos <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>current_enumeration_node<font color='#5555FF'>!</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>current_enumeration_pos;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>current_enumeration_pos<font color='#5555FF'>&lt;</font>sequence_size<font face='Lucida Console'>)</font>
+            <b>{</b>                
+                current_enumeration_node <font color='#5555FF'>=</font> current_enumeration_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// we have reached the end of the sequence
+</font>                current_enumeration_node <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+        <b>}</b>
+
+        at_start_ <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>current_enumeration_node<font color='#5555FF'>!</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// remover function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='remove_any'></a>remove_any</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,item<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// private member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='delete_nodes'></a>delete_nodes</b> <font face='Lucida Console'>(</font>
+        node<font color='#5555FF'>*</font> current_node,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> sequence_size
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        node<font color='#5555FF'>*</font> temp;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>sequence_size<font face='Lucida Console'>)</font>
+        <b>{</b>
+            temp <font color='#5555FF'>=</font> current_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right;
+            <font color='#0000FF'>delete</font> current_node;
+            current_node <font color='#5555FF'>=</font> temp;
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>sequence_size;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> sequence_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='move_to_pos'></a>move_to_pos</b> <font face='Lucida Console'>(</font>
+        node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> current_node,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> current_pos,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> current_pos <font color='#5555FF'>&gt;</font> pos<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// number of hops in each direction needed to reach pos
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right <font color='#5555FF'>=</font> size <font color='#5555FF'>+</font> pos <font color='#5555FF'>-</font> current_pos;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left <font color='#5555FF'>=</font> current_pos <font color='#5555FF'>-</font> pos;
+            current_pos <font color='#5555FF'>=</font> pos;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>left <font color='#5555FF'>&lt;</font> right<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// move left to position pos
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; left <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>left<font face='Lucida Console'>)</font>
+                    current_node <font color='#5555FF'>=</font> current_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// move left to position pos
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; right <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>right<font face='Lucida Console'>)</font>
+                    current_node <font color='#5555FF'>=</font> current_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>current_pos <font color='#5555FF'>!</font><font color='#5555FF'>=</font> pos<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// number of hops in each direction needed to reach pos
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right <font color='#5555FF'>=</font> pos <font color='#5555FF'>-</font> current_pos;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left <font color='#5555FF'>=</font> size <font color='#5555FF'>-</font> pos <font color='#5555FF'>+</font> current_pos;
+            current_pos <font color='#5555FF'>=</font> pos;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>left <font color='#5555FF'>&lt;</font> right<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// move left to position pos
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; left <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>left<font face='Lucida Console'>)</font>
+                    current_node <font color='#5555FF'>=</font> current_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// move left to position pos
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; right <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>right<font face='Lucida Console'>)</font>
+                    current_node <font color='#5555FF'>=</font> current_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SEQUENCE_KERNEl_2_
+</font>
+
+</pre></body></html>

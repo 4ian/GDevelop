@@ -1,0 +1,198 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - structural_svm_object_detection_problem_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_STRUCTURAL_SVM_ObJECT_DETECTION_PROBLEM_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_STRUCTURAL_SVM_ObJECT_DETECTION_PROBLEM_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='structural_svm_problem_threaded_abstract.h.html'>structural_svm_problem_threaded_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/full_object_detection_abstract.h.html'>../image_processing/full_object_detection_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/box_overlap_testing.h.html'>../image_processing/box_overlap_testing.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='impossible_labeling_error'></a>impossible_labeling_error</b> : <font color='#0000FF'>public</font> dlib::error 
+    <b>{</b> 
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is the exception thrown by the structural_svm_object_detection_problem
+                when it detects that the image_scanner_type it is working with is incapable
+                of representing the truth rectangles it has been asked to predict.  
+
+                This kind of problem can happen when the test_box_overlap object indicates
+                that two ground truth rectangles overlap and are therefore not allowed to
+                both be output at the same time.  Or alternatively, if there are not enough
+                detection templates to cover the variety of truth rectangle shapes.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_scanner_type,
+        <font color='#0000FF'>typename</font> image_array_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='structural_svm_object_detection_problem'></a>structural_svm_object_detection_problem</b> : <font color='#0000FF'>public</font> structural_svm_problem_threaded<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>,
+                                                    noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON image_scanner_type
+                image_scanner_type must be an implementation of 
+                dlib/image_processing/scan_fhog_pyramid_abstract.h or
+                dlib/image_processing/scan_image_custom_abstract.h or
+                dlib/image_processing/scan_image_pyramid_abstract.h or
+                dlib/image_processing/scan_image_boxes_abstract.h
+
+            REQUIREMENTS ON image_array_type
+                image_array_type must be an implementation of dlib/array/array_kernel_abstract.h 
+                and it must contain objects which can be accepted by image_scanner_type::load().
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for learning the parameter vector needed to use a
+                scan_image_pyramid, scan_fhog_pyramid, scan_image_custom, or
+                scan_image_boxes object.  
+
+                It learns the parameter vector by formulating the problem as a structural 
+                SVM problem.  The exact details of the method are described in the paper 
+                Max-Margin Object Detection by Davis E. King (http://arxiv.org/abs/1502.00046).
+
+
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='structural_svm_object_detection_problem'></a>structural_svm_object_detection_problem</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_scanner_type<font color='#5555FF'>&amp;</font> scanner,
+            <font color='#0000FF'>const</font> test_box_overlap<font color='#5555FF'>&amp;</font> overlap_tester,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> auto_overlap_tester,
+            <font color='#0000FF'>const</font> image_array_type<font color='#5555FF'>&amp;</font> images,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> truth_object_detections,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> ignore,
+            <font color='#0000FF'>const</font> test_box_overlap<font color='#5555FF'>&amp;</font> ignore_overlap_tester,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads <font color='#5555FF'>=</font> <font color='#979000'>2</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_learning_problem(images, truth_object_detections)
+                - ignore.size() == images.size()
+                - scanner.get_num_detection_templates() &gt; 0
+                - scanner.load(images[0]) must be a valid expression.
+                - for all valid i, j:
+                    - truth_object_detections[i][j].num_parts() == scanner.get_num_movable_components_per_detection_template() 
+                    - all_parts_in_rect(truth_object_detections[i][j]) == true
+            ensures
+                - This object attempts to learn a mapping from the given images to the
+                  object locations given in truth_object_detections.  In particular, it
+                  attempts to learn to predict truth_object_detections[i] based on
+                  images[i].  Or in other words, this object can be used to learn a
+                  parameter vector, w, such that an object_detector declared as:
+                    object_detector&lt;image_scanner_type&gt; detector(scanner,get_overlap_tester(),w)
+                  results in a detector object which attempts to compute the locations of
+                  all the objects in truth_object_detections.  So if you called
+                  detector(images[i]) you would hopefully get a list of rectangles back
+                  that had truth_object_detections[i].size() elements and contained exactly
+                  the rectangles indicated by truth_object_detections[i].
+                - if (auto_overlap_tester == true) then
+                    - #get_overlap_tester() == a test_box_overlap object that is configured
+                      using the find_tight_overlap_tester() routine and the contents of
+                      truth_object_detections. 
+                - else
+                    - #get_overlap_tester() == overlap_tester
+                - #get_match_eps() == 0.5
+                - This object will use num_threads threads during the optimization 
+                  procedure.  You should set this parameter equal to the number of 
+                  available processing cores on your machine.
+                - #get_loss_per_missed_target() == 1
+                - #get_loss_per_false_alarm() == 1
+                - for all valid i:
+                    - Within images[i] any detections that match against a rectangle in
+                      ignore[i], according to ignore_overlap_tester, are ignored.  That is,
+                      the optimizer doesn't care if the detector outputs a detection that
+                      matches any of the ignore rectangles or if it fails to output a
+                      detection for an ignore rectangle.  Therefore, if there are objects
+                      in your dataset that you are unsure you want to detect or otherwise
+                      don't care if the detector gets or doesn't then you can mark them
+                      with ignore rectangles and the optimizer will simply ignore them. 
+        !*/</font>
+
+        test_box_overlap <b><a name='get_overlap_tester'></a>get_overlap_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the overlap tester used by this object.  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_match_eps'></a>set_match_eps</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> eps
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt; eps &lt; 1
+            ensures
+                - #get_match_eps() == eps
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_match_eps'></a>get_match_eps</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the amount of alignment necessary for a detection to be considered
+                  as matching with a ground truth rectangle.  The precise formula for determining
+                  if two rectangles match each other is the following, rectangles A and B match 
+                  if and only if:
+                    A.intersect(B).area()/(A+B).area() &gt; get_match_eps()
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_loss_per_missed_target'></a>get_loss_per_missed_target</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the amount of loss experienced for failing to detect one of the
+                  targets.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_loss_per_missed_target'></a>set_loss_per_missed_target</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> loss
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - loss &gt; 0
+            ensures
+                - #get_loss_per_missed_target() == loss
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_loss_per_false_alarm'></a>get_loss_per_false_alarm</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the amount of loss experienced for emitting a false alarm detection.
+                  Or in other words, the loss for generating a detection that doesn't correspond 
+                  to one of the truth rectangles.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_loss_per_false_alarm'></a>set_loss_per_false_alarm</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> loss
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - loss &gt; 0
+            ensures
+                - #get_loss_per_false_alarm() == loss
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_STRUCTURAL_SVM_ObJECT_DETECTION_PROBLEM_ABSTRACT_Hh_
+</font>
+
+
+
+</pre></body></html>

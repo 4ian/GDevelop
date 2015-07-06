@@ -1,0 +1,493 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sort.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SORt_
+<font color='#0000FF'>#define</font> DLIB_SORt_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='algs.h.html'>algs.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>functional<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='qsort_array'></a>qsort_array</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> array,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right,
+        <font color='#0000FF'>const</font> compare<font color='#5555FF'>&amp;</font> comp 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T implements operator[]                                 
+            - the items in array must be comparable by comp where comp is a function
+              object with the same syntax as std::less&lt;&gt;
+            - the items in array must be swappable by a global swap()   
+            - left and right are within the bounds of array
+              i.e. array[left] and array[right] are valid elements
+            - left &lt;= right
+        ensures
+            - for all elements in #array between and including left and right the 
+              ith element is &lt; the i+1 element
+            - sorts using a quick sort algorithm
+    !*/</font> 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='hsort_array'></a>hsort_array</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> array,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right,
+        <font color='#0000FF'>const</font> compare<font color='#5555FF'>&amp;</font> comp 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T implements operator[]                                 
+            - the items in array must be comparable by comp where comp is a function
+              object with the same syntax as std::less&lt;&gt;
+            - the items in array must be swappable by a global swap()   
+            - left and right are within the bounds of array
+              i.e. array[left] and array[right] are valid elements
+            - left &lt;= right
+        ensures
+            - for all elements in #array between and including left and right the 
+              ith element is &lt; the i+1 element
+            - sorts using a heapsort algorithm
+    !*/</font> 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='isort_array'></a>isort_array</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> array,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right,
+        <font color='#0000FF'>const</font> compare<font color='#5555FF'>&amp;</font> comp 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T implements operator[]                                 
+            - the items in array must be comparable by comp where comp is a function
+              object with the same syntax as std::less&lt;&gt;
+            - the items in array must be swappable by a global swap()   
+            - left and right are within the bounds of array
+              i.e. array[left] and array[right] are valid elements
+            - left &lt;= right
+        ensures
+            - for all elements in #array between and including left and right the 
+              ith element is &lt; the i+1 element
+            - sorts using an insertion sort algorithm
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='qsort_array'></a>qsort_array</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> array,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right
+    <font face='Lucida Console'>)</font>; 
+    <font color='#009900'>/*!
+        requires
+            - T implements operator[]                                 
+            - the items in array must be comparable by std::less         
+            - the items in array must be swappable by a global swap()   
+            - left and right are within the bounds of array
+              i.e. array[left] and array[right] are valid elements
+            - left &lt;= right
+        ensures
+            - for all elements in #array between and including left and right the 
+              ith element is &lt; the i+1 element
+            - sorts using a quick sort algorithm
+    !*/</font> 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='hsort_array'></a>hsort_array</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> array,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T implements operator[]                                 
+            - the items in array must be comparable by std::less         
+            - the items in array must be swappable by a global swap()   
+            - left and right are within the bounds of array
+              i.e. array[left] and array[right] are valid elements
+            - left &lt;= right
+        ensures
+            - for all elements in #array between and including left and right the 
+              ith element is &lt; the i+1 element
+            - sorts using a heapsort algorithm
+    !*/</font> 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='isort_array'></a>isort_array</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> array,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right
+    <font face='Lucida Console'>)</font>; 
+    <font color='#009900'>/*!
+        requires
+            - T implements operator[]                                 
+            - the items in array must be comparable by std::less      
+            - the items in array must be swappable by a global swap()   
+            - left and right are within the bounds of array
+              i.e. array[left] and array[right] are valid elements
+            - left &lt;= right
+        ensures
+            - for all elements in #array between and including left and right the 
+              ith element is &lt; the i+1 element
+            - sorts using an insertion sort algorithm
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                            IMPLEMENTATION DETAILS
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> sort_helpers
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> std::less<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='comp'></a>comp</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> std::less<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'>typename</font> Y,
+            <font color='#0000FF'>typename</font> compare
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='qsort_partition'></a>qsort_partition</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> array,
+            Y<font color='#5555FF'>&amp;</font> pivot,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right,
+            <font color='#0000FF'>const</font> compare<font color='#5555FF'>&amp;</font> comp
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            requires
+                - &amp;pivot == &amp;array[right]
+                - T implements operator[]                             
+                - the items in array must be comparable by comp     
+                - left and right are within the bounts of the array
+                - left &lt; right
+            ensures
+                - returns a number called partition_element such that:
+                    - left &lt;= partition_element &lt;= right                              
+                    - all elements in #array &lt; #array[partition_element] have 
+                    indices &gt;= left and &lt; partition_element                         
+                    - all elements in #array &gt; #array[partition_element] have 
+                    indices &gt; partition_element and &lt;= right
+        !*/</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>pivot <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>array[right] <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> left <font color='#5555FF'>&lt;</font> right,
+                    "<font color='#CC0000'>\tunsigned long qsort_partition()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t&amp;pivot:        </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>&amp;</font>pivot
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t&amp;array[right]: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>&amp;</font>array[right]
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tleft:          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> left
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tright:         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> right <font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>array[<font face='Lucida Console'>(</font>right<font color='#5555FF'>-</font>left<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>+</font>left],pivot<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> left;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> left; j <font color='#5555FF'>&lt;</font> right; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>array[j] , pivot<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>array[i],array[j]<font face='Lucida Console'>)</font>;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+                <b>}</b>
+            <b>}</b>
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>array[i],pivot<font face='Lucida Console'>)</font>;
+            
+            <font color='#0000FF'>return</font> i;
+        <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'>typename</font> compare
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='qsort_array_main'></a>qsort_array_main</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> array,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> depth_check,
+            <font color='#0000FF'>const</font> compare<font color='#5555FF'>&amp;</font> comp
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            requires
+                - T implements operator[]                                 
+                - the items in array must be comparable by comp         
+                - the items in array must be swappable by a global swap()   
+                - left and right are within the bounds of array
+                  i.e. array[left] and array[right] are valid elements
+            ensures
+                - for all elements in #array between and including left and right the 
+                  ith element is &lt; the i+1 element
+                - will only recurse about as deep as log(depth_check) calls
+                - sorts using a quick sort algorithm
+        !*/</font> 
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> left <font color='#5555FF'>&lt;</font> right<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>right<font color='#5555FF'>-</font>left <font color='#5555FF'>&lt;</font> <font color='#979000'>30</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> depth_check <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>hsort_array</font><font face='Lucida Console'>(</font>array,left,right,comp<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// The idea here is to only let quick sort go about log(N)
+</font>                    <font color='#009900'>// calls deep before it kicks into something else.
+</font>                    depth_check <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                    depth_check <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>depth_check<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> partition_element <font color='#5555FF'>=</font> 
+                        <font color='#BB00BB'>qsort_partition</font><font face='Lucida Console'>(</font>array,array[right],left,right,comp<font face='Lucida Console'>)</font>;
+                    
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>partition_element <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <font color='#BB00BB'>qsort_array_main</font><font face='Lucida Console'>(</font>array,left,partition_element<font color='#5555FF'>-</font><font color='#979000'>1</font>,depth_check,comp<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>qsort_array_main</font><font face='Lucida Console'>(</font>array,partition_element<font color='#5555FF'>+</font><font color='#979000'>1</font>,right,depth_check,comp<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'>typename</font> compare
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='heapify'></a>heapify</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> array,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> start,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> end,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i,
+            <font color='#0000FF'>const</font> compare<font color='#5555FF'>&amp;</font> comp
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            requires
+                - T implements operator[]                                 
+                - the items in array must be comparable by comp        
+                - the items in array must be swappable by a global swap()   
+                - start, end, and i are within the bounds of array
+                  i.e. array[start], array[end], and array[i] are valid elements
+                - start &lt;= i &lt;= end
+                - array[i/2] is a max heap
+                - array[i/2+1] is a max heap
+                - start and end specify the range of the array we are working with.
+            ensures
+                - array[i] is now a max heap
+        !*/</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font> <font face='Lucida Console'>(</font>start <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> end,
+                    "<font color='#CC0000'>\tvoid heapify()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tstart:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> start 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tend:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> end 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\ti:       </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>bool</u></font> keep_going <font color='#5555FF'>=</font> <font color='#979000'>true</font>;            
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right;   
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> largest; 
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>keep_going<font face='Lucida Console'>)</font>
+            <b>{</b>
+                keep_going <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                left <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>-</font>start;
+                right <font color='#5555FF'>=</font> left<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>left <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>array[i] , array[left]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    largest <font color='#5555FF'>=</font> left;
+                <font color='#0000FF'>else</font>
+                    largest <font color='#5555FF'>=</font> i;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>right <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>array[largest] , array[right]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    largest <font color='#5555FF'>=</font> right;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>largest <font color='#5555FF'>!</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>array[i],array[largest]<font face='Lucida Console'>)</font>;
+                    i <font color='#5555FF'>=</font> largest;
+                    keep_going <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <b>}</b>
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='qsort_array'></a>qsort_array</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> array,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> sort_helpers;
+        <font color='#BB00BB'>qsort_array</font><font face='Lucida Console'>(</font>array,left,right,<font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>array[left]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='hsort_array'></a>hsort_array</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> array,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> sort_helpers;
+        <font color='#BB00BB'>hsort_array</font><font face='Lucida Console'>(</font>array,left,right,<font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>array[left]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='isort_array'></a>isort_array</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> array,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> sort_helpers;
+        <font color='#BB00BB'>isort_array</font><font face='Lucida Console'>(</font>array,left,right,<font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>array[left]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='isort_array'></a>isort_array</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> array,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right,
+        <font color='#0000FF'>const</font> compare<font color='#5555FF'>&amp;</font> comp
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font> <font face='Lucida Console'>(</font>left <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> right,
+                "<font color='#CC0000'>\tvoid isort_array()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tleft:          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> left
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tright:         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> right <font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> sort_helpers;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> left<font color='#5555FF'>+</font><font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> right; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// everything from left to i-1 is sorted.
+</font>            pos <font color='#5555FF'>=</font> i;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> i<font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>array[pos] , array[j]<font face='Lucida Console'>)</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>array[pos],array[j]<font face='Lucida Console'>)</font>;
+                pos <font color='#5555FF'>=</font> j;
+                
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font><font color='#5555FF'>=</font> left<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='qsort_array'></a>qsort_array</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> array,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right,
+        <font color='#0000FF'>const</font> compare<font color='#5555FF'>&amp;</font> comp
+    <font face='Lucida Console'>)</font>
+    <b>{</b>      
+        <font color='#BB00BB'>DLIB_ASSERT</font> <font face='Lucida Console'>(</font>left <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> right,
+                "<font color='#CC0000'>\tvoid qsort_array()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tleft:          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> left
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tright:         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> right <font face='Lucida Console'>)</font>;
+
+        sort_helpers::<font color='#BB00BB'>qsort_array_main</font><font face='Lucida Console'>(</font>array,left,right,right<font color='#5555FF'>-</font>left,comp<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='hsort_array'></a>hsort_array</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> array,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right,
+        <font color='#0000FF'>const</font> compare<font color='#5555FF'>&amp;</font> comp
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font> <font face='Lucida Console'>(</font>left <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> right,
+                "<font color='#CC0000'>\tvoid hsort_array()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tleft:          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> left
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tright:         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> right <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>right<font color='#5555FF'>-</font>left <font color='#5555FF'>&lt;</font> <font color='#979000'>30</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>isort_array</font><font face='Lucida Console'>(</font>array,left,right,comp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+        <font color='#009900'>// turn array into a max heap
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> left<font color='#5555FF'>+</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>right<font color='#5555FF'>-</font>left<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            sort_helpers::<font color='#BB00BB'>heapify</font><font face='Lucida Console'>(</font>array,left,right,i,comp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> left<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>break</font>;
+        <b>}</b>
+
+        <font color='#009900'>// now sort the array
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> right; i <font color='#5555FF'>&gt;</font> left;<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>array[i],array[left]<font face='Lucida Console'>)</font>;
+            sort_helpers::<font color='#BB00BB'>heapify</font><font face='Lucida Console'>(</font>array,left,<font color='#5555FF'>-</font><font color='#5555FF'>-</font>i,left,comp<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SORt_
+</font>
+
+</pre></body></html>

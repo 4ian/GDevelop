@@ -1,0 +1,75 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - memory_manager_stateless.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MEMORY_MANAGER_STATELESs_
+<font color='#0000FF'>#define</font> DLIB_MEMORY_MANAGER_STATELESs_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='memory_manager_stateless/memory_manager_stateless_kernel_1.h.html'>memory_manager_stateless/memory_manager_stateless_kernel_1.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='memory_manager_stateless/memory_manager_stateless_kernel_2.h.html'>memory_manager_stateless/memory_manager_stateless_kernel_2.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='memory_manager.h.html'>memory_manager.h</a>"
+
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='memory_manager_stateless'></a>memory_manager_stateless</b>
+    <b>{</b>
+        <b><a name='memory_manager_stateless'></a>memory_manager_stateless</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+
+    <font color='#0000FF'>public</font>:
+        
+        <font color='#009900'>//----------- kernels ---------------
+</font>
+        <font color='#009900'>// kernel_1        
+</font>        <font color='#0000FF'>typedef</font>      memory_manager_stateless_kernel_1<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>
+                     kernel_1a;
+      
+        <font color='#009900'>// kernel_2        
+</font>        <font color='#0000FF'>typedef</font>      memory_manager_stateless_kernel_2<font color='#5555FF'>&lt;</font>T,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_1a<font color='#5555FF'>&gt;</font>
+                     kernel_2_1a;
+        <font color='#0000FF'>typedef</font>      memory_manager_stateless_kernel_2<font color='#5555FF'>&lt;</font>T,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_1b<font color='#5555FF'>&gt;</font>
+                     kernel_2_1b;
+        <font color='#0000FF'>typedef</font>      memory_manager_stateless_kernel_2<font color='#5555FF'>&lt;</font>T,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_1c<font color='#5555FF'>&gt;</font>
+                     kernel_2_1c;
+        <font color='#0000FF'>typedef</font>      memory_manager_stateless_kernel_2<font color='#5555FF'>&lt;</font>T,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_1d<font color='#5555FF'>&gt;</font>
+                     kernel_2_1d;
+        <font color='#0000FF'>typedef</font>      memory_manager_stateless_kernel_2<font color='#5555FF'>&lt;</font>T,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_1e<font color='#5555FF'>&gt;</font>
+                     kernel_2_1e;
+        <font color='#0000FF'>typedef</font>      memory_manager_stateless_kernel_2<font color='#5555FF'>&lt;</font>T,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_1f<font color='#5555FF'>&gt;</font>
+                     kernel_2_1f;
+
+        <font color='#0000FF'>typedef</font>      memory_manager_stateless_kernel_2<font color='#5555FF'>&lt;</font>T,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2a<font color='#5555FF'>&gt;</font>
+                     kernel_2_2a;
+        <font color='#0000FF'>typedef</font>      memory_manager_stateless_kernel_2<font color='#5555FF'>&lt;</font>T,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2b<font color='#5555FF'>&gt;</font>
+                     kernel_2_2b;
+        <font color='#0000FF'>typedef</font>      memory_manager_stateless_kernel_2<font color='#5555FF'>&lt;</font>T,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2c<font color='#5555FF'>&gt;</font>
+                     kernel_2_2c;
+        <font color='#0000FF'>typedef</font>      memory_manager_stateless_kernel_2<font color='#5555FF'>&lt;</font>T,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2d<font color='#5555FF'>&gt;</font>
+                     kernel_2_2d;
+        <font color='#0000FF'>typedef</font>      memory_manager_stateless_kernel_2<font color='#5555FF'>&lt;</font>T,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2e<font color='#5555FF'>&gt;</font>
+                     kernel_2_2e;
+      
+        <font color='#0000FF'>typedef</font>      memory_manager_stateless_kernel_2<font color='#5555FF'>&lt;</font>T,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_3a<font color='#5555FF'>&gt;</font>
+                     kernel_2_3a;
+        <font color='#0000FF'>typedef</font>      memory_manager_stateless_kernel_2<font color='#5555FF'>&lt;</font>T,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_3b<font color='#5555FF'>&gt;</font>
+                     kernel_2_3b;
+        <font color='#0000FF'>typedef</font>      memory_manager_stateless_kernel_2<font color='#5555FF'>&lt;</font>T,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_3c<font color='#5555FF'>&gt;</font>
+                     kernel_2_3c;
+        <font color='#0000FF'>typedef</font>      memory_manager_stateless_kernel_2<font color='#5555FF'>&lt;</font>T,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_3d<font color='#5555FF'>&gt;</font>
+                     kernel_2_3d;
+        <font color='#0000FF'>typedef</font>      memory_manager_stateless_kernel_2<font color='#5555FF'>&lt;</font>T,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_3e<font color='#5555FF'>&gt;</font>
+                     kernel_2_3e;
+      
+
+    <b>}</b>;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MEMORY_MANAGER_STATELESs_
+</font>
+
+</pre></body></html>

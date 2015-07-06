@@ -1,0 +1,129 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - border_enumerator_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_BORDER_EnUMERATOR_ABSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_BORDER_EnUMERATOR_ABSTRACT_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='rectangle_abstract.h.html'>rectangle_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='border_enumerator'></a>border_enumerator</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            POINTERS AND REFERENCES TO INTERNAL DATA
+                All operations on this object other than calling element() invalidate
+                pointers and references to internal data.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is an enumerator over the border points of a rectangle.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='border_enumerator'></a>border_enumerator</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #move_next() == false
+                  (i.e. this object is "empty" and won't enumerate anything)
+                - current_element_valid() == false 
+                - at_start() == true
+                - size() == 0
+        !*/</font>
+
+        <b><a name='border_enumerator'></a>border_enumerator</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> border_size
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object will enumerate over the border points which are inside rect
+                  but within border_size of the edge.  For example, if border_size == 1
+                  then it enumerates over the single point wide strip of points all around
+                  the interior edge of rect.
+                - current_element_valid() == false 
+                - at_start() == true
+                - size() == rect.area() - shrink_rect(rect,border_size).area()
+                  (i.e. the number of points in the border area of rect)
+        !*/</font>
+
+        <b><a name='border_enumerator'></a>border_enumerator</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> non_border_region
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object will enumerate over all points which are in rect but
+                  not in non_border_region.  
+                - current_element_valid() == false 
+                - at_start() == true
+                - size() == rect.area() - rect.intersect(non_border_region).area() 
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='at_start'></a>at_start</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if *this represents one position before the first point 
+                  (this would also make the current element invalid) else returns false                
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #current_element_valid() == false 
+                - #at_start() == true
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='current_element_valid'></a>current_element_valid</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if we are currently at a valid element else
+                  returns false 
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='move_next'></a>move_next</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - moves to the next element.  i.e. #element() will now 
+                  return the next border point. 
+                - the return value will be equal to #current_element_valid() 
+                - #at_start() == false 
+
+                - returns true if there is another element 
+                - returns false if there are no more elements in the container
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of border points
+        !*/</font>
+
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - current_element_valid() == true
+            ensures
+                - returns the current border point
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BORDER_EnUMERATOR_ABSTRACT_H_
+</font>
+
+
+</pre></body></html>

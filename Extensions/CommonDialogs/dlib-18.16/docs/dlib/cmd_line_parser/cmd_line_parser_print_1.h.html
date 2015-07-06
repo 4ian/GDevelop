@@ -1,0 +1,208 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - cmd_line_parser_print_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_CMD_LINE_PARSER_PRINt_1_
+<font color='#0000FF'>#define</font> DLIB_CMD_LINE_PARSER_PRINt_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='cmd_line_parser_kernel_abstract.h.html'>cmd_line_parser_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../string.h.html'>../string.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>map<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../smart_pointers.h.html'>../smart_pointers.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> clp_base 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='cmd_line_parser_print_1'></a>cmd_line_parser_print_1</b> : <font color='#0000FF'>public</font> clp_base
+    <b>{</b>
+
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='print_options'></a>print_options</b> <font face='Lucida Console'>(</font>
+                std::basic_ostream<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> clp_base::char_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> out
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='print_options'></a>print_options</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#BB00BB'>print_options</font><font face='Lucida Console'>(</font>std::cout<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> clp_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        cmd_line_parser_print_1<font color='#5555FF'>&lt;</font>clp_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        cmd_line_parser_print_1<font color='#5555FF'>&lt;</font>clp_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> clp_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> cmd_line_parser_print_1<font color='#5555FF'>&lt;</font>clp_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='print_options'></a>print_options</b> <font face='Lucida Console'>(</font>
+        std::basic_ostream<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> clp_base::char_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> clp_base::char_type ct;
+        <font color='#0000FF'>typedef</font> std::basic_string<font color='#5555FF'>&lt;</font>ct<font color='#5555FF'>&gt;</font> string;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> string::size_type size_type;
+
+        <font color='#0000FF'>typedef</font> std::basic_ostringstream<font color='#5555FF'>&lt;</font>ct<font color='#5555FF'>&gt;</font> ostringstream;
+
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+
+
+            size_type max_len <font color='#5555FF'>=</font> <font color='#979000'>0</font>; 
+            <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// this loop here is just the bottom loop but without the print statements.
+</font>            <font color='#009900'>// I'm doing this to figure out what len should be.
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                size_type len <font color='#5555FF'>=</font> <font color='#979000'>0</font>; 
+                len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>name</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>len;
+                <b>}</b>
+                len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>name</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>6</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>7</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>9</font><font face='Lucida Console'>)</font>
+                            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>len;
+                    <b>}</b>
+                <b>}</b>
+
+                len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>&lt;</font> <font color='#979000'>33</font><font face='Lucida Console'>)</font>
+                    max_len <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>max_len,len<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+            <font color='#009900'>// Make a separate ostringstream for each option group.  We are going to write
+</font>            <font color='#009900'>// the output for each group to a separate ostringstream so that we can keep
+</font>            <font color='#009900'>// them grouped together in the final output.
+</font>            std::map<font color='#5555FF'>&lt;</font>string,shared_ptr<font color='#5555FF'>&lt;</font>ostringstream<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> groups;
+            <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>groups[<font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>group_name</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>]<font face='Lucida Console'>)</font>
+                    groups[<font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>group_name</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>].<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> ostringstream<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+
+
+            <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                ostringstream<font color='#5555FF'>&amp;</font> sout <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>groups[<font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>group_name</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>];
+
+                size_type len <font color='#5555FF'>=</font> <font color='#979000'>0</font>; 
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>ct,"<font color='#CC0000'>\n  -</font>"<font face='Lucida Console'>)</font>;
+                len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>name</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>ct,"<font color='#CC0000'>-</font>"<font face='Lucida Console'>)</font>;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>len;
+                <b>}</b>
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>name</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>name</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>ct,"<font color='#CC0000'> &lt;arg&gt;</font>"<font face='Lucida Console'>)</font>;
+                    len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>6</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>ct,"<font color='#CC0000'> &lt;arg</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>ct,"<font color='#CC0000'>&gt;</font>"<font face='Lucida Console'>)</font>;
+                        len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>7</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>9</font><font face='Lucida Console'>)</font>
+                            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>len;
+                    <b>}</b>
+                <b>}</b>
+
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>ct,"<font color='#CC0000'>   </font>"<font face='Lucida Console'>)</font>;
+                len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>&lt;</font> max_len<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>len;
+                    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>ct,"<font color='#CC0000'> </font>"<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> ml <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>max_len<font face='Lucida Console'>)</font>;
+                <font color='#009900'>// now print the description but make it wrap around nicely if it 
+</font>                <font color='#009900'>// is to long to fit on one line.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> max_len<font face='Lucida Console'>)</font>
+                    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>wrap_string</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>description</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>0</font>,ml<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>ct,"<font color='#CC0000'>\n</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>wrap_string</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>description</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,ml,ml<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>// Only print out a generic Options: group name if there is an unnamed option
+</font>            <font color='#009900'>// present.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>groups.<font color='#BB00BB'>count</font><font face='Lucida Console'>(</font><font color='#BB00BB'>string</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>ct,"<font color='#CC0000'>Options:</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Now print everything out
+</font>            <font color='#0000FF'>typename</font> std::map<font color='#5555FF'>&lt;</font>string,shared_ptr<font color='#5555FF'>&lt;</font>ostringstream<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::iterator i;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> groups.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> groups.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// print the group name if we have one
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> groups.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>ct,"<font color='#CC0000'>\n\n</font>"<font face='Lucida Console'>)</font>;
+                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>ct,"<font color='#CC0000'>:</font>"<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#009900'>// print the options in the group
+</font>                out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>ct,"<font color='#CC0000'>\n\n</font>"<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>throw</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CMD_LINE_PARSER_PRINt_1_
+</font>
+
+</pre></body></html>

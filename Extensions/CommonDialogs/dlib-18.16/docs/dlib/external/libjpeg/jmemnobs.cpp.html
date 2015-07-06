@@ -1,0 +1,112 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jmemnobs.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jmemnobs.c
+ *
+ * Copyright (C) 1992-1996, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file provides a really simple implementation of the system-
+ * dependent portion of the JPEG memory manager.  This implementation
+ * assumes that no backing-store files are needed: all required space
+ * can be obtained from malloc().
+ * This is very portable in the sense that it'll compile on almost anything,
+ * but you'd better have lots of main memory (or virtual memory) if you want
+ * to process big images.
+ * Note that the max_memory_to_use option is ignored by this implementation.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jmemsys.h.html'>jmemsys.h</a>"		<font color='#009900'>/* import the system-dependent declarations */</font>
+
+<font color='#0000FF'>#ifndef</font> HAVE_STDLIB_H		<font color='#009900'>/* &lt;stdlib.h&gt; should declare malloc(),free() */</font>
+<font color='#0000FF'>extern</font> <font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font> malloc <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font> size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>extern</font> <font color='#0000FF'><u>void</u></font> free <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font>ptr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#009900'>/*
+ * Memory allocation and freeing are controlled by the regular library
+ * routines malloc() and free().
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_get_small'></a>jpeg_get_small</b> <font face='Lucida Console'>(</font>j_common_ptr , <font color='#0000FF'><u>size_t</u></font> sizeofobject<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> <font color='#BB00BB'>malloc</font><font face='Lucida Console'>(</font>sizeofobject<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_free_small'></a>jpeg_free_small</b> <font face='Lucida Console'>(</font>j_common_ptr , <font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font> object, <font color='#0000FF'><u>size_t</u></font> <font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#BB00BB'>free</font><font face='Lucida Console'>(</font>object<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * "Large" objects are treated the same as "small" ones.
+ * NB: although we include FAR keywords in the routine declarations,
+ * this file won't actually work in 80x86 small/medium model; at least,
+ * you probably won't be able to process useful-size images in only 64KB.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_get_large'></a>jpeg_get_large</b> <font face='Lucida Console'>(</font>j_common_ptr , <font color='#0000FF'><u>size_t</u></font> sizeofobject<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> <font color='#BB00BB'>malloc</font><font face='Lucida Console'>(</font>sizeofobject<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_free_large'></a>jpeg_free_large</b> <font face='Lucida Console'>(</font>j_common_ptr , <font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font> object, <font color='#0000FF'><u>size_t</u></font> <font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#BB00BB'>free</font><font face='Lucida Console'>(</font>object<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * This routine computes the total memory space available for allocation.
+ * Here we always say, "we got all you want bud!"
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_mem_available'></a>jpeg_mem_available</b> <font face='Lucida Console'>(</font>j_common_ptr , <font color='#0000FF'><u>long</u></font> ,
+		    <font color='#0000FF'><u>long</u></font> max_bytes_needed, <font color='#0000FF'><u>long</u></font> <font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'>return</font> max_bytes_needed;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Backing store (temporary file) management.
+ * Since jpeg_mem_available always promised the moon,
+ * this should never be called and we can just error out.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_open_backing_store'></a>jpeg_open_backing_store</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo, backing_store_ptr ,
+			 <font color='#0000FF'><u>long</u></font> <font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_NO_BACKING_STORE<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * These routines take care of any system-dependent initialization and
+ * cleanup required.  Here, there isn't any.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_mem_init'></a>jpeg_mem_init</b> <font face='Lucida Console'>(</font>j_common_ptr <font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'>return</font> <font color='#979000'>0</font>;			<font color='#009900'>/* just set max_memory_to_use to 0 */</font>
+<b>}</b>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_mem_term'></a>jpeg_mem_term</b> <font face='Lucida Console'>(</font>j_common_ptr <font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#009900'>/* no work */</font>
+<b>}</b>
+
+</pre></body></html>

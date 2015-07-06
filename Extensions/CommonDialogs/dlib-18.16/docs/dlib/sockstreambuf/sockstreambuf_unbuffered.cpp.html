@@ -1,0 +1,171 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sockstreambuf_unbuffered.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SOCKSTrEAMBUF_UNBUFFERED_CPp_
+<font color='#0000FF'>#define</font> DLIB_SOCKSTrEAMBUF_UNBUFFERED_CPp_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sockstreambuf_unbuffered.h.html'>sockstreambuf_unbuffered.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>    <font color='#009900'>// output functions
+</font><font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+    sockstreambuf_unbuffered::int_type sockstreambuf_unbuffered::
+    <b><a name='overflow'></a>overflow</b> <font face='Lucida Console'>(</font>
+        int_type c
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>char</u></font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>con.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>temp,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// if the write was not successful
+</font>                <font color='#0000FF'>return</font> EOF;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>return</font> c;
+    <b>}</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+    std::streamsize sockstreambuf_unbuffered::
+    <b><a name='xsputn'></a>xsputn</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> s,
+        std::streamsize num
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>con.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font>s,<font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>num<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> num<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// the write was not successful so return that 0 bytes were written
+</font>            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b> 
+        <font color='#0000FF'>return</font> num;
+    <b>}</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>    <font color='#009900'>// input functions
+</font><font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+    sockstreambuf_unbuffered::int_type sockstreambuf_unbuffered::
+    <b><a name='underflow'></a>underflow</b><font face='Lucida Console'>(</font> 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lastread_next<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> lastread;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>peek <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> peek;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'><u>char</u></font> temp;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>con.<font color='#BB00BB'>read</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>temp,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// some error occurred
+</font>                <font color='#0000FF'>return</font> EOF;
+            <b>}</b>
+            peek <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> peek;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+    sockstreambuf_unbuffered::int_type sockstreambuf_unbuffered::
+    <b><a name='uflow'></a>uflow</b><font face='Lucida Console'>(</font> 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>   
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lastread_next<font face='Lucida Console'>)</font>
+        <b>{</b>
+            lastread_next <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>return</font> lastread;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>peek <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+        <b>{</b>
+            lastread <font color='#5555FF'>=</font> peek;
+            peek <font color='#5555FF'>=</font> EOF;
+            <font color='#0000FF'>return</font> lastread;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'><u>char</u></font> temp;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>con.<font color='#BB00BB'>read</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>temp,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// some error occurred
+</font>                <font color='#0000FF'>return</font> EOF;
+            <b>}</b>      
+            lastread <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> lastread;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+    sockstreambuf_unbuffered::int_type sockstreambuf_unbuffered::
+    <b><a name='pbackfail'></a>pbackfail</b><font face='Lucida Console'>(</font>
+        int_type c
+    <font face='Lucida Console'>)</font>
+    <b>{</b>  
+        <font color='#009900'>// if they are trying to push back a character that they didn't read last
+</font>        <font color='#009900'>// that is an error
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c <font color='#5555FF'>!</font><font color='#5555FF'>=</font> lastread<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> EOF;
+
+        <font color='#009900'>// if they are trying to push back a second character then thats an error
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lastread_next<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> EOF;
+
+        lastread_next <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+    <b>}</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+    std::streamsize sockstreambuf_unbuffered::
+    <b><a name='xsgetn'></a>xsgetn</b> <font face='Lucida Console'>(</font>
+        char_type<font color='#5555FF'>*</font> s, 
+        std::streamsize n
+    <font face='Lucida Console'>)</font>
+    <b>{</b> 
+        std::streamsize temp <font color='#5555FF'>=</font> n;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lastread_next <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> n <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font>s <font color='#5555FF'>=</font> lastread;
+            lastread_next <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>s;
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>n;
+        <b>}</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>peek <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> n <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font>s <font color='#5555FF'>=</font> peek;
+            peek <font color='#5555FF'>=</font> EOF;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>s;
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>n;
+        <b>}</b>
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>n<font color='#5555FF'>&gt;</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> status <font color='#5555FF'>=</font> con.<font color='#BB00BB'>read</font><font face='Lucida Console'>(</font>s,<font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>break</font>;
+            n <font color='#5555FF'>-</font><font color='#5555FF'>=</font> status;
+            s <font color='#5555FF'>+</font><font color='#5555FF'>=</font> status;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> temp<font color='#5555FF'>-</font>n;       
+    <b>}</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SOCKSTrEAMBUF_UNBUFFERED_CPp_
+</font>
+
+</pre></body></html>

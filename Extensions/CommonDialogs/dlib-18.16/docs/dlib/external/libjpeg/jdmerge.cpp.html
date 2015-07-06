@@ -1,0 +1,403 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jdmerge.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jdmerge.c
+ *
+ * Copyright (C) 1994-1996, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains code for merged upsampling/color conversion.
+ *
+ * This file combines functions from jdsample.c and jdcolor.c;
+ * read those files first to understand what's going on.
+ *
+ * When the chroma components are to be upsampled by simple replication
+ * (ie, box filtering), we can save some work in color conversion by
+ * calculating all the output pixels corresponding to a pair of chroma
+ * samples at one time.  In the conversion equations
+ *	R = Y           + K1 * Cr
+ *	G = Y + K2 * Cb + K3 * Cr
+ *	B = Y + K4 * Cb
+ * only the Y term varies among the group of pixels corresponding to a pair
+ * of chroma samples, so the rest of the terms can be calculated just once.
+ * At typical sampling ratios, this eliminates half or three-quarters of the
+ * multiplications needed for color conversion.
+ *
+ * This file currently provides implementations for the following cases:
+ *	YCbCr =&gt; RGB color conversion only.
+ *	Sampling ratios of 2h1v or 2h2v.
+ *	No scaling needed at upsample time.
+ *	Corner-aligned (non-CCIR601) sampling alignment.
+ * Other special cases could be added, but in most applications these are
+ * the only common cases.  (For uncommon cases we fall back on the more
+ * general code in jdsample.c and jdcolor.c.)
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+
+<font color='#0000FF'>#ifdef</font> UPSAMPLE_MERGING_SUPPORTED
+
+
+<font color='#009900'>/* Private subobject */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#0000FF'>struct</font> jpeg_upsampler pub;	<font color='#009900'>/* public fields */</font>
+
+  <font color='#009900'>/* Pointer to routine to do actual upsampling/conversion of one row group */</font>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, upmethod, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+			   JSAMPIMAGE input_buf, JDIMENSION in_row_group_ctr,
+			   JSAMPARRAY output_buf<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Private state for YCC-&gt;RGB conversion */</font>
+  <font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font> Cr_r_tab;		<font color='#009900'>/* =&gt; table for Cr to R conversion */</font>
+  <font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font> Cb_b_tab;		<font color='#009900'>/* =&gt; table for Cb to B conversion */</font>
+  <font color='#0000FF'><u>long</u></font> <font color='#5555FF'>*</font> Cr_g_tab;		<font color='#009900'>/* =&gt; table for Cr to G conversion */</font>
+  <font color='#0000FF'><u>long</u></font> <font color='#5555FF'>*</font> Cb_g_tab;		<font color='#009900'>/* =&gt; table for Cb to G conversion */</font>
+
+  <font color='#009900'>/* For 2:1 vertical sampling, we produce two output rows at a time.
+   * We need a "spare" row buffer to hold the second output row if the
+   * application provides just a one-row buffer; we also use the spare
+   * to discard the dummy last row if the image height is odd.
+   */</font>
+  JSAMPROW spare_row;
+  <font color='#0000FF'><u>int</u></font> spare_full;		<font color='#009900'>/* T if spare buffer is occupied */</font>
+
+  JDIMENSION out_row_width;	<font color='#009900'>/* samples per output row */</font>
+  JDIMENSION rows_to_go;	<font color='#009900'>/* counts rows remaining in image */</font>
+<b>}</b> my_upsampler;
+
+<font color='#0000FF'>typedef</font> my_upsampler <font color='#5555FF'>*</font> my_upsample_ptr;
+
+<font color='#0000FF'>#define</font> SCALEBITS	<font color='#979000'>16</font>	<font color='#009900'>/* speediest right-shift on some machines */</font>
+<font color='#0000FF'>#define</font> ONE_HALF	<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>SCALEBITS<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> FIX<font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>		<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font>L<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>SCALEBITS<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+
+<font color='#009900'>/*
+ * Initialize tables for YCC-&gt;RGB colorspace conversion.
+ * This is taken directly from jdcolor.c; see that file for more info.
+ */</font>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='build_ycc_rgb_table'></a>build_ycc_rgb_table</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_upsample_ptr upsample <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_upsample_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upsample;
+  <font color='#0000FF'><u>int</u></font> i;
+  <font color='#0000FF'><u>long</u></font> x;
+  SHIFT_TEMPS
+
+  upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Cr_r_tab <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				<font face='Lucida Console'>(</font>MAXJSAMPLE<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Cb_b_tab <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				<font face='Lucida Console'>(</font>MAXJSAMPLE<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Cr_g_tab <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				<font face='Lucida Console'>(</font>MAXJSAMPLE<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Cb_g_tab <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				<font face='Lucida Console'>(</font>MAXJSAMPLE<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>, x <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>CENTERJSAMPLE; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> MAXJSAMPLE; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, x<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* i is the actual input pixel value, in the range 0..MAXJSAMPLE */</font>
+    <font color='#009900'>/* The Cb or Cr value we are thinking of is x = i - CENTERJSAMPLE */</font>
+    <font color='#009900'>/* Cr=&gt;R value is nearest int to 1.40200 * x */</font>
+    upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Cr_r_tab[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+		    <font color='#BB00BB'>RIGHT_SHIFT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>FIX</font><font face='Lucida Console'>(</font><font color='#979000'>1.40200</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> x <font color='#5555FF'>+</font> ONE_HALF, SCALEBITS<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Cb=&gt;B value is nearest int to 1.77200 * x */</font>
+    upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Cb_b_tab[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+		    <font color='#BB00BB'>RIGHT_SHIFT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>FIX</font><font face='Lucida Console'>(</font><font color='#979000'>1.77200</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> x <font color='#5555FF'>+</font> ONE_HALF, SCALEBITS<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Cr=&gt;G value is scaled-up -0.71414 * x */</font>
+    upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Cr_g_tab[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font> <font color='#BB00BB'>FIX</font><font face='Lucida Console'>(</font><font color='#979000'>0.71414</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> x;
+    <font color='#009900'>/* Cb=&gt;G value is scaled-up -0.34414 * x */</font>
+    <font color='#009900'>/* We also add in ONE_HALF so that need not do it in inner loop */</font>
+    upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Cb_g_tab[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font> <font color='#BB00BB'>FIX</font><font face='Lucida Console'>(</font><font color='#979000'>0.34414</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> x <font color='#5555FF'>+</font> ONE_HALF;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Initialize for an upsampling pass.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='start_pass_merged_upsample'></a>start_pass_merged_upsample</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_upsample_ptr upsample <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_upsample_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upsample;
+
+  <font color='#009900'>/* Mark the spare buffer empty */</font>
+  upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>spare_full <font color='#5555FF'>=</font> FALSE;
+  <font color='#009900'>/* Initialize total-height counter for detecting bottom of image */</font>
+  upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_to_go <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_height;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Control routine to do upsampling (and color conversion).
+ *
+ * The control routine just handles the row buffering considerations.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='merged_2v_upsample'></a>merged_2v_upsample</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+		    JSAMPIMAGE input_buf, JDIMENSION <font color='#5555FF'>*</font>in_row_group_ctr,
+		    JDIMENSION ,
+		    JSAMPARRAY output_buf, JDIMENSION <font color='#5555FF'>*</font>out_row_ctr,
+		    JDIMENSION out_rows_avail<font face='Lucida Console'>)</font>
+<font color='#009900'>/* 2:1 vertical sampling case: may need a spare row. */</font>
+<b>{</b>
+  my_upsample_ptr upsample <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_upsample_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upsample;
+  JSAMPROW work_ptrs[<font color='#979000'>2</font>];
+  JDIMENSION num_rows;		<font color='#009900'>/* number of rows returned to caller */</font>
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>spare_full<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* If we have a spare row saved from a previous cycle, just return it. */</font>
+    <font color='#BB00BB'>jcopy_sample_rows</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font> upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>spare_row, <font color='#979000'>0</font>, output_buf <font color='#5555FF'>+</font> <font color='#5555FF'>*</font>out_row_ctr, <font color='#979000'>0</font>,
+		      <font color='#979000'>1</font>, upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_row_width<font face='Lucida Console'>)</font>;
+    num_rows <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>spare_full <font color='#5555FF'>=</font> FALSE;
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    <font color='#009900'>/* Figure number of rows to return to caller. */</font>
+    num_rows <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+    <font color='#009900'>/* Not more than the distance to the end of the image. */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_rows <font color='#5555FF'>&gt;</font> upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_to_go<font face='Lucida Console'>)</font>
+      num_rows <font color='#5555FF'>=</font> upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_to_go;
+    <font color='#009900'>/* And not more than what the client can accept: */</font>
+    out_rows_avail <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#5555FF'>*</font>out_row_ctr;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_rows <font color='#5555FF'>&gt;</font> out_rows_avail<font face='Lucida Console'>)</font>
+      num_rows <font color='#5555FF'>=</font> out_rows_avail;
+    <font color='#009900'>/* Create output pointer array for upsampler. */</font>
+    work_ptrs[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> output_buf[<font color='#5555FF'>*</font>out_row_ctr];
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_rows <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <b>{</b>
+      work_ptrs[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> output_buf[<font color='#5555FF'>*</font>out_row_ctr <font color='#5555FF'>+</font> <font color='#979000'>1</font>];
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      work_ptrs[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>spare_row;
+      upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>spare_full <font color='#5555FF'>=</font> TRUE;
+    <b>}</b>
+    <font color='#009900'>/* Now do the upsampling. */</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upmethod<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, input_buf, <font color='#5555FF'>*</font>in_row_group_ctr, work_ptrs<font face='Lucida Console'>)</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Adjust counts */</font>
+  <font color='#5555FF'>*</font>out_row_ctr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> num_rows;
+  upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_to_go <font color='#5555FF'>-</font><font color='#5555FF'>=</font> num_rows;
+  <font color='#009900'>/* When the buffer is emptied, declare this input row group consumed */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>spare_full<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>in_row_group_ctr<font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+<b>}</b>
+
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='merged_1v_upsample'></a>merged_1v_upsample</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+		    JSAMPIMAGE input_buf, JDIMENSION <font color='#5555FF'>*</font>in_row_group_ctr,
+		    JDIMENSION ,
+		    JSAMPARRAY output_buf, JDIMENSION <font color='#5555FF'>*</font>out_row_ctr,
+		    JDIMENSION <font face='Lucida Console'>)</font>
+<font color='#009900'>/* 1:1 vertical sampling case: much easier, never need a spare row. */</font>
+<b>{</b>
+  my_upsample_ptr upsample <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_upsample_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upsample;
+
+  <font color='#009900'>/* Just do the upsampling. */</font>
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upmethod<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, input_buf, <font color='#5555FF'>*</font>in_row_group_ctr,
+			 output_buf <font color='#5555FF'>+</font> <font color='#5555FF'>*</font>out_row_ctr<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Adjust counts */</font>
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>out_row_ctr<font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>in_row_group_ctr<font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * These are the routines invoked by the control routines to do
+ * the actual upsampling/conversion.  One row group is processed per call.
+ *
+ * Note: since we may be writing directly into application-supplied buffers,
+ * we have to be honest about the output width; we can't assume the buffer
+ * has been rounded up to an even width.
+ */</font>
+
+
+<font color='#009900'>/*
+ * Upsample and color convert for the case of 2:1 horizontal and 1:1 vertical.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='h2v1_merged_upsample'></a>h2v1_merged_upsample</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+		      JSAMPIMAGE input_buf, JDIMENSION in_row_group_ctr,
+		      JSAMPARRAY output_buf<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_upsample_ptr upsample <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_upsample_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upsample;
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> y, cred, cgreen, cblue;
+  <font color='#0000FF'><u>int</u></font> cb, cr;
+  <font color='#0000FF'>register</font> JSAMPROW outptr;
+  JSAMPROW inptr0, inptr1, inptr2;
+  JDIMENSION col;
+  <font color='#009900'>/* copy these pointers into registers if possible */</font>
+  <font color='#0000FF'>register</font> JSAMPLE <font color='#5555FF'>*</font> range_limit <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sample_range_limit;
+  <font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font> Crrtab <font color='#5555FF'>=</font> upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Cr_r_tab;
+  <font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font> Cbbtab <font color='#5555FF'>=</font> upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Cb_b_tab;
+  <font color='#0000FF'><u>long</u></font> <font color='#5555FF'>*</font> Crgtab <font color='#5555FF'>=</font> upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Cr_g_tab;
+  <font color='#0000FF'><u>long</u></font> <font color='#5555FF'>*</font> Cbgtab <font color='#5555FF'>=</font> upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Cb_g_tab;
+  SHIFT_TEMPS
+
+  inptr0 <font color='#5555FF'>=</font> input_buf[<font color='#979000'>0</font>][in_row_group_ctr];
+  inptr1 <font color='#5555FF'>=</font> input_buf[<font color='#979000'>1</font>][in_row_group_ctr];
+  inptr2 <font color='#5555FF'>=</font> input_buf[<font color='#979000'>2</font>][in_row_group_ctr];
+  outptr <font color='#5555FF'>=</font> output_buf[<font color='#979000'>0</font>];
+  <font color='#009900'>/* Loop for each pair of output pixels */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>col <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>1</font>; col <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; col<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Do the chroma part of the calculation */</font>
+    cb <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr1<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>;
+    cr <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr2<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>;
+    cred <font color='#5555FF'>=</font> Crrtab[cr];
+    cgreen <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>RIGHT_SHIFT</font><font face='Lucida Console'>(</font>Cbgtab[cb] <font color='#5555FF'>+</font> Crgtab[cr], SCALEBITS<font face='Lucida Console'>)</font>;
+    cblue <font color='#5555FF'>=</font> Cbbtab[cb];
+    <font color='#009900'>/* Fetch 2 Y values and emit 2 pixels */</font>
+    y  <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr0<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>;
+    outptr[RGB_RED] <font color='#5555FF'>=</font>   range_limit[y <font color='#5555FF'>+</font> cred];
+    outptr[RGB_GREEN] <font color='#5555FF'>=</font> range_limit[y <font color='#5555FF'>+</font> cgreen];
+    outptr[RGB_BLUE] <font color='#5555FF'>=</font>  range_limit[y <font color='#5555FF'>+</font> cblue];
+    outptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> RGB_PIXELSIZE;
+    y  <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr0<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>;
+    outptr[RGB_RED] <font color='#5555FF'>=</font>   range_limit[y <font color='#5555FF'>+</font> cred];
+    outptr[RGB_GREEN] <font color='#5555FF'>=</font> range_limit[y <font color='#5555FF'>+</font> cgreen];
+    outptr[RGB_BLUE] <font color='#5555FF'>=</font>  range_limit[y <font color='#5555FF'>+</font> cblue];
+    outptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> RGB_PIXELSIZE;
+  <b>}</b>
+  <font color='#009900'>/* If image width is odd, do the last output column separately */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width <font color='#5555FF'>&amp;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <b>{</b>
+    cb <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr1<font face='Lucida Console'>)</font>;
+    cr <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr2<font face='Lucida Console'>)</font>;
+    cred <font color='#5555FF'>=</font> Crrtab[cr];
+    cgreen <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>RIGHT_SHIFT</font><font face='Lucida Console'>(</font>Cbgtab[cb] <font color='#5555FF'>+</font> Crgtab[cr], SCALEBITS<font face='Lucida Console'>)</font>;
+    cblue <font color='#5555FF'>=</font> Cbbtab[cb];
+    y  <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr0<font face='Lucida Console'>)</font>;
+    outptr[RGB_RED] <font color='#5555FF'>=</font>   range_limit[y <font color='#5555FF'>+</font> cred];
+    outptr[RGB_GREEN] <font color='#5555FF'>=</font> range_limit[y <font color='#5555FF'>+</font> cgreen];
+    outptr[RGB_BLUE] <font color='#5555FF'>=</font>  range_limit[y <font color='#5555FF'>+</font> cblue];
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Upsample and color convert for the case of 2:1 horizontal and 2:1 vertical.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='h2v2_merged_upsample'></a>h2v2_merged_upsample</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+		      JSAMPIMAGE input_buf, JDIMENSION in_row_group_ctr,
+		      JSAMPARRAY output_buf<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_upsample_ptr upsample <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_upsample_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upsample;
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> y, cred, cgreen, cblue;
+  <font color='#0000FF'><u>int</u></font> cb, cr;
+  <font color='#0000FF'>register</font> JSAMPROW outptr0, outptr1;
+  JSAMPROW inptr00, inptr01, inptr1, inptr2;
+  JDIMENSION col;
+  <font color='#009900'>/* copy these pointers into registers if possible */</font>
+  <font color='#0000FF'>register</font> JSAMPLE <font color='#5555FF'>*</font> range_limit <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sample_range_limit;
+  <font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font> Crrtab <font color='#5555FF'>=</font> upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Cr_r_tab;
+  <font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font> Cbbtab <font color='#5555FF'>=</font> upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Cb_b_tab;
+  <font color='#0000FF'><u>long</u></font> <font color='#5555FF'>*</font> Crgtab <font color='#5555FF'>=</font> upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Cr_g_tab;
+  <font color='#0000FF'><u>long</u></font> <font color='#5555FF'>*</font> Cbgtab <font color='#5555FF'>=</font> upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Cb_g_tab;
+  SHIFT_TEMPS
+
+  inptr00 <font color='#5555FF'>=</font> input_buf[<font color='#979000'>0</font>][in_row_group_ctr<font color='#5555FF'>*</font><font color='#979000'>2</font>];
+  inptr01 <font color='#5555FF'>=</font> input_buf[<font color='#979000'>0</font>][in_row_group_ctr<font color='#5555FF'>*</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>];
+  inptr1 <font color='#5555FF'>=</font> input_buf[<font color='#979000'>1</font>][in_row_group_ctr];
+  inptr2 <font color='#5555FF'>=</font> input_buf[<font color='#979000'>2</font>][in_row_group_ctr];
+  outptr0 <font color='#5555FF'>=</font> output_buf[<font color='#979000'>0</font>];
+  outptr1 <font color='#5555FF'>=</font> output_buf[<font color='#979000'>1</font>];
+  <font color='#009900'>/* Loop for each group of output pixels */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>col <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>1</font>; col <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; col<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Do the chroma part of the calculation */</font>
+    cb <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr1<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>;
+    cr <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr2<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>;
+    cred <font color='#5555FF'>=</font> Crrtab[cr];
+    cgreen <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>RIGHT_SHIFT</font><font face='Lucida Console'>(</font>Cbgtab[cb] <font color='#5555FF'>+</font> Crgtab[cr], SCALEBITS<font face='Lucida Console'>)</font>;
+    cblue <font color='#5555FF'>=</font> Cbbtab[cb];
+    <font color='#009900'>/* Fetch 4 Y values and emit 4 pixels */</font>
+    y  <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr00<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>;
+    outptr0[RGB_RED] <font color='#5555FF'>=</font>   range_limit[y <font color='#5555FF'>+</font> cred];
+    outptr0[RGB_GREEN] <font color='#5555FF'>=</font> range_limit[y <font color='#5555FF'>+</font> cgreen];
+    outptr0[RGB_BLUE] <font color='#5555FF'>=</font>  range_limit[y <font color='#5555FF'>+</font> cblue];
+    outptr0 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> RGB_PIXELSIZE;
+    y  <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr00<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>;
+    outptr0[RGB_RED] <font color='#5555FF'>=</font>   range_limit[y <font color='#5555FF'>+</font> cred];
+    outptr0[RGB_GREEN] <font color='#5555FF'>=</font> range_limit[y <font color='#5555FF'>+</font> cgreen];
+    outptr0[RGB_BLUE] <font color='#5555FF'>=</font>  range_limit[y <font color='#5555FF'>+</font> cblue];
+    outptr0 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> RGB_PIXELSIZE;
+    y  <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr01<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>;
+    outptr1[RGB_RED] <font color='#5555FF'>=</font>   range_limit[y <font color='#5555FF'>+</font> cred];
+    outptr1[RGB_GREEN] <font color='#5555FF'>=</font> range_limit[y <font color='#5555FF'>+</font> cgreen];
+    outptr1[RGB_BLUE] <font color='#5555FF'>=</font>  range_limit[y <font color='#5555FF'>+</font> cblue];
+    outptr1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> RGB_PIXELSIZE;
+    y  <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr01<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>;
+    outptr1[RGB_RED] <font color='#5555FF'>=</font>   range_limit[y <font color='#5555FF'>+</font> cred];
+    outptr1[RGB_GREEN] <font color='#5555FF'>=</font> range_limit[y <font color='#5555FF'>+</font> cgreen];
+    outptr1[RGB_BLUE] <font color='#5555FF'>=</font>  range_limit[y <font color='#5555FF'>+</font> cblue];
+    outptr1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> RGB_PIXELSIZE;
+  <b>}</b>
+  <font color='#009900'>/* If image width is odd, do the last output column separately */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width <font color='#5555FF'>&amp;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <b>{</b>
+    cb <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr1<font face='Lucida Console'>)</font>;
+    cr <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr2<font face='Lucida Console'>)</font>;
+    cred <font color='#5555FF'>=</font> Crrtab[cr];
+    cgreen <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>RIGHT_SHIFT</font><font face='Lucida Console'>(</font>Cbgtab[cb] <font color='#5555FF'>+</font> Crgtab[cr], SCALEBITS<font face='Lucida Console'>)</font>;
+    cblue <font color='#5555FF'>=</font> Cbbtab[cb];
+    y  <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr00<font face='Lucida Console'>)</font>;
+    outptr0[RGB_RED] <font color='#5555FF'>=</font>   range_limit[y <font color='#5555FF'>+</font> cred];
+    outptr0[RGB_GREEN] <font color='#5555FF'>=</font> range_limit[y <font color='#5555FF'>+</font> cgreen];
+    outptr0[RGB_BLUE] <font color='#5555FF'>=</font>  range_limit[y <font color='#5555FF'>+</font> cblue];
+    y  <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr01<font face='Lucida Console'>)</font>;
+    outptr1[RGB_RED] <font color='#5555FF'>=</font>   range_limit[y <font color='#5555FF'>+</font> cred];
+    outptr1[RGB_GREEN] <font color='#5555FF'>=</font> range_limit[y <font color='#5555FF'>+</font> cgreen];
+    outptr1[RGB_BLUE] <font color='#5555FF'>=</font>  range_limit[y <font color='#5555FF'>+</font> cblue];
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Module initialization routine for merged upsampling/color conversion.
+ *
+ * NB: this is called under the conditions determined by use_merged_upsample()
+ * in jdmaster.c.  That routine MUST correspond to the actual capabilities
+ * of this module; no safety checks are made here.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jinit_merged_upsampler'></a>jinit_merged_upsampler</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_upsample_ptr upsample;
+
+  upsample <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_upsample_ptr<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				<font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>my_upsampler<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upsample <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> jpeg_upsampler <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> upsample;
+  upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.start_pass <font color='#5555FF'>=</font> start_pass_merged_upsample;
+  upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.need_context_rows <font color='#5555FF'>=</font> FALSE;
+
+  upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_row_width <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width <font color='#5555FF'>*</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font> <b>{</b>
+    upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.upsample <font color='#5555FF'>=</font> merged_2v_upsample;
+    upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upmethod <font color='#5555FF'>=</font> h2v2_merged_upsample;
+    <font color='#009900'>/* Allocate a spare row buffer */</font>
+    upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>spare_row <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPROW<font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_large<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+		<font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_row_width <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.upsample <font color='#5555FF'>=</font> merged_1v_upsample;
+    upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upmethod <font color='#5555FF'>=</font> h2v1_merged_upsample;
+    <font color='#009900'>/* No spare row needed */</font>
+    upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>spare_row <font color='#5555FF'>=</font> NULL;
+  <b>}</b>
+
+  <font color='#BB00BB'>build_ycc_rgb_table</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* UPSAMPLE_MERGING_SUPPORTED */</font>
+
+</pre></body></html>

@@ -1,0 +1,643 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - infback.c</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/* infback.c -- inflate using a call-back interface
+ * Copyright (C) 1995-2011 Mark Adler
+ * For conditions of distribution and use, see copyright notice in zlib.h
+ */</font>
+
+<font color='#009900'>/*
+   This code is largely copied from inflate.c.  Normally either infback.o or
+   inflate.o would be linked into an application--not both.  The interface
+   with inffast.c is retained so that optimized assembler-coded versions of
+   inflate_fast() can be used with either inflate.c or infback.c.
+ */</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='zutil.h.html'>zutil.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='inftrees.h.html'>inftrees.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='inflate.h.html'>inflate.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='inffast.h.html'>inffast.h</a>"
+
+<font color='#009900'>/* function prototypes */</font>
+local <font color='#0000FF'><u>void</u></font> fixedtables <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> inflate_state FAR <font color='#5555FF'>*</font>state<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/*
+   strm provides memory allocation functions in zalloc and zfree, or
+   Z_NULL to use the library memory allocation functions.
+
+   windowBits is in the range 8..15, and window is a user-supplied
+   window and output buffer that is 2**windowBits bytes.
+ */</font>
+<font color='#0000FF'><u>int</u></font> ZEXPORT <b><a name='inflateBackInit_'></a>inflateBackInit_</b><font face='Lucida Console'>(</font>strm, windowBits, window, version, stream_size<font face='Lucida Console'>)</font>
+z_streamp strm;
+<font color='#0000FF'><u>int</u></font> windowBits;
+<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> FAR <font color='#5555FF'>*</font>window;
+<font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>version;
+<font color='#0000FF'><u>int</u></font> stream_size;
+<b>{</b>
+    <font color='#0000FF'>struct</font> inflate_state FAR <font color='#5555FF'>*</font>state;
+
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>version <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_NULL <font color='#5555FF'>|</font><font color='#5555FF'>|</font> version[<font color='#979000'>0</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> ZLIB_VERSION[<font color='#979000'>0</font>] <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+        stream_size <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>z_stream<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> Z_VERSION_ERROR;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>strm <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_NULL <font color='#5555FF'>|</font><font color='#5555FF'>|</font> window <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_NULL <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+        windowBits <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> windowBits <font color='#5555FF'>&gt;</font> <font color='#979000'>15</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> Z_STREAM_ERROR;
+    strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg <font color='#5555FF'>=</font> Z_NULL;                 <font color='#009900'>/* in case we return an error */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zalloc <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>alloc_func<font face='Lucida Console'>)</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+<font color='#0000FF'>#ifdef</font> Z_SOLO
+        <font color='#0000FF'>return</font> Z_STREAM_ERROR;
+<font color='#0000FF'>#else</font>
+        strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zalloc <font color='#5555FF'>=</font> zcalloc;
+        strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>opaque <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>voidpf<font face='Lucida Console'>)</font><font color='#979000'>0</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zfree <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>free_func<font face='Lucida Console'>)</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#ifdef</font> Z_SOLO
+        <font color='#0000FF'>return</font> Z_STREAM_ERROR;
+<font color='#0000FF'>#else</font>
+    strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zfree <font color='#5555FF'>=</font> zcfree;
+<font color='#0000FF'>#endif</font>
+    state <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> inflate_state FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#BB00BB'>ZALLOC</font><font face='Lucida Console'>(</font>strm, <font color='#979000'>1</font>,
+                                               <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> <b><a name='inflate_state'></a>inflate_state</b><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_NULL<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> Z_MEM_ERROR;
+    <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>inflate: allocated\n</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>state <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> internal_state FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>state;
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dmax <font color='#5555FF'>=</font> <font color='#979000'>32768</font>U;
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>wbits <font color='#5555FF'>=</font> windowBits;
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>wsize <font color='#5555FF'>=</font> <font color='#979000'>1</font>U <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> windowBits;
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>window <font color='#5555FF'>=</font> window;
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>wnext <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whave <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>return</font> Z_OK;
+<b>}</b>
+
+<font color='#009900'>/*
+   Return state with length and distance decoding tables and index sizes set to
+   fixed code decoding.  Normally this returns fixed tables from inffixed.h.
+   If BUILDFIXED is defined, then instead this routine builds the tables the
+   first time it's called, and returns those tables the first time and
+   thereafter.  This reduces the size of the code by about 2K bytes, in
+   exchange for a little execution time.  However, BUILDFIXED should not be
+   used for threaded applications, since the rewriting of the tables and virgin
+   may not be thread-safe.
+ */</font>
+local <font color='#0000FF'><u>void</u></font> <b><a name='fixedtables'></a>fixedtables</b><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font>
+<font color='#0000FF'>struct</font> inflate_state FAR <font color='#5555FF'>*</font>state;
+<b>{</b>
+<font color='#0000FF'>#ifdef</font> BUILDFIXED
+    <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> virgin <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <font color='#0000FF'>static</font> code <font color='#5555FF'>*</font>lenfix, <font color='#5555FF'>*</font>distfix;
+    <font color='#0000FF'>static</font> code fixed[<font color='#979000'>544</font>];
+
+    <font color='#009900'>/* build fixed huffman tables if first call (may not be thread safe) */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>virgin<font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> sym, bits;
+        <font color='#0000FF'>static</font> code <font color='#5555FF'>*</font>next;
+
+        <font color='#009900'>/* literal/length table */</font>
+        sym <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>sym <font color='#5555FF'>&lt;</font> <font color='#979000'>144</font><font face='Lucida Console'>)</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lens[sym<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>sym <font color='#5555FF'>&lt;</font> <font color='#979000'>256</font><font face='Lucida Console'>)</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lens[sym<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font color='#979000'>9</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>sym <font color='#5555FF'>&lt;</font> <font color='#979000'>280</font><font face='Lucida Console'>)</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lens[sym<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font color='#979000'>7</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>sym <font color='#5555FF'>&lt;</font> <font color='#979000'>288</font><font face='Lucida Console'>)</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lens[sym<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+        next <font color='#5555FF'>=</font> fixed;
+        lenfix <font color='#5555FF'>=</font> next;
+        bits <font color='#5555FF'>=</font> <font color='#979000'>9</font>;
+        <font color='#BB00BB'>inflate_table</font><font face='Lucida Console'>(</font>LENS, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lens, <font color='#979000'>288</font>, <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>next<font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>bits<font face='Lucida Console'>)</font>, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>work<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>/* distance table */</font>
+        sym <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>sym <font color='#5555FF'>&lt;</font> <font color='#979000'>32</font><font face='Lucida Console'>)</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lens[sym<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+        distfix <font color='#5555FF'>=</font> next;
+        bits <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+        <font color='#BB00BB'>inflate_table</font><font face='Lucida Console'>(</font>DISTS, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lens, <font color='#979000'>32</font>, <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>next<font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>bits<font face='Lucida Console'>)</font>, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>work<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>/* do this just once */</font>
+        virgin <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>
+<font color='#0000FF'>#else</font> <font color='#009900'>/* !BUILDFIXED */</font>
+#   include "<font color='#CC0000'>inffixed.h</font>"
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* BUILDFIXED */</font>
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lencode <font color='#5555FF'>=</font> lenfix;
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lenbits <font color='#5555FF'>=</font> <font color='#979000'>9</font>;
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>distcode <font color='#5555FF'>=</font> distfix;
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>distbits <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+<b>}</b>
+
+<font color='#009900'>/* Macros for inflateBack(): */</font>
+
+<font color='#009900'>/* Load returned state from inflate_fast() */</font>
+<font color='#0000FF'>#define</font> LOAD<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> \
+    <font color='#0000FF'>do</font> <b>{</b> \
+        put <font color='#5555FF'>=</font> strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_out; \
+        left <font color='#5555FF'>=</font> strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_out; \
+        next <font color='#5555FF'>=</font> strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_in; \
+        have <font color='#5555FF'>=</font> strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in; \
+        hold <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hold; \
+        bits <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bits; \
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>/* Set state from registers for inflate_fast() */</font>
+<font color='#0000FF'>#define</font> RESTORE<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> \
+    <font color='#0000FF'>do</font> <b>{</b> \
+        strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_out <font color='#5555FF'>=</font> put; \
+        strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_out <font color='#5555FF'>=</font> left; \
+        strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_in <font color='#5555FF'>=</font> next; \
+        strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in <font color='#5555FF'>=</font> have; \
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hold <font color='#5555FF'>=</font> hold; \
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bits <font color='#5555FF'>=</font> bits; \
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>/* Clear the input bit accumulator */</font>
+<font color='#0000FF'>#define</font> INITBITS<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> \
+    <font color='#0000FF'>do</font> <b>{</b> \
+        hold <font color='#5555FF'>=</font> <font color='#979000'>0</font>; \
+        bits <font color='#5555FF'>=</font> <font color='#979000'>0</font>; \
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>/* Assure that some input is available.  If input is requested, but denied,
+   then return a Z_BUF_ERROR from inflateBack(). */</font>
+<font color='#0000FF'>#define</font> PULL<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> \
+    <font color='#0000FF'>do</font> <b>{</b> \
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>have <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b> \
+            have <font color='#5555FF'>=</font> <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font>in_desc, <font color='#5555FF'>&amp;</font>next<font face='Lucida Console'>)</font>; \
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>have <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b> \
+                next <font color='#5555FF'>=</font> Z_NULL; \
+                ret <font color='#5555FF'>=</font> Z_BUF_ERROR; \
+                <font color='#0000FF'>goto</font> inf_leave; \
+            <b>}</b> \
+        <b>}</b> \
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>/* Get a byte of input into the bit accumulator, or return from inflateBack()
+   with an error if there is no input available. */</font>
+<font color='#0000FF'>#define</font> PULLBYTE<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> \
+    <font color='#0000FF'>do</font> <b>{</b> \
+        <font color='#BB00BB'>PULL</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; \
+        have<font color='#5555FF'>-</font><font color='#5555FF'>-</font>; \
+        hold <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>next<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bits; \
+        bits <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>; \
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>/* Assure that there are at least n bits in the bit accumulator.  If there is
+   not enough available input to do that, then return from inflateBack() with
+   an error. */</font>
+<font color='#0000FF'>#define</font> NEEDBITS<font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font> \
+    <font color='#0000FF'>do</font> <b>{</b> \
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>bits <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> \
+            <font color='#BB00BB'>PULLBYTE</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; \
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>/* Return the low n bits of the bit accumulator (n &lt; 16) */</font>
+<font color='#0000FF'>#define</font> BITS<font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font> \
+    <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font>hold <font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>U <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>/* Remove n bits from the bit accumulator */</font>
+<font color='#0000FF'>#define</font> DROPBITS<font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font> \
+    <font color='#0000FF'>do</font> <b>{</b> \
+        hold <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>; \
+        bits <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>; \
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>/* Remove zero to seven bits as needed to go to a byte boundary */</font>
+<font color='#0000FF'>#define</font> BYTEBITS<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> \
+    <font color='#0000FF'>do</font> <b>{</b> \
+        hold <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> bits <font color='#5555FF'>&amp;</font> <font color='#979000'>7</font>; \
+        bits <font color='#5555FF'>-</font><font color='#5555FF'>=</font> bits <font color='#5555FF'>&amp;</font> <font color='#979000'>7</font>; \
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>/* Assure that some output space is available, by writing out the window
+   if it's full.  If the write fails, return from inflateBack() with a
+   Z_BUF_ERROR. */</font>
+<font color='#0000FF'>#define</font> ROOM<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> \
+    <font color='#0000FF'>do</font> <b>{</b> \
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>left <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b> \
+            put <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>window; \
+            left <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>wsize; \
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whave <font color='#5555FF'>=</font> left; \
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>out</font><font face='Lucida Console'>(</font>out_desc, put, left<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b> \
+                ret <font color='#5555FF'>=</font> Z_BUF_ERROR; \
+                <font color='#0000FF'>goto</font> inf_leave; \
+            <b>}</b> \
+        <b>}</b> \
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>/*
+   strm provides the memory allocation functions and window buffer on input,
+   and provides information on the unused input on return.  For Z_DATA_ERROR
+   returns, strm will also provide an error message.
+
+   in() and out() are the call-back input and output functions.  When
+   inflateBack() needs more input, it calls in().  When inflateBack() has
+   filled the window with output, or when it completes with data in the
+   window, it calls out() to write out the data.  The application must not
+   change the provided input until in() is called again or inflateBack()
+   returns.  The application must not change the window/output buffer until
+   inflateBack() returns.
+
+   in() and out() are called with a descriptor parameter provided in the
+   inflateBack() call.  This parameter can be a structure that provides the
+   information required to do the read or write, as well as accumulated
+   information on the input and output such as totals and check values.
+
+   in() should return zero on failure.  out() should return non-zero on
+   failure.  If either in() or out() fails, than inflateBack() returns a
+   Z_BUF_ERROR.  strm-&gt;next_in can be checked for Z_NULL to see whether it
+   was in() or out() that caused in the error.  Otherwise,  inflateBack()
+   returns Z_STREAM_END on success, Z_DATA_ERROR for an deflate format
+   error, or Z_MEM_ERROR if it could not allocate memory for the state.
+   inflateBack() can also return Z_STREAM_ERROR if the input parameters
+   are not correct, i.e. strm is Z_NULL or the state was not initialized.
+ */</font>
+<font color='#0000FF'><u>int</u></font> ZEXPORT <b><a name='inflateBack'></a>inflateBack</b><font face='Lucida Console'>(</font>strm, in, in_desc, out, out_desc<font face='Lucida Console'>)</font>
+z_streamp strm;
+in_func in;
+<font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font>in_desc;
+out_func out;
+<font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font>out_desc;
+<b>{</b>
+    <font color='#0000FF'>struct</font> inflate_state FAR <font color='#5555FF'>*</font>state;
+    z_const <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> FAR <font color='#5555FF'>*</font>next;    <font color='#009900'>/* next input */</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> FAR <font color='#5555FF'>*</font>put;     <font color='#009900'>/* next output */</font>
+    <font color='#0000FF'><u>unsigned</u></font> have, left;        <font color='#009900'>/* available input and output */</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> hold;         <font color='#009900'>/* bit buffer */</font>
+    <font color='#0000FF'><u>unsigned</u></font> bits;              <font color='#009900'>/* bits in bit buffer */</font>
+    <font color='#0000FF'><u>unsigned</u></font> copy;              <font color='#009900'>/* number of stored or match bytes to copy */</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> FAR <font color='#5555FF'>*</font>from;    <font color='#009900'>/* where to copy match bytes from */</font>
+    code here;                  <font color='#009900'>/* current decoding table entry */</font>
+    code last;                  <font color='#009900'>/* parent table entry */</font>
+    <font color='#0000FF'><u>unsigned</u></font> len;               <font color='#009900'>/* length to copy for repeats, bits to drop */</font>
+    <font color='#0000FF'><u>int</u></font> ret;                    <font color='#009900'>/* return code */</font>
+    <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> order[<font color='#979000'>19</font>] <font color='#5555FF'>=</font> <font color='#009900'>/* permutation of code lengths */</font>
+        <b>{</b><font color='#979000'>16</font>, <font color='#979000'>17</font>, <font color='#979000'>18</font>, <font color='#979000'>0</font>, <font color='#979000'>8</font>, <font color='#979000'>7</font>, <font color='#979000'>9</font>, <font color='#979000'>6</font>, <font color='#979000'>10</font>, <font color='#979000'>5</font>, <font color='#979000'>11</font>, <font color='#979000'>4</font>, <font color='#979000'>12</font>, <font color='#979000'>3</font>, <font color='#979000'>13</font>, <font color='#979000'>2</font>, <font color='#979000'>14</font>, <font color='#979000'>1</font>, <font color='#979000'>15</font><b>}</b>;
+
+    <font color='#009900'>/* Check that the strm exists and that the state was initialized */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>strm <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_NULL <font color='#5555FF'>|</font><font color='#5555FF'>|</font> strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>state <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_NULL<font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> Z_STREAM_ERROR;
+    state <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> inflate_state FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>state;
+
+    <font color='#009900'>/* Reset the state */</font>
+    strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg <font color='#5555FF'>=</font> Z_NULL;
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> TYPE;
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whave <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    next <font color='#5555FF'>=</font> strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_in;
+    have <font color='#5555FF'>=</font> next <font color='#5555FF'>!</font><font color='#5555FF'>=</font> Z_NULL ? strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in : <font color='#979000'>0</font>;
+    hold <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    bits <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    put <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>window;
+    left <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>wsize;
+
+    <font color='#009900'>/* Inflate until end of block marked as last */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>;;<font face='Lucida Console'>)</font>
+        <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode<font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#0000FF'>case</font> TYPE:
+            <font color='#009900'>/* determine and dispatch block type */</font>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last<font face='Lucida Console'>)</font> <b>{</b>
+                <font color='#BB00BB'>BYTEBITS</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> DONE;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+            <font color='#BB00BB'>NEEDBITS</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last <font color='#5555FF'>=</font> <font color='#BB00BB'>BITS</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DROPBITS</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>BITS</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+            <font color='#0000FF'>case</font> <font color='#979000'>0</font>:                             <font color='#009900'>/* stored block */</font>
+                <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>inflate:     stored block%s\n</font>",
+                        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last ? "<font color='#CC0000'> (last)</font>" : "<font color='#CC0000'></font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> STORED;
+                <font color='#0000FF'>break</font>;
+            <font color='#0000FF'>case</font> <font color='#979000'>1</font>:                             <font color='#009900'>/* fixed block */</font>
+                <font color='#BB00BB'>fixedtables</font><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>inflate:     fixed codes block%s\n</font>",
+                        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last ? "<font color='#CC0000'> (last)</font>" : "<font color='#CC0000'></font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> LEN;              <font color='#009900'>/* decode codes */</font>
+                <font color='#0000FF'>break</font>;
+            <font color='#0000FF'>case</font> <font color='#979000'>2</font>:                             <font color='#009900'>/* dynamic block */</font>
+                <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>inflate:     dynamic codes block%s\n</font>",
+                        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last ? "<font color='#CC0000'> (last)</font>" : "<font color='#CC0000'></font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> TABLE;
+                <font color='#0000FF'>break</font>;
+            <font color='#0000FF'>case</font> <font color='#979000'>3</font>:
+                strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>"<font color='#CC0000'>invalid block type</font>";
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> BAD;
+            <b>}</b>
+            <font color='#BB00BB'>DROPBITS</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>break</font>;
+
+        <font color='#0000FF'>case</font> STORED:
+            <font color='#009900'>/* get and verify stored block length */</font>
+            <font color='#BB00BB'>BYTEBITS</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;                         <font color='#009900'>/* go to byte boundary */</font>
+            <font color='#BB00BB'>NEEDBITS</font><font face='Lucida Console'>(</font><font color='#979000'>32</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>hold <font color='#5555FF'>&amp;</font> <font color='#979000'>0xffff</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>hold <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font> ^ <font color='#979000'>0xffff</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+                strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>"<font color='#CC0000'>invalid stored block lengths</font>";
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> BAD;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>length <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font>hold <font color='#5555FF'>&amp;</font> <font color='#979000'>0xffff</font>;
+            <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>inflate:       stored length %u\n</font>",
+                    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>length<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>INITBITS</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>/* copy stored block from input to output */</font>
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>length <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+                copy <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>length;
+                <font color='#BB00BB'>PULL</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>ROOM</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>copy <font color='#5555FF'>&gt;</font> have<font face='Lucida Console'>)</font> copy <font color='#5555FF'>=</font> have;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>copy <font color='#5555FF'>&gt;</font> left<font face='Lucida Console'>)</font> copy <font color='#5555FF'>=</font> left;
+                <font color='#BB00BB'>zmemcpy</font><font face='Lucida Console'>(</font>put, next, copy<font face='Lucida Console'>)</font>;
+                have <font color='#5555FF'>-</font><font color='#5555FF'>=</font> copy;
+                next <font color='#5555FF'>+</font><font color='#5555FF'>=</font> copy;
+                left <font color='#5555FF'>-</font><font color='#5555FF'>=</font> copy;
+                put <font color='#5555FF'>+</font><font color='#5555FF'>=</font> copy;
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>length <font color='#5555FF'>-</font><font color='#5555FF'>=</font> copy;
+            <b>}</b>
+            <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>inflate:       stored end\n</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> TYPE;
+            <font color='#0000FF'>break</font>;
+
+        <font color='#0000FF'>case</font> TABLE:
+            <font color='#009900'>/* get dynamic table entries descriptor */</font>
+            <font color='#BB00BB'>NEEDBITS</font><font face='Lucida Console'>(</font><font color='#979000'>14</font><font face='Lucida Console'>)</font>;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>nlen <font color='#5555FF'>=</font> <font color='#BB00BB'>BITS</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>257</font>;
+            <font color='#BB00BB'>DROPBITS</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ndist <font color='#5555FF'>=</font> <font color='#BB00BB'>BITS</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+            <font color='#BB00BB'>DROPBITS</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ncode <font color='#5555FF'>=</font> <font color='#BB00BB'>BITS</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>4</font>;
+            <font color='#BB00BB'>DROPBITS</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#ifndef</font> PKZIP_BUG_WORKAROUND
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>nlen <font color='#5555FF'>&gt;</font> <font color='#979000'>286</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ndist <font color='#5555FF'>&gt;</font> <font color='#979000'>30</font><font face='Lucida Console'>)</font> <b>{</b>
+                strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>"<font color='#CC0000'>too many length or distance symbols</font>";
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> BAD;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+<font color='#0000FF'>#endif</font>
+            <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>inflate:       table sizes ok\n</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>/* get code length code lengths (not a typo) */</font>
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>have <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>have <font color='#5555FF'>&lt;</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ncode<font face='Lucida Console'>)</font> <b>{</b>
+                <font color='#BB00BB'>NEEDBITS</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lens[order[state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>have<font color='#5555FF'>+</font><font color='#5555FF'>+</font>]] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>BITS</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DROPBITS</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>have <font color='#5555FF'>&lt;</font> <font color='#979000'>19</font><font face='Lucida Console'>)</font>
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lens[order[state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>have<font color='#5555FF'>+</font><font color='#5555FF'>+</font>]] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>codes;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lencode <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code <font color='#0000FF'>const</font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next<font face='Lucida Console'>)</font>;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lenbits <font color='#5555FF'>=</font> <font color='#979000'>7</font>;
+            ret <font color='#5555FF'>=</font> <font color='#BB00BB'>inflate_table</font><font face='Lucida Console'>(</font>CODES, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lens, <font color='#979000'>19</font>, <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next<font face='Lucida Console'>)</font>,
+                                <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lenbits<font face='Lucida Console'>)</font>, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>work<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ret<font face='Lucida Console'>)</font> <b>{</b>
+                strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>"<font color='#CC0000'>invalid code lengths set</font>";
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> BAD;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+            <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>inflate:       code lengths ok\n</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>/* get length and distance code code lengths */</font>
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>have <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>have <font color='#5555FF'>&lt;</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>nlen <font color='#5555FF'>+</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ndist<font face='Lucida Console'>)</font> <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>;;<font face='Lucida Console'>)</font> <b>{</b>
+                    here <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lencode[<font color='#BB00BB'>BITS</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lenbits<font face='Lucida Console'>)</font>];
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>here.bits<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> bits<font face='Lucida Console'>)</font> <font color='#0000FF'>break</font>;
+                    <font color='#BB00BB'>PULLBYTE</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>here.val <font color='#5555FF'>&lt;</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font> <b>{</b>
+                    <font color='#BB00BB'>DROPBITS</font><font face='Lucida Console'>(</font>here.bits<font face='Lucida Console'>)</font>;
+                    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lens[state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>have<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> here.val;
+                <b>}</b>
+                <font color='#0000FF'>else</font> <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>here.val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font> <b>{</b>
+                        <font color='#BB00BB'>NEEDBITS</font><font face='Lucida Console'>(</font>here.bits <font color='#5555FF'>+</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DROPBITS</font><font face='Lucida Console'>(</font>here.bits<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>have <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+                            strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>"<font color='#CC0000'>invalid bit length repeat</font>";
+                            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> BAD;
+                            <font color='#0000FF'>break</font>;
+                        <b>}</b>
+                        len <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lens[state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>have <font color='#5555FF'>-</font> <font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+                        copy <font color='#5555FF'>=</font> <font color='#979000'>3</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>BITS</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DROPBITS</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>here.val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>17</font><font face='Lucida Console'>)</font> <b>{</b>
+                        <font color='#BB00BB'>NEEDBITS</font><font face='Lucida Console'>(</font>here.bits <font color='#5555FF'>+</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DROPBITS</font><font face='Lucida Console'>(</font>here.bits<font face='Lucida Console'>)</font>;
+                        len <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                        copy <font color='#5555FF'>=</font> <font color='#979000'>3</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>BITS</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DROPBITS</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font> <b>{</b>
+                        <font color='#BB00BB'>NEEDBITS</font><font face='Lucida Console'>(</font>here.bits <font color='#5555FF'>+</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DROPBITS</font><font face='Lucida Console'>(</font>here.bits<font face='Lucida Console'>)</font>;
+                        len <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                        copy <font color='#5555FF'>=</font> <font color='#979000'>11</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>BITS</font><font face='Lucida Console'>(</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DROPBITS</font><font face='Lucida Console'>(</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>have <font color='#5555FF'>+</font> copy <font color='#5555FF'>&gt;</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>nlen <font color='#5555FF'>+</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ndist<font face='Lucida Console'>)</font> <b>{</b>
+                        strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>"<font color='#CC0000'>invalid bit length repeat</font>";
+                        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> BAD;
+                        <font color='#0000FF'>break</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>copy<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font>
+                        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lens[state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>have<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font face='Lucida Console'>)</font>len;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#009900'>/* handle error breaks in while */</font>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font><font color='#5555FF'>=</font> BAD<font face='Lucida Console'>)</font> <font color='#0000FF'>break</font>;
+
+            <font color='#009900'>/* check for end-of-block code (better have one) */</font>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lens[<font color='#979000'>256</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+                strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>"<font color='#CC0000'>invalid code -- missing end-of-block</font>";
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> BAD;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+
+            <font color='#009900'>/* build code tables -- note: do not change the lenbits or distbits
+               values here (9 and 6) without reading the comments in inftrees.h
+               concerning the ENOUGH constants, which depend on those values */</font>
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>codes;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lencode <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code <font color='#0000FF'>const</font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next<font face='Lucida Console'>)</font>;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lenbits <font color='#5555FF'>=</font> <font color='#979000'>9</font>;
+            ret <font color='#5555FF'>=</font> <font color='#BB00BB'>inflate_table</font><font face='Lucida Console'>(</font>LENS, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lens, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>nlen, <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next<font face='Lucida Console'>)</font>,
+                                <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lenbits<font face='Lucida Console'>)</font>, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>work<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ret<font face='Lucida Console'>)</font> <b>{</b>
+                strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>"<font color='#CC0000'>invalid literal/lengths set</font>";
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> BAD;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>distcode <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code <font color='#0000FF'>const</font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next<font face='Lucida Console'>)</font>;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>distbits <font color='#5555FF'>=</font> <font color='#979000'>6</font>;
+            ret <font color='#5555FF'>=</font> <font color='#BB00BB'>inflate_table</font><font face='Lucida Console'>(</font>DISTS, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lens <font color='#5555FF'>+</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>nlen, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ndist,
+                            <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next<font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>distbits<font face='Lucida Console'>)</font>, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>work<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ret<font face='Lucida Console'>)</font> <b>{</b>
+                strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>"<font color='#CC0000'>invalid distances set</font>";
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> BAD;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+            <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>inflate:       codes ok\n</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> LEN;
+
+        <font color='#0000FF'>case</font> LEN:
+            <font color='#009900'>/* use inflate_fast() if we have enough input and output */</font>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>have <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>6</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> left <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>258</font><font face='Lucida Console'>)</font> <b>{</b>
+                <font color='#BB00BB'>RESTORE</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whave <font color='#5555FF'>&lt;</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>wsize<font face='Lucida Console'>)</font>
+                    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whave <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>wsize <font color='#5555FF'>-</font> left;
+                <font color='#BB00BB'>inflate_fast</font><font face='Lucida Console'>(</font>strm, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>wsize<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>LOAD</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+
+            <font color='#009900'>/* get a literal, length, or end-of-block code */</font>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>;;<font face='Lucida Console'>)</font> <b>{</b>
+                here <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lencode[<font color='#BB00BB'>BITS</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lenbits<font face='Lucida Console'>)</font>];
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>here.bits<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> bits<font face='Lucida Console'>)</font> <font color='#0000FF'>break</font>;
+                <font color='#BB00BB'>PULLBYTE</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>here.op <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>here.op <font color='#5555FF'>&amp;</font> <font color='#979000'>0xf0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+                last <font color='#5555FF'>=</font> here;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>;;<font face='Lucida Console'>)</font> <b>{</b>
+                    here <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lencode[last.val <font color='#5555FF'>+</font>
+                            <font face='Lucida Console'>(</font><font color='#BB00BB'>BITS</font><font face='Lucida Console'>(</font>last.bits <font color='#5555FF'>+</font> last.op<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> last.bits<font face='Lucida Console'>)</font>];
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>last.bits <font color='#5555FF'>+</font> here.bits<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> bits<font face='Lucida Console'>)</font> <font color='#0000FF'>break</font>;
+                    <font color='#BB00BB'>PULLBYTE</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#BB00BB'>DROPBITS</font><font face='Lucida Console'>(</font>last.bits<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#BB00BB'>DROPBITS</font><font face='Lucida Console'>(</font>here.bits<font face='Lucida Console'>)</font>;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>length <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font>here.val;
+
+            <font color='#009900'>/* process literal */</font>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>here.op <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+                <font color='#BB00BB'>Tracevv</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, here.val <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0x20</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> here.val <font color='#5555FF'>&lt;</font> <font color='#979000'>0x7f</font> ?
+                        "<font color='#CC0000'>inflate:         literal '%c'\n</font>" :
+                        "<font color='#CC0000'>inflate:         literal 0x%02x\n</font>", here.val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>ROOM</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#5555FF'>*</font>put<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>length<font face='Lucida Console'>)</font>;
+                left<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> LEN;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+
+            <font color='#009900'>/* process end of block */</font>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>here.op <font color='#5555FF'>&amp;</font> <font color='#979000'>32</font><font face='Lucida Console'>)</font> <b>{</b>
+                <font color='#BB00BB'>Tracevv</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>inflate:         end of block\n</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> TYPE;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+
+            <font color='#009900'>/* invalid code */</font>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>here.op <font color='#5555FF'>&amp;</font> <font color='#979000'>64</font><font face='Lucida Console'>)</font> <b>{</b>
+                strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>"<font color='#CC0000'>invalid literal/length code</font>";
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> BAD;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+
+            <font color='#009900'>/* length code -- get extra bits, if any */</font>
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>extra <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>here.op<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>15</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>extra <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+                <font color='#BB00BB'>NEEDBITS</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>extra<font face='Lucida Console'>)</font>;
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>length <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>BITS</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>extra<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DROPBITS</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>extra<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#BB00BB'>Tracevv</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>inflate:         length %u\n</font>", state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>length<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>/* get distance code */</font>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>;;<font face='Lucida Console'>)</font> <b>{</b>
+                here <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>distcode[<font color='#BB00BB'>BITS</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>distbits<font face='Lucida Console'>)</font>];
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>here.bits<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> bits<font face='Lucida Console'>)</font> <font color='#0000FF'>break</font>;
+                <font color='#BB00BB'>PULLBYTE</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>here.op <font color='#5555FF'>&amp;</font> <font color='#979000'>0xf0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+                last <font color='#5555FF'>=</font> here;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>;;<font face='Lucida Console'>)</font> <b>{</b>
+                    here <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>distcode[last.val <font color='#5555FF'>+</font>
+                            <font face='Lucida Console'>(</font><font color='#BB00BB'>BITS</font><font face='Lucida Console'>(</font>last.bits <font color='#5555FF'>+</font> last.op<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> last.bits<font face='Lucida Console'>)</font>];
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>last.bits <font color='#5555FF'>+</font> here.bits<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> bits<font face='Lucida Console'>)</font> <font color='#0000FF'>break</font>;
+                    <font color='#BB00BB'>PULLBYTE</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#BB00BB'>DROPBITS</font><font face='Lucida Console'>(</font>last.bits<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#BB00BB'>DROPBITS</font><font face='Lucida Console'>(</font>here.bits<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>here.op <font color='#5555FF'>&amp;</font> <font color='#979000'>64</font><font face='Lucida Console'>)</font> <b>{</b>
+                strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>"<font color='#CC0000'>invalid distance code</font>";
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> BAD;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>offset <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font>here.val;
+
+            <font color='#009900'>/* get distance extra bits, if any */</font>
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>extra <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>here.op<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>15</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>extra <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+                <font color='#BB00BB'>NEEDBITS</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>extra<font face='Lucida Console'>)</font>;
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>offset <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>BITS</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>extra<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DROPBITS</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>extra<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>offset <font color='#5555FF'>&gt;</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>wsize <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whave <font color='#5555FF'>&lt;</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>wsize ?
+                                                left : <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+                strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>"<font color='#CC0000'>invalid distance too far back</font>";
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font> BAD;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+            <font color='#BB00BB'>Tracevv</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>inflate:         distance %u\n</font>", state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>offset<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>/* copy match from window to output */</font>
+            <font color='#0000FF'>do</font> <b>{</b>
+                <font color='#BB00BB'>ROOM</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                copy <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>wsize <font color='#5555FF'>-</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>offset;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>copy <font color='#5555FF'>&lt;</font> left<font face='Lucida Console'>)</font> <b>{</b>
+                    from <font color='#5555FF'>=</font> put <font color='#5555FF'>+</font> copy;
+                    copy <font color='#5555FF'>=</font> left <font color='#5555FF'>-</font> copy;
+                <b>}</b>
+                <font color='#0000FF'>else</font> <b>{</b>
+                    from <font color='#5555FF'>=</font> put <font color='#5555FF'>-</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>offset;
+                    copy <font color='#5555FF'>=</font> left;
+                <b>}</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>copy <font color='#5555FF'>&gt;</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>length<font face='Lucida Console'>)</font> copy <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>length;
+                state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>length <font color='#5555FF'>-</font><font color='#5555FF'>=</font> copy;
+                left <font color='#5555FF'>-</font><font color='#5555FF'>=</font> copy;
+                <font color='#0000FF'>do</font> <b>{</b>
+                    <font color='#5555FF'>*</font>put<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>from<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+                <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>copy<font face='Lucida Console'>)</font>;
+            <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>length <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>break</font>;
+
+        <font color='#0000FF'>case</font> DONE:
+            <font color='#009900'>/* inflate stream terminated properly -- write leftover output */</font>
+            ret <font color='#5555FF'>=</font> Z_STREAM_END;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>left <font color='#5555FF'>&lt;</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>wsize<font face='Lucida Console'>)</font> <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>out</font><font face='Lucida Console'>(</font>out_desc, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>window, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>wsize <font color='#5555FF'>-</font> left<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    ret <font color='#5555FF'>=</font> Z_BUF_ERROR;
+            <b>}</b>
+            <font color='#0000FF'>goto</font> inf_leave;
+
+        <font color='#0000FF'>case</font> BAD:
+            ret <font color='#5555FF'>=</font> Z_DATA_ERROR;
+            <font color='#0000FF'>goto</font> inf_leave;
+
+        <font color='#0000FF'>default</font>:                <font color='#009900'>/* can't happen, but makes compilers happy */</font>
+            ret <font color='#5555FF'>=</font> Z_STREAM_ERROR;
+            <font color='#0000FF'>goto</font> inf_leave;
+        <b>}</b>
+
+    <font color='#009900'>/* Return unused input */</font>
+  inf_leave:
+    strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_in <font color='#5555FF'>=</font> next;
+    strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in <font color='#5555FF'>=</font> have;
+    <font color='#0000FF'>return</font> ret;
+<b>}</b>
+
+<font color='#0000FF'><u>int</u></font> ZEXPORT <b><a name='inflateBackEnd'></a>inflateBackEnd</b><font face='Lucida Console'>(</font>strm<font face='Lucida Console'>)</font>
+z_streamp strm;
+<b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>strm <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_NULL <font color='#5555FF'>|</font><font color='#5555FF'>|</font> strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>state <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_NULL <font color='#5555FF'>|</font><font color='#5555FF'>|</font> strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zfree <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>free_func<font face='Lucida Console'>)</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> Z_STREAM_ERROR;
+    <font color='#BB00BB'>ZFREE</font><font face='Lucida Console'>(</font>strm, strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>state<font face='Lucida Console'>)</font>;
+    strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>state <font color='#5555FF'>=</font> Z_NULL;
+    <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>inflate: end\n</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>return</font> Z_OK;
+<b>}</b>
+
+</pre></body></html>

@@ -19,6 +19,10 @@ TEST_CASE( "InputManager", "[game-engine]" ) {
 		REQUIRE(InputManager::GetKeyNameToSfKeyMap().find("Space")->second == sf::Keyboard::Space);
 		REQUIRE(InputManager::GetKeyNameToSfKeyMap().find("a")->second == sf::Keyboard::A);
 	}
+	SECTION("Button maps") {
+		REQUIRE(InputManager::GetSfButtonToButtonNameMap().find(static_cast<int>(sf::Mouse::Left))->second == "Left");
+		REQUIRE(InputManager::GetButtonNameToSfButtonMap().find("Left")->second == sf::Mouse::Left);
+	}
 	SECTION("Key event management") {
 		InputManager m;
 
@@ -39,5 +43,15 @@ TEST_CASE( "InputManager", "[game-engine]" ) {
 		m.HandleEvent(focusLost);
 		m.HandleEvent(keyEvent);
 		REQUIRE(m.AnyKeyIsPressed() == false);
+	}
+	SECTION("Mouse event management") {
+		InputManager m;
+
+		REQUIRE(m.IsMouseButtonPressed("Left") == false);
+		REQUIRE(m.IsMouseButtonPressed("Right") == false);
+		REQUIRE(m.IsMouseButtonReleased("Left") == false);
+		REQUIRE(m.IsMouseButtonReleased("Right") == false);
+
+		//We can't mock mouse buttons.
 	}
 }

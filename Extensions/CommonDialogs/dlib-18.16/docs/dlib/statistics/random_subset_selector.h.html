@@ -1,0 +1,375 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - random_subset_selector.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_RANDOM_SUBSeT_SELECTOR_H_
+<font color='#0000FF'>#define</font> DLIB_RANDOM_SUBSeT_SELECTOR_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='random_subset_selector_abstract.h.html'>random_subset_selector_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../rand.h.html'>../rand.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../string.h.html'>../string.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_mat.h.html'>../matrix/matrix_mat.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> Rand_type <font color='#5555FF'>=</font> dlib::rand
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='random_subset_selector'></a>random_subset_selector</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - _max_size == 0
+                - items.size() == 0
+                - count == 0
+                - _next_add_accepts == false
+
+            CONVENTION
+                - count == the number of times add() has been called since the last
+                  time this object was empty.
+                - items.size() == size()
+                - max_size() == _max_size
+                - next_add_accepts() == _next_add_accepts
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> T type;
+        <font color='#0000FF'>typedef</font> T value_type;
+        <font color='#0000FF'>typedef</font> default_memory_manager mem_manager_type;
+        <font color='#0000FF'>typedef</font> Rand_type rand_type;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::iterator iterator;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::const_iterator const_iterator;
+
+
+        <b><a name='random_subset_selector'></a>random_subset_selector</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            _max_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#BB00BB'>make_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_seed'></a>set_seed</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> value<font face='Lucida Console'>)</font>
+        <b>{</b>
+            rnd.<font color='#BB00BB'>set_seed</font><font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='make_empty'></a>make_empty</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            items.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#BB00BB'>update_next_add_accepts</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='to_std_vector'></a>to_std_vector</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> items; <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            <font color='#0000FF'>return</font> items.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_size'></a>set_max_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_max_size
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            items.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>new_max_size<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>make_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            _max_size <font color='#5555FF'>=</font> new_max_size;
+            <font color='#BB00BB'>update_next_add_accepts</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='max_size'></a>max_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> _max_size;
+        <b>}</b>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>idx <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\tvoid random_subset_selector::operator[]()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t idx is out of range</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t idx:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> items[idx];
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>idx <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\tvoid random_subset_selector::operator[]()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t idx is out of range</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t idx:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> items[idx];
+        <b>}</b>
+
+        iterator                <b><a name='begin'></a>begin</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>                         <b>{</b> <font color='#0000FF'>return</font> items.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        const_iterator          <b><a name='begin'></a>begin</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>                   <b>{</b> <font color='#0000FF'>return</font> items.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        iterator                <b><a name='end'></a>end</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>                           <b>{</b> <font color='#0000FF'>return</font> items.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        const_iterator          <b><a name='end'></a>end</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>                     <b>{</b> <font color='#0000FF'>return</font> items.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='next_add_accepts'></a>next_add_accepts</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            <font color='#0000FF'>return</font> _next_add_accepts;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> new_item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>items.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> _max_size<font face='Lucida Console'>)</font>
+            <b>{</b>
+                items.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>new_item<font face='Lucida Console'>)</font>;
+                <font color='#009900'>// swap into a random place
+</font>                <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>items[rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>items.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>], items.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>_next_add_accepts<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// pick a random element of items and replace it.
+</font>                items[rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>items.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font> new_item;
+            <b>}</b>
+
+            <font color='#BB00BB'>update_next_add_accepts</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>next_add_accepts</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+                "<font color='#CC0000'>\tvoid random_subset_selector::add()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You should be calling the version of add() that takes an argument</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>update_next_add_accepts</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            random_subset_selector<font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>a.items<font face='Lucida Console'>)</font>;
+            std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>_max_size, a._max_size<font face='Lucida Console'>)</font>;
+            std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>count, a.count<font face='Lucida Console'>)</font>;
+            rnd.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>a.rnd<font face='Lucida Console'>)</font>;
+            std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>_next_add_accepts, a._next_add_accepts<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> random_subset_selector<font color='#5555FF'>&lt;</font>T1,T2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+            std::ostream<font color='#5555FF'>&amp;</font> out
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+            random_subset_selector<font color='#5555FF'>&lt;</font>T1,T2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+            std::istream<font color='#5555FF'>&amp;</font> in 
+        <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='update_next_add_accepts'></a>update_next_add_accepts</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>items.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> _max_size<font face='Lucida Console'>)</font>
+            <b>{</b>
+                _next_add_accepts <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>_max_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                _next_add_accepts <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// At this point each element of items has had an equal chance of being in this object.   
+</font>                <font color='#009900'>// In particular, the probability that each arrived here is currently items.size()/count.    
+</font>                <font color='#009900'>// We need to be able to say that, after this function ends, the probability of any 
+</font>                <font color='#009900'>// particular object ending up in items is items.size()/(count+1).  So this means that 
+</font>                <font color='#009900'>// we should decide to add a new item into items with this probability.  Also, if we do 
+</font>                <font color='#009900'>// so then we pick one of the current items and replace it at random with the new item.
+</font>
+                <font color='#009900'>// Make me a random 64 bit number.   This might seem excessive but I want this object
+</font>                <font color='#009900'>// to be able to handle an effectively infinite number of calls to add().  So count
+</font>                <font color='#009900'>// might get very large and we need to deal with that properly.
+</font>                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num1 <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num2 <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                uint64 num <font color='#5555FF'>=</font> num1;
+                num <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>32</font>;
+                num <font color='#5555FF'>|</font><font color='#5555FF'>=</font> num2;
+
+                num <font color='#5555FF'>%</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>count<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                _next_add_accepts <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>num <font color='#5555FF'>&lt;</font> items.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <b>}</b>
+
+        std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> items;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> _max_size;
+        uint64 count; 
+
+        rand_type rnd;
+
+        <font color='#0000FF'><u>bool</u></font> _next_add_accepts;
+
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> rand_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        random_subset_selector<font color='#5555FF'>&lt;</font>T,rand_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+        random_subset_selector<font color='#5555FF'>&lt;</font>T,rand_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> random_subset_selector<font color='#5555FF'>&lt;</font>T1,T2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.items, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item._max_size, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.count, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.rnd, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item._next_add_accepts, out<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        random_subset_selector<font color='#5555FF'>&lt;</font>T1,T2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.items, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item._max_size, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.count, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.rnd, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item._next_add_accepts, in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    random_subset_selector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='randomly_subsample'></a>randomly_subsample</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        random_subset_selector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> subset;
+        subset.<font color='#BB00BB'>set_max_size</font><font face='Lucida Console'>(</font>num<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            subset.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> subset;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> alloc,
+        <font color='#0000FF'>typename</font> U
+        <font color='#5555FF'>&gt;</font>
+    random_subset_selector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='randomly_subsample'></a>randomly_subsample</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> random_seed
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        random_subset_selector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> subset;
+        subset.<font color='#BB00BB'>set_seed</font><font face='Lucida Console'>(</font><font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>random_seed<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        subset.<font color='#BB00BB'>set_max_size</font><font face='Lucida Console'>(</font>num<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            subset.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> subset;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    random_subset_selector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='randomly_subsample'></a>randomly_subsample</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> random_subset_selector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        random_subset_selector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> subset;
+        subset.<font color='#BB00BB'>set_max_size</font><font face='Lucida Console'>(</font>num<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            subset.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> subset;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U
+        <font color='#5555FF'>&gt;</font>
+    random_subset_selector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='randomly_subsample'></a>randomly_subsample</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> random_subset_selector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> random_seed
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        random_subset_selector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> subset;
+        subset.<font color='#BB00BB'>set_seed</font><font face='Lucida Console'>(</font><font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>random_seed<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        subset.<font color='#BB00BB'>set_max_size</font><font face='Lucida Console'>(</font>num<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            subset.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> subset;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_op<font color='#5555FF'>&lt;</font>op_array_to_mat<font color='#5555FF'>&lt;</font>random_subset_selector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='mat'></a>mat</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> random_subset_selector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> op_array_to_mat<font color='#5555FF'>&lt;</font>random_subset_selector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> op;
+        <font color='#0000FF'>return</font> matrix_op<font color='#5555FF'>&lt;</font>op<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>op</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_RANDOM_SUBSeT_SELECTOR_H_
+</font>
+
+
+</pre></body></html>

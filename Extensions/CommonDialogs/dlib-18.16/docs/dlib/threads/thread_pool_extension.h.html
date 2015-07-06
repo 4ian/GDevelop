@@ -1,0 +1,1362 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - thread_pool_extension.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_THREAD_POOl_Hh_
+<font color='#0000FF'>#define</font> DLIB_THREAD_POOl_Hh_ 
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='thread_pool_extension_abstract.h.html'>thread_pool_extension_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='multithreaded_object_extension.h.html'>multithreaded_object_extension.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../member_function_pointer.h.html'>../member_function_pointer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../bound_function_pointer.h.html'>../bound_function_pointer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel.h.html'>threads_kernel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='auto_mutex_extension.h.html'>auto_mutex_extension.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array.h.html'>../array.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../smart_pointers_thread_safe.h.html'>../smart_pointers_thread_safe.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../smart_pointers.h.html'>../smart_pointers.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> thread_pool_implementation;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='future'></a>future</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - task_id == 0
+                - tp.get() == 0
+
+            CONVENTION
+                - is_ready() == (tp.get() == 0)
+                - get() == var
+
+                - if (tp.get() != 0)
+                    - tp == a pointer to the thread_pool_implementation that is using this future object
+                    - task_id == the task id of the task in the thread pool tp that is using
+                      this future object.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='future'></a>future</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> : task_id<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <b><a name='future'></a>future</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> : task_id<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, var<font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <b><a name='future'></a>future</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> future<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> :task_id<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, var<font face='Lucida Console'>(</font>item.get<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        ~<b><a name='future'></a>future</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        future<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> item; <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>; <b>}</b>
+
+        future<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> future<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> item.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>; <b>}</b>
+
+        <b><a name='operator'></a>operator</b> T<font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <b><a name='operator'></a>operator</b> <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='get'></a>get</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#0000FF'>return</font> var; <b>}</b>
+
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='get'></a>get</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#0000FF'>return</font> var; <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_ready'></a>is_ready</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> tp.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> thread_pool;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='wait'></a>wait</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>mutable</font> uint64 task_id;
+        <font color='#0000FF'>mutable</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>thread_pool_implementation<font color='#5555FF'>&gt;</font> tp;
+
+        T var;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+        future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> dlib::<font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>a.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, b.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>// Note that dlib::exchange() just calls std::swap.  I'm only using it because
+</font>    <font color='#009900'>// this works around some bugs in certain compilers.
+</font>
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font>  <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font>  b.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font>  <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font>  b.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font>         <b>{</b> <font color='#0000FF'>return</font> a.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,         <font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a       <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font>         <b>{</b> <font color='#0000FF'>return</font> a.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,         <font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a       <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font>         <b>{</b> <font color='#0000FF'>return</font> a.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> b; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,         <font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a       <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font>         <b>{</b> <font color='#0000FF'>return</font> a.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> b; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,         <font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a       <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font>  <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font>         <b>{</b> <font color='#0000FF'>return</font> a.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font>  b; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font>  <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,         <font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a       <font color='#5555FF'>&lt;</font>  b.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font>  <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font>         <b>{</b> <font color='#0000FF'>return</font> a.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font>  b; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font>  <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,         <font color='#0000FF'>const</font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a       <font color='#5555FF'>&gt;</font>  b.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='thread_pool_implementation'></a>thread_pool_implementation</b> : <font color='#0000FF'>private</font> multithreaded_object
+    <b>{</b>
+        <font color='#009900'>/*!
+            CONVENTION
+                - num_threads_in_pool() == tasks.size()
+                - if (the destructor has been called) then
+                    - we_are_destructing == true
+                - else
+                    - we_are_destructing == false
+
+                - is_task_thread() == is_worker_thread(get_thread_id())
+
+                - m == the mutex used to protect everything in this object
+                - worker_thread_ids == an array that contains the thread ids for
+                  all the threads in the thread pool
+        !*/</font>
+        <font color='#0000FF'>typedef</font> bound_function_pointer::kernel_1a_c bfp_type;
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> thread_pool;
+        <font color='#0000FF'>explicit</font> <b><a name='thread_pool_implementation'></a>thread_pool_implementation</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads
+        <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>public</font>:
+        ~<b><a name='thread_pool_implementation'></a>thread_pool_implementation</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='wait_for_task'></a>wait_for_task</b> <font face='Lucida Console'>(</font>
+            uint64 task_id
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_threads_in_pool'></a>num_threads_in_pool</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='wait_for_all_tasks'></a>wait_for_all_tasks</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_task_thread'></a>is_task_thread</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> thread_id_type my_thread_id <font color='#5555FF'>=</font> <font color='#BB00BB'>get_thread_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// find a thread that isn't doing anything
+</font>            <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> <font color='#BB00BB'>find_empty_task_slot</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>is_worker_thread</font><font face='Lucida Console'>(</font>my_thread_id<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// this function is being called from within a worker thread and there
+</font>                <font color='#009900'>// aren't any other worker threads free so just perform the task right
+</font>                <font color='#009900'>// here
+</font>
+                M.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font face='Lucida Console'>(</font>obj.<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// return a task id that is both non-zero and also one
+</font>                <font color='#009900'>// that is never normally returned.  This way calls
+</font>                <font color='#009900'>// to wait_for_task() will never block given this id.
+</font>                <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+            <b>}</b>
+
+            <font color='#009900'>// wait until there is a thread that isn't doing anything
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                task_done_signaler.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                idx <font color='#5555FF'>=</font> <font color='#BB00BB'>find_empty_task_slot</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            tasks[idx].thread_id <font color='#5555FF'>=</font> my_thread_id;
+            tasks[idx].task_id <font color='#5555FF'>=</font> <font color='#BB00BB'>make_next_task_id</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>;
+            tasks[idx].mfp0.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>obj,funct<font face='Lucida Console'>)</font>;
+
+            task_ready_signaler.<font color='#BB00BB'>signal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> tasks[idx].task_id;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>,
+            <font color='#0000FF'><u>long</u></font> arg1
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> thread_id_type my_thread_id <font color='#5555FF'>=</font> <font color='#BB00BB'>get_thread_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// find a thread that isn't doing anything
+</font>            <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> <font color='#BB00BB'>find_empty_task_slot</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>is_worker_thread</font><font face='Lucida Console'>(</font>my_thread_id<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// this function is being called from within a worker thread and there
+</font>                <font color='#009900'>// aren't any other worker threads free so just perform the task right
+</font>                <font color='#009900'>// here
+</font>
+                M.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font face='Lucida Console'>(</font>obj.<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>arg1<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// return a task id that is both non-zero and also one
+</font>                <font color='#009900'>// that is never normally returned.  This way calls
+</font>                <font color='#009900'>// to wait_for_task() will never block given this id.
+</font>                <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+            <b>}</b>
+
+            <font color='#009900'>// wait until there is a thread that isn't doing anything
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                task_done_signaler.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                idx <font color='#5555FF'>=</font> <font color='#BB00BB'>find_empty_task_slot</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            tasks[idx].thread_id <font color='#5555FF'>=</font> my_thread_id;
+            tasks[idx].task_id <font color='#5555FF'>=</font> <font color='#BB00BB'>make_next_task_id</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>;
+            tasks[idx].mfp1.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>obj,funct<font face='Lucida Console'>)</font>;
+            tasks[idx].arg1 <font color='#5555FF'>=</font> arg1;
+
+            task_ready_signaler.<font color='#BB00BB'>signal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> tasks[idx].task_id;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>,
+            <font color='#0000FF'><u>long</u></font> arg1,
+            <font color='#0000FF'><u>long</u></font> arg2
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> thread_id_type my_thread_id <font color='#5555FF'>=</font> <font color='#BB00BB'>get_thread_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// find a thread that isn't doing anything
+</font>            <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> <font color='#BB00BB'>find_empty_task_slot</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>is_worker_thread</font><font face='Lucida Console'>(</font>my_thread_id<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// this function is being called from within a worker thread and there
+</font>                <font color='#009900'>// aren't any other worker threads free so just perform the task right
+</font>                <font color='#009900'>// here
+</font>
+                M.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font face='Lucida Console'>(</font>obj.<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>arg1, arg2<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// return a task id that is both non-zero and also one
+</font>                <font color='#009900'>// that is never normally returned.  This way calls
+</font>                <font color='#009900'>// to wait_for_task() will never block given this id.
+</font>                <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+            <b>}</b>
+
+            <font color='#009900'>// wait until there is a thread that isn't doing anything
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                task_done_signaler.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                idx <font color='#5555FF'>=</font> <font color='#BB00BB'>find_empty_task_slot</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            tasks[idx].thread_id <font color='#5555FF'>=</font> my_thread_id;
+            tasks[idx].task_id <font color='#5555FF'>=</font> <font color='#BB00BB'>make_next_task_id</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>;
+            tasks[idx].mfp2.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>obj,funct<font face='Lucida Console'>)</font>;
+            tasks[idx].arg1 <font color='#5555FF'>=</font> arg1;
+            tasks[idx].arg2 <font color='#5555FF'>=</font> arg2;
+
+            task_ready_signaler.<font color='#BB00BB'>signal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> tasks[idx].task_id;
+        <b>}</b>
+
+        <font color='#0000FF'>struct</font> <b><a name='function_object_copy'></a>function_object_copy</b> 
+        <b>{</b>
+            <font color='#0000FF'>virtual</font> ~<b><a name='function_object_copy'></a>function_object_copy</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b><b>}</b>
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='function_object_copy_instance'></a>function_object_copy_instance</b> : function_object_copy
+        <b>{</b>
+            <b><a name='function_object_copy_instance'></a>function_object_copy_instance</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item_<font face='Lucida Console'>)</font> : item<font face='Lucida Console'>(</font>item_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            T item;
+            <font color='#0000FF'>virtual</font> ~<b><a name='function_object_copy_instance'></a>function_object_copy_instance</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b><b>}</b>
+        <b>}</b>;
+
+        uint64 <b><a name='add_task_internal'></a>add_task_internal</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bfp_type<font color='#5555FF'>&amp;</font> bfp,
+            shared_ptr<font color='#5555FF'>&lt;</font>function_object_copy<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - adds a task to call the given bfp object.
+                - swaps item into the internal task object which will have a lifetime
+                  at least as long as the running task.
+                - returns the task id for this new task
+        !*/</font>
+
+        uint64 <b><a name='add_task_internal'></a>add_task_internal</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bfp_type<font color='#5555FF'>&amp;</font> bfp
+        <font face='Lucida Console'>)</font> <b>{</b> shared_ptr<font color='#5555FF'>&lt;</font>function_object_copy<font color='#5555FF'>&gt;</font> temp; <font color='#0000FF'>return</font> <font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>bfp, temp<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - adds a task to call the given bfp object.
+                - returns the task id for this new task
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='shutdown_pool'></a>shutdown_pool</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - causes all threads to terminate and blocks the
+                  caller until this happens.
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_worker_thread'></a>is_worker_thread</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> thread_id_type id
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - m is locked
+            ensures
+                - if (thread with given id is one of the thread pool's worker threads or num_threads_in_pool() == 0) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread'></a>thread</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            this is the function that executes the threads in the thread pool
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='find_empty_task_slot'></a>find_empty_task_slot</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - m is locked
+            ensures
+                - if (there is currently a empty task slot) then
+                    - returns the index of that task slot in tasks
+                    - there is a task slot
+                - else
+                    - returns -1
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='find_ready_task'></a>find_ready_task</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - m is locked
+            ensures
+                - if (there is currently a task to do) then
+                    - returns the index of that task in tasks
+                - else
+                    - returns -1
+        !*/</font>
+
+        uint64 <b><a name='make_next_task_id'></a>make_next_task_id</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - m is locked
+                - 0 &lt;= idx &lt; tasks.size()
+            ensures
+                - returns the next index to be used for tasks that are placed in
+                  tasks[idx]
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='task_id_to_index'></a>task_id_to_index</b> <font face='Lucida Console'>(</font>
+            uint64 id
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - m is locked
+                - num_threads_in_pool() != 0
+            ensures
+                - returns the index in tasks corresponding to the given id
+        !*/</font>
+
+        <font color='#0000FF'>struct</font> <b><a name='task_state_type'></a>task_state_type</b>
+        <b>{</b>
+            <b><a name='task_state_type'></a>task_state_type</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : is_being_processed<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>, task_id<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, next_task_id<font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>, arg1<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, arg2<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='is_ready'></a>is_ready</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+            <font color='#009900'>/*!
+                ensures
+                    - if (is_empty() == false &amp;&amp; no thread is currently processing this task) then
+                        - returns true
+                    - else
+                        - returns false
+            !*/</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>!</font>is_being_processed <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font><font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='is_empty'></a>is_empty</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <font color='#009900'>/*!
+                ensures
+                    - if (this task state is empty.  i.e. it doesn't contain a task to be processed) then
+                        - returns true
+                    - else 
+                        - returns false
+            !*/</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> task_id <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>bool</u></font> is_being_processed;  <font color='#009900'>// true when a thread is working on this task 
+</font>            uint64 task_id; <font color='#009900'>// the id of this task.  0 means this task is empty
+</font>            thread_id_type thread_id; <font color='#009900'>// the id of the thread that requested this task 
+</font>
+            uint64 next_task_id;
+
+            <font color='#0000FF'><u>long</u></font> arg1;
+            <font color='#0000FF'><u>long</u></font> arg2;
+
+            member_function_pointer<font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> mfp0;
+            member_function_pointer<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> mfp1;
+            member_function_pointer<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> mfp2;
+            bfp_type bfp;
+
+            shared_ptr<font color='#5555FF'>&lt;</font>function_object_copy<font color='#5555FF'>&gt;</font> function_copy;
+
+        <b>}</b>;
+
+        array<font color='#5555FF'>&lt;</font>task_state_type<font color='#5555FF'>&gt;</font> tasks;
+        array<font color='#5555FF'>&lt;</font>thread_id_type<font color='#5555FF'>&gt;</font> worker_thread_ids;
+
+        mutex m;
+        signaler task_done_signaler;
+        signaler task_ready_signaler;
+        <font color='#0000FF'><u>bool</u></font> we_are_destructing;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='thread_pool_implementation'></a>thread_pool_implementation</b><font face='Lucida Console'>(</font>thread_pool_implementation<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        thread_pool_implementation<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>thread_pool_implementation<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='thread_pool'></a>thread_pool</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            This object is just a shell that holds a shared_ptr_thread_safe 
+            to the real thread_pool_implementation object.  The reason for doing
+            it this way is so that we can allow any mixture of destruction orders
+            between thread_pool objects and futures.  Whoever gets destroyed
+            last cleans up the thread_pool_implementation resources.
+        !*/</font>
+        <font color='#0000FF'>typedef</font> bound_function_pointer::kernel_1a_c bfp_type;
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>explicit</font> <b><a name='thread_pool'></a>thread_pool</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            impl.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> <font color='#BB00BB'>thread_pool_implementation</font><font face='Lucida Console'>(</font>num_threads<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        ~<b><a name='thread_pool'></a>thread_pool</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>shutdown_pool</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='wait_for_task'></a>wait_for_task</b> <font face='Lucida Console'>(</font>
+            uint64 task_id
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>wait_for_task</font><font face='Lucida Console'>(</font>task_id<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_threads_in_pool'></a>num_threads_in_pool</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>num_threads_in_pool</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='wait_for_all_tasks'></a>wait_for_all_tasks</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>wait_for_all_tasks</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_task_thread'></a>is_task_thread</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>is_task_thread</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>obj, funct<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>,
+            <font color='#0000FF'><u>long</u></font> arg1
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>obj, funct, arg1<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>,
+            <font color='#0000FF'><u>long</u></font> arg1,
+            <font color='#0000FF'><u>long</u></font> arg2
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>obj, funct, arg1, arg2<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// --------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> function_object
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_function<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_pointer_type<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>function_object<font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task_by_value'></a>add_task_by_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> F<font color='#5555FF'>&amp;</font> function_object
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> ptr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            ptr <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>function_object<font face='Lucida Console'>)</font>;
+            shared_ptr<font color='#5555FF'>&lt;</font>thread_pool_implementation::function_object_copy<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>function_copy</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>;
+
+
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item<font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp, function_copy<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>obj,funct<font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task_by_value'></a>add_task_by_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> ptr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            ptr <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>obj<font face='Lucida Console'>)</font>;
+            shared_ptr<font color='#5555FF'>&lt;</font>thread_pool_implementation::function_object_copy<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>function_copy</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>;
+
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item,funct<font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp, function_copy<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task_by_value'></a>add_task_by_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> ptr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            ptr <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>obj<font face='Lucida Console'>)</font>;
+            shared_ptr<font color='#5555FF'>&lt;</font>thread_pool_implementation::function_object_copy<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>function_copy</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>;
+
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item,funct<font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp, function_copy<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>funct<font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+
+        <font color='#009900'>// --------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> A1<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> function_object,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_function<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_pointer_type<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>function_object,arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the future to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> A1<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task_by_value'></a>add_task_by_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> F<font color='#5555FF'>&amp;</font> function_object,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> ptr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            ptr <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>function_object<font face='Lucida Console'>)</font>;
+            shared_ptr<font color='#5555FF'>&lt;</font>thread_pool_implementation::function_object_copy<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>function_copy</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>;
+
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp, function_copy<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the future to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1<font face='Lucida Console'>)</font>,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>obj,funct,arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the future to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task_by_value'></a>add_task_by_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1<font face='Lucida Console'>)</font>,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> ptr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            ptr <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>obj<font face='Lucida Console'>)</font>;
+            shared_ptr<font color='#5555FF'>&lt;</font>thread_pool_implementation::function_object_copy<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>function_copy</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>;
+
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item,funct,arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp, function_copy<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the future to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>obj,funct,arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the future to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task_by_value'></a>add_task_by_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> ptr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            ptr <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>obj<font face='Lucida Console'>)</font>;
+            shared_ptr<font color='#5555FF'>&lt;</font>thread_pool_implementation::function_object_copy<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>function_copy</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>;
+
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item,funct,arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp, function_copy<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the future to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1<font face='Lucida Console'>)</font>,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>funct,arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the future to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+
+        <font color='#009900'>// --------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> function_object,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_function<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_pointer_type<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>function_object, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the future to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task_by_value'></a>add_task_by_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> F<font color='#5555FF'>&amp;</font> function_object,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> ptr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            ptr <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>function_object<font face='Lucida Console'>)</font>;
+            shared_ptr<font color='#5555FF'>&lt;</font>thread_pool_implementation::function_object_copy<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>function_copy</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>;
+
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp, function_copy<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the future to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                              <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2<font face='Lucida Console'>)</font>,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>obj, funct, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the futures to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                              <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task_by_value'></a>add_task_by_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2<font face='Lucida Console'>)</font>,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> ptr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            ptr <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>obj<font face='Lucida Console'>)</font>;
+            shared_ptr<font color='#5555FF'>&lt;</font>thread_pool_implementation::function_object_copy<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>function_copy</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>;
+
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item, funct, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp, function_copy<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the futures to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                              <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>obj, funct, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the futures to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                              <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task_by_value'></a>add_task_by_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> ptr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            ptr <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>obj<font face='Lucida Console'>)</font>;
+            shared_ptr<font color='#5555FF'>&lt;</font>thread_pool_implementation::function_object_copy<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>function_copy</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>;
+
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item, funct, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp, function_copy<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the futures to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                  <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2<font face='Lucida Console'>)</font>,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>funct, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the futures to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+
+        <font color='#009900'>// --------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> function_object,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2,
+            future<font color='#5555FF'>&lt;</font>A3<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg3
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_function<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_pointer_type<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>function_object, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg3.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the future to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            arg3.task_id <font color='#5555FF'>=</font> id;
+            arg3.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task_by_value'></a>add_task_by_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> F<font color='#5555FF'>&amp;</font> function_object,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2,
+            future<font color='#5555FF'>&lt;</font>A3<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg3
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> ptr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            ptr <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>function_object<font face='Lucida Console'>)</font>;
+            shared_ptr<font color='#5555FF'>&lt;</font>thread_pool_implementation::function_object_copy<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>function_copy</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>;
+
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg3.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp, function_copy<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the future to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            arg3.task_id <font color='#5555FF'>=</font> id;
+            arg3.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                              <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+                              <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2,T3<font face='Lucida Console'>)</font>,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2,
+            future<font color='#5555FF'>&lt;</font>A3<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg3
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>obj, funct, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg3.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the futures to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            arg3.task_id <font color='#5555FF'>=</font> id;
+            arg3.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                              <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+                              <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task_by_value'></a>add_task_by_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2,T3<font face='Lucida Console'>)</font>,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2,
+            future<font color='#5555FF'>&lt;</font>A3<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg3
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> ptr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            ptr <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>obj<font face='Lucida Console'>)</font>;
+            shared_ptr<font color='#5555FF'>&lt;</font>thread_pool_implementation::function_object_copy<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>function_copy</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>;
+
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item, funct, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg3.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp, function_copy<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the futures to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            arg3.task_id <font color='#5555FF'>=</font> id;
+            arg3.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                              <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+                              <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2,T3<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2,
+            future<font color='#5555FF'>&lt;</font>A3<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg3
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>obj, funct, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg3.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the futures to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            arg3.task_id <font color='#5555FF'>=</font> id;
+            arg3.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                              <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+                              <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task_by_value'></a>add_task_by_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2,T3<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2,
+            future<font color='#5555FF'>&lt;</font>A3<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg3
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> ptr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            ptr <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>obj<font face='Lucida Console'>)</font>;
+            shared_ptr<font color='#5555FF'>&lt;</font>thread_pool_implementation::function_object_copy<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>function_copy</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>;
+
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item, funct, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg3.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp, function_copy<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the futures to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            arg3.task_id <font color='#5555FF'>=</font> id;
+            arg3.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                  <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+                  <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2,T3<font face='Lucida Console'>)</font>,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2,
+            future<font color='#5555FF'>&lt;</font>A3<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg3
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>funct, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg3.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the futures to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            arg3.task_id <font color='#5555FF'>=</font> id;
+            arg3.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+
+        <font color='#009900'>// --------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3, <font color='#0000FF'>typename</font> A4<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> function_object,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2,
+            future<font color='#5555FF'>&lt;</font>A3<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg3,
+            future<font color='#5555FF'>&lt;</font>A4<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg4
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_function<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_pointer_type<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>function_object, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg3.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg4.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the future to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            arg3.task_id <font color='#5555FF'>=</font> id;
+            arg3.tp <font color='#5555FF'>=</font> impl;
+            arg4.task_id <font color='#5555FF'>=</font> id;
+            arg4.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3, <font color='#0000FF'>typename</font> A4<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task_by_value'></a>add_task_by_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> F<font color='#5555FF'>&amp;</font> function_object,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2,
+            future<font color='#5555FF'>&lt;</font>A3<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg3,
+            future<font color='#5555FF'>&lt;</font>A4<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg4
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> ptr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            ptr <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>function_object<font face='Lucida Console'>)</font>;
+            shared_ptr<font color='#5555FF'>&lt;</font>thread_pool_implementation::function_object_copy<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>function_copy</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>;
+
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg3.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg4.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp, function_copy<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the future to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            arg3.task_id <font color='#5555FF'>=</font> id;
+            arg3.tp <font color='#5555FF'>=</font> impl;
+            arg4.task_id <font color='#5555FF'>=</font> id;
+            arg4.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                              <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+                              <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3,
+                              <font color='#0000FF'>typename</font> T4, <font color='#0000FF'>typename</font> A4<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2,T3,T4<font face='Lucida Console'>)</font>,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2,
+            future<font color='#5555FF'>&lt;</font>A3<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg3,
+            future<font color='#5555FF'>&lt;</font>A4<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg4
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>obj, funct, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg3.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg4.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the futures to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            arg3.task_id <font color='#5555FF'>=</font> id;
+            arg3.tp <font color='#5555FF'>=</font> impl;
+            arg4.task_id <font color='#5555FF'>=</font> id;
+            arg4.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                              <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+                              <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3,
+                              <font color='#0000FF'>typename</font> T4, <font color='#0000FF'>typename</font> A4<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task_by_value'></a>add_task_by_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2,T3,T4<font face='Lucida Console'>)</font>,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2,
+            future<font color='#5555FF'>&lt;</font>A3<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg3,
+            future<font color='#5555FF'>&lt;</font>A4<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg4
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> ptr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            ptr <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>obj<font face='Lucida Console'>)</font>;
+            shared_ptr<font color='#5555FF'>&lt;</font>thread_pool_implementation::function_object_copy<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>function_copy</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>;
+
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item, funct, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg3.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg4.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp, function_copy<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the futures to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            arg3.task_id <font color='#5555FF'>=</font> id;
+            arg3.tp <font color='#5555FF'>=</font> impl;
+            arg4.task_id <font color='#5555FF'>=</font> id;
+            arg4.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                              <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+                              <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3,
+                              <font color='#0000FF'>typename</font> T4, <font color='#0000FF'>typename</font> A4<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2,T3,T4<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2,
+            future<font color='#5555FF'>&lt;</font>A3<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg3,
+            future<font color='#5555FF'>&lt;</font>A4<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg4
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>obj, funct, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg3.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg4.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the futures to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            arg3.task_id <font color='#5555FF'>=</font> id;
+            arg3.tp <font color='#5555FF'>=</font> impl;
+            arg4.task_id <font color='#5555FF'>=</font> id;
+            arg4.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                              <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+                              <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3,
+                              <font color='#0000FF'>typename</font> T4, <font color='#0000FF'>typename</font> A4<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task_by_value'></a>add_task_by_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> obj,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2,T3,T4<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2,
+            future<font color='#5555FF'>&lt;</font>A3<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg3,
+            future<font color='#5555FF'>&lt;</font>A4<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg4
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> ptr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            ptr <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> thread_pool_implementation::function_object_copy_instance<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>obj<font face='Lucida Console'>)</font>;
+            shared_ptr<font color='#5555FF'>&lt;</font>thread_pool_implementation::function_object_copy<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>function_copy</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>;
+
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item, funct, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg3.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg4.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp, function_copy<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the futures to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            arg3.task_id <font color='#5555FF'>=</font> id;
+            arg3.tp <font color='#5555FF'>=</font> impl;
+            arg4.task_id <font color='#5555FF'>=</font> id;
+            arg4.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                  <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+                  <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3,
+                  <font color='#0000FF'>typename</font> T4, <font color='#0000FF'>typename</font> A4<font color='#5555FF'>&gt;</font>
+        uint64 <b><a name='add_task'></a>add_task</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2,T3,T4<font face='Lucida Console'>)</font>,
+            future<font color='#5555FF'>&lt;</font>A1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg1,
+            future<font color='#5555FF'>&lt;</font>A2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg2,
+            future<font color='#5555FF'>&lt;</font>A3<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg3,
+            future<font color='#5555FF'>&lt;</font>A4<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> arg4
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            bfp_type temp;
+            temp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>funct, arg1.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg2.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg3.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, arg4.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            uint64 id <font color='#5555FF'>=</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add_task_internal</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// tie the futures to this task
+</font>            arg1.task_id <font color='#5555FF'>=</font> id;
+            arg1.tp <font color='#5555FF'>=</font> impl;
+            arg2.task_id <font color='#5555FF'>=</font> id;
+            arg2.tp <font color='#5555FF'>=</font> impl;
+            arg3.task_id <font color='#5555FF'>=</font> id;
+            arg3.tp <font color='#5555FF'>=</font> impl;
+            arg4.task_id <font color='#5555FF'>=</font> id;
+            arg4.tp <font color='#5555FF'>=</font> impl;
+            <font color='#0000FF'>return</font> id;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>thread_pool_implementation<font color='#5555FF'>&gt;</font> impl;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='thread_pool'></a>thread_pool</b><font face='Lucida Console'>(</font>thread_pool<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        thread_pool<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>thread_pool<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> future<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='wait'></a>wait</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tp<font face='Lucida Console'>)</font>
+        <b>{</b>
+            tp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>wait_for_task</font><font face='Lucida Console'>(</font>task_id<font face='Lucida Console'>)</font>;
+            tp.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            task_id <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+    <b>}</b>
+
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='thread_pool_extension.cpp.html'>thread_pool_extension.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_THREAD_POOl_Hh_
+</font>
+
+
+</pre></body></html>

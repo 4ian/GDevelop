@@ -23,3 +23,8 @@ gd_extension_link_libraries(PathfindingAutomatism)
 #Linker files for the GD C++ Runtime extension
 ###
 gdcpp_runtime_extension_link_libraries(PathfindingAutomatism_Runtime)
+
+#Tests for the GD C++ Runtime extension
+###
+file(GLOB_RECURSE test_source_files tests/*)
+gdcpp_add_tests_extension_target(PathfindingAutomatism_Runtime_tests "${test_source_files}")

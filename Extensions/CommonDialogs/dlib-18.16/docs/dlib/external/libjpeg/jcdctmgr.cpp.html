@@ -1,0 +1,390 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jcdctmgr.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jcdctmgr.c
+ *
+ * Copyright (C) 1994-1996, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains the forward-DCT management logic.
+ * This code selects a particular DCT implementation to be used,
+ * and it performs related housekeeping chores including coefficient
+ * quantization.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jdct.h.html'>jdct.h</a>"		<font color='#009900'>/* Private declarations for DCT subsystem */</font>
+
+
+<font color='#009900'>/* Private subobject for this module */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#0000FF'>struct</font> jpeg_forward_dct pub;	<font color='#009900'>/* public fields */</font>
+
+  <font color='#009900'>/* Pointer to the DCT routine actually in use */</font>
+  forward_DCT_method_ptr do_dct;
+
+  <font color='#009900'>/* The actual post-DCT divisors --- not identical to the quant table
+   * entries, because of scaling (especially for an unnormalized DCT).
+   * Each table is given in normal array order.
+   */</font>
+  DCTELEM <font color='#5555FF'>*</font> divisors[NUM_QUANT_TBLS];
+
+<font color='#0000FF'>#ifdef</font> DCT_FLOAT_SUPPORTED
+  <font color='#009900'>/* Same as above for the floating-point case. */</font>
+  float_DCT_method_ptr do_float_dct;
+  FAST_FLOAT <font color='#5555FF'>*</font> float_divisors[NUM_QUANT_TBLS];
+<font color='#0000FF'>#endif</font>
+<b>}</b> my_fdct_controller;
+
+<font color='#0000FF'>typedef</font> my_fdct_controller <font color='#5555FF'>*</font> my_fdct_ptr;
+
+
+<font color='#009900'>/*
+ * Initialize for a processing pass.
+ * Verify that all referenced Q-tables are present, and set up
+ * the divisor table for each one.
+ * In the current implementation, DCT of all components is done during
+ * the first pass, even if only some components will be output in the
+ * first scan.  Hence all components should be examined here.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='start_pass_fdctmgr'></a>start_pass_fdctmgr</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_fdct_ptr fdct <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_fdct_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fdct;
+  <font color='#0000FF'><u>int</u></font> ci, qtblno, i;
+  jpeg_component_info <font color='#5555FF'>*</font>compptr;
+  JQUANT_TBL <font color='#5555FF'>*</font> qtbl;
+  DCTELEM <font color='#5555FF'>*</font> dtbl;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>, compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+       ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, compptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    qtblno <font color='#5555FF'>=</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quant_tbl_no;
+    <font color='#009900'>/* Make sure specified quantization table is present */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>qtblno <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> qtblno <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> NUM_QUANT_TBLS <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+	cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quant_tbl_ptrs[qtblno] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_NO_QUANT_TABLE, qtblno<font face='Lucida Console'>)</font>;
+    qtbl <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quant_tbl_ptrs[qtblno];
+    <font color='#009900'>/* Compute divisors for this quant table */</font>
+    <font color='#009900'>/* We may do this more than once for same table, but it's not a big deal */</font>
+    <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dct_method<font face='Lucida Console'>)</font> <b>{</b>
+<font color='#0000FF'>#ifdef</font> DCT_ISLOW_SUPPORTED
+    <font color='#0000FF'>case</font> JDCT_ISLOW:
+      <font color='#009900'>/* For LL&amp;M IDCT method, divisors are equal to raw quantization
+       * coefficients multiplied by 8 (to counteract scaling).
+       */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>divisors[qtblno] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+	fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>divisors[qtblno] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>DCTELEM <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+	  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				      DCTSIZE2 <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>DCTELEM<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+      <b>}</b>
+      dtbl <font color='#5555FF'>=</font> fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>divisors[qtblno];
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> DCTSIZE2; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	dtbl[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>DCTELEM<font face='Lucida Console'>)</font> qtbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantval[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>3</font>;
+      <b>}</b>
+      <font color='#0000FF'>break</font>;
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> DCT_IFAST_SUPPORTED
+    <font color='#0000FF'>case</font> JDCT_IFAST:
+      <b>{</b>
+	<font color='#009900'>/* For AA&amp;N IDCT method, divisors are equal to quantization
+	 * coefficients scaled by scalefactor[row]*scalefactor[col], where
+	 *   scalefactor[0] = 1
+	 *   scalefactor[k] = cos(k*PI/16) * sqrt(2)    for k=1..7
+	 * We apply a further scale factor of 8.
+	 */</font>
+<font color='#0000FF'>#define</font> CONST_BITS <font color='#979000'>14</font>
+	<font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>short</u></font> aanscales[DCTSIZE2] <font color='#5555FF'>=</font> <b>{</b>
+	  <font color='#009900'>/* precomputed values scaled up by 14 bits */</font>
+	  <font color='#979000'>16384</font>, <font color='#979000'>22725</font>, <font color='#979000'>21407</font>, <font color='#979000'>19266</font>, <font color='#979000'>16384</font>, <font color='#979000'>12873</font>,  <font color='#979000'>8867</font>,  <font color='#979000'>4520</font>,
+	  <font color='#979000'>22725</font>, <font color='#979000'>31521</font>, <font color='#979000'>29692</font>, <font color='#979000'>26722</font>, <font color='#979000'>22725</font>, <font color='#979000'>17855</font>, <font color='#979000'>12299</font>,  <font color='#979000'>6270</font>,
+	  <font color='#979000'>21407</font>, <font color='#979000'>29692</font>, <font color='#979000'>27969</font>, <font color='#979000'>25172</font>, <font color='#979000'>21407</font>, <font color='#979000'>16819</font>, <font color='#979000'>11585</font>,  <font color='#979000'>5906</font>,
+	  <font color='#979000'>19266</font>, <font color='#979000'>26722</font>, <font color='#979000'>25172</font>, <font color='#979000'>22654</font>, <font color='#979000'>19266</font>, <font color='#979000'>15137</font>, <font color='#979000'>10426</font>,  <font color='#979000'>5315</font>,
+	  <font color='#979000'>16384</font>, <font color='#979000'>22725</font>, <font color='#979000'>21407</font>, <font color='#979000'>19266</font>, <font color='#979000'>16384</font>, <font color='#979000'>12873</font>,  <font color='#979000'>8867</font>,  <font color='#979000'>4520</font>,
+	  <font color='#979000'>12873</font>, <font color='#979000'>17855</font>, <font color='#979000'>16819</font>, <font color='#979000'>15137</font>, <font color='#979000'>12873</font>, <font color='#979000'>10114</font>,  <font color='#979000'>6967</font>,  <font color='#979000'>3552</font>,
+	   <font color='#979000'>8867</font>, <font color='#979000'>12299</font>, <font color='#979000'>11585</font>, <font color='#979000'>10426</font>,  <font color='#979000'>8867</font>,  <font color='#979000'>6967</font>,  <font color='#979000'>4799</font>,  <font color='#979000'>2446</font>,
+	   <font color='#979000'>4520</font>,  <font color='#979000'>6270</font>,  <font color='#979000'>5906</font>,  <font color='#979000'>5315</font>,  <font color='#979000'>4520</font>,  <font color='#979000'>3552</font>,  <font color='#979000'>2446</font>,  <font color='#979000'>1247</font>
+	<b>}</b>;
+	SHIFT_TEMPS
+
+	<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>divisors[qtblno] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+	  fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>divisors[qtblno] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>DCTELEM <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+	    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+					DCTSIZE2 <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>DCTELEM<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+	<b>}</b>
+	dtbl <font color='#5555FF'>=</font> fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>divisors[qtblno];
+	<font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> DCTSIZE2; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	  dtbl[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>DCTELEM<font face='Lucida Console'>)</font>
+	    <font color='#BB00BB'>DESCALE</font><font face='Lucida Console'>(</font><font color='#BB00BB'>MULTIPLY16V16</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> qtbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantval[i],
+				  <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> aanscales[i]<font face='Lucida Console'>)</font>,
+		    CONST_BITS<font color='#5555FF'>-</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+	<b>}</b>
+      <b>}</b>
+      <font color='#0000FF'>break</font>;
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> DCT_FLOAT_SUPPORTED
+    <font color='#0000FF'>case</font> JDCT_FLOAT:
+      <b>{</b>
+	<font color='#009900'>/* For float AA&amp;N IDCT method, divisors are equal to quantization
+	 * coefficients scaled by scalefactor[row]*scalefactor[col], where
+	 *   scalefactor[0] = 1
+	 *   scalefactor[k] = cos(k*PI/16) * sqrt(2)    for k=1..7
+	 * We apply a further scale factor of 8.
+	 * What's actually stored is 1/divisor so that the inner loop can
+	 * use a multiplication rather than a division.
+	 */</font>
+	FAST_FLOAT <font color='#5555FF'>*</font> fdtbl;
+	<font color='#0000FF'><u>int</u></font> row, col;
+	<font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> aanscalefactor[DCTSIZE] <font color='#5555FF'>=</font> <b>{</b>
+	  <font color='#979000'>1.0</font>, <font color='#979000'>1.387039845</font>, <font color='#979000'>1.306562965</font>, <font color='#979000'>1.175875602</font>,
+	  <font color='#979000'>1.0</font>, <font color='#979000'>0.785694958</font>, <font color='#979000'>0.541196100</font>, <font color='#979000'>0.275899379</font>
+	<b>}</b>;
+
+	<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>float_divisors[qtblno] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+	  fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>float_divisors[qtblno] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FAST_FLOAT <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+	    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+					DCTSIZE2 <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+	<b>}</b>
+	fdtbl <font color='#5555FF'>=</font> fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>float_divisors[qtblno];
+	i <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+	<font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>row <font color='#5555FF'>=</font> <font color='#979000'>0</font>; row <font color='#5555FF'>&lt;</font> DCTSIZE; row<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>col <font color='#5555FF'>=</font> <font color='#979000'>0</font>; col <font color='#5555FF'>&lt;</font> DCTSIZE; col<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	    fdtbl[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font>
+	      <font face='Lucida Console'>(</font><font color='#979000'>1.0</font> <font color='#5555FF'>/</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font> qtbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantval[i] <font color='#5555FF'>*</font>
+		       aanscalefactor[row] <font color='#5555FF'>*</font> aanscalefactor[col] <font color='#5555FF'>*</font> <font color='#979000'>8.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+	    i<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+	  <b>}</b>
+	<b>}</b>
+      <b>}</b>
+      <font color='#0000FF'>break</font>;
+<font color='#0000FF'>#endif</font>
+    <font color='#0000FF'>default</font>:
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_NOT_COMPILED<font face='Lucida Console'>)</font>;
+      <font color='#0000FF'>break</font>;
+    <b>}</b>
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Perform forward DCT on one or more blocks of a component.
+ *
+ * The input samples are taken from the sample_data[] array starting at
+ * position start_row/start_col, and moving to the right for any additional
+ * blocks. The quantized coefficients are returned in coef_blocks[].
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='forward_DCT'></a>forward_DCT</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, jpeg_component_info <font color='#5555FF'>*</font> compptr,
+	     JSAMPARRAY sample_data, JBLOCKROW coef_blocks,
+	     JDIMENSION start_row, JDIMENSION start_col,
+	     JDIMENSION num_blocks<font face='Lucida Console'>)</font>
+<font color='#009900'>/* This version is used for integer DCT implementations. */</font>
+<b>{</b>
+  <font color='#009900'>/* This routine is heavily used, so it's worth coding it tightly. */</font>
+  my_fdct_ptr fdct <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_fdct_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fdct;
+  forward_DCT_method_ptr do_dct <font color='#5555FF'>=</font> fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>do_dct;
+  DCTELEM <font color='#5555FF'>*</font> divisors <font color='#5555FF'>=</font> fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>divisors[compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quant_tbl_no];
+  DCTELEM workspace[DCTSIZE2];	<font color='#009900'>/* work area for FDCT subroutine */</font>
+  JDIMENSION bi;
+
+  sample_data <font color='#5555FF'>+</font><font color='#5555FF'>=</font> start_row;	<font color='#009900'>/* fold in the vertical offset once */</font>
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>bi <font color='#5555FF'>=</font> <font color='#979000'>0</font>; bi <font color='#5555FF'>&lt;</font> num_blocks; bi<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, start_col <font color='#5555FF'>+</font><font color='#5555FF'>=</font> DCTSIZE<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Load data into workspace, applying unsigned-&gt;signed conversion */</font>
+    <b>{</b> <font color='#0000FF'>register</font> DCTELEM <font color='#5555FF'>*</font>workspaceptr;
+      <font color='#0000FF'>register</font> JSAMPROW elemptr;
+      <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> elemr;
+
+      workspaceptr <font color='#5555FF'>=</font> workspace;
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>elemr <font color='#5555FF'>=</font> <font color='#979000'>0</font>; elemr <font color='#5555FF'>&lt;</font> DCTSIZE; elemr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	elemptr <font color='#5555FF'>=</font> sample_data[elemr] <font color='#5555FF'>+</font> start_col;
+<font color='#0000FF'>#if</font> DCTSIZE <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>		<font color='#009900'>/* unroll the inner loop */</font>
+	<font color='#5555FF'>*</font>workspaceptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>elemptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> CENTERJSAMPLE;
+	<font color='#5555FF'>*</font>workspaceptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>elemptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> CENTERJSAMPLE;
+	<font color='#5555FF'>*</font>workspaceptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>elemptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> CENTERJSAMPLE;
+	<font color='#5555FF'>*</font>workspaceptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>elemptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> CENTERJSAMPLE;
+	<font color='#5555FF'>*</font>workspaceptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>elemptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> CENTERJSAMPLE;
+	<font color='#5555FF'>*</font>workspaceptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>elemptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> CENTERJSAMPLE;
+	<font color='#5555FF'>*</font>workspaceptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>elemptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> CENTERJSAMPLE;
+	<font color='#5555FF'>*</font>workspaceptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>elemptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> CENTERJSAMPLE;
+<font color='#0000FF'>#else</font>
+	<b>{</b> <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> elemc;
+	  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>elemc <font color='#5555FF'>=</font> DCTSIZE; elemc <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; elemc<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+	    <font color='#5555FF'>*</font>workspaceptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>elemptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> CENTERJSAMPLE;
+	  <b>}</b>
+	<b>}</b>
+<font color='#0000FF'>#endif</font>
+      <b>}</b>
+    <b>}</b>
+
+    <font color='#009900'>/* Perform the DCT */</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>do_dct<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>workspace<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/* Quantize/descale the coefficients, and store into coef_blocks[] */</font>
+    <b>{</b> <font color='#0000FF'>register</font> DCTELEM temp, qval;
+      <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> i;
+      <font color='#0000FF'>register</font> JCOEFPTR output_ptr <font color='#5555FF'>=</font> coef_blocks[bi];
+
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> DCTSIZE2; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	qval <font color='#5555FF'>=</font> divisors[i];
+	temp <font color='#5555FF'>=</font> workspace[i];
+	<font color='#009900'>/* Divide the coefficient value by qval, ensuring proper rounding.
+	 * Since C does not specify the direction of rounding for negative
+	 * quotients, we have to force the dividend positive for portability.
+	 *
+	 * In most files, at least half of the output values will be zero
+	 * (at default quantization settings, more like three-quarters...)
+	 * so we should ensure that this case is fast.  On many machines,
+	 * a comparison is enough cheaper than a divide to make a special test
+	 * a win.  Since both inputs will be nonnegative, we need only test
+	 * for a &lt; b to discover whether a/b is 0.
+	 * If your machine's division is fast enough, define FAST_DIVIDE.
+	 */</font>
+<font color='#0000FF'>#ifdef</font> FAST_DIVIDE
+<font color='#0000FF'>#define</font> DIVIDE_BY<font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font>	a <font color='#5555FF'>/</font><font color='#5555FF'>=</font> b
+<font color='#0000FF'>#else</font>
+<font color='#0000FF'>#define</font> DIVIDE_BY<font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font>	<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> b<font face='Lucida Console'>)</font> a <font color='#5555FF'>/</font><font color='#5555FF'>=</font> b; <font color='#0000FF'>else</font> a <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+<font color='#0000FF'>#endif</font>
+	<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+	  temp <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>temp;
+	  temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> qval<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>1</font>;	<font color='#009900'>/* for rounding */</font>
+	  <font color='#BB00BB'>DIVIDE_BY</font><font face='Lucida Console'>(</font>temp, qval<font face='Lucida Console'>)</font>;
+	  temp <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>temp;
+	<b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+	  temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> qval<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>1</font>;	<font color='#009900'>/* for rounding */</font>
+	  <font color='#BB00BB'>DIVIDE_BY</font><font face='Lucida Console'>(</font>temp, qval<font face='Lucida Console'>)</font>;
+	<b>}</b>
+	output_ptr[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JCOEF<font face='Lucida Console'>)</font> temp;
+      <b>}</b>
+    <b>}</b>
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#0000FF'>#ifdef</font> DCT_FLOAT_SUPPORTED
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='forward_DCT_float'></a>forward_DCT_float</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, jpeg_component_info <font color='#5555FF'>*</font> compptr,
+		   JSAMPARRAY sample_data, JBLOCKROW coef_blocks,
+		   JDIMENSION start_row, JDIMENSION start_col,
+		   JDIMENSION num_blocks<font face='Lucida Console'>)</font>
+<font color='#009900'>/* This version is used for floating-point DCT implementations. */</font>
+<b>{</b>
+  <font color='#009900'>/* This routine is heavily used, so it's worth coding it tightly. */</font>
+  my_fdct_ptr fdct <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_fdct_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fdct;
+  float_DCT_method_ptr do_dct <font color='#5555FF'>=</font> fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>do_float_dct;
+  FAST_FLOAT <font color='#5555FF'>*</font> divisors <font color='#5555FF'>=</font> fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>float_divisors[compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quant_tbl_no];
+  FAST_FLOAT workspace[DCTSIZE2]; <font color='#009900'>/* work area for FDCT subroutine */</font>
+  JDIMENSION bi;
+
+  sample_data <font color='#5555FF'>+</font><font color='#5555FF'>=</font> start_row;	<font color='#009900'>/* fold in the vertical offset once */</font>
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>bi <font color='#5555FF'>=</font> <font color='#979000'>0</font>; bi <font color='#5555FF'>&lt;</font> num_blocks; bi<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, start_col <font color='#5555FF'>+</font><font color='#5555FF'>=</font> DCTSIZE<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Load data into workspace, applying unsigned-&gt;signed conversion */</font>
+    <b>{</b> <font color='#0000FF'>register</font> FAST_FLOAT <font color='#5555FF'>*</font>workspaceptr;
+      <font color='#0000FF'>register</font> JSAMPROW elemptr;
+      <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> elemr;
+
+      workspaceptr <font color='#5555FF'>=</font> workspace;
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>elemr <font color='#5555FF'>=</font> <font color='#979000'>0</font>; elemr <font color='#5555FF'>&lt;</font> DCTSIZE; elemr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	elemptr <font color='#5555FF'>=</font> sample_data[elemr] <font color='#5555FF'>+</font> start_col;
+<font color='#0000FF'>#if</font> DCTSIZE <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>		<font color='#009900'>/* unroll the inner loop */</font>
+	<font color='#5555FF'>*</font>workspaceptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>elemptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> CENTERJSAMPLE<font face='Lucida Console'>)</font>;
+	<font color='#5555FF'>*</font>workspaceptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>elemptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> CENTERJSAMPLE<font face='Lucida Console'>)</font>;
+	<font color='#5555FF'>*</font>workspaceptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>elemptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> CENTERJSAMPLE<font face='Lucida Console'>)</font>;
+	<font color='#5555FF'>*</font>workspaceptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>elemptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> CENTERJSAMPLE<font face='Lucida Console'>)</font>;
+	<font color='#5555FF'>*</font>workspaceptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>elemptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> CENTERJSAMPLE<font face='Lucida Console'>)</font>;
+	<font color='#5555FF'>*</font>workspaceptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>elemptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> CENTERJSAMPLE<font face='Lucida Console'>)</font>;
+	<font color='#5555FF'>*</font>workspaceptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>elemptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> CENTERJSAMPLE<font face='Lucida Console'>)</font>;
+	<font color='#5555FF'>*</font>workspaceptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>elemptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> CENTERJSAMPLE<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+	<b>{</b> <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> elemc;
+	  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>elemc <font color='#5555FF'>=</font> DCTSIZE; elemc <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; elemc<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+	    <font color='#5555FF'>*</font>workspaceptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font>
+	      <font face='Lucida Console'>(</font><font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>elemptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> CENTERJSAMPLE<font face='Lucida Console'>)</font>;
+	  <b>}</b>
+	<b>}</b>
+<font color='#0000FF'>#endif</font>
+      <b>}</b>
+    <b>}</b>
+
+    <font color='#009900'>/* Perform the DCT */</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>do_dct<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>workspace<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/* Quantize/descale the coefficients, and store into coef_blocks[] */</font>
+    <b>{</b> <font color='#0000FF'>register</font> FAST_FLOAT temp;
+      <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> i;
+      <font color='#0000FF'>register</font> JCOEFPTR output_ptr <font color='#5555FF'>=</font> coef_blocks[bi];
+
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> DCTSIZE2; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#009900'>/* Apply the quantization and scaling factor */</font>
+	temp <font color='#5555FF'>=</font> workspace[i] <font color='#5555FF'>*</font> divisors[i];
+	<font color='#009900'>/* Round to nearest integer.
+	 * Since C does not specify the direction of rounding for negative
+	 * quotients, we have to force the dividend positive for portability.
+	 * The maximum coefficient size is +-16K (for 12-bit data), so this
+	 * code should work for either 16-bit or 32-bit ints.
+	 */</font>
+	output_ptr[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JCOEF<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font> <font color='#979000'>16384.5</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>16384</font><font face='Lucida Console'>)</font>;
+      <b>}</b>
+    <b>}</b>
+  <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* DCT_FLOAT_SUPPORTED */</font>
+
+
+<font color='#009900'>/*
+ * Initialize FDCT manager.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jinit_forward_dct'></a>jinit_forward_dct</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_fdct_ptr fdct;
+  <font color='#0000FF'><u>int</u></font> i;
+
+  fdct <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_fdct_ptr<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				<font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>my_fdct_controller<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fdct <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> jpeg_forward_dct <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> fdct;
+  fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.start_pass <font color='#5555FF'>=</font> start_pass_fdctmgr;
+
+  <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dct_method<font face='Lucida Console'>)</font> <b>{</b>
+<font color='#0000FF'>#ifdef</font> DCT_ISLOW_SUPPORTED
+  <font color='#0000FF'>case</font> JDCT_ISLOW:
+    fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.forward_DCT <font color='#5555FF'>=</font> forward_DCT;
+    fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>do_dct <font color='#5555FF'>=</font> jpeg_fdct_islow;
+    <font color='#0000FF'>break</font>;
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> DCT_IFAST_SUPPORTED
+  <font color='#0000FF'>case</font> JDCT_IFAST:
+    fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.forward_DCT <font color='#5555FF'>=</font> forward_DCT;
+    fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>do_dct <font color='#5555FF'>=</font> jpeg_fdct_ifast;
+    <font color='#0000FF'>break</font>;
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> DCT_FLOAT_SUPPORTED
+  <font color='#0000FF'>case</font> JDCT_FLOAT:
+    fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.forward_DCT <font color='#5555FF'>=</font> forward_DCT_float;
+    fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>do_float_dct <font color='#5555FF'>=</font> jpeg_fdct_float;
+    <font color='#0000FF'>break</font>;
+<font color='#0000FF'>#endif</font>
+  <font color='#0000FF'>default</font>:
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_NOT_COMPILED<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>break</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Mark divisor tables unallocated */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> NUM_QUANT_TBLS; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>divisors[i] <font color='#5555FF'>=</font> NULL;
+<font color='#0000FF'>#ifdef</font> DCT_FLOAT_SUPPORTED
+    fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>float_divisors[i] <font color='#5555FF'>=</font> NULL;
+<font color='#0000FF'>#endif</font>
+  <b>}</b>
+<b>}</b>
+
+</pre></body></html>

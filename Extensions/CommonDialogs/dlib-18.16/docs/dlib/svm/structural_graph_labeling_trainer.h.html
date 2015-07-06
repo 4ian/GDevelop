@@ -1,0 +1,285 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - structural_graph_labeling_trainer.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_STRUCTURAL_GRAPH_LABELING_tRAINER_Hh_
+<font color='#0000FF'>#define</font> DLIB_STRUCTURAL_GRAPH_LABELING_tRAINER_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='structural_graph_labeling_trainer_abstract.h.html'>structural_graph_labeling_trainer_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../optimization.h.html'>../optimization.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='structural_svm_graph_labeling_problem.h.html'>structural_svm_graph_labeling_problem.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../graph_cuts/graph_labeler.h.html'>../graph_cuts/graph_labeler.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='structural_graph_labeling_trainer'></a>structural_graph_labeling_trainer</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> label_type;
+        <font color='#0000FF'>typedef</font> graph_labeler<font color='#5555FF'>&lt;</font>vector_type<font color='#5555FF'>&gt;</font> trained_function_type;
+
+        <b><a name='structural_graph_labeling_trainer'></a>structural_graph_labeling_trainer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>  
+        <b>{</b>
+            C <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            eps <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>;
+            num_threads <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+            max_cache_size <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+            loss_pos <font color='#5555FF'>=</font> <font color='#979000'>1.0</font>;
+            loss_neg <font color='#5555FF'>=</font> <font color='#979000'>1.0</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_num_threads'></a>set_num_threads</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            num_threads <font color='#5555FF'>=</font> num;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_threads'></a>get_num_threads</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> num_threads;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_epsilon'></a>set_epsilon</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> eps_
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>eps_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t void structural_graph_labeling_trainer::set_epsilon()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps_ must be greater than 0</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps_: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> eps_ 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            eps <font color='#5555FF'>=</font> eps_;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_epsilon'></a>get_epsilon</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> eps; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_cache_size'></a>set_max_cache_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_size
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            max_cache_size <font color='#5555FF'>=</font> max_size;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_cache_size'></a>get_max_cache_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> max_cache_size; 
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_verbose'></a>be_verbose</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_quiet'></a>be_quiet</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_oca'></a>set_oca</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> oca<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            solver <font color='#5555FF'>=</font> item;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> oca <b><a name='get_oca'></a>get_oca</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> solver;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_c'></a>set_c</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> C_ 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>C_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t void structural_graph_labeling_trainer::set_c()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t C_ must be greater than 0</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t C_:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C_ 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            C <font color='#5555FF'>=</font> C_;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_c'></a>get_c</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> C;
+        <b>}</b>
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_loss_on_positive_class'></a>set_loss_on_positive_class</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> loss
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>loss <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                    "<font color='#CC0000'>\t structural_graph_labeling_trainer::set_loss_on_positive_class()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t loss: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> loss 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font> <font face='Lucida Console'>)</font>;
+
+            loss_pos <font color='#5555FF'>=</font> loss;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_loss_on_negative_class'></a>set_loss_on_negative_class</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> loss
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>loss <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                    "<font color='#CC0000'>\t structural_graph_labeling_trainer::set_loss_on_negative_class()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t loss: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> loss 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font> <font face='Lucida Console'>)</font>;
+
+            loss_neg <font color='#5555FF'>=</font> loss;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_loss_on_negative_class'></a>get_loss_on_negative_class</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> loss_neg; <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_loss_on_positive_class'></a>get_loss_on_positive_class</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> loss_pos; <b>}</b>
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> graph_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> graph_labeler<font color='#5555FF'>&lt;</font>vector_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>  
+            <font color='#0000FF'>const</font> dlib::array<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> losses
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+<font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+            std::string reason_for_failure;
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_graph_labeling_problem</font><font face='Lucida Console'>(</font>samples, labels, reason_for_failure<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> ,
+                    "<font color='#CC0000'>\t void structural_graph_labeling_trainer::train()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t reason_for_failure: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> reason_for_failure 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t samples.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t labels.size():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font> <font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>losses.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font color='#BB00BB'>sizes_match</font><font face='Lucida Console'>(</font>labels, losses<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        <font color='#BB00BB'>all_values_are_nonnegative</font><font face='Lucida Console'>(</font>losses<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+                    "<font color='#CC0000'>\t void structural_graph_labeling_trainer::train()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t labels.size():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t losses.size():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> losses.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t sizes_match(labels,losses): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>sizes_match</font><font face='Lucida Console'>(</font>labels,losses<font face='Lucida Console'>)</font> 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t all_values_are_nonnegative(losses): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>all_values_are_nonnegative</font><font face='Lucida Console'>(</font>losses<font face='Lucida Console'>)</font> 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font> <font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+
+
+            structural_svm_graph_labeling_problem<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>prob</font><font face='Lucida Console'>(</font>samples, labels, losses, num_threads<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>verbose<font face='Lucida Console'>)</font>
+                prob.<font color='#BB00BB'>be_verbose</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            prob.<font color='#BB00BB'>set_c</font><font face='Lucida Console'>(</font>C<font face='Lucida Console'>)</font>;
+            prob.<font color='#BB00BB'>set_epsilon</font><font face='Lucida Console'>(</font>eps<font face='Lucida Console'>)</font>;
+            prob.<font color='#BB00BB'>set_max_cache_size</font><font face='Lucida Console'>(</font>max_cache_size<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>prob.<font color='#BB00BB'>get_losses</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                prob.<font color='#BB00BB'>set_loss_on_positive_class</font><font face='Lucida Console'>(</font>loss_pos<font face='Lucida Console'>)</font>;
+                prob.<font color='#BB00BB'>set_loss_on_negative_class</font><font face='Lucida Console'>(</font>loss_neg<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> w;
+            <font color='#BB00BB'>solver</font><font face='Lucida Console'>(</font>prob, w, prob.<font color='#BB00BB'>get_num_edge_weights</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            vector_type edge_weights;
+            vector_type node_weights;
+            <font color='#BB00BB'>populate_weights</font><font face='Lucida Console'>(</font>w, edge_weights, node_weights, prob.<font color='#BB00BB'>get_num_edge_weights</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> graph_labeler<font color='#5555FF'>&lt;</font>vector_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>edge_weights, node_weights<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> graph_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> graph_labeler<font color='#5555FF'>&lt;</font>vector_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>  
+            <font color='#0000FF'>const</font> dlib::array<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> losses;
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>samples, labels, losses<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='populate_weights'></a>populate_weights</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> w,
+            T<font color='#5555FF'>&amp;</font> edge_weights,
+            T<font color='#5555FF'>&amp;</font> node_weights,
+            <font color='#0000FF'><u>long</u></font> split_idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            edge_weights <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>w,<font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, split_idx<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            node_weights <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>w,<font color='#BB00BB'>range</font><font face='Lucida Console'>(</font>split_idx,w.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='populate_weights'></a>populate_weights</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> w,
+            T<font color='#5555FF'>&amp;</font> edge_weights,
+            T<font color='#5555FF'>&amp;</font> node_weights,
+            <font color='#0000FF'><u>long</u></font> split_idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            edge_weights.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            node_weights.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> split_idx; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>w</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    edge_weights.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>edge_weights.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>i,<font color='#BB00BB'>w</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> split_idx; i <font color='#5555FF'>&lt;</font> w.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>w</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    node_weights.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>node_weights.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font>split_idx,<font color='#BB00BB'>w</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+
+        <font color='#0000FF'><u>double</u></font> C;
+        oca solver;
+        <font color='#0000FF'><u>double</u></font> eps;
+        <font color='#0000FF'><u>bool</u></font> verbose;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_cache_size;
+        <font color='#0000FF'><u>double</u></font> loss_pos;
+        <font color='#0000FF'><u>double</u></font> loss_neg;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_STRUCTURAL_GRAPH_LABELING_tRAINER_Hh_
+</font>
+
+</pre></body></html>

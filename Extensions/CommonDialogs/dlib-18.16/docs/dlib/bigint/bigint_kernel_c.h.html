@@ -1,0 +1,1133 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bigint_kernel_c.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_BIGINT_KERNEl_C_
+<font color='#0000FF'>#define</font> DLIB_BIGINT_KERNEl_C_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='bigint_kernel_abstract.h.html'>bigint_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='bigint_kernel_c'></a>bigint_kernel_c</b> 
+    <b>{</b>
+        bigint_base data;
+
+        <font color='#0000FF'>explicit</font> <b><a name='bigint_kernel_c'></a>bigint_kernel_c</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_base<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> : data<font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+    <font color='#0000FF'>public</font>:
+
+
+        <b><a name='bigint_kernel_c'></a>bigint_kernel_c</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <b><a name='bigint_kernel_c'></a>bigint_kernel_c</b> <font face='Lucida Console'>(</font>
+            uint32 value
+        <font face='Lucida Console'>)</font>;
+
+        <b><a name='bigint_kernel_c'></a>bigint_kernel_c</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        ~<b><a name='bigint_kernel_c'></a>bigint_kernel_c</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> std::ostream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+            std::ostream<font color='#5555FF'>&amp;</font> out,
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> std::istream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font>  <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in,
+            bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font>
+        <font face='Lucida Console'>)</font>;
+
+        bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font>  <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font>  <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font>  <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font>  <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font>  <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font>  <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font>  <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font>  <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font>  <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font>  <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font>  <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font>  <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font>  <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font>  <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <b>{</b> data.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.data<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+        bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b> 
+        std::ios::fmtflags oldflags <font color='#5555FF'>=</font> out.<font color='#BB00BB'>flags</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;  
+        out.<font color='#BB00BB'>flags</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> item <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'> </font>'; 
+        out.<font color='#BB00BB'>flags</font><font face='Lucida Console'>(</font>oldflags<font face='Lucida Console'>)</font>; 
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>out<font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error serializing object of type bigint_kernel_c</font>"<font face='Lucida Console'>)</font>; 
+    <b>}</b>   
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        std::ios::fmtflags oldflags <font color='#5555FF'>=</font> in.<font color='#BB00BB'>flags</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;  
+        in.<font color='#BB00BB'>flags</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        in <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> item; in.<font color='#BB00BB'>flags</font><font face='Lucida Console'>(</font>oldflags<font face='Lucida Console'>)</font>; 
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>'<font face='Lucida Console'>)</font> 
+        <b>{</b>
+            item <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error deserializing object of type bigint_kernel_c</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>   
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='bigint_kernel_c'></a>bigint_kernel_c</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b><b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='bigint_kernel_c'></a>bigint_kernel_c</b> <font face='Lucida Console'>(</font>
+        uint32 value
+    <font face='Lucida Console'>)</font> : 
+        data<font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> value <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0xFFFFFFFF</font> ,
+            "<font color='#CC0000'>\tbigint::bigint(uint16)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t value must be &lt;= (2^32)-1</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tvalue:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> value
+            <font face='Lucida Console'>)</font>;        
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='bigint_kernel_c'></a>bigint_kernel_c</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font> :
+        data<font face='Lucida Console'>(</font>item.data<font face='Lucida Console'>)</font>
+    <b>{</b><b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    ~<b><a name='bigint_kernel_c'></a>bigint_kernel_c</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b><b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>data <font color='#5555FF'>+</font> rhs.data<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        data <font color='#5555FF'>+</font><font color='#5555FF'>=</font> rhs.data;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font> <font color='#5555FF'>&lt;</font> rhs<font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tconst bigint bigint::operator-(const bigint&amp;)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t *this should not be less than rhs</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t*this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#0000FF'>return</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font>rhs.data<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font> <font color='#5555FF'>&lt;</font> rhs<font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tbigint&amp; bigint::operator-=(const bigint&amp;)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t *this should not be less than rhs</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t*this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        data <font color='#5555FF'>-</font><font color='#5555FF'>=</font> rhs.data;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>data <font color='#5555FF'>*</font> rhs.data <font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        data <font color='#5555FF'>*</font><font color='#5555FF'>=</font> rhs.data;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>//make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>rhs <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tconst bigint bigint::operator/(const bigint&amp;)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t can't divide by zero</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#0000FF'>return</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>/</font>rhs.data<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>rhs <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tbigint&amp; bigint::operator/=(const bigint&amp;)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t can't divide by zero</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        data <font color='#5555FF'>/</font><font color='#5555FF'>=</font> rhs.data;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>rhs <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tconst bigint bigint::operator%(const bigint&amp;)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t can't divide by zero</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#0000FF'>return</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>%</font>rhs.data<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>rhs <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tbigint&amp; bigint::operator%=(const bigint&amp;)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t can't divide by zero</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        data <font color='#5555FF'>%</font><font color='#5555FF'>=</font> rhs.data;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> data <font color='#5555FF'>&lt;</font> rhs.data;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> data <font color='#5555FF'>=</font><font color='#5555FF'>=</font> rhs.data;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        data <font color='#5555FF'>=</font> rhs.data;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    std::ostream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        std::ostream<font color='#5555FF'>&amp;</font> out,
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs.data;
+        <font color='#0000FF'>return</font> out;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    std::istream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in,
+        bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        in <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> rhs.data;
+        <font color='#0000FF'>return</font> in;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>data;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>int</u></font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tbigint&amp; bigint::operator--()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t *this to subtract from *this it must not be zero to begin with</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>data;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>int</u></font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tconst bigint bigint::operator--(int)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t *this to subtract from *this it must not be zero to begin with</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#0000FF'>return</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+        uint16 l,
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint32 lhs <font color='#5555FF'>=</font> l;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> lhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>,
+            "<font color='#CC0000'>\tconst bigint operator+(uint16, const bigint&amp;)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t lhs must be &lt;= 65535</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tlhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> lhs
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>lhs<font face='Lucida Console'>)</font><font color='#5555FF'>+</font>rhs.data<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+        uint16 r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint32 rhs <font color='#5555FF'>=</font> r;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> rhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>,
+            "<font color='#CC0000'>\tconst bigint operator+(const bigint&amp;, uint16)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t rhs must be &lt;= 65535</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tlhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> lhs
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>lhs.data<font color='#5555FF'>+</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        uint16 r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint32 rhs <font color='#5555FF'>=</font> r;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> rhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>,
+            "<font color='#CC0000'>\tbigint&amp; bigint::operator+=(uint16)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t rhs must be &lt;= 65535</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t*this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs
+            <font face='Lucida Console'>)</font>;
+
+        data <font color='#5555FF'>+</font><font color='#5555FF'>=</font> rhs;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+        uint16 l,
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint32 lhs <font color='#5555FF'>=</font> l;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>lhs<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> rhs<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> lhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>,
+            "<font color='#CC0000'>\tconst bigint operator-(uint16,const bigint&amp;)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t lhs must be greater than or equal to rhs and lhs &lt;= 65535</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tlhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> lhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t&amp;lhs:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>&amp;</font>lhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t&amp;rhs:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>&amp;</font>rhs
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#0000FF'>return</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>lhs<font face='Lucida Console'>)</font><font color='#5555FF'>-</font>rhs.data<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+        uint16 r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint32 rhs <font color='#5555FF'>=</font> r;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>lhs <font color='#5555FF'>&lt;</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> rhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>,
+            "<font color='#CC0000'>\tconst bigint operator-(const bigint&amp;,uint16)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t lhs must be greater than or equal to rhs and rhs &lt;= 65535</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tlhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> lhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t&amp;lhs:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>&amp;</font>lhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t&amp;rhs:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>&amp;</font>rhs
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#0000FF'>return</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>lhs.data<font color='#5555FF'>-</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        uint16 r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint32 rhs <font color='#5555FF'>=</font> r;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> rhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>,
+            "<font color='#CC0000'>\tbigint&amp; bigint::operator-=(uint16)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t *this must not be less than rhs and rhs &lt;= 65535</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t*this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        data <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rhs<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+        uint16 l,
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint32 lhs <font color='#5555FF'>=</font> l;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> lhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>,
+            "<font color='#CC0000'>\tconst bigint operator*(uint16, const bigint&amp;)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t lhs must be &lt;= 65535</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tlhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> lhs
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>lhs<font color='#5555FF'>*</font>rhs.data<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+        uint16 r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint32 rhs <font color='#5555FF'>=</font> r;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> rhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>,
+            "<font color='#CC0000'>\tconst bigint operator*(const bigint&amp;, uint16)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t rhs must be &lt;= 65535</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tlhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> lhs
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>lhs.data<font color='#5555FF'>*</font>rhs<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        uint16 r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint32 rhs <font color='#5555FF'>=</font> r;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> rhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>,
+            "<font color='#CC0000'>\t bigint bigint::operator*=(uint16)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t rhs must be &lt;= 65535</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t*this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs
+            <font face='Lucida Console'>)</font>;
+
+        data <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rhs<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font> <font face='Lucida Console'>(</font>
+        uint16 l,
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint32 lhs <font color='#5555FF'>=</font> l;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>rhs <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> lhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>,
+            "<font color='#CC0000'>\tconst bigint operator/(uint16,const bigint&amp;)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you can't divide by zero and lhs &lt;= 65535</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t&amp;lhs:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>&amp;</font>lhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t&amp;rhs:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>&amp;</font>rhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tlhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> lhs
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#0000FF'>return</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>lhs<font color='#5555FF'>/</font>rhs.data<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+        uint16 r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint32 rhs <font color='#5555FF'>=</font> r;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>rhs <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> rhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>,
+            "<font color='#CC0000'>\tconst bigint operator/(const bigint&amp;,uint16)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you can't divide by zero and rhs &lt;= 65535</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t&amp;lhs:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>&amp;</font>lhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t&amp;rhs:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>&amp;</font>rhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#0000FF'>return</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>lhs.data<font color='#5555FF'>/</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        uint16 rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>rhs <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint32<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rhs<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>,
+            "<font color='#CC0000'>\tbigint&amp; bigint::operator/=(uint16)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you can't divide by zero and rhs must be &lt;= 65535</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        data <font color='#5555FF'>/</font><font color='#5555FF'>=</font> rhs;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font> <font face='Lucida Console'>(</font>
+        uint16 lhs,
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>rhs <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint32<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>lhs<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>,
+            "<font color='#CC0000'>\tconst bigint operator%(uint16,const bigint&amp;)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you can't divide by zero and lhs must be &lt;= 65535</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t&amp;lhs:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>&amp;</font>lhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t&amp;rhs:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>&amp;</font>rhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tlhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> lhs
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#0000FF'>return</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>lhs<font color='#5555FF'>%</font>rhs.data<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+        uint16 r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint32 rhs <font color='#5555FF'>=</font> r;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>rhs <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> rhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>,
+            "<font color='#CC0000'>\tconst bigint operator%(const bigint&amp;,uint16)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you can't divide by zero and rhs must be &lt;= 65535</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t&amp;lhs:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>&amp;</font>lhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t&amp;rhs:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>&amp;</font>rhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#0000FF'>return</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>lhs.data<font color='#5555FF'>%</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        uint16 r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+
+        uint32 rhs <font color='#5555FF'>=</font> r;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>rhs <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> rhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>,
+            "<font color='#CC0000'>\tbigint&amp; bigint::operator%=(uint16)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you can't divide by zero and rhs must be &lt;= 65535</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        data <font color='#5555FF'>%</font><font color='#5555FF'>=</font> rhs;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        uint16 l,
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint32 lhs <font color='#5555FF'>=</font> l;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> lhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>,
+            "<font color='#CC0000'>\tbool operator&lt;(uint16, const bigint&amp;)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t lhs must be &lt;= 65535</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tlhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> lhs
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>lhs<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> rhs.data;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+        uint16 r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint32 rhs <font color='#5555FF'>=</font> r;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> rhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>,
+            "<font color='#CC0000'>\tbool operator&lt;(const bigint&amp;, uint16)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t rhs must be &lt;= 65535</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tlhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> lhs
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> lhs.data <font color='#5555FF'>&lt;</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rhs<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+        uint16 r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint32 rhs <font color='#5555FF'>=</font> r;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> rhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>,
+            "<font color='#CC0000'>\tbool operator==(const bigint&amp;, uint16)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t rhs must be &lt;= 65535</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tlhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> lhs
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> lhs.data <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rhs<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        uint16 l,
+        <font color='#0000FF'>const</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint32 lhs <font color='#5555FF'>=</font> l;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> lhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>,
+            "<font color='#CC0000'>\tbool operator==(uint16, const bigint&amp;)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t lhs must be &lt;= 65535</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tlhs:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> lhs
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>lhs<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> rhs.data;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bigint_base
+        <font color='#5555FF'>&gt;</font>
+    bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> bigint_kernel_c<font color='#5555FF'>&lt;</font>bigint_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        uint16 r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint32 rhs <font color='#5555FF'>=</font> r;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> rhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>,
+            "<font color='#CC0000'>\tbigint bigint::operator=(uint16)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t rhs must be &lt;= 65535</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t*this:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tlhs:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs
+            <font face='Lucida Console'>)</font>;
+
+        data <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rhs<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BIGINT_KERNEl_C_
+</font>
+
+</pre></body></html>

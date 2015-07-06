@@ -1,0 +1,332 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - trust_region.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>optimization.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='optimization_test_functions.h.html'>optimization_test_functions.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../rand.h.html'>../rand.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib::test_functions;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.trust_region</font>"<font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='neg_rosen_model'></a>neg_rosen_model</b>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> column_vector;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>0</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> general_matrix;
+
+        T <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font> column_vector x<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rosen<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_derivative_and_hessian'></a>get_derivative_and_hessian</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> column_vector<font color='#5555FF'>&amp;</font> x,
+            column_vector<font color='#5555FF'>&amp;</font> d,
+            general_matrix<font color='#5555FF'>&amp;</font> h
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            d <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>matrix_cast<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rosen_derivative<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            h <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>matrix_cast<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rosen_hessian<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    dlib::rand rnd;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_with_rosen'></a>test_with_rosen</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> ans;
+        ans <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>1</font>;
+
+        matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> p <font color='#5555FF'>=</font> <font color='#979000'>100</font><font color='#5555FF'>*</font>matrix_cast<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>50</font>;
+
+        T obj <font color='#5555FF'>=</font> <font color='#BB00BB'>find_min_trust_region</font><font face='Lucida Console'>(</font><font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>12</font>, <font color='#979000'>100</font><font face='Lucida Console'>)</font>, rosen_function_model<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, p<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>obj<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font>, "<font color='#CC0000'>obj: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> obj<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>p<font color='#5555FF'>-</font>ans<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font>, "<font color='#CC0000'>length(p): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>p<font color='#5555FF'>-</font>ans<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> p2 <font color='#5555FF'>=</font> <font color='#979000'>100</font><font color='#5555FF'>*</font>matrix_cast<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>50</font>;
+        obj <font color='#5555FF'>=</font> <font color='#BB00BB'>find_max_trust_region</font><font face='Lucida Console'>(</font><font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>12</font>, <font color='#979000'>100</font><font face='Lucida Console'>)</font>, neg_rosen_model<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, p2<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>obj<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font>, "<font color='#CC0000'>obj: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> obj<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>p<font color='#5555FF'>-</font>ans<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font>, "<font color='#CC0000'>length(p): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>p<font color='#5555FF'>-</font>ans<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_trust_region_sub_problem'></a>test_trust_region_sub_problem</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>subproblem test 1</font>";
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> B;
+            B <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>0</font>,
+                <font color='#979000'>0</font>, <font color='#979000'>1</font>;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> g, p, ans;
+            g <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            ans <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#BB00BB'>solve_trust_region_subproblem</font><font face='Lucida Console'>(</font>B,g,<font color='#979000'>1</font>,p, <font color='#979000'>0.001</font>, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>p<font color='#5555FF'>-</font>ans<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>solve_trust_region_subproblem</font><font face='Lucida Console'>(</font>B,g,<font color='#979000'>1</font>,p, <font color='#979000'>0.001</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>p<font color='#5555FF'>-</font>ans<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>subproblem test 2</font>";
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> B;
+            B <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>0</font>,
+                <font color='#979000'>0</font>, <font color='#979000'>1</font>;
+
+            B <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>0.1</font>;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> g, p, ans;
+            g <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            ans <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>g <font color='#5555FF'>/</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>solve_trust_region_subproblem</font><font face='Lucida Console'>(</font>B,g,<font color='#979000'>1</font>,p, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>6</font>, <font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>p<font color='#5555FF'>-</font>ans<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>subproblem test 3</font>";
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> B;
+            B <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>,
+                <font color='#979000'>0</font>, <font color='#979000'>0</font>;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> g, p, ans;
+            g <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            ans <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>g <font color='#5555FF'>/</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>solve_trust_region_subproblem</font><font face='Lucida Console'>(</font>B,g,<font color='#979000'>1</font>,p, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>6</font>, <font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>ans: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>ans<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>p<font color='#5555FF'>-</font>ans<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>return</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>subproblem test 4</font>";
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> B;
+            B <font color='#5555FF'>=</font> <font color='#979000'>2</font>, <font color='#979000'>0</font>,
+                <font color='#979000'>0</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> g, p, ans;
+            g <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            ans <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+            <font color='#BB00BB'>solve_trust_region_subproblem</font><font face='Lucida Console'>(</font>B,g,<font color='#979000'>1</font>,p, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>6</font>, <font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>p<font color='#5555FF'>-</font>ans<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>subproblem test 5</font>";
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> B;
+            B <font color='#5555FF'>=</font> <font color='#979000'>2</font>, <font color='#979000'>0</font>,
+                <font color='#979000'>0</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> g, p, ans;
+            g <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>1</font>;
+
+            ans <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+            <font color='#BB00BB'>solve_trust_region_subproblem</font><font face='Lucida Console'>(</font>B,g,<font color='#979000'>1</font>,p, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>6</font>, <font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>p<font color='#5555FF'>-</font>ans<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>subproblem test 6</font>";
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>10</font>,<font color='#979000'>10</font><font color='#5555FF'>&gt;</font> B;
+
+            B <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>10</font>,<font color='#979000'>10</font>, rnd<font face='Lucida Console'>)</font>;
+
+            B <font color='#5555FF'>=</font> <font color='#979000'>0.01</font><font color='#5555FF'>*</font>B<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font>;
+
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>10</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> g, p, ans;
+            g <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            <font color='#BB00BB'>solve_trust_region_subproblem</font><font face='Lucida Console'>(</font>B,g,<font color='#979000'>1</font>,p, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>6</font>, <font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_problems'></a>test_problems</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>4</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> ch;
+
+            ch <font color='#5555FF'>=</font> <font color='#BB00BB'>brown_start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>find_min_trust_region</font><font face='Lucida Console'>(</font><font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font>, <font color='#979000'>80</font><font face='Lucida Console'>)</font>,
+                                  <font color='#BB00BB'>brown_function_model</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                  ch<font face='Lucida Console'>)</font>;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>brown obj: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>brown</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>brown der: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font color='#BB00BB'>brown_derivative</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>brown error: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>ch <font color='#5555FF'>-</font> <font color='#BB00BB'>brown_solution</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>ch <font color='#5555FF'>-</font> <font color='#BB00BB'>brown_solution</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> ch;
+
+            ch <font color='#5555FF'>=</font> rosen_start<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>find_min_trust_region</font><font face='Lucida Console'>(</font><font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font>, <font color='#979000'>80</font><font face='Lucida Console'>)</font>,
+                                  rosen_function_model<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                  ch<font face='Lucida Console'>)</font>;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>rosen obj: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>rosen</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>rosen der: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rosen_derivative</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>rosen error: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>ch <font color='#5555FF'>-</font> rosen_solution<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>ch <font color='#5555FF'>-</font> rosen_solution<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> ch;
+
+            ch <font color='#5555FF'>=</font> <font color='#BB00BB'>chebyquad_start</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>find_min_trust_region</font><font face='Lucida Console'>(</font><font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font>, <font color='#979000'>80</font><font face='Lucida Console'>)</font>,
+                                  <font color='#BB00BB'>chebyquad_function_model</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                  ch<font face='Lucida Console'>)</font>;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>chebyquad 2 obj: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>chebyquad</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>chebyquad 2 der: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font color='#BB00BB'>chebyquad_derivative</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>chebyquad 2 error: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>ch <font color='#5555FF'>-</font> <font color='#BB00BB'>chebyquad_solution</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>ch <font color='#5555FF'>-</font> <font color='#BB00BB'>chebyquad_solution</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> ch;
+
+            ch <font color='#5555FF'>=</font> <font color='#BB00BB'>chebyquad_start</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>find_min_trust_region</font><font face='Lucida Console'>(</font><font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font>, <font color='#979000'>80</font><font face='Lucida Console'>)</font>,
+                                  <font color='#BB00BB'>chebyquad_function_model</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                  ch<font face='Lucida Console'>)</font>;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>chebyquad 4 obj: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>chebyquad</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>chebyquad 4 der: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font color='#BB00BB'>chebyquad_derivative</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>chebyquad 4 error: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>ch <font color='#5555FF'>-</font> <font color='#BB00BB'>chebyquad_solution</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>ch <font color='#5555FF'>-</font> <font color='#BB00BB'>chebyquad_solution</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> ch;
+
+            ch <font color='#5555FF'>=</font> <font color='#BB00BB'>chebyquad_start</font><font face='Lucida Console'>(</font><font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>find_min_trust_region</font><font face='Lucida Console'>(</font><font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>12</font>, <font color='#979000'>80</font><font face='Lucida Console'>)</font>,
+                                  <font color='#BB00BB'>chebyquad_function_model</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                  ch<font face='Lucida Console'>)</font>;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>chebyquad 6 obj: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>chebyquad</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>chebyquad 6 der: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font color='#BB00BB'>chebyquad_derivative</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>chebyquad 6 error: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>ch <font color='#5555FF'>-</font> <font color='#BB00BB'>chebyquad_solution</font><font face='Lucida Console'>(</font><font color='#979000'>6</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>ch <font color='#5555FF'>-</font> <font color='#BB00BB'>chebyquad_solution</font><font face='Lucida Console'>(</font><font color='#979000'>6</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> ch;
+
+            ch <font color='#5555FF'>=</font> <font color='#BB00BB'>chebyquad_start</font><font face='Lucida Console'>(</font><font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>find_min_trust_region</font><font face='Lucida Console'>(</font><font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font>, <font color='#979000'>80</font><font face='Lucida Console'>)</font>,
+                                  <font color='#BB00BB'>chebyquad_function_model</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                  ch<font face='Lucida Console'>)</font>;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>chebyquad 8 obj: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>chebyquad</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>chebyquad 8 der: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font color='#BB00BB'>chebyquad_derivative</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>chebyquad 8 error: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>ch <font color='#5555FF'>-</font> <font color='#BB00BB'>chebyquad_solution</font><font face='Lucida Console'>(</font><font color='#979000'>8</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>ch <font color='#5555FF'>-</font> <font color='#BB00BB'>chebyquad_solution</font><font face='Lucida Console'>(</font><font color='#979000'>8</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+
+
+    <font color='#0000FF'>class</font> <b><a name='optimization_tester'></a>optimization_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='optimization_tester'></a>optimization_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_trust_region</font>",
+                    "<font color='#CC0000'>Runs tests on the trust region optimization component.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test with rosen&lt;float&gt;</font>";
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>50</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                test_with_rosen<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test with rosen&lt;double&gt;</font>";
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>50</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                test_with_rosen<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>test_trust_region_sub_problem</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>test_problems</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> a;
+
+<b>}</b>
+
+
+
+</pre></body></html>

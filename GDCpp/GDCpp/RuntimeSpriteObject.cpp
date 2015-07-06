@@ -87,9 +87,6 @@ RuntimeSpriteObject::~RuntimeSpriteObject()
 {
 };
 
-/**
- * Update animation and direction from the inital position
- */
 bool RuntimeSpriteObject::ExtraInitializationFromInitialInstance(const gd::InitialInstance & position)
 {
     if ( position.floatInfos.find("animation") != position.floatInfos.end() )
@@ -98,9 +95,6 @@ bool RuntimeSpriteObject::ExtraInitializationFromInitialInstance(const gd::Initi
     return true;
 }
 
-/**
- * Render object at runtime
- */
 bool RuntimeSpriteObject::Draw( sf::RenderTarget & renderTarget )
 {
     //Don't draw anything if hidden
@@ -114,33 +108,21 @@ bool RuntimeSpriteObject::Draw( sf::RenderTarget & renderTarget )
     return true;
 }
 
-/**
- * Get the real X position of the sprite
- */
 float RuntimeSpriteObject::GetDrawableX() const
 {
     return X - GetCurrentSprite().GetOrigin().GetX()*fabs(scaleX);
 }
 
-/**
- * Get the real Y position of the sprite
- */
 float RuntimeSpriteObject::GetDrawableY() const
 {
     return Y - GetCurrentSprite().GetOrigin().GetY()*fabs(scaleY);
 }
 
-/**
- * Get the width of the current sprite.
- */
 float RuntimeSpriteObject::GetWidth() const
 {
     return scaleX > 0 ? GetCurrentSFMLSprite().getLocalBounds().width*scaleX : -GetCurrentSFMLSprite().getLocalBounds().width*scaleX;
 }
 
-/**
- * Get the height of the current sprite.
- */
 float RuntimeSpriteObject::GetHeight() const
 {
     return scaleY > 0 ? GetCurrentSFMLSprite().getLocalBounds().height*scaleY : -GetCurrentSFMLSprite().getLocalBounds().height*scaleY;
@@ -166,28 +148,13 @@ void RuntimeSpriteObject::SetHeight(float newHeight)
     }
 }
 
-void RuntimeSpriteObject::SetOriginalSize()
-{
-    scaleX = 1;
-    scaleY = 1;
-    needUpdateCurrentSprite = true;
-}
-
-/**
- * X center is computed with the current sprite
- */
 float RuntimeSpriteObject::GetCenterX() const
 {
-    //Just need to multiply by the scale as it is the center
     return GetCurrentSprite().GetCenter().GetX()*fabs(scaleX);
 }
 
-/**
- * Y center is computed with the current sprite
- */
 float RuntimeSpriteObject::GetCenterY() const
 {
-    //Just need to multiply by the scale as it is the center
     return GetCurrentSprite().GetCenter().GetY()*fabs(scaleY);
 }
 
@@ -243,6 +210,34 @@ void RuntimeSpriteObject::ChangeScale( const gd::String & operatorStr, double ne
     }
 
     return;
+}
+
+void RuntimeSpriteObject::SetScaleX(float val)
+{
+    if (val == GetScaleX()) return;
+    if (val < 0) val = 0;
+
+    scaleX = val * (isFlippedX ? -1.0 : 1.0);
+    needUpdateCurrentSprite = true;
+}
+
+void RuntimeSpriteObject::SetScaleY(float val)
+{
+    if (val == GetScaleY()) return;
+    if (val < 0) val = 0;
+
+    scaleY = val * (isFlippedY ? -1.0 : 1.0);
+    needUpdateCurrentSprite = true;
+}
+
+float RuntimeSpriteObject::GetScaleX() const
+{
+    return fabs(scaleX);
+}
+
+float RuntimeSpriteObject::GetScaleY() const
+{
+    return fabs(scaleY);
 }
 
 void RuntimeSpriteObject::CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, const gd::String & imageName, float xPosition, float yPosition, bool useTransparency)
@@ -325,10 +320,6 @@ void RuntimeSpriteObject::UpdateCurrentSprite() const
     needUpdateCurrentSprite = false;
 }
 
-
-/**
- * Update the time elpased on the current sprite, and change this latter if needed.
- */
 void RuntimeSpriteObject::UpdateTime(float elapsedTime)
 {
     if ( animationStopped || currentAnimation >= GetAnimationsCount() ) return;
@@ -339,7 +330,6 @@ void RuntimeSpriteObject::UpdateTime(float elapsedTime)
 
     float delay = direction.GetTimeBetweenFrames();
 
-    //On gère l'avancement du sprite actuel suivant le temps entre chaque sprite
     if ( timeElapsedOnCurrentSprite > delay )
     {
         if ( delay != 0 )
@@ -360,9 +350,6 @@ void RuntimeSpriteObject::UpdateTime(float elapsedTime)
     needUpdateCurrentSprite = true;
 }
 
-/**
- * Get the SFML sprite
- */
 const sf::Sprite & RuntimeSpriteObject::GetCurrentSFMLSprite() const
 {
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
@@ -370,9 +357,6 @@ const sf::Sprite & RuntimeSpriteObject::GetCurrentSFMLSprite() const
     return ptrToCurrentSprite->GetSFMLSprite();
 }
 
-/**
- * Get the ( GDevelop ) sprite
- */
 const gd::Sprite & RuntimeSpriteObject::GetCurrentSprite() const
 {
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
@@ -380,9 +364,6 @@ const gd::Sprite & RuntimeSpriteObject::GetCurrentSprite() const
     return *ptrToCurrentSprite;
 }
 
-/**
- * Get object hit box(es)
- */
 std::vector<Polygon2d> RuntimeSpriteObject::GetHitBoxes() const
 {
     if ( currentAnimation >= animations.size() )
@@ -407,9 +388,6 @@ std::vector<Polygon2d> RuntimeSpriteObject::GetHitBoxes() const
     return polygons;
 }
 
-/**
- * Change the number of the current sprite
- */
 bool RuntimeSpriteObject::SetSprite( unsigned int nb )
 {
     if ( currentAnimation >= GetAnimationsCount() ||
@@ -423,9 +401,6 @@ bool RuntimeSpriteObject::SetSprite( unsigned int nb )
     return true;
 }
 
-/**
- * Change the number of the current animation
- */
 bool RuntimeSpriteObject::SetCurrentAnimation( unsigned int nb )
 {
     if ( nb >= GetAnimationsCount() ) return false;
@@ -440,10 +415,6 @@ bool RuntimeSpriteObject::SetCurrentAnimation( unsigned int nb )
     return true;
 }
 
-/**
- * Change the value of the current direction.
- * If Sprite is using a direction which use angle, the function behave as SetAngle.
- */
 bool RuntimeSpriteObject::SetDirection( float nb )
 {
     if ( currentAnimation >= GetAnimationsCount() ) return false;
@@ -471,10 +442,6 @@ bool RuntimeSpriteObject::SetDirection( float nb )
     }
 }
 
-/**
- * Set the angle of a sprite object, which corresponds to its direction.
- * If Sprite is using a direction which do not use angle, the direction is deduced from the angle.
- */
 bool RuntimeSpriteObject::SetAngle(float newAngle)
 {
     if ( currentAnimation >= GetAnimationsCount() ) return false;
@@ -496,9 +463,6 @@ bool RuntimeSpriteObject::SetAngle(float newAngle)
     return true;
 }
 
-/**
- * Get the angle of a sprite object, which corresponds to its direction.
- */
 float RuntimeSpriteObject::GetAngle() const
 {
     if ( currentAnimation >= GetAnimationsCount() ) return 0;
@@ -527,9 +491,6 @@ bool RuntimeSpriteObject::AnimationEnded() const
     return ( !direction.IsLooping() && currentSprite == direction.GetSpritesCount()-1 );
 }
 
-/**
- * Change the opacity of the object
- */
 void RuntimeSpriteObject::SetOpacity( float val )
 {
     if ( val > 255 )
@@ -541,9 +502,6 @@ void RuntimeSpriteObject::SetOpacity( float val )
     needUpdateCurrentSprite = true;
 }
 
-/**
- * Change the color filter of the sprite object
- */
 void RuntimeSpriteObject::SetColor( unsigned int r, unsigned int v, unsigned int b )
 {
     colorR = r;
@@ -556,20 +514,21 @@ void RuntimeSpriteObject::FlipX(bool flip)
 {
     if ( flip != isFlippedX )
     {
-        scaleX *= -1;
+        scaleX *= -1.0;
         needUpdateCurrentSprite = true;
     }
     isFlippedX = flip;
-};
+}
+
 void RuntimeSpriteObject::FlipY(bool flip)
 {
     if ( flip != isFlippedY )
     {
-        scaleY *= -1;
+        scaleY *= -1.0;
         needUpdateCurrentSprite = true;
     }
     isFlippedY = flip;
-};
+}
 
 bool RuntimeSpriteObject::CursorOnObject(RuntimeScene & scene, bool accurate)
 {

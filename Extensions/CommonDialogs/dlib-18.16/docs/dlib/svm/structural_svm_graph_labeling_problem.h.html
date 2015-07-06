@@ -1,0 +1,545 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - structural_svm_graph_labeling_problem.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_STRUCTURAL_SVM_GRAPH_LAbELING_PROBLEM_Hh_
+<font color='#0000FF'>#define</font> DLIB_STRUCTURAL_SVM_GRAPH_LAbELING_PROBLEM_Hh_
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='structural_svm_graph_labeling_problem_abstract.h.html'>structural_svm_graph_labeling_problem_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../graph_cuts.h.html'>../graph_cuts.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array.h.html'>../array.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iterator<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='structural_svm_problem_threaded.h.html'>structural_svm_problem_threaded.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../graph.h.html'>../graph.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sparse_vector.h.html'>sparse_vector.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> graph_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_graph_labeling_problem'></a>is_graph_labeling_problem</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> dlib::array<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels,
+        std::string<font color='#5555FF'>&amp;</font> reason_for_failure
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> graph_type::type node_vector_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> graph_type::edge_type edge_vector_type;
+        <font color='#009900'>// The graph must use all dense vectors or all sparse vectors.  It can't mix the two types together.
+</font>        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>is_matrix<font color='#5555FF'>&lt;</font>node_vector_type<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> is_matrix<font color='#5555FF'>&lt;</font>edge_vector_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                            <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>is_matrix<font color='#5555FF'>&lt;</font>node_vector_type<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>is_matrix<font color='#5555FF'>&lt;</font>edge_vector_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                            
+
+        std::ostringstream sout;
+        reason_for_failure.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_learning_problem</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            reason_for_failure <font color='#5555FF'>=</font> "<font color='#CC0000'>is_learning_problem(samples, labels) returned false.</font>";
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> ismat <font color='#5555FF'>=</font> is_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> graph_type::type<font color='#5555FF'>&gt;</font>::value;
+
+        <font color='#009900'>// these are -1 until assigned with a value
+</font>        <font color='#0000FF'><u>long</u></font> node_dims <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <font color='#0000FF'><u>long</u></font> edge_dims <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>samples[i].<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> labels[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>samples[</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>].number_of_nodes() doesn't match labels[</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>].size().</font>";
+                reason_for_failure <font color='#5555FF'>=</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>graph_contains_length_one_cycle</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>graph_contains_length_one_cycle(samples[</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>]) returned true.</font>";
+                reason_for_failure <font color='#5555FF'>=</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> samples[i].<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ismat <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> samples[i].<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>A graph contains an empty vector at node: samples[</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>].node(</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>j<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>).data.</font>";
+                    reason_for_failure <font color='#5555FF'>=</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ismat <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> node_dims <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                    node_dims <font color='#5555FF'>=</font> samples[i].<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#009900'>// all nodes must have vectors of the same size. 
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ismat <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>samples[i].<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> node_dims<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Not all node vectors in samples[</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>] are the same dimension.</font>";
+                    reason_for_failure <font color='#5555FF'>=</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> samples[i].<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>n<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ismat <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> samples[i].<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.<font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>A graph contains an empty vector at edge: samples[</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>].node(</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>j<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>).edge(</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>n<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>).</font>";
+                        reason_for_failure <font color='#5555FF'>=</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>samples[i].<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.<font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>A graph contains negative values on an edge vector at: samples[</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>].node(</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>j<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>).edge(</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>n<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>).</font>";
+                        reason_for_failure <font color='#5555FF'>=</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                    <b>}</b>
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ismat <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> edge_dims <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                        edge_dims <font color='#5555FF'>=</font> samples[i].<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.<font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#009900'>// all edges must have vectors of the same size.
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ismat <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>samples[i].<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.<font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> edge_dims<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Not all edge vectors in samples[</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>] are the same dimension.</font>";
+                        reason_for_failure <font color='#5555FF'>=</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> graph_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_graph_labeling_problem'></a>is_graph_labeling_problem</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> dlib::array<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::string reason_for_failure;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>is_graph_labeling_problem</font><font face='Lucida Console'>(</font>samples, labels, reason_for_failure<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='sizes_match'></a>sizes_match</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> rhs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> lhs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lhs[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> rhs[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='all_values_are_nonnegative'></a>all_values_are_nonnegative</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> x[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x[i][j] <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'>typename</font> enable <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font>
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='fvect'></a>fvect</b>
+        <b>{</b>
+            <font color='#009900'>// In this case type should be some sparse vector type
+</font>            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type type;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='fvect'></a>fvect</b><font color='#5555FF'>&lt;</font>T, <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T::type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&gt;</font>
+        <b>{</b>
+            <font color='#009900'>// The point of this stuff is to create the proper matrix
+</font>            <font color='#009900'>// type to represent the concatenation of an edge vector
+</font>            <font color='#009900'>// with an node vector.
+</font>            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type      node_mat;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::edge_type edge_mat;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NRd <font color='#5555FF'>=</font> node_mat::NR; 
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NRe <font color='#5555FF'>=</font> edge_mat::NR; 
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>NRd<font color='#5555FF'>!</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>NRe<font color='#5555FF'>!</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> ? <font face='Lucida Console'>(</font>NRd<font color='#5555FF'>+</font>NRe<font face='Lucida Console'>)</font> : <font color='#979000'>0</font>;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> node_mat::value_type value_type;
+
+            <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>value_type,NR,<font color='#979000'>1</font>, <font color='#0000FF'>typename</font> node_mat::mem_manager_type, <font color='#0000FF'>typename</font> node_mat::layout_type<font color='#5555FF'>&gt;</font> type;
+        <b>}</b>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> graph_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='structural_svm_graph_labeling_problem'></a>structural_svm_graph_labeling_problem</b> : noncopyable,
+        <font color='#0000FF'>public</font> structural_svm_problem_threaded<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font>, 
+                                            <font color='#0000FF'>typename</font> dlib::impl::fvect<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font>::type <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> matrix_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> dlib::impl::fvect<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font>::type feature_vector_type;
+
+        <font color='#0000FF'>typedef</font> graph_type sample_type;
+
+        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> label_type;
+
+        <b><a name='structural_svm_graph_labeling_problem'></a>structural_svm_graph_labeling_problem</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> dlib::array<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples_,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels_,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> losses_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads <font color='#5555FF'>=</font> <font color='#979000'>2</font>
+        <font face='Lucida Console'>)</font> :
+            structural_svm_problem_threaded<font color='#5555FF'>&lt;</font>matrix_type,feature_vector_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>num_threads<font face='Lucida Console'>)</font>,
+            samples<font face='Lucida Console'>(</font>samples_<font face='Lucida Console'>)</font>,
+            labels<font face='Lucida Console'>(</font>labels_<font face='Lucida Console'>)</font>,
+            losses<font face='Lucida Console'>(</font>losses_<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font><font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+            std::string reason_for_failure;
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_graph_labeling_problem</font><font face='Lucida Console'>(</font>samples, labels, reason_for_failure<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> ,
+                    "<font color='#CC0000'>\t structural_svm_graph_labeling_problem::structural_svm_graph_labeling_problem()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t reason_for_failure: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> reason_for_failure 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t samples.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t labels.size():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font> <font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>losses.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font color='#BB00BB'>sizes_match</font><font face='Lucida Console'>(</font>labels, losses<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        <font color='#BB00BB'>all_values_are_nonnegative</font><font face='Lucida Console'>(</font>losses<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+                    "<font color='#CC0000'>\t structural_svm_graph_labeling_problem::structural_svm_graph_labeling_problem()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t labels.size():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t losses.size():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> losses.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t sizes_match(labels,losses): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>sizes_match</font><font face='Lucida Console'>(</font>labels,losses<font face='Lucida Console'>)</font> 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t all_values_are_nonnegative(losses): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>all_values_are_nonnegative</font><font face='Lucida Console'>(</font>losses<font face='Lucida Console'>)</font> 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font> <font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+
+            loss_pos <font color='#5555FF'>=</font> <font color='#979000'>1.0</font>;
+            loss_neg <font color='#5555FF'>=</font> <font color='#979000'>1.0</font>;
+
+            <font color='#009900'>// figure out how many dimensions are in the node and edge vectors.
+</font>            node_dims <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            edge_dims <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> samples[i].<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    node_dims <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>node_dims,<font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>samples[i].<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.data<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> samples[i].<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>n<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        edge_dims <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>edge_dims, <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>samples[i].<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.<font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_losses'></a>get_losses</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> losses; <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='get_num_edge_weights'></a>get_num_edge_weights</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#0000FF'>return</font> edge_dims;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_loss_on_positive_class'></a>set_loss_on_positive_class</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> loss
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>loss <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>get_losses</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                    "<font color='#CC0000'>\t void structural_svm_graph_labeling_problem::set_loss_on_positive_class()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t loss: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> loss 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font> <font face='Lucida Console'>)</font>;
+
+            loss_pos <font color='#5555FF'>=</font> loss;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_loss_on_negative_class'></a>set_loss_on_negative_class</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> loss
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>loss <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>get_losses</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                    "<font color='#CC0000'>\t void structural_svm_graph_labeling_problem::set_loss_on_negative_class()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t loss: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> loss 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font> <font face='Lucida Console'>)</font>;
+
+            loss_neg <font color='#5555FF'>=</font> loss;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_loss_on_negative_class'></a>get_loss_on_negative_class</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_losses</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                    "<font color='#CC0000'>\t double structural_svm_graph_labeling_problem::get_loss_on_negative_class()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font> <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> loss_neg; 
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_loss_on_positive_class'></a>get_loss_on_positive_class</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_losses</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                    "<font color='#CC0000'>\t double structural_svm_graph_labeling_problem::get_loss_on_positive_class()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font> <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> loss_pos; 
+        <b>}</b>
+
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_dimensions'></a>get_num_dimensions</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            <font color='#009900'>// The psi/w vector will begin with all the edge dims and then follow with the node dims.
+</font>            <font color='#0000FF'>return</font> edge_dims <font color='#5555FF'>+</font> node_dims;
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_samples'></a>get_num_samples</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            <font color='#0000FF'>return</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> psi_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>psi_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='get_joint_feature_vector'></a>get_joint_feature_vector</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> sample, 
+            <font color='#0000FF'>const</font> label_type<font color='#5555FF'>&amp;</font> label,
+            psi_type<font color='#5555FF'>&amp;</font> psi
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            psi.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            psi <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> sample.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// accumulate the node vectors
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>label[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>set_rowm</font><font face='Lucida Console'>(</font>psi, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font>edge_dims, psi.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> sample.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data;
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> sample.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>n<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> sample.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// Don't double count edges.  Also only include the vector if
+</font>                    <font color='#009900'>// the labels disagree.
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font> j <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> label[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> label[j]<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>set_rowm</font><font face='Lucida Console'>(</font>psi, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, edge_dims<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> sample.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='add_to_sparse_vect'></a>add_to_sparse_vect</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> psi,
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> vect,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> offset 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> T::const_iterator i <font color='#5555FF'>=</font> vect.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> vect.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                psi.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>psi.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font color='#5555FF'>+</font>offset, i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='subtract_from_sparse_vect'></a>subtract_from_sparse_vect</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> psi,
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> vect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> T::const_iterator i <font color='#5555FF'>=</font> vect.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> vect.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                psi.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>psi.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first, <font color='#5555FF'>-</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> psi_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>psi_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='get_joint_feature_vector'></a>get_joint_feature_vector</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> sample, 
+            <font color='#0000FF'>const</font> label_type<font color='#5555FF'>&amp;</font> label,
+            psi_type<font color='#5555FF'>&amp;</font> psi
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            psi.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> sample.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// accumulate the node vectors
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>label[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>add_to_sparse_vect</font><font face='Lucida Console'>(</font>psi, sample.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data, edge_dims<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> sample.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>n<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> sample.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// Don't double count edges.  Also only include the vector if
+</font>                    <font color='#009900'>// the labels disagree.
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font> j <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> label[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> label[j]<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>subtract_from_sparse_vect</font><font face='Lucida Console'>(</font>psi, sample.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='get_truth_joint_feature_vector'></a>get_truth_joint_feature_vector</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> idx,
+            feature_vector_type<font color='#5555FF'>&amp;</font> psi 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            <font color='#BB00BB'>get_joint_feature_vector</font><font face='Lucida Console'>(</font>samples[idx], labels[idx], psi<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='separation_oracle'></a>separation_oracle</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> idx,
+            <font color='#0000FF'>const</font> matrix_type<font color='#5555FF'>&amp;</font> current_solution,
+            <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> loss,
+            feature_vector_type<font color='#5555FF'>&amp;</font> psi
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> samp <font color='#5555FF'>=</font> samples[idx];
+
+            <font color='#009900'>// setup the potts graph based on samples[idx] and current_solution.
+</font>            graph<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::kernel_1a g; 
+            <font color='#BB00BB'>copy_graph_structure</font><font face='Lucida Console'>(</font>samp, g<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>current_solution,<font color='#BB00BB'>range</font><font face='Lucida Console'>(</font>edge_dims,current_solution.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                                    samp.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// Include a loss augmentation so that we will get the proper loss augmented
+</font>                <font color='#009900'>// max when we use find_max_factor_graph_potts() below.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>labels[idx][i]<font face='Lucida Console'>)</font>
+                    g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>get_loss_for_sample</font><font face='Lucida Console'>(</font>idx,i,<font color='#5555FF'>!</font>labels[idx][i]<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>get_loss_for_sample</font><font face='Lucida Console'>(</font>idx,i,<font color='#5555FF'>!</font>labels[idx][i]<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>n<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#009900'>// Don't compute an edge weight more than once. 
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font> j<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>current_solution,<font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,edge_dims<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                                                samp.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+
+            <b>}</b>
+
+            std::vector<font color='#5555FF'>&lt;</font>node_label<font color='#5555FF'>&gt;</font> labeling;
+            <font color='#BB00BB'>find_max_factor_graph_potts</font><font face='Lucida Console'>(</font>g, labeling<font face='Lucida Console'>)</font>;
+
+
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> bool_labeling;
+            bool_labeling.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>labeling.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// figure out the loss
+</font>            loss <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> labeling.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> predicted_label <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>labeling[i]<font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                bool_labeling.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>predicted_label<font face='Lucida Console'>)</font>;
+                loss <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>get_loss_for_sample</font><font face='Lucida Console'>(</font>idx, i, predicted_label<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>// compute psi
+</font>            <font color='#BB00BB'>get_joint_feature_vector</font><font face='Lucida Console'>(</font>samp, bool_labeling, psi<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_loss_for_sample'></a>get_loss_for_sample</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> sample_idx,
+            <font color='#0000FF'><u>long</u></font> node_idx,
+            <font color='#0000FF'><u>bool</u></font> predicted_label
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= sample_idx &lt; labels.size()
+                - 0 &lt;= node_idx &lt; labels[sample_idx].size()
+            ensures
+                - returns the loss incurred for predicting that the node
+                  samples[sample_idx].node(node_idx) has a label of predicted_label.
+        !*/</font>
+        <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> true_label <font color='#5555FF'>=</font> labels[sample_idx][node_idx];
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>true_label <font color='#5555FF'>!</font><font color='#5555FF'>=</font> predicted_label<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>losses.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>return</font> losses[sample_idx][node_idx];
+                    <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>true_label <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>return</font> loss_pos;
+                    <font color='#0000FF'>else</font>
+                        <font color='#0000FF'>return</font> loss_neg;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// no loss for making the correct prediction.
+</font>                    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+                <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> dlib::array<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples;
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels;
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> losses;
+
+        <font color='#0000FF'><u>long</u></font> node_dims;
+        <font color='#0000FF'><u>long</u></font> edge_dims;
+        <font color='#0000FF'><u>double</u></font> loss_pos;
+        <font color='#0000FF'><u>double</u></font> loss_neg;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_STRUCTURAL_SVM_GRAPH_LAbELING_PROBLEM_Hh_
+</font>
+
+
+</pre></body></html>

@@ -1,0 +1,471 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sequence_segmenter.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SEQUENCE_SeGMENTER_H_h_
+<font color='#0000FF'>#define</font> DLIB_SEQUENCE_SeGMENTER_H_h_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sequence_segmenter_abstract.h.html'>sequence_segmenter_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sequence_labeler.h.html'>sequence_labeler.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#009900'>// This namespace contains implementation details for the sequence_segmenter.
+</font>    <font color='#0000FF'>namespace</font> impl_ss
+    <b>{</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#009900'>// BIO/BILOU labels
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> BEGIN   <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> INSIDE  <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> OUTSIDE <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> LAST    <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> UNIT    <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> ss_feature_extractor<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='feature_extractor'></a>feature_extractor</b>
+        <b>{</b>
+            <font color='#009900'>/*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is a feature extractor for a sequence_labeler.  It serves to map
+                    the interface defined by a sequence_labeler into the kind of interface
+                    defined for a sequence_segmenter.
+            !*/</font>
+
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> ss_feature_extractor::sequence_type sequence_type;
+
+            ss_feature_extractor fe;
+
+            <b><a name='feature_extractor'></a>feature_extractor</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <b><a name='feature_extractor'></a>feature_extractor</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> ss_feature_extractor<font color='#5555FF'>&amp;</font> ss_fe_<font face='Lucida Console'>)</font> : fe<font face='Lucida Console'>(</font>ss_fe_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_nonnegative_weights'></a>num_nonnegative_weights</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> NL <font color='#5555FF'>=</font> ss_feature_extractor::use_BIO_model ? <font color='#979000'>3</font> : <font color='#979000'>5</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ss_feature_extractor::allow_negative_weights<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// We make everything non-negative except for the label transition
+</font>                    <font color='#009900'>// and bias features.
+</font>                    <font color='#0000FF'>return</font> <font color='#BB00BB'>num_features</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> NL<font color='#5555FF'>*</font>NL <font color='#5555FF'>-</font> NL;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.fe, out<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>feature_extractor<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.fe, in<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_features'></a>num_features</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> NL <font color='#5555FF'>=</font> ss_feature_extractor::use_BIO_model ? <font color='#979000'>3</font> : <font color='#979000'>5</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ss_feature_extractor::use_high_order_features<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> NL <font color='#5555FF'>+</font> NL<font color='#5555FF'>*</font>NL <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>NL<font color='#5555FF'>*</font>NL<font color='#5555FF'>+</font>NL<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>fe.<font color='#BB00BB'>num_features</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>fe.<font color='#BB00BB'>window_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    <font color='#0000FF'>return</font> NL <font color='#5555FF'>+</font> NL<font color='#5555FF'>*</font>NL <font color='#5555FF'>+</font> NL<font color='#5555FF'>*</font>fe.<font color='#BB00BB'>num_features</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>fe.<font color='#BB00BB'>window_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='order'></a>order</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+            <b>{</b> 
+                <font color='#0000FF'>return</font> <font color='#979000'>1</font>; 
+            <b>}</b>
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_labels'></a>num_labels</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+            <b>{</b> 
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ss_feature_extractor::use_BIO_model<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>3</font>;
+                <font color='#0000FF'>else</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>5</font>;
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> feature_setter<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'>struct</font> <b><a name='dot_functor'></a>dot_functor</b>
+            <b>{</b>
+                <font color='#009900'>/*!
+                    WHAT THIS OBJECT REPRESENTS
+                        This class wraps the feature_setter used by a sequence_labeler
+                        and turns it into the kind needed by a sequence_segmenter.
+                !*/</font>
+
+                <b><a name='dot_functor'></a>dot_functor</b><font face='Lucida Console'>(</font>feature_setter<font color='#5555FF'>&amp;</font> set_feature_, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> offset_<font face='Lucida Console'>)</font> : 
+                    set_feature<font face='Lucida Console'>(</font>set_feature_<font face='Lucida Console'>)</font>, offset<font face='Lucida Console'>(</font>offset_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+                feature_setter<font color='#5555FF'>&amp;</font> set_feature;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> offset;
+
+                <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> feat_index
+                <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>set_feature</font><font face='Lucida Console'>(</font>offset<font color='#5555FF'>+</font>feat_index<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> feat_index,
+                    <font color='#0000FF'><u>double</u></font> feat_value
+                <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>set_feature</font><font face='Lucida Console'>(</font>offset<font color='#5555FF'>+</font>feat_index, feat_value<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>;
+
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'><u>bool</u></font> <b><a name='reject_labeling'></a>reject_labeling</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> sequence_type<font color='#5555FF'>&amp;</font> x,
+                <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> y,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ss_feature_extractor::use_BIO_model<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// Don't allow BIO label patterns that don't correspond to a sensical
+</font>                    <font color='#009900'>// segmentation. 
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>y.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> INSIDE <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> OUTSIDE<font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>y.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> INSIDE<font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// Don't allow BILOU label patterns that don't correspond to a sensical
+</font>                    <font color='#009900'>// segmentation. 
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>y.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> BEGIN <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> OUTSIDE<font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> BEGIN <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> UNIT<font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> BEGIN <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> BEGIN<font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> INSIDE <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> BEGIN<font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> INSIDE <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> OUTSIDE<font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> INSIDE <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> UNIT<font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> OUTSIDE <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> INSIDE<font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> OUTSIDE <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> LAST<font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> LAST <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> INSIDE<font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> LAST <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> LAST<font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> UNIT <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> INSIDE<font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> UNIT <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> LAST<font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+                        <font color='#009900'>// if at the end of the sequence
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pos <font color='#5555FF'>=</font><font color='#5555FF'>=</font> x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> BEGIN<font face='Lucida Console'>)</font>
+                                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> INSIDE<font face='Lucida Console'>)</font>
+                                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                        <b>}</b>
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> INSIDE<font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> LAST<font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+                        <font color='#009900'>// if at the end of the sequence
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pos <font color='#5555FF'>=</font><font color='#5555FF'>=</font> x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> BEGIN<font face='Lucida Console'>)</font>
+                                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> feature_setter, <font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'><u>void</u></font> <b><a name='get_features'></a>get_features</b> <font face='Lucida Console'>(</font>
+                feature_setter<font color='#5555FF'>&amp;</font> set_feature,
+                <font color='#0000FF'>const</font> sequence_type<font color='#5555FF'>&amp;</font> x,
+                <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> y,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> position
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> offset <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> window_size <font color='#5555FF'>=</font> fe.<font color='#BB00BB'>window_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> base_dims <font color='#5555FF'>=</font> fe.<font color='#BB00BB'>num_features</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> window_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> pos <font color='#5555FF'>=</font> i<font color='#5555FF'>-</font>window_size<font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>position<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> pos <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pos <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> off1 <font color='#5555FF'>=</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>base_dims;
+                        dot_functor<font color='#5555FF'>&lt;</font>feature_setter<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>fs1</font><font face='Lucida Console'>(</font>set_feature, offset<font color='#5555FF'>+</font>off1<font face='Lucida Console'>)</font>;
+                        fe.<font color='#BB00BB'>get_features</font><font face='Lucida Console'>(</font>fs1, x, pos<font face='Lucida Console'>)</font>;
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ss_feature_extractor::use_high_order_features <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> y.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> off2 <font color='#5555FF'>=</font> <font color='#BB00BB'>num_labels</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>base_dims <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>num_labels</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>base_dims;
+                            dot_functor<font color='#5555FF'>&lt;</font>feature_setter<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>fs2</font><font face='Lucida Console'>(</font>set_feature, offset<font color='#5555FF'>+</font>off2<font face='Lucida Console'>)</font>;
+                            fe.<font color='#BB00BB'>get_features</font><font face='Lucida Console'>(</font>fs2, x, pos<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ss_feature_extractor::use_high_order_features<font face='Lucida Console'>)</font>
+                        offset <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>num_labels</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>base_dims <font color='#5555FF'>+</font> <font color='#BB00BB'>num_labels</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>num_labels</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>base_dims;
+                    <font color='#0000FF'>else</font>
+                        offset <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>num_labels</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>base_dims;
+                <b>}</b>
+
+                <font color='#009900'>// Pull out an indicator feature for the type of transition between the
+</font>                <font color='#009900'>// previous label and the current label.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>y.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>set_feature</font><font face='Lucida Console'>(</font>offset <font color='#5555FF'>+</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>num_labels</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                offset <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>num_labels</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>num_labels</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#009900'>// pull out an indicator feature for the current label.  This is the per
+</font>                <font color='#009900'>// label bias.
+</font>                <font color='#BB00BB'>set_feature</font><font face='Lucida Console'>(</font>offset <font color='#5555FF'>+</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+
+    <b>}</b> <font color='#009900'>// end namespace impl_ss
+</font>
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='total_feature_vector_size'></a>total_feature_vector_size</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> fe
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> NL <font color='#5555FF'>=</font> feature_extractor::use_BIO_model ? <font color='#979000'>3</font> : <font color='#979000'>5</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>feature_extractor::use_high_order_features<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> NL <font color='#5555FF'>+</font> NL<font color='#5555FF'>*</font>NL <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>NL<font color='#5555FF'>*</font>NL<font color='#5555FF'>+</font>NL<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>fe.<font color='#BB00BB'>num_features</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>fe.<font color='#BB00BB'>window_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> NL <font color='#5555FF'>+</font> NL<font color='#5555FF'>*</font>NL <font color='#5555FF'>+</font> NL<font color='#5555FF'>*</font>fe.<font color='#BB00BB'>num_features</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>fe.<font color='#BB00BB'>window_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='sequence_segmenter'></a>sequence_segmenter</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> feature_extractor::sequence_type sample_sequence_type;
+        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> segmented_sequence_type;
+
+
+        <b><a name='sequence_segmenter'></a>sequence_segmenter</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+<font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+            <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> fe <font color='#5555FF'>=</font> labeler.<font color='#BB00BB'>get_feature_extractor</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.fe;
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>fe.<font color='#BB00BB'>window_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> fe.<font color='#BB00BB'>num_features</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+                "<font color='#CC0000'>\t sequence_segmenter::sequence_segmenter()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t An invalid feature extractor was supplied.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t fe.window_size():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> fe.<font color='#BB00BB'>window_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t fe.num_features(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> fe.<font color='#BB00BB'>num_features</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+        <b>}</b>
+
+        <font color='#0000FF'>explicit</font> <b><a name='sequence_segmenter'></a>sequence_segmenter</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> weights
+        <font face='Lucida Console'>)</font> : 
+            labeler<font face='Lucida Console'>(</font>weights<font face='Lucida Console'>)</font>
+        <b>{</b>
+<font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+            <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> fe <font color='#5555FF'>=</font> labeler.<font color='#BB00BB'>get_feature_extractor</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.fe;
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>total_feature_vector_size</font><font face='Lucida Console'>(</font>fe<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>weights.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\t sequence_segmenter::sequence_segmenter(weights)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t These sizes should match</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t total_feature_vector_size(fe):  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>total_feature_vector_size</font><font face='Lucida Console'>(</font>fe<font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t weights.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> weights.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>fe.<font color='#BB00BB'>window_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> fe.<font color='#BB00BB'>num_features</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+                "<font color='#CC0000'>\t sequence_segmenter::sequence_segmenter()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t An invalid feature extractor was supplied.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t fe.window_size():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> fe.<font color='#BB00BB'>window_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t fe.num_features(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> fe.<font color='#BB00BB'>num_features</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+        <b>}</b>
+
+        <b><a name='sequence_segmenter'></a>sequence_segmenter</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> weights,
+            <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> fe
+        <font face='Lucida Console'>)</font> :
+            labeler<font face='Lucida Console'>(</font>weights, impl_ss::feature_extractor<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>fe<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>total_feature_vector_size</font><font face='Lucida Console'>(</font>fe<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>weights.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\t sequence_segmenter::sequence_segmenter(weights,fe)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t These sizes should match</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t total_feature_vector_size(fe):  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>total_feature_vector_size</font><font face='Lucida Console'>(</font>fe<font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t weights.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> weights.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>fe.<font color='#BB00BB'>window_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> fe.<font color='#BB00BB'>num_features</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+                "<font color='#CC0000'>\t sequence_segmenter::sequence_segmenter()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t An invalid feature extractor was supplied.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t fe.window_size():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> fe.<font color='#BB00BB'>window_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t fe.num_features(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> fe.<font color='#BB00BB'>num_features</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> <b><a name='get_feature_extractor'></a>get_feature_extractor</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> labeler.<font color='#BB00BB'>get_feature_extractor</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.fe; <b>}</b>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_weights'></a>get_weights</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> labeler.<font color='#BB00BB'>get_weights</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        segmented_sequence_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_sequence_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            segmented_sequence_type y;
+            <font color='#BB00BB'>segment_sequence</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> y;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='segment_sequence'></a>segment_sequence</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_sequence_type<font color='#5555FF'>&amp;</font> x,
+            segmented_sequence_type<font color='#5555FF'>&amp;</font> y
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            y.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> labels;
+            labeler.<font color='#BB00BB'>label_sequence</font><font face='Lucida Console'>(</font>x, labels<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>feature_extractor::use_BIO_model<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// Convert from BIO tagging to the explicit segments representation.
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>labels[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> impl_ss::BEGIN<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> begin <font color='#5555FF'>=</font> i;
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+                        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> labels[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> impl_ss::INSIDE<font face='Lucida Console'>)</font>
+                            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+
+                        y.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>begin, i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>i;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// Convert from BILOU tagging to the explicit segments representation.
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>labels[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> impl_ss::BEGIN<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> begin <font color='#5555FF'>=</font> i;
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+                        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> labels[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> impl_ss::INSIDE<font face='Lucida Console'>)</font>
+                            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+
+                        y.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>begin, i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>labels[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> impl_ss::UNIT<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        y.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>i, i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> sequence_segmenter<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> version <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>version, out<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Save these just so we can compare them when we deserialize and make
+</font>            <font color='#009900'>// sure the feature_extractor being used is compatible with the model being
+</font>            <font color='#009900'>// loaded.
+</font>            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>feature_extractor::use_BIO_model, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>feature_extractor::use_high_order_features, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font><font color='#BB00BB'>total_feature_vector_size</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>get_feature_extractor</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, out<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.labeler, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>sequence_segmenter<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> version <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>version, in<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>version <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unexpected version found while deserializing dlib::sequence_segmenter.</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Try to check if the saved model is compatible with the current feature
+</font>            <font color='#009900'>// extractor.
+</font>            <font color='#0000FF'><u>bool</u></font> use_BIO_model, use_high_order_features;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> dims;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>use_BIO_model, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>use_high_order_features, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>dims, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.labeler, in<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>use_BIO_model <font color='#5555FF'>!</font><font color='#5555FF'>=</font> feature_extractor::use_BIO_model<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Incompatible feature extractor found while deserializing </font>"
+                    "<font color='#CC0000'>dlib::sequence_segmenter. Wrong value of use_BIO_model.</font>"<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>use_high_order_features <font color='#5555FF'>!</font><font color='#5555FF'>=</font> feature_extractor::use_high_order_features<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Incompatible feature extractor found while deserializing </font>"
+                    "<font color='#CC0000'>dlib::sequence_segmenter. Wrong value of use_high_order_features.</font>"<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dims <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#BB00BB'>total_feature_vector_size</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>get_feature_extractor</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Incompatible feature extractor found while deserializing </font>"
+                    "<font color='#CC0000'>dlib::sequence_segmenter. Wrong value of total_feature_vector_size().</font>"<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        sequence_labeler<font color='#5555FF'>&lt;</font>impl_ss::feature_extractor<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> labeler;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SEQUENCE_SeGMENTER_H_h_
+</font>
+
+
+</pre></body></html>

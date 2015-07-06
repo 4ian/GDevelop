@@ -1,0 +1,780 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - style_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net), and Nils Labugt
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_WIDGETs_STYLE_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_WIDGETs_STYLE_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../gui_core.h.html'>../gui_core.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='widgets_abstract.h.html'>widgets_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../unicode/unicode_abstract.h.html'>../unicode/unicode_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// button styles  
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='button_style'></a>button_style</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an abstract class that defines the interface a
+                button style object must implement.
+
+                Note that derived classes must be copyable via
+                their copy constructors.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='button_style'></a>button_style</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='redraw_on_mouse_over'></a>redraw_on_mouse_over</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>false</font>; <b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - if (this style draws buttons differently when a mouse is over them) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> rectangle <b><a name='get_invalidation_rect'></a>get_invalidation_rect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> rect; <b>}</b>
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+                - rect == the get_rect() that defines where the button is
+            ensures
+                - returns a rectangle that should be invalidated whenever a button
+                  needs to redraw itself.  (e.g. If you wanted your button style to
+                  draw outside the button then you could return a larger rectangle)
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> rectangle <b><a name='get_min_size'></a>get_min_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+            ensures
+                - returns a rectangle that represents the minimum size of the button
+                  given the name and font.
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_button'></a>draw_button</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lastx,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lasty,
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+                - c == the canvas to draw on
+                - rect, enabled, mfont, lastx, and lasty are the variables
+                  defined in the protected section of the drawable class.
+                - name == the name of the button to be drawn
+                - is_depressed == true if the button is to be drawn in a depressed state
+            ensures
+                - draws the button on the canvas c at the location given by rect.  
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='button_style_default'></a>button_style_default</b> : <font color='#0000FF'>public</font> button_style
+    <b>{</b>
+        <font color='#009900'>/*!
+            This is the default style for button objects.  It will cause
+            a button to appear as the simple MS Windows 2000 button style.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='button_style_toolbar1'></a>button_style_toolbar1</b> : <font color='#0000FF'>public</font> button_style
+    <b>{</b>
+        <font color='#009900'>/*!
+            This draws a simple toolbar style button that displays its name in the
+            middle of itself.  When the mouse moves over it it will light up.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='button_style_toolbar_icon1'></a>button_style_toolbar_icon1</b> : <font color='#0000FF'>public</font> button_style
+    <b>{</b>
+        <font color='#009900'>/*!
+            This draws a simple toolbar style button that displays an image in the 
+            middle of itself.  When the mouse moves over it it will light up.
+        !*/</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+        <b><a name='button_style_toolbar_icon1'></a>button_style_toolbar_icon1</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img, 
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> border_size <font color='#5555FF'>=</font> <font color='#979000'>6</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - image_type == an implementation of array2d/array2d_kernel_abstract.h
+                - pixel_traits&lt;typename image_type::type&gt; is defined
+            ensures
+                - displays image img in the middle of the button
+                - the distance between the edge of the button and the image
+                  will be border_size pixels
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='button_style_arrow'></a>button_style_arrow</b> : <font color='#0000FF'>public</font> button_style
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#009900'>/*!
+            This draws a simple button with an arrow in it 
+        !*/</font>
+
+        <font color='#0000FF'>enum</font> <b><a name='arrow_direction'></a>arrow_direction</b> 
+        <b>{</b>
+            UP,
+            DOWN,
+            LEFT,
+            RIGHT
+        <b>}</b>;
+
+        <b><a name='button_style_arrow'></a>button_style_arrow</b> <font face='Lucida Console'>(</font>
+            arrow_direction dir
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - the arrow in the button will point in the given direction
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// toggle button styles  
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='toggle_button_style'></a>toggle_button_style</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an abstract class that defines the interface a
+                toggle button style object must implement.
+
+                Note that derived classes must be copyable via
+                their copy constructors.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='toggle_button_style'></a>toggle_button_style</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='redraw_on_mouse_over'></a>redraw_on_mouse_over</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>false</font>; <b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - if (this style draws buttons differently when a mouse is over them) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> rectangle <b><a name='get_min_size'></a>get_min_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+            ensures
+                - returns a rectangle that represents the minimum size of the button
+                  given the name and font.
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_toggle_button'></a>draw_toggle_button</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lastx,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lasty,
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_checked 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+                - c == the canvas to draw on
+                - rect, enabled, mfont, lastx, and lasty are the variables
+                  defined in the protected section of the drawable class.
+                - name == the name of the button to be drawn
+                - is_depressed == true if the button is to be drawn in a depressed state
+                - is_checked == true if the toggle_button is in the checked state 
+            ensures
+                - draws the button on the canvas c at the location given by rect.  
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='toggle_button_style_default'></a>toggle_button_style_default</b> : <font color='#0000FF'>public</font> toggle_button_style
+    <b>{</b>
+        <font color='#009900'>/*!
+            This is the default style for toggle_button objects.  It will cause
+            a button to appear as the simple MS Windows 2000 button style.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='toggle_button_style_check_box'></a>toggle_button_style_check_box</b> : <font color='#0000FF'>public</font> toggle_button_style
+    <b>{</b>
+        <font color='#009900'>/*!
+            This draws a simple check box style toggle button that displays its 
+            name to the right of a check box. 
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='toggle_button_style_radio_button'></a>toggle_button_style_radio_button</b> : <font color='#0000FF'>public</font> toggle_button_style
+    <b>{</b>
+        <font color='#009900'>/*!
+            This draws a simple radio button style toggle button that displays its 
+            name to the right of a circular radio button. 
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// scroll_bar styles  
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='scroll_bar_style'></a>scroll_bar_style</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an abstract class that defines the interface a
+                scroll_bar style object must implement.
+
+                Note that derived classes must be copyable via
+                their copy constructors.
+
+                There are three parts of a scroll bar, the slider, the background,
+                and the two buttons on its ends.  The "slider" is the thing that you
+                drag around on the scroll bar and the "background" is the part
+                in between the slider and the buttons on the ends.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='scroll_bar_style'></a>scroll_bar_style</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='redraw_on_mouse_over_slider'></a>redraw_on_mouse_over_slider</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>false</font>; <b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - if (this style draws a scroll_bar's slider differently when a mouse is over it
+                  or it is being dragged) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_width'></a>get_width</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+            ensures
+                - returns the width in pixels of the scroll bar
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_slider_length'></a>get_slider_length</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> total_length,
+            <font color='#0000FF'><u>long</u></font> max_pos
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+                - total_length == the total length in pixels of the scroll bar
+                - max_pos == the value of scroll_bar::max_slider_pos() for this
+                  scroll bar
+            ensures
+                - returns the length in pixels of the scroll bar's slider
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_button_length'></a>get_button_length</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> total_length,
+            <font color='#0000FF'><u>long</u></font> max_pos
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+                - total_length == the total length in pixels of the scroll bar
+                - max_pos == the value of scroll_bar::max_slider_pos() for this
+                  scroll bar
+            ensures
+                - returns the length in pixels of each of the scroll bar's
+                  buttons
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_scroll_bar_background'></a>draw_scroll_bar_background</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lastx,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lasty,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+                - c == the canvas to draw on
+                - rect, enabled, lastx, and lasty are the variables
+                  defined in the protected section of the drawable class.
+                - is_depressed == true if the background area of the scroll_bar is to 
+                  be drawn in a depressed state (because the user is clicking on it)
+            ensures
+                - draws the background part of the scroll_bar on the canvas c at the 
+                  location given by rect.  
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_scroll_bar_slider'></a>draw_scroll_bar_slider</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lastx,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lasty,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_being_dragged
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+                - c == the canvas to draw on
+                - rect, enabled, lastx, and lasty are the variables
+                  defined in the protected section of the drawable class
+                - is_being_dragged == true if the user is dragging the slider
+            ensures
+                - draws the slider part of the scroll_bar on the canvas c at the 
+                  location given by rect.  
+        !*/</font>
+
+        button_style_type <b><a name='get_up_button_style'></a>get_up_button_style</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the type of button_style to use for a button on the
+                  top side of a vertical scroll bar.
+        !*/</font>
+
+        button_style_type <b><a name='get_down_button_style'></a>get_down_button_style</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the type of button_style to use for a button on the
+                  bottom side of a vertical scroll bar.
+        !*/</font>
+
+        button_style_type <b><a name='get_left_button_style'></a>get_left_button_style</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the type of button_style to use for a button on the
+                  left side of a horizontal scroll bar.
+        !*/</font>
+
+        button_style_type <b><a name='get_right_button_style'></a>get_right_button_style</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the type of button_style to use for a button on the
+                  right side of a horizontal scroll bar.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='scroll_bar_style_default'></a>scroll_bar_style_default</b> : <font color='#0000FF'>public</font> scroll_bar_style
+    <b>{</b>
+        <font color='#009900'>/*!
+            This is the default style for scroll_bar objects.  It will cause
+            a scroll_bar to appear as the simple MS Windows 2000 scroll_bar style.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// scrollable_region (and zoomable_region) styles  
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='scrollable_region_style'></a>scrollable_region_style</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an abstract class that defines the interface a
+                scrollable_region and zoomable_region style object must implement.
+
+                Note that derived classes must be copyable via
+                their copy constructors.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='scrollable_region_style'></a>scrollable_region_style</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_border_size'></a>get_border_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+            ensures
+                - returns the size of the border region in pixels 
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_scrollable_region_border'></a>draw_scrollable_region_border</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+                - c == the canvas to draw on
+                - rect and enabled are the variables defined in the protected section 
+                  of the drawable class.
+            ensures
+                - draws the border part of a scrollable_region on the canvas c at the 
+                  location given by rect.  
+        !*/</font>
+
+        scroll_bar_style_type <b><a name='get_horizontal_scroll_bar_style'></a>get_horizontal_scroll_bar_style</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the style of scroll_bar to use for the 
+                  horizontal scroll_bar in this widget.
+        !*/</font>
+
+        scroll_bar_style_type <b><a name='get_vertical_scroll_bar_style'></a>get_vertical_scroll_bar_style</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the style of scroll_bar to use for the 
+                  vertical scroll_bar in this widget.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='scrollable_region_style_default'></a>scrollable_region_style_default</b> : <font color='#0000FF'>public</font> scrollable_region_style
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#009900'>/*!
+            This is the default style for scrollable_region and zoomable_region objects.  
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// text_box styles  
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='text_box_style'></a>text_box_style</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an abstract class that defines the interface a
+                text_box style object must implement.
+
+                Note that derived classes must be copyable via
+                their copy constructors.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='text_field_style'></a>text_field_style</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        scrollable_region_style_type <b><a name='get_scrollable_region_style'></a>get_scrollable_region_style</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the style of scrollable_region to use for the 
+                  text_box.
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_padding'></a>get_padding</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+            ensures
+                - returns the number of pixels that separate the text in the text_box 
+                  from the edge of the text_box widget itself.
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_text_box'></a>draw_text_box</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> display_rect,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> text_rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> text,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> cursor_rect,
+            <font color='#0000FF'>const</font> rgb_pixel<font color='#5555FF'>&amp;</font> text_color,
+            <font color='#0000FF'>const</font> rgb_pixel<font color='#5555FF'>&amp;</font> bg_color,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> has_focus,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> cursor_visible,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> highlight_start,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> highlight_end
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+                - c == the canvas to draw on
+                - enabled and mfont are the variables defined in the protected section 
+                - text_rect == the rectangle in which we should draw the given text
+                  of the drawable class.
+                - display_rect == the rectangle returned by scrollable_region::display_rect()
+                - text == the current text in the text_box 
+                - cursor_rect == A rectangle of width 1 that represents the current
+                  position of the cursor on the screen.
+                - text_color == the color of the text to be drawn
+                - bg_color == the background color of the text field
+                - has_focus == true if this text field has keyboard input focus
+                - cursor_visible == true if the cursor should be drawn 
+                - if (highlight_start &lt;= highlight_end) then
+                    - text[highlight_start] though text[highlight_end] should be
+                      highlighted
+            ensures
+                - draws the text_box on the canvas c at the location given by text_rect.
+                  (Note that the scroll bars and borders are drawn by the scrollable_region
+                  and therefore the style returned by get_scrollable_region_style() 
+                  controls how those appear)
+                - doesn't draw anything outside display_rect
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='text_box_style_default'></a>text_box_style_default</b> : <font color='#0000FF'>public</font> text_box_style
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#009900'>/*!
+            This is the default style for text_box objects.  
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// list_box styles  
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='list_box_style'></a>list_box_style</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an abstract class that defines the interface a
+                list_box style object must implement.
+
+                Note that derived classes must be copyable via
+                their copy constructors.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='list_box_style'></a>list_box_style</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_list_box_background'></a>draw_list_box_background</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> display_rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+                - c == the canvas to draw on
+                - display_rect == the display_rect for the list_box.  This is the area
+                  in which list box items are drawn (see display_rect in the scrollable_region
+                  widget for more info)
+                - enabled == true if the list box is enabled
+            ensures
+                - draws the background of a list box on the canvas c at the location given 
+                  by display_rect.  
+        !*/</font>
+
+        scrollable_region_style_type <b><a name='get_scrollable_region_style'></a>get_scrollable_region_style</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the style of scrollable_region to use for the 
+                  list_box.
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_list_box_item'></a>draw_list_box_item</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> display_rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> text,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_selected
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+                - c == the canvas to draw on
+                - rect == the rectangle that defines where on the screen this list box item is.
+                - display_rect == the display_rect for the list_box.  This is the area
+                  in which list box items are drawn (see display_rect in the scrollable_region
+                  widget for more info)
+                - mfont == the font to use to draw the list box item
+                - text == the text of the list box item to be drawn
+                - enabled == true if the list box is enabled
+                - is_selected == true if the item is to be drawn in a selected state
+            ensures
+                - draws the list box item on the canvas c at the location given by rect.  
+        !*/</font>
+
+        <font color='#009900'>// wide character overloads
+</font>        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_list_box_item'></a>draw_list_box_item</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> display_rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> std::wstring<font color='#5555FF'>&amp;</font> text,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_selected
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_list_box_item'></a>draw_list_box_item</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> display_rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> text,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_selected
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='list_box_style_default'></a>list_box_style_default</b> : <font color='#0000FF'>public</font> list_box_style
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#009900'>/*!
+            This is the default style for list_box objects.  
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// text_field styles  
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='text_field_style'></a>text_field_style</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an abstract class that defines the interface a
+                text_field style object must implement.
+
+                Note that derived classes must be copyable via
+                their copy constructors.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='text_field_style'></a>text_field_style</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_padding'></a>get_padding</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+            ensures
+                - returns the number of pixels that separate the text in the text_field
+                  from the edge of the text_field widget itself.
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_text_field'></a>draw_text_field</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> text_rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> text,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> cursor_x,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> text_pos,
+            <font color='#0000FF'>const</font> rgb_pixel<font color='#5555FF'>&amp;</font> text_color,
+            <font color='#0000FF'>const</font> rgb_pixel<font color='#5555FF'>&amp;</font> bg_color,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> has_focus,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> cursor_visible,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> highlight_start,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> highlight_end
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+                - c == the canvas to draw on
+                - rect, enabled, and mfont are the variables defined in the protected section 
+                  of the drawable class.
+                - text == the current text in the text_field 
+                - text_rect == the rectangle in which we should draw the given text
+                - cursor_x == the x coordinate of the cursor relative to the left side 
+                  of rect.  i.e. the number of pixels that separate the cursor from the
+                  left side of the text_field.
+                - text_pos == the index of the first letter in text that appears in 
+                  this text field.
+                - text_color == the color of the text to be drawn
+                - bg_color == the background color of the text field
+                - has_focus == true if this text field has keyboard input focus
+                - cursor_visible == true if the cursor should be drawn 
+                - if (highlight_start &lt;= highlight_end) then
+                    - text[highlight_start] though text[highlight_end] should be
+                      highlighted
+            ensures
+                - draws the text_field on the canvas c at the location given by rect.  
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='text_field_style_default'></a>text_field_style_default</b> : <font color='#0000FF'>public</font> text_field_style
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#009900'>/*!
+            This is the default style for text_field objects.  
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_WIDGETs_STYLE_ABSTRACT_
+</font>
+
+
+
+</pre></body></html>

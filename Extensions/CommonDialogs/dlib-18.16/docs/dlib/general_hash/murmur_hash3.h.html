@@ -1,0 +1,520 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - murmur_hash3.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MURMUR_HAsH_3_Hh_ 
+<font color='#0000FF'>#define</font> DLIB_MURMUR_HAsH_3_Hh_ 
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='murmur_hash3_abstract.h.html'>murmur_hash3_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>utility<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#009900'>//-----------------------------------------------------------------------------
+</font>    <font color='#009900'>// The original MurmurHash3 code was written by Austin Appleby, and is placed 
+</font>    <font color='#009900'>// in the public domain. The author hereby disclaims copyright to this source code.
+</font>    <font color='#009900'>// The code in this particular file was modified by Davis E. King.  In
+</font>    <font color='#009900'>// particular, endian-swapping was added along with some other minor code
+</font>    <font color='#009900'>// changes like avoiding strict aliasing violations.
+</font>
+
+    <font color='#009900'>//-----------------------------------------------------------------------------
+</font>    <font color='#009900'>// Platform-specific functions and macros
+</font>
+    <font color='#009900'>// Microsoft Visual Studio
+</font>
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>_MSC_VER<font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>#define</font> DLIB_FORCE_INLINE	__forceinline
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>stdlib.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#define</font> DLIB_ROTL32<font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>	_rotl<font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> DLIB_ROTL64<font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>	_rotl64<font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>#define</font> DLIB_BIG_CONSTANT<font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>
+
+    <font color='#009900'>// Other compilers
+</font>
+<font color='#0000FF'>#else</font>	<font color='#009900'>// defined(_MSC_VER)
+</font>
+<font color='#0000FF'>#define</font>	DLIB_FORCE_INLINE __attribute__<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>always_inline<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#0000FF'>inline</font> 
+
+    <font color='#0000FF'>inline</font> uint32 <b><a name='murmur_rotl32'></a>murmur_rotl32</b> <font face='Lucida Console'>(</font> uint32 x, int8 r <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> r<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font><font color='#979000'>32</font> <font color='#5555FF'>-</font> r<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> uint64 <b><a name='murmur_rotl64'></a>murmur_rotl64</b> <font face='Lucida Console'>(</font> uint64 x, int8 r <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> r<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font><font color='#979000'>64</font> <font color='#5555FF'>-</font> r<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#0000FF'>#define</font>	DLIB_ROTL32<font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>	dlib::murmur_rotl32<font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> DLIB_ROTL64<font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>	dlib::murmur_rotl64<font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>#define</font> DLIB_BIG_CONSTANT<font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>x##LLU<font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// !defined(_MSC_VER)
+</font>
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// Block read - if your platform needs to do endian-swapping or can only
+</font>    <font color='#009900'>// handle aligned reads, do the conversion here
+</font>
+    DLIB_FORCE_INLINE uint32 <b><a name='murmur_getblock'></a>murmur_getblock</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> uint32 <font color='#5555FF'>*</font> p, <font color='#0000FF'><u>int</u></font> i <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// The reason we do a memcpy() here instead of simply returning p[i] is because
+</font>        <font color='#009900'>// doing it this way avoids violations of the strict aliasing rule when all these
+</font>        <font color='#009900'>// functions are inlined into the user's code.
+</font>        uint32 temp;
+        <font color='#BB00BB'>memcpy</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>temp, p<font color='#5555FF'>+</font>i, <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+    DLIB_FORCE_INLINE uint32 <b><a name='murmur_getblock_byte_swap'></a>murmur_getblock_byte_swap</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> uint32 <font color='#5555FF'>*</font> p, <font color='#0000FF'><u>int</u></font> i <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>union</font> 
+        <b>{</b>
+            uint8 bytes[<font color='#979000'>4</font>];
+            uint32 val;
+        <b>}</b> temp;
+
+        <font color='#0000FF'>const</font> uint8<font color='#5555FF'>*</font> pp <font color='#5555FF'>=</font> <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> uint8<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>p <font color='#5555FF'>+</font> i<font face='Lucida Console'>)</font>;
+        temp.bytes[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> pp[<font color='#979000'>3</font>];
+        temp.bytes[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> pp[<font color='#979000'>2</font>];
+        temp.bytes[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> pp[<font color='#979000'>1</font>];
+        temp.bytes[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> pp[<font color='#979000'>0</font>];
+
+        <font color='#0000FF'>return</font> temp.val;
+    <b>}</b>
+
+    DLIB_FORCE_INLINE uint64 <b><a name='murmur_getblock'></a>murmur_getblock</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> uint64 <font color='#5555FF'>*</font> p, <font color='#0000FF'><u>int</u></font> i <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// The reason we do a memcpy() here instead of simply returning p[i] is because
+</font>        <font color='#009900'>// doing it this way avoids violations of the strict aliasing rule when all these
+</font>        <font color='#009900'>// functions are inlined into the user's code.
+</font>        uint64 temp;
+        <font color='#BB00BB'>memcpy</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>temp, p<font color='#5555FF'>+</font>i, <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+    DLIB_FORCE_INLINE uint64 <b><a name='murmur_getblock_byte_swap'></a>murmur_getblock_byte_swap</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> uint64 <font color='#5555FF'>*</font> p, <font color='#0000FF'><u>int</u></font> i <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>union</font> 
+        <b>{</b>
+            uint8 bytes[<font color='#979000'>8</font>];
+            uint64 val;
+        <b>}</b> temp;
+
+        <font color='#0000FF'>const</font> uint8<font color='#5555FF'>*</font> pp <font color='#5555FF'>=</font> <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> uint8<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>p <font color='#5555FF'>+</font> i<font face='Lucida Console'>)</font>;
+        temp.bytes[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> pp[<font color='#979000'>7</font>];
+        temp.bytes[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> pp[<font color='#979000'>6</font>];
+        temp.bytes[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> pp[<font color='#979000'>5</font>];
+        temp.bytes[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> pp[<font color='#979000'>4</font>];
+        temp.bytes[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> pp[<font color='#979000'>3</font>];
+        temp.bytes[<font color='#979000'>5</font>] <font color='#5555FF'>=</font> pp[<font color='#979000'>2</font>];
+        temp.bytes[<font color='#979000'>6</font>] <font color='#5555FF'>=</font> pp[<font color='#979000'>1</font>];
+        temp.bytes[<font color='#979000'>7</font>] <font color='#5555FF'>=</font> pp[<font color='#979000'>0</font>];
+
+        <font color='#0000FF'>return</font> temp.val;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// Finalization mix - force all bits of a hash block to avalanche
+</font>
+    DLIB_FORCE_INLINE uint32 <b><a name='murmur_fmix'></a>murmur_fmix</b> <font face='Lucida Console'>(</font> uint32 h <font face='Lucida Console'>)</font>
+    <b>{</b>
+        h ^<font color='#5555FF'>=</font> h <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>16</font>;
+        h <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>0x85ebca6b</font>;
+        h ^<font color='#5555FF'>=</font> h <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>13</font>;
+        h <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>0xc2b2ae35</font>;
+        h ^<font color='#5555FF'>=</font> h <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>16</font>;
+
+        <font color='#0000FF'>return</font> h;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    DLIB_FORCE_INLINE uint64 <b><a name='murmur_fmix'></a>murmur_fmix</b> <font face='Lucida Console'>(</font> uint64 k <font face='Lucida Console'>)</font>
+    <b>{</b>
+        k ^<font color='#5555FF'>=</font> k <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>33</font>;
+        k <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_BIG_CONSTANT</font><font face='Lucida Console'>(</font><font color='#979000'>0xff51afd7ed558ccd</font><font face='Lucida Console'>)</font>;
+        k ^<font color='#5555FF'>=</font> k <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>33</font>;
+        k <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_BIG_CONSTANT</font><font face='Lucida Console'>(</font><font color='#979000'>0xc4ceb9fe1a85ec53</font><font face='Lucida Console'>)</font>;
+        k ^<font color='#5555FF'>=</font> k <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>33</font>;
+
+        <font color='#0000FF'>return</font> k;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> uint32 <b><a name='murmur_hash3'></a>murmur_hash3</b> <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font> key, 
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> len, 
+        <font color='#0000FF'>const</font> uint32 seed <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> uint8 <font color='#5555FF'>*</font> data <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> uint8<font color='#5555FF'>*</font><font face='Lucida Console'>)</font>key;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> nblocks <font color='#5555FF'>=</font> len <font color='#5555FF'>/</font> <font color='#979000'>4</font>;
+
+        uint32 h1 <font color='#5555FF'>=</font> seed;
+
+        uint32 c1 <font color='#5555FF'>=</font> <font color='#979000'>0xcc9e2d51</font>;
+        uint32 c2 <font color='#5555FF'>=</font> <font color='#979000'>0x1b873593</font>;
+
+        <font color='#009900'>//----------
+</font>        <font color='#009900'>// body
+</font>
+        <font color='#0000FF'>const</font> uint32 <font color='#5555FF'>*</font> blocks <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> uint32 <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>data <font color='#5555FF'>+</font> nblocks<font color='#5555FF'>*</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> is_little_endian <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        uint32 endian_test <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>endian_test<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            is_little_endian <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_little_endian<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>nblocks; i; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                uint32 k1 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_getblock</font><font face='Lucida Console'>(</font>blocks,i<font face='Lucida Console'>)</font>;
+
+                k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c1;
+                k1 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL32</font><font face='Lucida Console'>(</font>k1,<font color='#979000'>15</font><font face='Lucida Console'>)</font>;
+                k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c2;
+
+                h1 ^<font color='#5555FF'>=</font> k1;
+                h1 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL32</font><font face='Lucida Console'>(</font>h1,<font color='#979000'>13</font><font face='Lucida Console'>)</font>; 
+                h1 <font color='#5555FF'>=</font> h1<font color='#5555FF'>*</font><font color='#979000'>5</font><font color='#5555FF'>+</font><font color='#979000'>0xe6546b64</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>nblocks; i; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                uint32 k1 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_getblock_byte_swap</font><font face='Lucida Console'>(</font>blocks,i<font face='Lucida Console'>)</font>;
+
+                k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c1;
+                k1 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL32</font><font face='Lucida Console'>(</font>k1,<font color='#979000'>15</font><font face='Lucida Console'>)</font>;
+                k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c2;
+
+                h1 ^<font color='#5555FF'>=</font> k1;
+                h1 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL32</font><font face='Lucida Console'>(</font>h1,<font color='#979000'>13</font><font face='Lucida Console'>)</font>; 
+                h1 <font color='#5555FF'>=</font> h1<font color='#5555FF'>*</font><font color='#979000'>5</font><font color='#5555FF'>+</font><font color='#979000'>0xe6546b64</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>//----------
+</font>        <font color='#009900'>// tail
+</font>
+        <font color='#0000FF'>const</font> uint8 <font color='#5555FF'>*</font> tail <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> uint8<font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>data <font color='#5555FF'>+</font> nblocks<font color='#5555FF'>*</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+        uint32 k1 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>switch</font><font face='Lucida Console'>(</font>len <font color='#5555FF'>&amp;</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>case</font> <font color='#979000'>3</font>: k1 ^<font color='#5555FF'>=</font> tail[<font color='#979000'>2</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>16</font>;
+            <font color='#0000FF'>case</font> <font color='#979000'>2</font>: k1 ^<font color='#5555FF'>=</font> tail[<font color='#979000'>1</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>8</font>;
+            <font color='#0000FF'>case</font> <font color='#979000'>1</font>: k1 ^<font color='#5555FF'>=</font> tail[<font color='#979000'>0</font>];
+                    k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c1; k1 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL32</font><font face='Lucida Console'>(</font>k1,<font color='#979000'>15</font><font face='Lucida Console'>)</font>; k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c2; h1 ^<font color='#5555FF'>=</font> k1;
+        <b>}</b>;
+
+        <font color='#009900'>//----------
+</font>        <font color='#009900'>// finalization
+</font>
+        h1 ^<font color='#5555FF'>=</font> len;
+
+        h1 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_fmix</font><font face='Lucida Console'>(</font>h1<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> h1;
+    <b>}</b> 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> uint32 <b><a name='murmur_hash3_2'></a>murmur_hash3_2</b> <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> uint32 v1,
+        <font color='#0000FF'>const</font> uint32 v2 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint32 h1 <font color='#5555FF'>=</font> v2;
+
+        uint32 c1 <font color='#5555FF'>=</font> <font color='#979000'>0xcc9e2d51</font>;
+        uint32 c2 <font color='#5555FF'>=</font> <font color='#979000'>0x1b873593</font>;
+
+        <font color='#009900'>//----------
+</font>        <font color='#009900'>// body
+</font>
+
+        uint32 k1 <font color='#5555FF'>=</font> v1;
+
+        k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c1;
+        k1 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL32</font><font face='Lucida Console'>(</font>k1,<font color='#979000'>15</font><font face='Lucida Console'>)</font>;
+        k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c2;
+
+        h1 ^<font color='#5555FF'>=</font> k1;
+        h1 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL32</font><font face='Lucida Console'>(</font>h1,<font color='#979000'>13</font><font face='Lucida Console'>)</font>; 
+        h1 <font color='#5555FF'>=</font> h1<font color='#5555FF'>*</font><font color='#979000'>5</font><font color='#5555FF'>+</font><font color='#979000'>0xe6546b64</font>;
+
+
+        <font color='#009900'>//----------
+</font>        <font color='#009900'>// finalization
+</font>
+        h1 ^<font color='#5555FF'>=</font> <font color='#979000'>4</font>; <font color='#009900'>// =^ by length in bytes
+</font>
+        h1 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_fmix</font><font face='Lucida Console'>(</font>h1<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> h1;
+    <b>}</b> 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> uint32 <b><a name='murmur_hash3_3'></a>murmur_hash3_3</b> <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> uint32 v1,
+        <font color='#0000FF'>const</font> uint32 v2, 
+        <font color='#0000FF'>const</font> uint32 v3 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+
+        uint32 h1 <font color='#5555FF'>=</font> v3;
+
+        uint32 c1 <font color='#5555FF'>=</font> <font color='#979000'>0xcc9e2d51</font>;
+        uint32 c2 <font color='#5555FF'>=</font> <font color='#979000'>0x1b873593</font>;
+
+        <font color='#009900'>//----------
+</font>        <font color='#009900'>// body
+</font>
+
+        uint32 k1 <font color='#5555FF'>=</font> v1;
+
+        k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c1;
+        k1 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL32</font><font face='Lucida Console'>(</font>k1,<font color='#979000'>15</font><font face='Lucida Console'>)</font>;
+        k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c2;
+
+        h1 ^<font color='#5555FF'>=</font> k1;
+        h1 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL32</font><font face='Lucida Console'>(</font>h1,<font color='#979000'>13</font><font face='Lucida Console'>)</font>; 
+        h1 <font color='#5555FF'>=</font> h1<font color='#5555FF'>*</font><font color='#979000'>5</font><font color='#5555FF'>+</font><font color='#979000'>0xe6546b64</font>;
+
+        k1 <font color='#5555FF'>=</font> v2;
+        k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c1;
+        k1 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL32</font><font face='Lucida Console'>(</font>k1,<font color='#979000'>15</font><font face='Lucida Console'>)</font>;
+        k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c2;
+
+        h1 ^<font color='#5555FF'>=</font> k1;
+        h1 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL32</font><font face='Lucida Console'>(</font>h1,<font color='#979000'>13</font><font face='Lucida Console'>)</font>; 
+        h1 <font color='#5555FF'>=</font> h1<font color='#5555FF'>*</font><font color='#979000'>5</font><font color='#5555FF'>+</font><font color='#979000'>0xe6546b64</font>;
+
+        <font color='#009900'>//----------
+</font>        <font color='#009900'>// finalization
+</font>
+        h1 ^<font color='#5555FF'>=</font> <font color='#979000'>8</font>; <font color='#009900'>// =^ by length in bytes
+</font>
+        h1 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_fmix</font><font face='Lucida Console'>(</font>h1<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> h1;
+    <b>}</b> 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> std::pair<font color='#5555FF'>&lt;</font>uint64,uint64<font color='#5555FF'>&gt;</font> <b><a name='murmur_hash3_128bit'></a>murmur_hash3_128bit</b> <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> key, 
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> len,
+        <font color='#0000FF'>const</font> uint32 seed <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> uint8 <font color='#5555FF'>*</font> data <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> uint8<font color='#5555FF'>*</font><font face='Lucida Console'>)</font>key;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> nblocks <font color='#5555FF'>=</font> len <font color='#5555FF'>/</font> <font color='#979000'>16</font>;
+
+        uint64 h1 <font color='#5555FF'>=</font> seed;
+        uint64 h2 <font color='#5555FF'>=</font> seed;
+
+        uint64 c1 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_BIG_CONSTANT</font><font face='Lucida Console'>(</font><font color='#979000'>0x87c37b91114253d5</font><font face='Lucida Console'>)</font>;
+        uint64 c2 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_BIG_CONSTANT</font><font face='Lucida Console'>(</font><font color='#979000'>0x4cf5ad432745937f</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>//----------
+</font>        <font color='#009900'>// body
+</font>
+        <font color='#0000FF'>const</font> uint64 <font color='#5555FF'>*</font> blocks <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> uint64 <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> is_little_endian <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        uint32 endian_test <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>endian_test<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            is_little_endian <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_little_endian<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> nblocks; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                uint64 k1 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_getblock</font><font face='Lucida Console'>(</font>blocks,i<font color='#5555FF'>*</font><font color='#979000'>2</font><font color='#5555FF'>+</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                uint64 k2 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_getblock</font><font face='Lucida Console'>(</font>blocks,i<font color='#5555FF'>*</font><font color='#979000'>2</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c1; k1  <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL64</font><font face='Lucida Console'>(</font>k1,<font color='#979000'>31</font><font face='Lucida Console'>)</font>; k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c2; h1 ^<font color='#5555FF'>=</font> k1;
+
+                h1 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL64</font><font face='Lucida Console'>(</font>h1,<font color='#979000'>27</font><font face='Lucida Console'>)</font>; h1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h2; h1 <font color='#5555FF'>=</font> h1<font color='#5555FF'>*</font><font color='#979000'>5</font><font color='#5555FF'>+</font><font color='#979000'>0x52dce729</font>;
+
+                k2 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c2; k2  <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL64</font><font face='Lucida Console'>(</font>k2,<font color='#979000'>33</font><font face='Lucida Console'>)</font>; k2 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c1; h2 ^<font color='#5555FF'>=</font> k2;
+
+                h2 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL64</font><font face='Lucida Console'>(</font>h2,<font color='#979000'>31</font><font face='Lucida Console'>)</font>; h2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h1; h2 <font color='#5555FF'>=</font> h2<font color='#5555FF'>*</font><font color='#979000'>5</font><font color='#5555FF'>+</font><font color='#979000'>0x38495ab5</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> nblocks; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                uint64 k1 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_getblock_byte_swap</font><font face='Lucida Console'>(</font>blocks,i<font color='#5555FF'>*</font><font color='#979000'>2</font><font color='#5555FF'>+</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                uint64 k2 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_getblock_byte_swap</font><font face='Lucida Console'>(</font>blocks,i<font color='#5555FF'>*</font><font color='#979000'>2</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c1; k1  <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL64</font><font face='Lucida Console'>(</font>k1,<font color='#979000'>31</font><font face='Lucida Console'>)</font>; k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c2; h1 ^<font color='#5555FF'>=</font> k1;
+
+                h1 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL64</font><font face='Lucida Console'>(</font>h1,<font color='#979000'>27</font><font face='Lucida Console'>)</font>; h1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h2; h1 <font color='#5555FF'>=</font> h1<font color='#5555FF'>*</font><font color='#979000'>5</font><font color='#5555FF'>+</font><font color='#979000'>0x52dce729</font>;
+
+                k2 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c2; k2  <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL64</font><font face='Lucida Console'>(</font>k2,<font color='#979000'>33</font><font face='Lucida Console'>)</font>; k2 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c1; h2 ^<font color='#5555FF'>=</font> k2;
+
+                h2 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL64</font><font face='Lucida Console'>(</font>h2,<font color='#979000'>31</font><font face='Lucida Console'>)</font>; h2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h1; h2 <font color='#5555FF'>=</font> h2<font color='#5555FF'>*</font><font color='#979000'>5</font><font color='#5555FF'>+</font><font color='#979000'>0x38495ab5</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>//----------
+</font>        <font color='#009900'>// tail
+</font>
+        <font color='#0000FF'>const</font> uint8 <font color='#5555FF'>*</font> tail <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> uint8<font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>data <font color='#5555FF'>+</font> nblocks<font color='#5555FF'>*</font><font color='#979000'>16</font><font face='Lucida Console'>)</font>;
+
+        uint64 k1 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        uint64 k2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>switch</font><font face='Lucida Console'>(</font>len <font color='#5555FF'>&amp;</font> <font color='#979000'>15</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>case</font> <font color='#979000'>15</font>: k2 ^<font color='#5555FF'>=</font> <font color='#BB00BB'>uint64</font><font face='Lucida Console'>(</font>tail[<font color='#979000'>14</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>48</font>;
+            <font color='#0000FF'>case</font> <font color='#979000'>14</font>: k2 ^<font color='#5555FF'>=</font> <font color='#BB00BB'>uint64</font><font face='Lucida Console'>(</font>tail[<font color='#979000'>13</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>40</font>;
+            <font color='#0000FF'>case</font> <font color='#979000'>13</font>: k2 ^<font color='#5555FF'>=</font> <font color='#BB00BB'>uint64</font><font face='Lucida Console'>(</font>tail[<font color='#979000'>12</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>32</font>;
+            <font color='#0000FF'>case</font> <font color='#979000'>12</font>: k2 ^<font color='#5555FF'>=</font> <font color='#BB00BB'>uint64</font><font face='Lucida Console'>(</font>tail[<font color='#979000'>11</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>24</font>;
+            <font color='#0000FF'>case</font> <font color='#979000'>11</font>: k2 ^<font color='#5555FF'>=</font> <font color='#BB00BB'>uint64</font><font face='Lucida Console'>(</font>tail[<font color='#979000'>10</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>16</font>;
+            <font color='#0000FF'>case</font> <font color='#979000'>10</font>: k2 ^<font color='#5555FF'>=</font> <font color='#BB00BB'>uint64</font><font face='Lucida Console'>(</font>tail[ <font color='#979000'>9</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>8</font>;
+            <font color='#0000FF'>case</font>  <font color='#979000'>9</font>: k2 ^<font color='#5555FF'>=</font> <font color='#BB00BB'>uint64</font><font face='Lucida Console'>(</font>tail[ <font color='#979000'>8</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>0</font>;
+                     k2 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c2; k2  <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL64</font><font face='Lucida Console'>(</font>k2,<font color='#979000'>33</font><font face='Lucida Console'>)</font>; k2 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c1; h2 ^<font color='#5555FF'>=</font> k2;
+
+            <font color='#0000FF'>case</font>  <font color='#979000'>8</font>: k1 ^<font color='#5555FF'>=</font> <font color='#BB00BB'>uint64</font><font face='Lucida Console'>(</font>tail[ <font color='#979000'>7</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>56</font>;
+            <font color='#0000FF'>case</font>  <font color='#979000'>7</font>: k1 ^<font color='#5555FF'>=</font> <font color='#BB00BB'>uint64</font><font face='Lucida Console'>(</font>tail[ <font color='#979000'>6</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>48</font>;
+            <font color='#0000FF'>case</font>  <font color='#979000'>6</font>: k1 ^<font color='#5555FF'>=</font> <font color='#BB00BB'>uint64</font><font face='Lucida Console'>(</font>tail[ <font color='#979000'>5</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>40</font>;
+            <font color='#0000FF'>case</font>  <font color='#979000'>5</font>: k1 ^<font color='#5555FF'>=</font> <font color='#BB00BB'>uint64</font><font face='Lucida Console'>(</font>tail[ <font color='#979000'>4</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>32</font>;
+            <font color='#0000FF'>case</font>  <font color='#979000'>4</font>: k1 ^<font color='#5555FF'>=</font> <font color='#BB00BB'>uint64</font><font face='Lucida Console'>(</font>tail[ <font color='#979000'>3</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>24</font>;
+            <font color='#0000FF'>case</font>  <font color='#979000'>3</font>: k1 ^<font color='#5555FF'>=</font> <font color='#BB00BB'>uint64</font><font face='Lucida Console'>(</font>tail[ <font color='#979000'>2</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>16</font>;
+            <font color='#0000FF'>case</font>  <font color='#979000'>2</font>: k1 ^<font color='#5555FF'>=</font> <font color='#BB00BB'>uint64</font><font face='Lucida Console'>(</font>tail[ <font color='#979000'>1</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>8</font>;
+            <font color='#0000FF'>case</font>  <font color='#979000'>1</font>: k1 ^<font color='#5555FF'>=</font> <font color='#BB00BB'>uint64</font><font face='Lucida Console'>(</font>tail[ <font color='#979000'>0</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>0</font>;
+                     k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c1; k1  <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL64</font><font face='Lucida Console'>(</font>k1,<font color='#979000'>31</font><font face='Lucida Console'>)</font>; k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c2; h1 ^<font color='#5555FF'>=</font> k1;
+        <b>}</b>;
+
+        <font color='#009900'>//----------
+</font>        <font color='#009900'>// finalization
+</font>
+        h1 ^<font color='#5555FF'>=</font> len; h2 ^<font color='#5555FF'>=</font> len;
+
+        h1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h2;
+        h2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h1;
+
+        h1 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_fmix</font><font face='Lucida Console'>(</font>h1<font face='Lucida Console'>)</font>;
+        h2 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_fmix</font><font face='Lucida Console'>(</font>h2<font face='Lucida Console'>)</font>;
+
+        h1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h2;
+        h2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h1;
+
+        <font color='#0000FF'>return</font> std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>h1,h2<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> std::pair<font color='#5555FF'>&lt;</font>uint64,uint64<font color='#5555FF'>&gt;</font> <b><a name='murmur_hash3_128bit'></a>murmur_hash3_128bit</b> <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> uint32<font color='#5555FF'>&amp;</font> v1, 
+        <font color='#0000FF'>const</font> uint32<font color='#5555FF'>&amp;</font> v2, 
+        <font color='#0000FF'>const</font> uint32<font color='#5555FF'>&amp;</font> v3, 
+        <font color='#0000FF'>const</font> uint32<font color='#5555FF'>&amp;</font> v4 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint64 h1 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        uint64 h2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>const</font> uint64 c1 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_BIG_CONSTANT</font><font face='Lucida Console'>(</font><font color='#979000'>0x87c37b91114253d5</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> uint64 c2 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_BIG_CONSTANT</font><font face='Lucida Console'>(</font><font color='#979000'>0x4cf5ad432745937f</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>//----------
+</font>        <font color='#009900'>// body
+</font>
+        uint64 k1 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint64<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>v2<font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>32</font><font face='Lucida Console'>)</font><font color='#5555FF'>|</font>v1; 
+        uint64 k2 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint64<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>v4<font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>32</font><font face='Lucida Console'>)</font><font color='#5555FF'>|</font>v3; 
+
+        k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c1; k1  <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL64</font><font face='Lucida Console'>(</font>k1,<font color='#979000'>31</font><font face='Lucida Console'>)</font>; k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c2;
+
+        h1 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL64</font><font face='Lucida Console'>(</font>k1,<font color='#979000'>27</font><font face='Lucida Console'>)</font>; h1 <font color='#5555FF'>=</font> h1<font color='#5555FF'>*</font><font color='#979000'>5</font><font color='#5555FF'>+</font><font color='#979000'>0x52dce729</font>;
+
+        k2 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c2; k2  <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL64</font><font face='Lucida Console'>(</font>k2,<font color='#979000'>33</font><font face='Lucida Console'>)</font>; k2 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c1; 
+
+        h2 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL64</font><font face='Lucida Console'>(</font>k2,<font color='#979000'>31</font><font face='Lucida Console'>)</font>; h2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h1; h2 <font color='#5555FF'>=</font> h2<font color='#5555FF'>*</font><font color='#979000'>5</font><font color='#5555FF'>+</font><font color='#979000'>0x38495ab5</font>;
+
+        <font color='#009900'>//----------
+</font>        <font color='#009900'>// finalization
+</font>
+        h1 ^<font color='#5555FF'>=</font> <font color='#979000'>16</font>; h2 ^<font color='#5555FF'>=</font> <font color='#979000'>16</font>;
+
+        h1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h2;
+        h2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h1;
+
+        h1 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_fmix</font><font face='Lucida Console'>(</font>h1<font face='Lucida Console'>)</font>;
+        h2 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_fmix</font><font face='Lucida Console'>(</font>h2<font face='Lucida Console'>)</font>;
+
+        h1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h2;
+        h2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h1;
+
+        <font color='#0000FF'>return</font> std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>h1,h2<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> std::pair<font color='#5555FF'>&lt;</font>uint64,uint64<font color='#5555FF'>&gt;</font> <b><a name='murmur_hash3_128bit_3'></a>murmur_hash3_128bit_3</b> <font face='Lucida Console'>(</font> 
+        uint64 k1, 
+        uint64 k2,
+        uint64 k3 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint64 h1 <font color='#5555FF'>=</font> k3;
+        uint64 h2 <font color='#5555FF'>=</font> k3;
+
+        <font color='#0000FF'>const</font> uint64 c1 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_BIG_CONSTANT</font><font face='Lucida Console'>(</font><font color='#979000'>0x87c37b91114253d5</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> uint64 c2 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_BIG_CONSTANT</font><font face='Lucida Console'>(</font><font color='#979000'>0x4cf5ad432745937f</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>//----------
+</font>        <font color='#009900'>// body
+</font>
+        k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c1; k1  <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL64</font><font face='Lucida Console'>(</font>k1,<font color='#979000'>31</font><font face='Lucida Console'>)</font>; k1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c2; h1 ^<font color='#5555FF'>=</font> k1;
+
+        h1 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL64</font><font face='Lucida Console'>(</font>h1,<font color='#979000'>27</font><font face='Lucida Console'>)</font>; h1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h2; h1 <font color='#5555FF'>=</font> h1<font color='#5555FF'>*</font><font color='#979000'>5</font><font color='#5555FF'>+</font><font color='#979000'>0x52dce729</font>;
+
+        k2 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c2; k2  <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL64</font><font face='Lucida Console'>(</font>k2,<font color='#979000'>33</font><font face='Lucida Console'>)</font>; k2 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> c1; h2 ^<font color='#5555FF'>=</font> k2;
+
+        h2 <font color='#5555FF'>=</font> <font color='#BB00BB'>DLIB_ROTL64</font><font face='Lucida Console'>(</font>h2,<font color='#979000'>31</font><font face='Lucida Console'>)</font>; h2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h1; h2 <font color='#5555FF'>=</font> h2<font color='#5555FF'>*</font><font color='#979000'>5</font><font color='#5555FF'>+</font><font color='#979000'>0x38495ab5</font>;
+
+        <font color='#009900'>//----------
+</font>        <font color='#009900'>// finalization
+</font>
+        h1 ^<font color='#5555FF'>=</font> <font color='#979000'>16</font>; h2 ^<font color='#5555FF'>=</font> <font color='#979000'>16</font>;
+
+        h1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h2;
+        h2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h1;
+
+        h1 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_fmix</font><font face='Lucida Console'>(</font>h1<font face='Lucida Console'>)</font>;
+        h2 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_fmix</font><font face='Lucida Console'>(</font>h2<font face='Lucida Console'>)</font>;
+
+        h1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h2;
+        h2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h1;
+
+        <font color='#0000FF'>return</font> std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>h1,h2<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MURMUR_HAsH_3_Hh_
+</font>
+
+</pre></body></html>

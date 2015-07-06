@@ -1,0 +1,279 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - mpc_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2015  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_MPC_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_MPC_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>long</u></font> S_,
+        <font color='#0000FF'><u>long</u></font> I_,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> horizon_
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='mpc'></a>mpc</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON horizon_
+                horizon_ &gt; 0
+
+            REQUIREMENTS ON S_
+                S_ &gt;= 0
+
+            REQUIREMENTS ON I_
+                I_ &gt;= 0
+            
+            WHAT THIS OBJECT REPRESENTS
+                This object implements a linear model predictive controller.  To explain
+                what that means, suppose you have some process you want to control and the
+                process dynamics are described by the linear equation:
+                    x_{i+1} = A*x_i + B*u_i + C
+                That is, the next state the system goes into is a linear function of its
+                current state (x_i) and the current control (u_i) plus some constant bias
+                or disturbance.  
+                
+                A model predictive controller can find the control (u) you should apply to
+                drive the state (x) to some reference value, or alternatively to make the
+                state track some reference time-varying sequence.  It does this by
+                simulating the process for horizon_ time steps and selecting the control
+                that leads to the best performance over the next horizon_ steps.
+                
+                To be precise, each time you ask this object for a control, it solves the
+                following quadratic program:
+        
+                    min    sum_i trans(x_i-target_i)*Q*(x_i-target_i) + trans(u_i)*R*u_i 
+                  x_i,u_i
+
+                    such that: x_0     == current_state 
+                               x_{i+1} == A*x_i + B*u_i + C
+                               lower &lt;= u_i &lt;= upper
+                               0 &lt;= i &lt; horizon_
+
+                and reports u_0 as the control you should take given that you are currently
+                in current_state.  Q and R are user supplied matrices that define how we
+                penalize variations away from the target state as well as how much we want
+                to avoid generating large control signals.  
+                
+                Finally, the algorithm we use to solve this quadratic program is based
+                largely on the method described in:
+                  A Fast Gradient method for embedded linear predictive control (2011)
+                  by Markus Kogel and Rolf Findeisen
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> S <font color='#5555FF'>=</font> S_;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> I <font color='#5555FF'>=</font> I_;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> horizon <font color='#5555FF'>=</font> horizon_;
+
+        <b><a name='mpc'></a>mpc</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_max_iterations() == 0
+                - The A,B,C,Q,R,lower, and upper parameter matrices are filled with zeros.
+                  Therefore, to use this object you must initialize it via the constructor
+                  that supplies these parameters.
+        !*/</font>
+
+        <b><a name='mpc'></a>mpc</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,S<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A,
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,I<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> B,
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> C,
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> Q,
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> R,
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lower,
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> upper
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - A.nr() &gt; 0
+                - B.nc() &gt; 0
+                - A.nr() == A.nc() == B.nr() == C.nr() == Q.nr()
+                - B.nc() == R.nr() == lower.nr() == upper.nr()
+                - min(Q) &gt;= 0
+                - min(R) &gt; 0
+                - min(upper-lower) &gt;= 0
+            ensures
+                - #get_A() == A
+                - #get_B() == B
+                - #get_C() == C
+                - #get_Q() == Q
+                - #get_R() == R
+                - #get_lower_constraints() == lower
+                - #get_upper_constraints() == upper 
+                - for all valid i:
+                    - get_target(i) == a vector of all zeros
+                    - get_target(i).size() == A.nr()
+                - #get_max_iterations() == 10000 
+                - #get_epsilon() == 0.01
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,S<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_A'></a>get_A</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the A matrix from the quadratic program defined above. 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,I<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_B'></a>get_B</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the B matrix from the quadratic program defined above. 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_C'></a>get_C</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the C matrix from the quadratic program defined above. 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_Q'></a>get_Q</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the diagonal of the Q matrix from the quadratic program defined
+                  above. 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_R'></a>get_R</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the diagonal of the R matrix from the quadratic program defined
+                  above. 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_lower_constraints'></a>get_lower_constraints</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the lower matrix from the quadratic program defined above.  All
+                  controls generated by this object will have values no less than this
+                  lower bound.  That is, any control u will satisfy min(u-lower) &gt;= 0.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_upper_constraints'></a>get_upper_constraints</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the upper matrix from the quadratic program defined above.  All
+                  controls generated by this object will have values no larger than this
+                  upper bound.  That is, any control u will satisfy min(upper-u) &gt;= 0.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_target'></a>get_target</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> time
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - time &lt; horizon
+            ensures
+                - This object will try to find the control sequence that results in the
+                  process obtaining get_target(time) state at the indicated time.  Note
+                  that the next time instant after "right now" is time 0. 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_target'></a>set_target</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> val,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> time
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - time &lt; horizon
+            ensures
+                - #get_target(time) == val
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_target'></a>set_target</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> val
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - for all valid t:
+                    - #get_target(t) == val
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_last_target'></a>set_last_target</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> val
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - performs: set_target(val, horizon-1)
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_iterations'></a>get_max_iterations</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - When operator() is called it solves an optimization problem to
+                  get_epsilon() precision to determine the next control action.  In
+                  particular, we run the optimizer until the magnitude of each element of
+                  the gradient vector is less than get_epsilon() or until
+                  get_max_iterations() solver iterations have been executed.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_iterations'></a>set_max_iterations</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_max_iterations() == max_iter
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_epsilon'></a>set_epsilon</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> eps
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - eps &gt; 0
+            ensures
+                - #get_epsilon() == eps
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_epsilon'></a>get_epsilon</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - When operator() is called it solves an optimization problem to
+                  get_epsilon() precision to determine the next control action.  In
+                  particular, we run the optimizer until the magnitude of each element of
+                  the gradient vector is less than get_epsilon() or until
+                  get_max_iterations() solver iterations have been executed.  This means
+                  that smaller epsilon values will give more accurate outputs but may take
+                  longer to compute.
+        !*/</font>
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> current_state
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - min(R) &gt; 0
+                - A.nr() == current_state.size()
+            ensures
+                - Solves the model predictive control problem defined by the arguments to
+                  this objects constructor, assuming that the starting state is given by
+                  current_state.  Then we return the control that should be taken in the
+                  current state that best optimizes the quadratic objective function
+                  defined above.
+                - We also shift over the target states so that you only need to update the
+                  last one (if you are using non-zero target states) via a call to
+                  set_last_target()).  In particular, for all valid t, it will be the case
+                  that:
+                    - #get_target(t) == get_target(t+1)
+                    - #get_target(horizon-1) == get_target(horizon-1)
+        !*/</font>
+
+    <b>}</b>;
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MPC_ABSTRACT_Hh_
+</font>
+
+</pre></body></html>

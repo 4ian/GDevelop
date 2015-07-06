@@ -1,0 +1,188 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - graph_labeler_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_GRAPH_LaBELER_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_GRAPH_LaBELER_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='find_max_factor_graph_potts_abstract.h.html'>find_max_factor_graph_potts_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../graph/graph_kernel_abstract.h.html'>../graph/graph_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='graph_labeler'></a>graph_labeler</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON vector_type
+                - vector_type is a dlib::matrix capable of representing column 
+                  vectors or it is a sparse vector type as defined in dlib/svm/sparse_vector_abstract.h.  
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for labeling each node in a graph with a value 
+                of true or false, subject to a labeling consistency constraint between 
+                nodes that share an edge.  In particular, this object is useful for 
+                representing a graph labeling model learned via some machine learning 
+                method.
+                
+                To elaborate, suppose we have a graph we want to label.  Moreover, 
+                suppose we can assign a score to each node which represents how much 
+                we want to label the node as true, and we also have scores for each 
+                edge which represent how much we wanted the nodes sharing the edge to 
+                have the same label.  If we could do this then we could find the optimal 
+                labeling using the find_max_factor_graph_potts() routine.  Therefore, 
+                the graph_labeler is just an object which contains the necessary data 
+                to compute these score functions and then call find_max_factor_graph_potts().  
+                Additionally, this object uses linear functions to represent these score 
+                functions.    
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    It is safe to call the const members of this object from multiple
+                    threads.  This is because the const members are purely read-only
+                    operations.  However, any operation that modifies a graph_labeler is
+                    not threadsafe.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> label_type;
+        <font color='#0000FF'>typedef</font> label_type result_type;
+
+        <b><a name='graph_labeler'></a>graph_labeler</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+                - #get_node_weights() == an initial value of type vector_type.
+                - #get_edge_weights() == an initial value of type vector_type.
+        !*/</font>
+
+        <b><a name='graph_labeler'></a>graph_labeler</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> edge_weights,
+            <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> node_weights
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - min(edge_weights) &gt;= 0
+            ensures
+                - #get_edge_weights() == edge_weights
+                - #get_node_weights() == node_weights
+        !*/</font>
+
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> <b><a name='get_edge_weights'></a>get_edge_weights</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - Recall that the score function for an edge is a linear function of
+                  the vector stored at that edge.  This means there is some vector, E,
+                  which we dot product with the vector in the graph to compute the 
+                  score.  Therefore, this function returns that E vector which defines 
+                  the edge score function.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> <b><a name='get_node_weights'></a>get_node_weights</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - Recall that the score function for a node is a linear function of
+                  the vector stored in that node.  This means there is some vector, W, 
+                  which we dot product with the vector in the graph to compute the score.  
+                  Therefore, this function returns that W vector which defines the node 
+                  score function.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> graph_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> graph_type<font color='#5555FF'>&amp;</font> sample,
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - graph_type is an implementation of dlib/graph/graph_kernel_abstract.h
+                - graph_type::type and graph_type::edge_type must be either matrix objects
+                  capable of representing column vectors or some kind of sparse vector
+                  type as defined in dlib/svm/sparse_vector_abstract.h.
+                - graph_contains_length_one_cycle(sample) == false
+                - for all valid i and j:
+                    - min(edge(sample,i,j)) &gt;= 0
+                    - it must be legal to call dot(edge(sample,i,j), get_edge_weights())
+                    - it must be legal to call dot(sample.node(i).data, get_node_weights())
+            ensures
+                - Computes a labeling for each node in the given graph and stores the result
+                  in #labels.  
+                - #labels.size() == sample.number_of_nodes()
+                - for all valid i:
+                    - #labels[i] == the label of the node sample.node(i).
+                - The labels are computed by creating a graph, G, with scalar values on each node 
+                  and edge.  The scalar values are calculated according to the following:
+                    - for all valid i:
+                        - G.node(i).data == dot(get_node_weights(), sample.node(i).data)
+                    - for all valid i and j:
+                        - edge(G,i,j) == dot(get_edge_weights(), edge(sample,i,j))
+                  Then the labels are computed by calling find_max_factor_graph_potts(G,#labels).
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> graph_type<font color='#5555FF'>&gt;</font>
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> graph_type<font color='#5555FF'>&amp;</font> sample 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - graph_type is an implementation of dlib/graph/graph_kernel_abstract.h
+                - graph_contains_length_one_cycle(sample) == false
+                - for all valid i and j:
+                    - min(edge(sample,i,j)) &gt;= 0
+                    - it must be legal to call dot(edge(sample,i,j), get_edge_weights())
+                    - it must be legal to call dot(sample.node(i).data, get_node_weights())
+            ensures
+                - Performs (*this)(sample, labels); return labels;
+                  (i.e. This is just another version of the above operator() routine
+                  but instead of returning the labels via the second argument, it
+                  returns them as the normal return value).
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> graph_labeler<font color='#5555FF'>&lt;</font>vector_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        graph_labeler<font color='#5555FF'>&lt;</font>vector_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_GRAPH_LaBELER_ABSTRACT_Hh_
+</font>
+
+</pre></body></html>

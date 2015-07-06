@@ -222,7 +222,7 @@ public:
      * \brief Get the namespace of the extension.
      * \note The namespace is simply the name of the extension concatenated with "::" at the end.
      */
-    gd::String GetNameSpace() { return nameSpace; };
+    const gd::String & GetNameSpace() { return nameSpace; };
 
     /**
      * \brief Return a vector containing all the object types provided by the extension

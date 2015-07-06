@@ -1,0 +1,217 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - thread_function_extension.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_THREAD_FUNCTIOn_
+<font color='#0000FF'>#define</font> DLIB_THREAD_FUNCTIOn_ 
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='thread_function_extension_abstract.h.html'>thread_function_extension_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel.h.html'>threads_kernel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='auto_mutex_extension.h.html'>auto_mutex_extension.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threaded_object_extension.h.html'>threaded_object_extension.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../smart_pointers.h.html'>../smart_pointers.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='thread_function'></a>thread_function</b> : <font color='#0000FF'>private</font> threaded_object
+    <b>{</b>
+        
+        <font color='#0000FF'>class</font> <b><a name='base_funct'></a>base_funct</b>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='go'></a>go</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>virtual</font> ~<b><a name='base_funct'></a>base_funct</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> T4<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='super_funct_4'></a>super_funct_4</b> : <font color='#0000FF'>public</font> base_funct
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='super_funct_4'></a>super_funct_4</b> <font face='Lucida Console'>(</font> F funct, T1 arg1, T2 arg2, T3 arg3, T4 arg4<font face='Lucida Console'>)</font> :
+                f<font face='Lucida Console'>(</font>funct<font face='Lucida Console'>)</font>,
+                a1<font face='Lucida Console'>(</font>arg1<font face='Lucida Console'>)</font>,
+                a2<font face='Lucida Console'>(</font>arg2<font face='Lucida Console'>)</font>,
+                a3<font face='Lucida Console'>(</font>arg3<font face='Lucida Console'>)</font>,
+                a4<font face='Lucida Console'>(</font>arg4<font face='Lucida Console'>)</font>
+            <b>{</b>
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='go'></a>go</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>a1, a2, a3, a4<font face='Lucida Console'>)</font>; <b>}</b>
+
+
+            F f;
+            T1 a1;
+            T2 a2;
+            T3 a3;
+            T4 a4;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> T3<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='super_funct_3'></a>super_funct_3</b> : <font color='#0000FF'>public</font> base_funct
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='super_funct_3'></a>super_funct_3</b> <font face='Lucida Console'>(</font> F funct, T1 arg1, T2 arg2, T3 arg3<font face='Lucida Console'>)</font>:
+                f<font face='Lucida Console'>(</font>funct<font face='Lucida Console'>)</font>,
+                a1<font face='Lucida Console'>(</font>arg1<font face='Lucida Console'>)</font>,
+                a2<font face='Lucida Console'>(</font>arg2<font face='Lucida Console'>)</font>,
+                a3<font face='Lucida Console'>(</font>arg3<font face='Lucida Console'>)</font>
+            <b>{</b>
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='go'></a>go</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>a1, a2, a3<font face='Lucida Console'>)</font>; <b>}</b>
+
+
+            F f;
+            T1 a1;
+            T2 a2;
+            T3 a3;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='super_funct_2'></a>super_funct_2</b> : <font color='#0000FF'>public</font> base_funct
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='super_funct_2'></a>super_funct_2</b> <font face='Lucida Console'>(</font> F funct, T1 arg1, T2 arg2<font face='Lucida Console'>)</font> :
+                f<font face='Lucida Console'>(</font>funct<font face='Lucida Console'>)</font>,
+                a1<font face='Lucida Console'>(</font>arg1<font face='Lucida Console'>)</font>,
+                a2<font face='Lucida Console'>(</font>arg2<font face='Lucida Console'>)</font>
+            <b>{</b>
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='go'></a>go</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>a1, a2<font face='Lucida Console'>)</font>; <b>}</b>
+
+
+            F f;
+            T1 a1;
+            T2 a2;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='super_funct_1'></a>super_funct_1</b> : <font color='#0000FF'>public</font> base_funct
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='super_funct_1'></a>super_funct_1</b> <font face='Lucida Console'>(</font> F funct, T arg<font face='Lucida Console'>)</font> : f<font face='Lucida Console'>(</font>funct<font face='Lucida Console'>)</font>, a<font face='Lucida Console'>(</font>arg<font face='Lucida Console'>)</font>
+            <b>{</b>
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='go'></a>go</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>; <b>}</b>
+
+
+            F f;
+            T a;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='super_funct_0'></a>super_funct_0</b> : <font color='#0000FF'>public</font> base_funct
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='super_funct_0'></a>super_funct_0</b> <font face='Lucida Console'>(</font> F funct<font face='Lucida Console'>)</font> : f<font face='Lucida Console'>(</font>funct<font face='Lucida Console'>)</font>
+            <b>{</b>
+            <b>}</b>
+            
+            <font color='#0000FF'><u>void</u></font> <b><a name='go'></a>go</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+            F f;
+        <b>}</b>;
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <b><a name='thread_function'></a>thread_function</b> <font face='Lucida Console'>(</font>
+            F funct
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            f.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> super_funct_0<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <b><a name='thread_function'></a>thread_function</b> <font face='Lucida Console'>(</font>
+            F funct,
+            T arg
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            f.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> super_funct_1<font color='#5555FF'>&lt;</font>F,T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>funct,arg<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2<font color='#5555FF'>&gt;</font>
+        <b><a name='thread_function'></a>thread_function</b> <font face='Lucida Console'>(</font>
+            F funct,
+            T1 arg1,
+            T2 arg2
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            f.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> super_funct_2<font color='#5555FF'>&lt;</font>F,T1,T2<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>funct, arg1, arg2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> T3<font color='#5555FF'>&gt;</font>
+        <b><a name='thread_function'></a>thread_function</b> <font face='Lucida Console'>(</font>
+            F funct,
+            T1 arg1,
+            T2 arg2,
+            T3 arg3
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            f.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> super_funct_3<font color='#5555FF'>&lt;</font>F,T1,T2,T3<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>funct, arg1, arg2, arg3<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> T4<font color='#5555FF'>&gt;</font>
+        <b><a name='thread_function'></a>thread_function</b> <font face='Lucida Console'>(</font>
+            F funct,
+            T1 arg1,
+            T2 arg2,
+            T3 arg3,
+            T4 arg4
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            f.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> super_funct_4<font color='#5555FF'>&lt;</font>F,T1,T2,T3,T4<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>funct, arg1, arg2, arg3, arg4<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        ~<b><a name='thread_function'></a>thread_function</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            threaded_object::<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_alive'></a>is_alive</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> threaded_object::<font color='#BB00BB'>is_alive</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='wait'></a>wait</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            threaded_object::<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread'></a>thread</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            f<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>go</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        scoped_ptr<font color='#5555FF'>&lt;</font>base_funct<font color='#5555FF'>&gt;</font> f;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='thread_function'></a>thread_function</b><font face='Lucida Console'>(</font>thread_function<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        thread_function<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>thread_function<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_THREAD_FUNCTIOn_
+</font>
+
+
+
+</pre></body></html>

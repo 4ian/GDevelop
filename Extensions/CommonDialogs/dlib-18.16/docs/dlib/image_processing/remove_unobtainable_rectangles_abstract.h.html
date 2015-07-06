@@ -1,0 +1,59 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - remove_unobtainable_rectangles_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_REMOVE_UnOBTAINABLE_RECTANGLES_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_REMOVE_UnOBTAINABLE_RECTANGLES_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='scan_image_pyramid_abstract.h.html'>scan_image_pyramid_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='scan_image_boxes_abstract.h.html'>scan_image_boxes_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='scan_image_custom_abstract.h.html'>scan_image_custom_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='scan_fhog_pyramid_abstract.h.html'>scan_fhog_pyramid_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../svm/structural_object_detection_trainer_abstract.h.html'>../svm/structural_object_detection_trainer_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_scanner_type,
+        <font color='#0000FF'>typename</font> image_array_type
+        <font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='remove_unobtainable_rectangles'></a>remove_unobtainable_rectangles</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> structural_object_detection_trainer<font color='#5555FF'>&lt;</font>image_scanner_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> image_array_type<font color='#5555FF'>&amp;</font> images,
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> object_locations
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_scanner_type must be either scan_image_boxes, scan_image_pyramid,
+              scan_image_custom, or scan_fhog_pyramid.
+            - images.size() == object_locations.size()
+        ensures
+            - Recall that the image scanner objects can't produce all possible rectangles
+              as object detections since they only consider a limited subset of all possible
+              object positions.  Moreover, the structural_object_detection_trainer requires
+              its input training data to not contain any object positions which are unobtainable
+              by its scanner object.  Therefore, remove_unobtainable_rectangles() is a tool
+              to filter out these unobtainable rectangles from the training data before giving
+              it to a structural_object_detection_trainer.
+            - This function interprets object_locations[i] as the set of object positions for
+              image[i], for all valid i.
+            - In particular, this function removes unobtainable rectangles from object_locations
+              and also returns a vector V such that:
+                - V.size() == object_locations.size()
+                - for all valid i:
+                    - V[i] == the set of rectangles removed from object_locations[i]
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_REMOVE_UnOBTAINABLE_RECTANGLES_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

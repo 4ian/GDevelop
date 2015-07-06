@@ -1,0 +1,77 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - simplify_linear_decision_function_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SIMPLIFY_LINEAR_DECiSION_FUNCTION_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_SIMPLIFY_LINEAR_DECiSION_FUNCTION_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='function_abstract.h.html'>function_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sparse_kernel_abstract.h.html'>sparse_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel_abstract.h.html'>kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    decision_function<font color='#5555FF'>&lt;</font>sparse_linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='simplify_linear_decision_function'></a>simplify_linear_decision_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>sparse_linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> df
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T must be a sparse vector as defined in dlib/svm/sparse_vector_abstract.h
+        ensures
+            - returns a simplified version of df that only has one basis vector.  That
+              is, returns a decision function D such that:
+                - D.basis_vectors.size() == 1 (or 0 if df is empty)
+                - for all possible x: D(x) == df(x)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    decision_function<font color='#5555FF'>&lt;</font>linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='simplify_linear_decision_function'></a>simplify_linear_decision_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> df
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T must be a dlib::matrix object 
+        ensures
+            - returns a simplified version of df that only has one basis vector.  That
+              is, returns a decision function D such that:
+                - D.basis_vectors.size() == 1 (or 0 if df is empty)
+                - for all possible x: D(x) == df(x)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    decision_function<font color='#5555FF'>&lt;</font>linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='simplify_linear_decision_function'></a>simplify_linear_decision_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> normalized_function<font color='#5555FF'>&lt;</font>decision_function<font color='#5555FF'>&lt;</font>linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>, vector_normalizer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> df
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T must be a dlib::matrix object 
+        ensures
+            - returns a simplified version of df that only has one basis vector and 
+              doesn't involve an explicit vector_normalizer.  That is, returns a 
+              decision function D such that:
+                - D.basis_vectors.size() == 1 (or 0 if df is empty)
+                - for all possible x: D(x) == df(x)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SIMPLIFY_LINEAR_DECiSION_FUNCTION_ABSTRACT_Hh_
+</font>
+
+</pre></body></html>

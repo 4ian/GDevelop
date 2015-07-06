@@ -1,0 +1,141 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - vectorstream.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_VECTORStREAM_Hh_
+<font color='#0000FF'>#define</font> DLIB_VECTORStREAM_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='vectorstream_abstract.h.html'>vectorstream_abstract.h</a>"
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstring<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>streambuf<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdio<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+
+<font color='#0000FF'>#ifdef</font> _MSC_VER
+<font color='#009900'>// Disable the warning about inheriting from std::iostream 'via dominance' since this warning is a warning about
+</font><font color='#009900'>// visual studio conforming to the standard and is ignorable.  See http://connect.microsoft.com/VisualStudio/feedback/details/733720/inheriting-from-std-fstream-produces-c4250-warning
+</font><font color='#009900'>// for further details if interested.
+</font><font color='#0000FF'>#pragma</font> warning<font face='Lucida Console'>(</font>disable : <font color='#979000'>4250</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// _MSC_VER
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>class</font> <b><a name='vectorstream'></a>vectorstream</b> : <font color='#0000FF'>public</font> std::iostream
+    <b>{</b>
+        <font color='#0000FF'>class</font> <b><a name='vector_streambuf'></a>vector_streambuf</b> : <font color='#0000FF'>public</font> std::streambuf
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::size_type size_type;
+            size_type read_pos; <font color='#009900'>// buffer[read_pos] == next byte to read from buffer
+</font>        <font color='#0000FF'>public</font>:
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> buffer;
+
+            <b><a name='vector_streambuf'></a>vector_streambuf</b><font face='Lucida Console'>(</font>
+                std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> buffer_
+            <font face='Lucida Console'>)</font> :
+                read_pos<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                buffer<font face='Lucida Console'>(</font>buffer_<font face='Lucida Console'>)</font> 
+            <b>{</b><b>}</b>
+
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='seekg'></a>seekg</b><font face='Lucida Console'>(</font>size_type pos<font face='Lucida Console'>)</font>
+            <b>{</b>
+                read_pos <font color='#5555FF'>=</font> pos;
+            <b>}</b>
+
+            <font color='#009900'>// ------------------------ OUTPUT FUNCTIONS ------------------------
+</font>
+            int_type <b><a name='overflow'></a>overflow</b> <font face='Lucida Console'>(</font> int_type c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font> buffer.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> c;
+            <b>}</b>
+
+            std::streamsize <b><a name='xsputn'></a>xsputn</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> s, std::streamsize num<font face='Lucida Console'>)</font>
+            <b>{</b>
+                buffer.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>buffer.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, s, s<font color='#5555FF'>+</font>num<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> num;
+            <b>}</b>
+
+            <font color='#009900'>// ------------------------ INPUT FUNCTIONS ------------------------
+</font>
+            int_type <b><a name='underflow'></a>underflow</b><font face='Lucida Console'>(</font> 
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>read_pos <font color='#5555FF'>&lt;</font> buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buffer[read_pos]<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    <font color='#0000FF'>return</font> EOF;
+            <b>}</b>
+
+            int_type <b><a name='uflow'></a>uflow</b><font face='Lucida Console'>(</font> 
+            <font face='Lucida Console'>)</font>
+            <b>{</b>   
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>read_pos <font color='#5555FF'>&lt;</font> buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buffer[read_pos<font color='#5555FF'>+</font><font color='#5555FF'>+</font>]<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    <font color='#0000FF'>return</font> EOF;
+            <b>}</b>
+
+            int_type <b><a name='pbackfail'></a>pbackfail</b><font face='Lucida Console'>(</font>
+                int_type c
+            <font face='Lucida Console'>)</font>
+            <b>{</b>  
+                <font color='#009900'>// if they are trying to push back a character that they didn't read last
+</font>                <font color='#009900'>// that is an error
+</font>                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> prev <font color='#5555FF'>=</font> read_pos<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> prev <font color='#5555FF'>&lt;</font> buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                    c <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buffer[prev]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>return</font> EOF;
+                <b>}</b>
+
+                read_pos <font color='#5555FF'>=</font> prev;
+                <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+            <b>}</b>
+
+            std::streamsize <b><a name='xsgetn'></a>xsgetn</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> s, 
+                std::streamsize n
+            <font face='Lucida Console'>)</font>
+            <b>{</b> 
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>read_pos <font color='#5555FF'>&lt;</font> buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> size_type num <font color='#5555FF'>=</font> std::min<font color='#5555FF'>&lt;</font>size_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>n, buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>read_pos<font face='Lucida Console'>)</font>;
+                    std::<font color='#BB00BB'>memcpy</font><font face='Lucida Console'>(</font>s, <font color='#5555FF'>&amp;</font>buffer[read_pos], num<font face='Lucida Console'>)</font>;
+                    read_pos <font color='#5555FF'>+</font><font color='#5555FF'>=</font> num;
+                    <font color='#0000FF'>return</font> num;
+                <b>}</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+        <b>}</b>;
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='vectorstream'></a>vectorstream</b> <font face='Lucida Console'>(</font>
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> buffer
+        <font face='Lucida Console'>)</font> :
+            std::iostream<font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>buf<font face='Lucida Console'>)</font>,
+            buf<font face='Lucida Console'>(</font>buffer<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        std::istream<font color='#5555FF'>&amp;</font> <b><a name='seekg'></a>seekg</b> <font face='Lucida Console'>(</font>
+            std::streampos pos
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            buf.<font color='#BB00BB'>seekg</font><font face='Lucida Console'>(</font>pos<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        vector_streambuf buf;
+    <b>}</b>;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_VECTORStREAM_Hh_
+</font>
+
+</pre></body></html>

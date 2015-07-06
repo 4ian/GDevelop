@@ -1,0 +1,607 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - svm_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SVm_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_SVm_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='function_abstract.h.html'>function_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel_abstract.h.html'>kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm_nu_trainer_abstract.h.html'>svm_nu_trainer_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_learning_problem'></a>is_learning_problem</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> x_labels
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T == a matrix or something convertible to a matrix via mat()
+            - U == a matrix or something convertible to a matrix via mat()
+        ensures
+            - returns true if all of the following are true and false otherwise:
+                - is_col_vector(x) == true
+                - is_col_vector(x_labels) == true
+                - x.size() == x_labels.size() 
+                - x.size() &gt; 0
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_binary_classification_problem'></a>is_binary_classification_problem</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> x_labels
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T == a matrix or something convertible to a matrix via mat()
+            - U == a matrix or something convertible to a matrix via mat()
+        ensures
+            - returns true if all of the following are true and false otherwise:
+                - is_learning_problem(x, x_labels) == true
+                - x.size() &gt; 1
+                - there exists at least one sample from both the +1 and -1 classes.
+                  (i.e. all samples can't have the same label)
+                - for all valid i:
+                    - x_labels(i) == -1 or +1
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sequence_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_sequence_labeling_problem'></a>is_sequence_labeling_problem</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sequence_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns true if all of the following are true and false otherwise:
+                - is_learning_problem(samples, labels) == true
+                - for all valid i:
+                    - samples[i].size() == labels[i].size()
+                      (i.e. The size of a label sequence need to match the size of 
+                      its corresponding sample sequence)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sequence_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_sequence_segmentation_problem'></a>is_sequence_segmentation_problem</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sequence_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> segments
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - Note that a sequence segmentation problem is a task where you are given a
+              sequence of objects (e.g. words in a sentence) and your task is to find
+              certain types of sub-sequences (e.g. proper names).
+            - returns true if all of the following are true and false otherwise:
+                - is_learning_problem(samples, segments) == true
+                - for all valid i and j:
+                    - We interpret segments[i][j] as defining a half open range starting
+                      with segments[i][j].first and ending just before segments[i][j].second.
+                    - segments[i][j].first &lt; segments[i][j].second
+                    - segments[i][j].second &lt;= samples[i].size()
+                      (i.e. Each segment must be contained within its associated sequence)
+                    - segments[i][j] does not overlap with any of the other ranges in
+                      segments[i].
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> lhs_type, 
+        <font color='#0000FF'>typename</font> rhs_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_assignment_problem'></a>is_assignment_problem</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>lhs_type<font color='#5555FF'>&gt;</font>, std::vector<font color='#5555FF'>&lt;</font>rhs_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - Note that an assignment problem is a task to associate each element of samples[i].first
+              to an element of samples[i].second, or to indicate that the element doesn't associate 
+              with anything.  Therefore, labels[i] should contain the association information for
+              samples[i].
+            - This function returns true if all of the following are true and false otherwise:
+                - is_learning_problem(samples, labels) == true
+                - for all valid i:
+                    - samples[i].first.size() == labels[i].size()
+                    - for all valid j:
+                        -1 &lt;= labels[i][j] &lt; samples[i].second.size()
+                        (A value of -1 indicates that samples[i].first[j] isn't associated with anything.
+                        All other values indicate the associating element of samples[i].second)
+                    - All elements of labels[i] which are not equal to -1 are unique.  That is,
+                      multiple elements of samples[i].first can't associate to the same element
+                      in samples[i].second.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> lhs_type, 
+        <font color='#0000FF'>typename</font> rhs_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_forced_assignment_problem'></a>is_forced_assignment_problem</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>lhs_type<font color='#5555FF'>&gt;</font>, std::vector<font color='#5555FF'>&lt;</font>rhs_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - A regular assignment problem is allowed to indicate that all elements of 
+              samples[i].first don't associate to anything.  However, a forced assignment
+              problem is required to always associate an element of samples[i].first to 
+              something in samples[i].second if there is an element of samples[i].second
+              that hasn't already been associated to something.  
+            - This function returns true if all of the following are true and false otherwise:
+                - is_assignment_problem(samples, labels) == true
+                - for all valid i:
+                    - let N denote the number of elements in labels[i] that are not equal to -1.
+                    - min(samples[i].first.size(), samples[i].second.size()) == N
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> detection_type_,
+        <font color='#0000FF'>typename</font> label_type_ <font color='#5555FF'>=</font> <font color='#0000FF'><u>long</u></font>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='labeled_detection'></a>labeled_detection</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple object, like std::pair, it just holds two objects.  It
+                serves the same purpose as std::pair except that it has informative names
+                describing its two members and is intended for use with track association
+                problems.
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> detection_type_ detection_type;
+        <font color='#0000FF'>typedef</font> label_type_ label_type;
+
+        detection_type det;
+        label_type label;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> detection_type_,
+        <font color='#0000FF'>typename</font> label_type_ 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> labeled_detection<font color='#5555FF'>&lt;</font>detection_type_,label_type_<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> detection_type_,
+        <font color='#0000FF'>typename</font> label_type_ 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>labeled_detection<font color='#5555FF'>&lt;</font>detection_type_,label_type_<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> detection_type, 
+        <font color='#0000FF'>typename</font> label_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_track_association_problem'></a>is_track_association_problem</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>labeled_detection<font color='#5555FF'>&lt;</font>detection_type,label_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - In this tracking model you get a set of detections at each time step and are
+              expected to associate each detection with a track or have it spawn a new
+              track.  Therefore, a track association problem is a machine learning problem
+              where you are given a dataset of example input detections and are expected to
+              learn to perform the proper detection to track association.  
+            - This function checks if samples can form a valid dataset for this machine
+              learning problem and returns true if this is the case.  This means we should
+              interpret samples in the following way:
+                - samples is a track history and for each valid i:
+                    - samples[i] is a set of labeled detections from the i-th time step.
+                      Each detection has been labeled with its "true object identity".
+                      That is, all the detection throughout the history with the same
+                      label_type value are detections from the same object and therefore
+                      should be associated to the same track.
+              Putting this all together, samples is a valid track association learning
+              problem if and only if the following are all true:
+                - samples.size() &gt; 0
+                - There are at least two values, i and j such that:
+                    - i != j
+                    - samples[i].size() &gt; 0
+                    - samples[j].size() &gt; 0
+                  Or in other words, there needs to be some detections in samples somewhere
+                  or it is impossible to learn anything.
+                - for all valid i:
+                    - for all valid j and k where j!=k:
+                        - samples[i][j].label != samples[i][k].label
+                          (i.e. the label_type values must be unique within each time step.
+                          Or in other words, you can't have two detections on the same
+                          object in a single time step.)
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> detection_type, 
+        <font color='#0000FF'>typename</font> label_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_track_association_problem'></a>is_track_association_problem</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>labeled_detection<font color='#5555FF'>&lt;</font>detection_type,label_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns true if is_track_association_problem(samples[i]) == true for all
+              valid i and false otherwise.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='platt_scale'></a>platt_scale</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> params,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> score
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns 1/(1 + std::exp(params.first*score + params.second))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <b><a name='learn_platt_scaling'></a>learn_platt_scaling</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> scores,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T should be either float, double, or long double 
+            - is_binary_classification_problem(scores,labels) == true
+        ensures
+            - This function learns to map scalar values into well calibrated probabilities
+              using Platt scaling.  In particular, it returns a params object such that, 
+              for all valid i:
+                - platt_scale(params,scores[i]) == the scaled version of the scalar value
+                  scores[i].  That is, the output is a number between 0 and 1.  In
+                  particular, platt_scale(params,scores[i]) is meant to represent the
+                  probability that labels[i] == +1.
+            - This function is an implementation of the algorithm described in the following
+              papers: 
+                Probabilistic Outputs for Support Vector Machines and Comparisons to
+                Regularized Likelihood Methods by John C. Platt.  March 26, 1999
+
+                A Note on Platt's Probabilistic Outputs for Support Vector Machines
+                by Hsuan-Tien Lin, Chih-Jen Lin, and Ruby C. Weng
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type,
+        <font color='#0000FF'>typename</font> sample_vector_type,
+        <font color='#0000FF'>typename</font> label_vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> probabilistic_function<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> trainer_type::trained_function_type<font color='#5555FF'>&gt;</font> 
+    <b><a name='train_probabilistic_decision_function'></a>train_probabilistic_decision_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> sample_vector_type<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> label_vector_type<font color='#5555FF'>&amp;</font> y,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> folds
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 1 &lt; folds &lt;= x.size()
+            - is_binary_classification_problem(x,y) == true
+            - x and y must be std::vector objects or types with a compatible interface.
+            - trainer_type == some kind of batch trainer object (e.g. svm_nu_trainer)
+        ensures
+            - trains a classifier given the training samples in x and labels in y.  
+            - returns a probabilistic_decision_function that represents the trained classifier.
+            - The parameters of the probability model are estimated by performing k-fold 
+              cross validation. 
+            - The number of folds used is given by the folds argument.
+            - This function is implemented using learn_platt_scaling()
+        throws
+            - any exceptions thrown by trainer.train()
+            - std::bad_alloc
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type
+        <font color='#5555FF'>&gt;</font>
+    trainer_adapter_probabilistic<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font> <b><a name='probabilistic'></a>probabilistic</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> folds
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 1 &lt; folds &lt;= x.size()
+            - trainer_type == some kind of batch trainer object (e.g. svm_nu_trainer)
+        ensures
+            - returns a trainer adapter TA such that calling TA.train(samples, labels)
+              returns the same object as calling train_probabilistic_decision_function(trainer,samples,labels,folds).
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                                  Miscellaneous functions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type,
+        <font color='#0000FF'>typename</font> in_sample_vector_type,
+        <font color='#0000FF'>typename</font> in_scalar_vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='cross_validate_trainer'></a>cross_validate_trainer</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> folds
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is_binary_classification_problem(x,y) == true
+            - 1 &lt; folds &lt;= std::min(sum(y&gt;0),sum(y&lt;0))
+              (e.g. There must be at least as many examples of each class as there are folds)
+            - trainer_type == some kind of binary classification trainer object (e.g. svm_nu_trainer)
+        ensures
+            - performs k-fold cross validation by using the given trainer to solve the
+              given binary classification problem for the given number of folds.
+              Each fold is tested using the output of the trainer and the average 
+              classification accuracy from all folds is returned.  
+            - The average accuracy is computed by running test_binary_decision_function()
+              on each fold and its output is averaged and returned.
+            - The number of folds used is given by the folds argument.
+        throws
+            - any exceptions thrown by trainer.train()
+            - std::bad_alloc
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> dec_funct_type,
+        <font color='#0000FF'>typename</font> in_sample_vector_type,
+        <font color='#0000FF'>typename</font> in_scalar_vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='test_binary_decision_function'></a>test_binary_decision_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> dec_funct_type<font color='#5555FF'>&amp;</font> dec_funct,
+        <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x_test,
+        <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y_test
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is_binary_classification_problem(x_test,y_test) == true
+            - dec_funct_type == some kind of decision function object (e.g. decision_function)
+        ensures
+            - Tests the given decision function by calling it on the x_test and y_test samples.
+              The output of dec_funct is interpreted as a prediction for the +1 class
+              if its output is &gt;= 0 and as a prediction for the -1 class otherwise.
+            - The test accuracy is returned in a row vector, let us call it R.  Both 
+              quantities in R are numbers between 0 and 1 which represent the fraction 
+              of examples correctly classified.  R(0) is the fraction of +1 examples 
+              correctly classified and R(1) is the fraction of -1 examples correctly 
+              classified.
+        throws
+            - std::bad_alloc
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='randomize_samples'></a>randomize_samples</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> samples,
+        U<font color='#5555FF'>&amp;</font> labels 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - U == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - if samples or labels are matrix objects then is_vector(samples) == true and
+              is_vector(labels) == true
+            - samples.size() == labels.size()
+        ensures
+            - randomizes the order of the samples and labels but preserves
+              the pairing between each sample and its label
+            - A default initialized random number generator is used to perform the randomizing.
+              Note that this means that each call this this function does the same thing.  
+              That is, the random number generator always uses the same seed.
+            - for all valid i:
+                - let r == the random index samples(i) was moved to.  then:
+                    - #labels(r) == labels(i)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U,
+        <font color='#0000FF'>typename</font> rand_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='randomize_samples'></a>randomize_samples</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> samples,
+        U<font color='#5555FF'>&amp;</font> labels,
+        rand_type<font color='#5555FF'>&amp;</font> rnd
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - U == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - if samples or labels are matrix objects then is_vector(samples) == true and
+              is_vector(labels) == true
+            - samples.size() == labels.size()
+            - rand_type == a type that implements the dlib/rand/rand_kernel_abstract.h interface
+        ensures
+            - randomizes the order of the samples and labels but preserves
+              the pairing between each sample and its label
+            - the given rnd random number generator object is used to do the randomizing
+            - for all valid i:
+                - let r == the random index samples(i) was moved to.  then:
+                    - #labels(r) == labels(i)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='randomize_samples'></a>randomize_samples</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> samples
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - if (samples is a matrix) then 
+                - is_vector(samples) == true 
+        ensures
+            - randomizes the order of the elements inside samples 
+            - A default initialized random number generator is used to perform the randomizing.
+              Note that this means that each call this this function does the same thing.  
+              That is, the random number generator always uses the same seed.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> rand_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='randomize_samples'></a>randomize_samples</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> samples,
+        rand_type<font color='#5555FF'>&amp;</font> rnd
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - rand_type == a type that implements the dlib/rand/rand_kernel_abstract.h interface
+            - if (samples is a matrix) then 
+                - is_vector(samples) == true 
+        ensures
+            - randomizes the order of the elements inside samples 
+            - the given rnd random number generator object is used to do the randomizing
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U,
+        <font color='#0000FF'>typename</font> V
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='randomize_samples'></a>randomize_samples</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> samples,
+        U<font color='#5555FF'>&amp;</font> labels,
+        V<font color='#5555FF'>&amp;</font> auxiliary
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - U == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - V == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - if (samples, labels, or auxiliary are matrix objects) then 
+                - is_vector(samples) == true 
+                - is_vector(labels) == true
+                - is_vector(auxiliary) == true
+            - samples.size() == labels.size() == auxiliary.size()
+        ensures
+            - randomizes the order of the samples, labels, and auxiliary but preserves the
+              pairing between each sample, its label, and its auxiliary value.
+            - A default initialized random number generator is used to perform the
+              randomizing.  Note that this means that each call this this function does the
+              same thing.  That is, the random number generator always uses the same seed.
+            - for all valid i:
+                - let r == the random index samples(i) was moved to.  then:
+                    - #labels(r) == labels(i)
+                    - #auxiliary(r) == auxiliary(i)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U,
+        <font color='#0000FF'>typename</font> V,
+        <font color='#0000FF'>typename</font> rand_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='randomize_samples'></a>randomize_samples</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> samples,
+        U<font color='#5555FF'>&amp;</font> labels,
+        V<font color='#5555FF'>&amp;</font> auxiliary,
+        rand_type<font color='#5555FF'>&amp;</font> rnd
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - U == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - V == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - if (samples, labels, or auxiliary are matrix objects) then 
+                - is_vector(samples) == true 
+                - is_vector(labels) == true
+                - is_vector(auxiliary) == true
+            - samples.size() == labels.size() == auxiliary.size()
+            - rand_type == a type that implements the dlib/rand/rand_kernel_abstract.h interface
+        ensures
+            - randomizes the order of the samples, labels, and auxiliary but preserves the
+              pairing between each sample, its label, and its auxiliary value.
+            - the given rnd random number generator object is used to do the randomizing
+            - for all valid i:
+                - let r == the random index samples(i) was moved to.  then:
+                    - #labels(r) == labels(i)
+                    - #auxiliary(r) == auxiliary(i)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SVm_ABSTRACT_
+</font>
+
+
+</pre></body></html>

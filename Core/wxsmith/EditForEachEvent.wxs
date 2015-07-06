@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="EditForEachEvent">
-		<title>Edition of &quot;For each object&quot; event</title>
+		<title>Edit the &quot;For each object&quot; event</title>
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">

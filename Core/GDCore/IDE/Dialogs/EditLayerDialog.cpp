@@ -78,7 +78,7 @@ tempLayer(layer_)
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
 	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Name :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	nameEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(129,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	nameEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(129,-1), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer2->Add(nameEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	visibilityCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Visible"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
 	visibilityCheck->SetValue(false);
@@ -89,7 +89,9 @@ tempLayer(layer_)
 	FlexGridSizer5 = new wxFlexGridSizer(0, 4, 0, 0);
 	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Camera No."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer5->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	cameraChoice = new wxChoice(this, ID_CHOICE1, wxDefaultPosition, wxSize(37,21), 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
+	cameraChoice = new wxChoice(this, ID_CHOICE1, wxDefaultPosition, wxSize(50,-1), 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
+	cameraChoice->Append("00");
+	cameraChoice->SetSelection(0);
 	FlexGridSizer5->Add(cameraChoice, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	deleteCameraBt = new wxButton(this, ID_BUTTON5, _("Delete"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
 	FlexGridSizer5->Add(deleteCameraBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -103,12 +105,12 @@ tempLayer(layer_)
 	sizeCheck = new wxCheckBox(this, ID_CHECKBOX2, _("Custom size :"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
 	sizeCheck->SetValue(false);
 	FlexGridSizer8->Add(sizeCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	cameraWidthEdit = new wxTextCtrl(this, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxSize(52,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
+	cameraWidthEdit = new wxTextCtrl(this, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxSize(60,-1), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
 	cameraWidthEdit->Disable();
 	FlexGridSizer8->Add(cameraWidthEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("x"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	FlexGridSizer8->Add(StaticText4, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	cameraHeightEdit = new wxTextCtrl(this, ID_TEXTCTRL3, wxEmptyString, wxDefaultPosition, wxSize(52,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
+	cameraHeightEdit = new wxTextCtrl(this, ID_TEXTCTRL3, wxEmptyString, wxDefaultPosition, wxSize(60,-1), 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
 	cameraHeightEdit->Disable();
 	FlexGridSizer8->Add(cameraHeightEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer6->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -119,22 +121,22 @@ tempLayer(layer_)
 	FlexGridSizer9 = new wxFlexGridSizer(0, 8, 0, 0);
 	StaticText7 = new wxStaticText(this, ID_STATICTEXT7, _("From"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
 	FlexGridSizer9->Add(StaticText7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	viewportX1Edit = new wxTextCtrl(this, ID_TEXTCTRL4, _("0"), wxDefaultPosition, wxSize(35,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
+	viewportX1Edit = new wxTextCtrl(this, ID_TEXTCTRL4, _("0"), wxDefaultPosition, wxSize(40,-1), 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
 	viewportX1Edit->Disable();
 	FlexGridSizer9->Add(viewportX1Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText6 = new wxStaticText(this, ID_STATICTEXT6, _(";"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
 	FlexGridSizer9->Add(StaticText6, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	viewportY1Edit = new wxTextCtrl(this, ID_TEXTCTRL5, _("0"), wxDefaultPosition, wxSize(35,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
+	viewportY1Edit = new wxTextCtrl(this, ID_TEXTCTRL5, _("0"), wxDefaultPosition, wxSize(40,-1), 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
 	viewportY1Edit->Disable();
 	FlexGridSizer9->Add(viewportY1Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText8 = new wxStaticText(this, ID_STATICTEXT8, _("to"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
 	FlexGridSizer9->Add(StaticText8, 1, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	viewportX2Edit = new wxTextCtrl(this, ID_TEXTCTRL6, _("1"), wxDefaultPosition, wxSize(35,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL6"));
+	viewportX2Edit = new wxTextCtrl(this, ID_TEXTCTRL6, _("1"), wxDefaultPosition, wxSize(40,-1), 0, wxDefaultValidator, _T("ID_TEXTCTRL6"));
 	viewportX2Edit->Disable();
 	FlexGridSizer9->Add(viewportX2Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText9 = new wxStaticText(this, ID_STATICTEXT9, _(";"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT9"));
 	FlexGridSizer9->Add(StaticText9, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	viewportY2Edit = new wxTextCtrl(this, ID_TEXTCTRL7, _("1"), wxDefaultPosition, wxSize(35,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL7"));
+	viewportY2Edit = new wxTextCtrl(this, ID_TEXTCTRL7, _("1"), wxDefaultPosition, wxSize(40,-1), 0, wxDefaultValidator, _T("ID_TEXTCTRL7"));
 	viewportY2Edit->Disable();
 	FlexGridSizer9->Add(viewportY2Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer7->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -187,10 +189,14 @@ tempLayer(layer_)
 	nameEdit->ChangeValue(layer.GetName());
 	visibilityCheck->SetValue(layer.GetVisibility());
 
-	//Impossible de modifier le nom du calque de base
+	//Can't edit the base layer's name
 	if ( layer.GetName() == "" )
-        nameEdit->SetEditable(false);
+	{
+        nameEdit->Disable();
+        nameEdit->SetValue(_("Base layer"));
+	}
 
+    cameraChoice->Clear();
     for (unsigned int i = 0;i<layer.GetCameraCount();++i)
     	cameraChoice->Append(ToString(i));
 
@@ -213,13 +219,15 @@ void EditLayerDialog::OncancelBtClick(wxCommandEvent& event)
 void EditLayerDialog::OnokBtClick(wxCommandEvent& event)
 {
     //Obligation d'avoir un nom sauf pour le calque de base
-    if ( nameEdit->GetValue() == "" && nameEdit->IsEditable() )
+    if ( nameEdit->GetValue() == "" && nameEdit->IsEnabled() )
     {
         gd::LogWarning(GD_T("The name is incorrect"));
         return;
     }
 
-    tempLayer.SetName(nameEdit->GetValue());
+    if( layer.GetName() != "")
+    	tempLayer.SetName(nameEdit->GetValue());
+    
     tempLayer.SetVisibility(visibilityCheck->GetValue());
 
     layer = tempLayer;

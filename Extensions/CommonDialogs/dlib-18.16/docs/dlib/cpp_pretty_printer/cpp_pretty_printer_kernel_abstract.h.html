@@ -1,0 +1,91 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - cpp_pretty_printer_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_CPP_PRETTY_PRINTER_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_CPP_PRETTY_PRINTER_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ioswfd<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='cpp_pretty_printer'></a>cpp_pretty_printer</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                This object does not have any state associated with it.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents an HTML pretty printer for C++ source code. 
+
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='cpp_pretty_printer'></a>cpp_pretty_printer</b> <font face='Lucida Console'>(</font>        
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures                
+                - #*this is properly initialized
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='cpp_pretty_printer'></a>cpp_pretty_printer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - any resources associated with *this have been released
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='print'></a>print</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in,
+            std::ostream<font color='#5555FF'>&amp;</font> out,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> title
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - treats data from in as C++ source code and pretty prints it in
+                  HTML and writes it to out.
+                - The title of the HTML document writen to out will be title
+            throws
+                - std::ios_base::failure
+                    If there was a problem writing to out then this exception will 
+                    be thrown.                      
+                - any other exception
+                    This exception may be thrown if there is any other problem. 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='print_and_number'></a>print_and_number</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in,
+            std::ostream<font color='#5555FF'>&amp;</font> out,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> title
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - treats data from in as C++ source code and pretty prints it in
+                  HTML with line numbers and writes it to out.
+                - The title of the HTML document writen to out will be title
+            throws
+                - std::ios_base::failure
+                    If there was a problem writing to out then this exception will 
+                    be thrown.                      
+                - any other exception
+                    This exception may be thrown if there is any other problem. 
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='cpp_pretty_printer'></a>cpp_pretty_printer</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> cpp_pretty_printer<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        cpp_pretty_printer<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> cpp_pretty_printer<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;    
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CPP_PRETTY_PRINTER_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

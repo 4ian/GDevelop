@@ -26,6 +26,7 @@ MouseExtension::MouseExtension()
     GetAllConditions()["SourisX"].SetFunctionName("GetCursorXPosition").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/MouseTools.h");
     GetAllConditions()["SourisY"].SetFunctionName("GetCursorYPosition").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/MouseTools.h");
     GetAllConditions()["SourisBouton"].SetFunctionName("MouseButtonPressed").SetIncludeFile("GDCpp/BuiltinExtensions/MouseTools.h");
+    GetAllConditions()["MouseButtonReleased"].SetFunctionName("MouseButtonReleased").SetIncludeFile("GDCpp/BuiltinExtensions/MouseTools.h");
 
     GetAllConditions()["SourisSurObjet"].SetFunctionName("CursorOnObject").SetIncludeFile("GDCpp/BuiltinExtensions/MouseTools.h");
 

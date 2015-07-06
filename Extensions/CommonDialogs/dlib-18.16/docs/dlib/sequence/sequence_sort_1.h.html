@@ -1,0 +1,185 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sequence_sort_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SEQUENCE_SORt_1_
+<font color='#0000FF'>#define</font> DLIB_SEQUENCE_SORt_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sequence_sort_abstract.h.html'>sequence_sort_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> seq_base 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='sequence_sort_1'></a>sequence_sort_1</b> : <font color='#0000FF'>public</font> seq_base
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> seq_base::type T;
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#009900'>/*!
+            this is a median of three version of the QuickSort algorithm and
+            it sorts sequences of less than 30 elements with a selection sort
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='sort'></a>sort</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='sort_this_sequence'></a>sort_this_sequence</b> <font face='Lucida Console'>(</font>
+            seq_base<font color='#5555FF'>&amp;</font> sequence
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - each element in the sequence is &lt; the element behind it
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='selection_sort'></a>selection_sort</b> <font face='Lucida Console'>(</font>
+            seq_base<font color='#5555FF'>&amp;</font> sequence
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - sequence is sorted with a selection_sort
+        !*/</font>
+
+
+    <b>}</b>;
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> seq_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        sequence_sort_1<font color='#5555FF'>&lt;</font>seq_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        sequence_sort_1<font color='#5555FF'>&lt;</font>seq_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b> 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> seq_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> sequence_sort_1<font color='#5555FF'>&lt;</font>seq_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='sort'></a>sort</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>sort_this_sequence</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// private member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> seq_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> sequence_sort_1<font color='#5555FF'>&lt;</font>seq_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='sort_this_sequence'></a>sort_this_sequence</b> <font face='Lucida Console'>(</font>
+        seq_base<font color='#5555FF'>&amp;</font> sequence
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sequence.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>30</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>selection_sort</font><font face='Lucida Console'>(</font>sequence<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> 
+        <b>{</b>
+            seq_base left, right;
+            T partition_element;
+
+            sequence.<font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,partition_element<font face='Lucida Console'>)</font>;
+
+            dlib::<font color='#BB00BB'>median</font> <font face='Lucida Console'>(</font>
+                partition_element,
+                sequence[sequence.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>],
+                sequence[<font face='Lucida Console'>(</font>sequence.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>]
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// partition sequence into left and right
+</font>            T temp;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>sequence.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                sequence.<font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,temp<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&lt;</font> partition_element<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    left.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,temp<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    right.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,temp<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#BB00BB'>sort_this_sequence</font><font face='Lucida Console'>(</font>left<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>sort_this_sequence</font><font face='Lucida Console'>(</font>right<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// combine left and right into sequence
+</font>            left.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>sequence<font face='Lucida Console'>)</font>;
+            sequence.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>sequence.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,partition_element<font face='Lucida Console'>)</font>;
+            sequence.<font color='#BB00BB'>cat</font><font face='Lucida Console'>(</font>right<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> seq_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> sequence_sort_1<font color='#5555FF'>&lt;</font>seq_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='selection_sort'></a>selection_sort</b> <font face='Lucida Console'>(</font>
+        seq_base<font color='#5555FF'>&amp;</font> sequence
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sequence.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            T temp[<font color='#979000'>29</font>];
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> ssize <font color='#5555FF'>=</font> sequence.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> ssize; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                sequence.<font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,temp[i]<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> smallest;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> ssize <font color='#5555FF'>-</font> <font color='#979000'>1</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>    
+                <font color='#009900'>// find smallest element and swap into i
+</font>                smallest <font color='#5555FF'>=</font> i;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> i<font color='#5555FF'>+</font><font color='#979000'>1</font>; j <font color='#5555FF'>&lt;</font> ssize; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp[j] <font color='#5555FF'>&lt;</font> temp[smallest]<font face='Lucida Console'>)</font>
+                        smallest <font color='#5555FF'>=</font> j;
+                <b>}</b>
+                <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>temp[smallest],temp[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> ssize; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                sequence.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>i,temp[i]<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sequence.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sequence[<font color='#979000'>1</font>] <font color='#5555FF'>&lt;</font> sequence[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>sequence[<font color='#979000'>0</font>],sequence[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SEQUENCE_SORt_1_
+</font>
+
+</pre></body></html>

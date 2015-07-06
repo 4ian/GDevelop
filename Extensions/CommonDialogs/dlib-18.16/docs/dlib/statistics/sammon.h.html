@@ -1,0 +1,272 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sammon.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Emanuele Cesena (emanuele.cesena@gmail.com), Davis E. King
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SAMMoN_Hh_
+<font color='#0000FF'>#define</font> DLIB_SAMMoN_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sammon_abstract.h.html'>sammon_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dpca.h.html'>dpca.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='sammon_projection'></a>sammon_projection</b>
+    <b>{</b>
+
+    <font color='#0000FF'>public</font>:
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_type<font color='#5555FF'>&gt;</font>
+        std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> data,       
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_dims                      
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>num_dims <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t std::vector&lt;matrix&lt;double,0,1&gt; &gt; sammon_projection::operator()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_dims:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_dims
+                <font face='Lucida Console'>)</font>;
+            std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> result;    <font color='#009900'>// projections
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> result;
+            <b>}</b>
+
+<font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font> num_dims <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_dims <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> data[<font color='#979000'>0</font>].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\t std::vector&lt;matrix&lt;double,0,1&gt; &gt; sammon_projection::operator()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t data.size():    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_dims:       </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_dims
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t data[0].size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> data[<font color='#979000'>0</font>].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>data[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> data[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> data[<font color='#979000'>0</font>].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                        "<font color='#CC0000'>\t std::vector&lt;matrix&lt;double,0,1&gt; &gt; sammon_projection::operator()</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t data[</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>].size():    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> data[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t data[0].size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> data[<font color='#979000'>0</font>].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_col_vector(data[</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>]): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>data[i]<font face='Lucida Console'>)</font>
+                <font face='Lucida Console'>)</font>;
+            <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+            <font color='#0000FF'><u>double</u></font> err;                                 <font color='#009900'>// error (discarded)
+</font>            <font color='#BB00BB'>do_sammon_projection</font><font face='Lucida Console'>(</font>data, num_dims, result, err<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> result;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> data,       
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_dims,                     
+            std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> result,   
+            <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>&amp;</font>err,                                
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_iters <font color='#5555FF'>=</font> <font color='#979000'>1000</font>,             
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> err_delta <font color='#5555FF'>=</font> <font color='#979000'>1.0e</font><font color='#5555FF'>-</font><font color='#979000'>9</font>            
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>num_dims <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_iters <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> err_delta <font color='#5555FF'>&gt;</font> <font color='#979000'>0.0</font>,
+                "<font color='#CC0000'>\t std::vector&lt;matrix&lt;double,0,1&gt; &gt; sammon_projection::operator()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t data.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_dims:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_dims
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_iters:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_iters
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t err_delta:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> err_delta
+                <font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                result.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                err <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>return</font>;
+            <b>}</b>
+
+<font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font> num_dims <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_dims <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> data[<font color='#979000'>0</font>].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\t std::vector&lt;matrix&lt;double,0,1&gt; &gt; sammon_projection::operator()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t data.size():    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_dims:       </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_dims
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t data[0].size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> data[<font color='#979000'>0</font>].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>data[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> data[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> data[<font color='#979000'>0</font>].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                        "<font color='#CC0000'>\t std::vector&lt;matrix&lt;double,0,1&gt; &gt; sammon_projection::operator()</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t data[</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>].size():    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> data[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t data[0].size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> data[<font color='#979000'>0</font>].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_col_vector(data[</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>]): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>data[i]<font face='Lucida Console'>)</font>
+                <font face='Lucida Console'>)</font>;
+            <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+            <font color='#BB00BB'>do_sammon_projection</font><font face='Lucida Console'>(</font>data, num_dims, result, err, num_iters, err_delta<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>        <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='compute_relative_distances'></a>compute_relative_distances</b><font face='Lucida Console'>(</font>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dist,                   <font color='#009900'>// relative distances (output)
+</font>            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> data,                   <font color='#009900'>// input data (matrix whose columns are the input vectors)
+</font>            <font color='#0000FF'><u>double</u></font> eps_ratio <font color='#5555FF'>=</font> <font color='#979000'>1.0e</font><font color='#5555FF'>-</font><font color='#979000'>7</font>                   <font color='#009900'>// to compute the minimum distance eps
+</font>        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            requires
+                - dist.nc() == comb( data.nc(), 2 ), preallocated
+                - eps_ratio &gt; 0
+            ensures
+                - dist[k] == lenght(data[i] - data[j]) for k = j(j-1)/2 + i
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> N <font color='#5555FF'>=</font> data.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;                   <font color='#009900'>// num of points
+</font>            <font color='#0000FF'><u>double</u></font> eps;                                 <font color='#009900'>// minimum distance, forced to avoid vectors collision
+</font>                                                        <font color='#009900'>// computed at runtime as eps_ration * mean(vectors distances)
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>, i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> N; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> i; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>data, i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>data, j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            eps <font color='#5555FF'>=</font> eps_ratio <font color='#5555FF'>*</font> <font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font>;
+            dist <font color='#5555FF'>=</font> <font color='#BB00BB'>lowerbound</font><font face='Lucida Console'>(</font>dist, eps<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='do_sammon_projection'></a>do_sammon_projection</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> data,       <font color='#009900'>// input data
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_dims,                     <font color='#009900'>// dimension of the reduced space
+</font>            std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> result,   <font color='#009900'>// projections (output)
+</font>            <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>&amp;</font>err,                                <font color='#009900'>// error (output)
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_iters <font color='#5555FF'>=</font> <font color='#979000'>1000</font>,             <font color='#009900'>// max num of iterations: stop condition
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> err_delta <font color='#5555FF'>=</font> <font color='#979000'>1.0e</font><font color='#5555FF'>-</font><font color='#979000'>9</font>             <font color='#009900'>// delta error: stop condition
+</font>        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            requires
+                - matrix_type should be a kind of dlib::matrix&lt;double,N,1&gt;
+                - num_dims &gt; 0
+                - num_iters &gt; 0
+                - err_delta &gt; 0
+            ensures
+                - result == a set of matrix&lt;double,num_dims,1&gt; objects that represent
+                  the Sammon's projections of data vectors.
+                - err == the estimated error done in the projection, with the extra
+                  property that err(at previous iteration) - err &lt; err_delta
+        !*/</font>
+        <b>{</b>
+            <font color='#009900'>// other params
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> mf <font color='#5555FF'>=</font> <font color='#979000'>0.3</font>;                      <font color='#009900'>// magic factor
+</font>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> mdata;                <font color='#009900'>// input data as matrix
+</font>            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> projs;                <font color='#009900'>// projected vectors, i.e. output data as matrix
+</font>
+            <font color='#009900'>// std::vector&lt;matrix&gt; -&gt; matrix
+</font>            mdata.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>data[<font color='#979000'>0</font>].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>set_colm</font><font face='Lucida Console'>(</font>mdata, i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> data[i];
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> N <font color='#5555FF'>=</font> mdata.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;           <font color='#009900'>// num of points
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> d <font color='#5555FF'>=</font> num_dims;             <font color='#009900'>// size of the reduced space
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> nd <font color='#5555FF'>=</font> N <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>N <font color='#5555FF'>-</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>2</font>;     <font color='#009900'>// num of pairs of points = size of the distances vectors
+</font>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, <font color='#979000'>0</font>, <font color='#979000'>1</font><font color='#5555FF'>&gt;</font> dsij, inv_dsij; <font color='#009900'>// d*_ij: pair-wise distances in the input space (and inverses)
+</font>            dsij.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>nd, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            inv_dsij.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>nd, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>double</u></font> ic; <font color='#009900'>// 1.0 / sum of dsij
+</font>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, <font color='#979000'>0</font>, <font color='#979000'>1</font><font color='#5555FF'>&gt;</font> dij;            <font color='#009900'>// d_ij: pair-wise distances in the reduced space
+</font>            dij.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>nd, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, <font color='#979000'>0</font>, <font color='#979000'>0</font><font color='#5555FF'>&gt;</font> dE, dE2, dtemp; <font color='#009900'>// matrices representing error partial derivatives
+</font>            dE.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>d, N<font face='Lucida Console'>)</font>;
+            dE2.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>d, N<font face='Lucida Console'>)</font>;
+            dtemp.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>d, N<font face='Lucida Console'>)</font>;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, <font color='#979000'>0</font>, <font color='#979000'>1</font><font color='#5555FF'>&gt;</font> inv_dij, alpha; <font color='#009900'>// utility vectors used to compute the partial derivatives
+</font>            inv_dij.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>N, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;              <font color='#009900'>// inv_dij is 1.0/dij, but we only need it column-wise
+</font>            alpha.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>N, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;                <font color='#009900'>// (slightly wasting a bit of computation)
+</font>            <font color='#009900'>// alpha = 1.0/dij - 1.0/dsij, again column-wise
+</font>
+
+            <font color='#009900'>// initialize projs with PCA
+</font>            discriminant_pca<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> dpca;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> mdata.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dpca.<font color='#BB00BB'>add_to_total_variance</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>mdata, i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> mat <font color='#5555FF'>=</font> dpca.<font color='#BB00BB'>dpca_matrix_of_size</font><font face='Lucida Console'>(</font>num_dims<font face='Lucida Console'>)</font>;
+            projs <font color='#5555FF'>=</font> mat <font color='#5555FF'>*</font> mdata;
+
+            <font color='#009900'>// compute dsij, inv_dsij and ic
+</font>            <font color='#BB00BB'>compute_relative_distances</font><font face='Lucida Console'>(</font>dsij, mdata<font face='Lucida Console'>)</font>;
+            inv_dsij <font color='#5555FF'>=</font> <font color='#979000'>1.0</font> <font color='#5555FF'>/</font> dsij;
+            ic <font color='#5555FF'>=</font> <font color='#979000'>1.0</font> <font color='#5555FF'>/</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>dsij<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// compute dij and err
+</font>            <font color='#BB00BB'>compute_relative_distances</font><font face='Lucida Console'>(</font>dij, projs<font face='Lucida Console'>)</font>;
+            err <font color='#5555FF'>=</font> ic <font color='#5555FF'>*</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font><font color='#BB00BB'>squared</font><font face='Lucida Console'>(</font>dij <font color='#5555FF'>-</font> dsij<font face='Lucida Console'>)</font>, inv_dsij<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// start iterating
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>num_iters<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// compute dE, dE2 progressively column by column
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> p <font color='#5555FF'>=</font> <font color='#979000'>0</font>; p <font color='#5555FF'>&lt;</font> N; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>p<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// compute
+</font>                    <font color='#009900'>// - alpha_p, the column vector with 1/d_pj - 1/d*_pj
+</font>                    <font color='#009900'>// - dtemp, the matrix with the p-th column repeated all along
+</font>                    <font color='#009900'>//TODO: optimize constructions
+</font>                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> N; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'><u>int</u></font> pos <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font> p<font face='Lucida Console'>)</font> ? p <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>p <font color='#5555FF'>-</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>2</font> <font color='#5555FF'>+</font> i : i <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>-</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>2</font> <font color='#5555FF'>+</font> p;
+                        <font color='#BB00BB'>inv_dij</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p<font face='Lucida Console'>)</font> ? <font color='#979000'>0.0</font> : <font color='#979000'>1.0</font> <font color='#5555FF'>/</font> <font color='#BB00BB'>dij</font><font face='Lucida Console'>(</font>pos<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p<font face='Lucida Console'>)</font> ? <font color='#979000'>0.0</font> : <font color='#BB00BB'>inv_dij</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>inv_dsij</font><font face='Lucida Console'>(</font>pos<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>set_colm</font><font face='Lucida Console'>(</font>dtemp, i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>projs, p<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    dtemp <font color='#5555FF'>-</font><font color='#5555FF'>=</font> projs;
+                    <font color='#BB00BB'>set_colm</font><font face='Lucida Console'>(</font>dE, p<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> dtemp <font color='#5555FF'>*</font> alpha;
+
+                    <font color='#0000FF'><u>double</u></font> sum_alpha <font color='#5555FF'>=</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>set_colm</font><font face='Lucida Console'>(</font>dE2, p<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font> sum_alpha <font color='#5555FF'>+</font> <font color='#BB00BB'>squared</font><font face='Lucida Console'>(</font>dtemp<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>cubed</font><font face='Lucida Console'>(</font>inv_dij<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+
+                <font color='#009900'>// compute the update projections
+</font>                projs <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font>dE, mf <font color='#5555FF'>*</font> <font color='#BB00BB'>reciprocal</font><font face='Lucida Console'>(</font>dE2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// compute new dij and error
+</font>                <font color='#BB00BB'>compute_relative_distances</font><font face='Lucida Console'>(</font>dij, projs<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>double</u></font> err_new <font color='#5555FF'>=</font> ic <font color='#5555FF'>*</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font><font color='#BB00BB'>squared</font><font face='Lucida Console'>(</font>dij <font color='#5555FF'>-</font> dsij<font face='Lucida Console'>)</font>, inv_dsij<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>err <font color='#5555FF'>-</font> err_new <font color='#5555FF'>&lt;</font> err_delta<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+                err <font color='#5555FF'>=</font> err_new;
+            <b>}</b>
+
+            <font color='#009900'>// matrix -&gt; std::vector&lt;matrix&gt;
+</font>            result.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> projs.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                result.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>projs, i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b>;
+
+<b>}</b> <font color='#009900'>// namespace dlib
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SAMMoN_Hh_
+</font>
+
+</pre></body></html>

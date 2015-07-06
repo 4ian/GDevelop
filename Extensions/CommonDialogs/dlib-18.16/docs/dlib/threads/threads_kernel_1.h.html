@@ -1,0 +1,270 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - threads_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_THREADS_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_THREADS_KERNEl_1_
+
+<font color='#0000FF'>#ifdef</font> DLIB_ISO_CPP_ONLY
+<font color='#0000FF'>#error</font> "<font color='#CC0000'>DLIB_ISO_CPP_ONLY is defined so you can't use this OS dependent code.  Turn DLIB_ISO_CPP_ONLY off if you want to use it.</font>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel_abstract.h.html'>threads_kernel_abstract.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../windows_magic.h.html'>../windows_magic.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>windows.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>typedef</font> DWORD thread_id_type;
+
+    <font color='#0000FF'>inline</font> thread_id_type <b><a name='get_thread_id'></a>get_thread_id</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>GetCurrentThreadId</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// mutex object
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// forward declaration of signaler
+</font>    <font color='#0000FF'>class</font> signaler;
+
+    <font color='#0000FF'>class</font> <b><a name='mutex'></a>mutex</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='mutex'></a>mutex</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>InitializeCriticalSection</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cs<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        ~<b><a name='mutex'></a>mutex</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>DeleteCriticalSection</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cs<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='lock'></a>lock</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#BB00BB'>EnterCriticalSection</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cs<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='unlock'></a>unlock</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#BB00BB'>LeaveCriticalSection</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cs<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>mutable</font> CRITICAL_SECTION cs;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='mutex'></a>mutex</b><font face='Lucida Console'>(</font>mutex<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        mutex<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>mutex<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// signaler object
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='signaler'></a>signaler</b>
+    <b>{</b>
+
+    <font color='#0000FF'>public</font>:
+        <b><a name='signaler'></a>signaler</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> mutex<font color='#5555FF'>&amp;</font> associated_mutex
+        <font face='Lucida Console'>)</font> :
+            hSemaphore<font face='Lucida Console'>(</font>CreateSemaphore <font face='Lucida Console'>(</font>NULL, <font color='#979000'>0</font>, <font color='#979000'>100000000</font>, NULL<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+            waiters<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            hCountSema<font face='Lucida Console'>(</font>CreateSemaphore <font face='Lucida Console'>(</font>NULL,<font color='#979000'>0</font>,<font color='#979000'>100000000</font>,NULL<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+            m<font face='Lucida Console'>(</font>associated_mutex<font face='Lucida Console'>)</font>
+        <b>{</b>           
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hSemaphore <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL <font color='#5555FF'>|</font><font color='#5555FF'>|</font> hCountSema <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hSemaphore <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>CloseHandle</font><font face='Lucida Console'>(</font>hSemaphore<font face='Lucida Console'>)</font>; 
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hCountSema <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>CloseHandle</font><font face='Lucida Console'>(</font>hCountSema<font face='Lucida Console'>)</font>; 
+                <b>}</b>
+
+                <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>thread_error</font><font face='Lucida Console'>(</font>ECREATE_SIGNALER,
+        "<font color='#CC0000'>in function signaler::signaler() an error occurred making the signaler</font>"
+                <font face='Lucida Console'>)</font>;        
+            <b>}</b>
+        <b>}</b>
+
+        ~<b><a name='signaler'></a>signaler</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>CloseHandle</font><font face='Lucida Console'>(</font>hSemaphore<font face='Lucida Console'>)</font>; <font color='#BB00BB'>CloseHandle</font><font face='Lucida Console'>(</font>hCountSema<font face='Lucida Console'>)</font>;<b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='wait'></a>wait</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#009900'>// get a lock on the mutex for the waiters variable
+</font>            waiters_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// mark that one more thread will be waiting on this signaler
+</font>            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>waiters;
+            <font color='#009900'>// release the mutex for waiters
+</font>            waiters_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// release the associated mutex
+</font>            m.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// wait for the semaphore to be signaled
+</font>            <font color='#BB00BB'>WaitForSingleObject</font> <font face='Lucida Console'>(</font>hSemaphore,INFINITE<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// signal that we are awake
+</font>            <font color='#BB00BB'>ReleaseSemaphore</font><font face='Lucida Console'>(</font>hCountSema,<font face='Lucida Console'>(</font>LONG<font face='Lucida Console'>)</font><font color='#979000'>1</font>,NULL<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// relock the associated mutex 
+</font>            m.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='wait_or_timeout'></a>wait_or_timeout</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> milliseconds
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#009900'>// get a lock on the mutex for the waiters variable
+</font>            waiters_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// mark that one more thread will be waiting on this signaler
+</font>            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>waiters;
+            <font color='#009900'>// release the mutex for waiters
+</font>            waiters_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// release the associated mutex
+</font>            m.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>bool</u></font> value;
+
+            <font color='#009900'>// wait for the semaphore to be signaled
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>WaitForSingleObject</font> <font face='Lucida Console'>(</font>hSemaphore, milliseconds <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> WAIT_TIMEOUT <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// in this case we should decrement waiters because we are returning
+</font>                <font color='#009900'>// due to a timeout rather than because someone called signal() or 
+</font>                <font color='#009900'>// broadcast().
+</font>                value <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+                <font color='#009900'>// signal that we are awake
+</font>                <font color='#BB00BB'>ReleaseSemaphore</font><font face='Lucida Console'>(</font>hCountSema,<font face='Lucida Console'>(</font>LONG<font face='Lucida Console'>)</font><font color='#979000'>1</font>,NULL<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// get a lock on the mutex for the waiters variable
+</font>                waiters_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#009900'>// mark that one less thread will be waiting on this signaler. 
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>waiters <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>-</font><font color='#5555FF'>-</font>waiters;
+                <font color='#009900'>// release the mutex for waiters
+</font>                waiters_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> 
+            <b>{</b>
+                value <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+                <font color='#009900'>// signal that we are awake
+</font>                <font color='#BB00BB'>ReleaseSemaphore</font><font face='Lucida Console'>(</font>hCountSema,<font face='Lucida Console'>(</font>LONG<font face='Lucida Console'>)</font><font color='#979000'>1</font>,NULL<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+            <font color='#009900'>// relock the associated mutex 
+</font>            m.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> value;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='signal'></a>signal</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#009900'>// get a lock on the mutex for the waiters variable
+</font>            waiters_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#5555FF'>-</font><font color='#5555FF'>-</font>waiters;
+                <font color='#009900'>// make the semaphore release one waiting thread
+</font>                <font color='#BB00BB'>ReleaseSemaphore</font><font face='Lucida Console'>(</font>hSemaphore,<font color='#979000'>1</font>,NULL<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// wait for signaled thread to wake up
+</font>                <font color='#BB00BB'>WaitForSingleObject</font><font face='Lucida Console'>(</font>hCountSema,INFINITE<font face='Lucida Console'>)</font>;               
+            <b>}</b>
+
+            <font color='#009900'>// release the mutex for waiters
+</font>            waiters_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='broadcast'></a>broadcast</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#009900'>// get a lock on the mutex for the waiters variable
+</font>            waiters_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>waiters <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>   
+                <font color='#009900'>// make the semaphore release all the waiting threads
+</font>                <font color='#BB00BB'>ReleaseSemaphore</font><font face='Lucida Console'>(</font>hSemaphore,<font face='Lucida Console'>(</font>LONG<font face='Lucida Console'>)</font>waiters,NULL<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// wait for count to be zero
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> waiters; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>WaitForSingleObject</font><font face='Lucida Console'>(</font>hCountSema,INFINITE<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                waiters <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+            <font color='#009900'>// release the mutex for waiters
+</font>            waiters_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> mutex<font color='#5555FF'>&amp;</font> <b><a name='get_mutex'></a>get_mutex</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> m; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>mutable</font> HANDLE hSemaphore;
+
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> waiters;
+        mutex waiters_mutex;
+        
+
+        <font color='#0000FF'>mutable</font> HANDLE hCountSema;
+
+        <font color='#0000FF'>const</font> mutex<font color='#5555FF'>&amp;</font> m;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='signaler'></a>signaler</b><font face='Lucida Console'>(</font>signaler<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        signaler<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>signaler<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> threads_kernel_shared_helpers
+    <b>{</b>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='spawn_thread'></a>spawn_thread</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font>,
+            <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> param
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            is identical to create_new_thread() but just doesn't use any thread pooling.
+        !*/</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel_shared.h.html'>threads_kernel_shared.h</a>"
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel_1.cpp.html'>threads_kernel_1.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_THREADS_KERNEl_1_
+</font>
+
+</pre></body></html>

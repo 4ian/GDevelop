@@ -1,0 +1,318 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - threads_kernel_shared.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_THREADS_KERNEl_SHARED_
+<font color='#0000FF'>#define</font> DLIB_THREADS_KERNEl_SHARED_
+
+<font color='#009900'>// this file should be included at the bottom of one of the thread kernel headers for a 
+</font><font color='#009900'>// specific platform.
+</font><font color='#009900'>//#include "../threads.h"
+</font><font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='auto_mutex_extension.h.html'>auto_mutex_extension.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../binary_search_tree.h.html'>../binary_search_tree.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../member_function_pointer.h.html'>../member_function_pointer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../memory_manager.h.html'>../memory_manager.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../queue.h.html'>../queue.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../set.h.html'>../set.h</a>"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<font color='#0000FF'>extern</font> "<font color='#CC0000'>C</font>"
+<b>{</b>
+<font color='#009900'>// =========================&gt;&gt;&gt; WHY YOU ARE GETTING AN ERROR HERE &lt;&lt;&lt;=========================
+</font><font color='#009900'>// The point of this block of code is to cause a link time error that will prevent a user
+</font><font color='#009900'>// from compiling part of their application with DLIB_ASSERT enabled and part with it
+</font><font color='#009900'>// disabled since doing that would be a violation of C++'s one definition rule.  So if you
+</font><font color='#009900'>// are getting an error here then you are either not enabling DLIB_ASSERT consistently
+</font><font color='#009900'>// (e.g. by compiling part of your program in a debug mode and part in a release mode) or
+</font><font color='#009900'>// you have simply forgotten to compile dlib/all/source.cpp into your application.
+</font><font color='#009900'>// =========================&gt;&gt;&gt; WHY YOU ARE GETTING AN ERROR HERE &lt;&lt;&lt;=========================
+</font><font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+    <font color='#0000FF'>extern</font> <font color='#0000FF'><u>int</u></font> USER_ERROR__missing_dlib_all_source_cpp_file__OR__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives;
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>int</u></font> <b><a name='dlib_check_consistent_assert_usage'></a>dlib_check_consistent_assert_usage</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> USER_ERROR__missing_dlib_all_source_cpp_file__OR__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#0000FF'>return</font> <font color='#979000'>0</font>; <b>}</b>
+<font color='#0000FF'>#else</font>
+    <font color='#0000FF'>extern</font> <font color='#0000FF'><u>int</u></font> USER_ERROR__missing_dlib_all_source_cpp_file__OR__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives_;
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>int</u></font> <b><a name='dlib_check_consistent_assert_usage'></a>dlib_check_consistent_assert_usage</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> USER_ERROR__missing_dlib_all_source_cpp_file__OR__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives_ <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#0000FF'>return</font> <font color='#979000'>0</font>; <b>}</b>
+<font color='#0000FF'>#endif</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> dlib_check_assert_helper_variable <font color='#5555FF'>=</font> <b><a name='dlib_check_consistent_assert_usage'></a>dlib_check_consistent_assert_usage</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> threads_kernel_shared
+    <b>{</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread_starter'></a>thread_starter</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>class</font> <b><a name='threader'></a>threader</b>
+        <b>{</b>
+            <font color='#009900'>/*!
+                INITIAL VALUE
+                    - pool_count == 0 and
+                    - data_ready is associated with the mutex data_mutex 
+                    - data_empty is associated with the mutex data_mutex
+                    - destructed is associated with the mutex data_mutex
+                    - destruct == false
+                    - total_count == 0
+                    - function_pointer == 0
+                    - do_not_ever_destruct == false
+
+                CONVENTION
+                    - data_ready is associated with the mutex data_mutex 
+                    - data_empty is associated with the mutex data_mutex 
+                    - data_ready == a signaler used signal when there is new data waiting 
+                      to start a thread with.
+                    - data_empty == a signaler used to signal when the data is now empty 
+                    - pool_count == the number of suspended threads in the thread pool 
+                    - total_count == the number of threads that are executing anywhere.  i.e.
+                      pool_count + the ones that are currently running some user function.
+                    - if (function_pointer != 0) then
+                        - parameter == a void pointer pointing to the parameter which 
+                          should be used to start the next thread 
+                        - function_pointer == a pointer to the next function to make a 
+                          new thread with
+
+                    - if (the destructor is running) then
+                        - destruct == true
+                    - else
+                        - destruct == false
+
+                    - thread_ids is locked by the data_mutex
+                    - thread_ids == a set that contains the thread id for each thread spawned by this
+                      object.
+            !*/</font>
+
+
+        <font color='#0000FF'>public</font>:
+            <b><a name='threader'></a>threader</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+           
+            ~<b><a name='threader'></a>threader</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='destruct_if_ready'></a>destruct_if_ready</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - if (there are no threads currently running and we haven't set do_not_ever_destruct) then
+                        - calls delete this
+                    - else
+                        - does nothing
+            !*/</font>
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='create_new_thread'></a>create_new_thread</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font>,
+                <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> param
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+                <font color='#0000FF'>typename</font> T
+                <font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'><u>void</u></font> <b><a name='unregister_thread_end_handler'></a>unregister_thread_end_handler</b> <font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>&amp;</font> obj,
+                <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>handler<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                member_function_pointer<font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> mfp, junk_mfp;
+                mfp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>obj,handler<font face='Lucida Console'>)</font>;
+
+                thread_id_type junk_id;
+
+                <font color='#009900'>// find any member function pointers in the registry that point to the same
+</font>                <font color='#009900'>// thing as mfp and remove them
+</font>                auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>reg.m<font face='Lucida Console'>)</font>;
+                reg.reg.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>reg.reg.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>reg.reg.<font color='#BB00BB'>current_element_valid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> reg.reg.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> mfp<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        reg.reg.<font color='#BB00BB'>remove_current_element</font><font face='Lucida Console'>(</font>junk_id, junk_mfp<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+                <font color='#0000FF'>typename</font> T
+                <font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'><u>void</u></font> <b><a name='register_thread_end_handler'></a>register_thread_end_handler</b> <font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>&amp;</font> obj,
+                <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>handler<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                thread_id_type id <font color='#5555FF'>=</font> <font color='#BB00BB'>get_thread_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                member_function_pointer<font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> mfp;
+                mfp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>obj,handler<font face='Lucida Console'>)</font>;
+
+                auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>reg.m<font face='Lucida Console'>)</font>;
+                reg.reg.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>id,mfp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='is_dlib_thread'></a>is_dlib_thread</b> <font face='Lucida Console'>(</font>
+                thread_id_type id
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='thread_starter'></a>thread_starter</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='call_end_handlers'></a>call_end_handlers</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - calls the registered end handlers for the calling thread and
+                      then removes them from reg.reg
+            !*/</font>
+
+
+            <font color='#009900'>// private data
+</font>            set<font color='#5555FF'>&lt;</font>thread_id_type,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2b<font color='#5555FF'>&gt;</font>::kernel_1b_c thread_ids;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total_count;
+            <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> parameter;
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>function_pointer<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pool_count;
+            mutex data_mutex;           <font color='#009900'>// mutex to protect the above data
+</font>            signaler data_ready;        <font color='#009900'>// signaler to signal when there is new data
+</font>            signaler data_empty;        <font color='#009900'>// signaler to signal when the data is empty
+</font>            <font color='#0000FF'><u>bool</u></font> destruct;
+            signaler destructed;        <font color='#009900'>// signaler to signal when a thread has ended 
+</font>            <font color='#0000FF'><u>bool</u></font> do_not_ever_destruct;
+
+            <font color='#0000FF'>struct</font> <b><a name='registry_type'></a>registry_type</b>
+            <b>{</b>
+                mutex m;
+                binary_search_tree<font color='#5555FF'>&lt;</font>
+                    thread_id_type,
+                    member_function_pointer<font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font>,
+                    memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2a
+                    <font color='#5555FF'>&gt;</font>::kernel_2a_c reg;
+            <b>}</b>;
+
+            <font color='#009900'>// stuff for the register_thread_end_handler 
+</font>            registry_type reg;
+
+
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='threader'></a>threader</b><font face='Lucida Console'>(</font>threader<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>            threader<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>threader<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignement opertor
+</font>
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        threader<font color='#5555FF'>&amp;</font> <b><a name='thread_pool'></a>thread_pool</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns a reference to the global threader object
+        !*/</font>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>extern</font> <font color='#0000FF'><u>bool</u></font> thread_pool_has_been_destroyed;
+    <b>}</b>
+
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_dlib_thread'></a>is_dlib_thread</b> <font face='Lucida Console'>(</font>
+        thread_id_type id 
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_dlib_thread'></a>is_dlib_thread</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='create_new_thread'></a>create_new_thread</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> param
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#009900'>// now make this thread
+</font>            <font color='#0000FF'>return</font> threads_kernel_shared::<font color='#BB00BB'>thread_pool</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>create_new_thread</font><font face='Lucida Console'>(</font>funct,param<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::bad_alloc<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='register_thread_end_handler'></a>register_thread_end_handler</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> obj,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>handler<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_dlib_thread</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,            
+               "<font color='#CC0000'>\tvoid register_thread_end_handler</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can't register a thread end handler for a thread dlib didn't spawn.</font>"
+            <font face='Lucida Console'>)</font>;
+
+        threads_kernel_shared::<font color='#BB00BB'>thread_pool</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>register_thread_end_handler</font><font face='Lucida Console'>(</font>obj,handler<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='unregister_thread_end_handler'></a>unregister_thread_end_handler</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> obj,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>handler<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// Check if the thread pool has been destroyed and if it has then don't do anything.
+</font>        <font color='#009900'>// This bool here is always true except when the program has started to terminate and
+</font>        <font color='#009900'>// the thread pool object has been destroyed.  This if is here to catch other global
+</font>        <font color='#009900'>// objects that have destructors that try to call unregister_thread_end_handler().  
+</font>        <font color='#009900'>// Without this check we get into trouble if the thread pool is destroyed before these
+</font>        <font color='#009900'>// objects.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>threads_kernel_shared::thread_pool_has_been_destroyed <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            threads_kernel_shared::<font color='#BB00BB'>thread_pool</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>unregister_thread_end_handler</font><font face='Lucida Console'>(</font>obj,handler<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel_shared.cpp.html'>threads_kernel_shared.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_THREADS_KERNEl_SHARED_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html xmlns:gcse="googleCustomSearch"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="shortcut icon" href="dlib-icon.ico"><meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I="><meta name="google-site-verification" content="DGSSJMKDomaDaDTIRJ8jDkv0YMx9Cz7OESbXHjjr6Jw"><title>dlib C++ Library
+   - Graph Tools</title><script language="JavaScript">
+
+// ---------------------------------------------
+// --- Name:    Easy DHTML Treeview           --
+// --- Author:  D.D. de Kerf                  --
+// --- Version: 0.2          Date: 13-6-2001  --
+// ---------------------------------------------
+function Toggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "minus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "plus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+function BigToggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigminus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigplus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+</script><style type="text/css">
+   body {margin:0px;}
+   pre {margin:0px;}
+
+   ul.tree  li { list-style: none;  margin-left:10px;} 
+   ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
+   ul.tree  li ul { margin-left:10px; padding:0px; }
+
+   li#term { list-style: none; }
+
+   div.component {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      padding: 0.7em;
+   }
+
+   div.question {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      margin-bottom: 90%;
+      padding: 0.7em;
+   }
+
+   div.function {
+      background-color:white; 
+      border: 2px solid rgb(102,102,255); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.class {
+      background-color:white; 
+      border: 2px solid rgb(255,102,102); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.extension {
+      background-color:#FDFDFD; 
+      border: 1px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.0em;
+      padding: 0.7em;
+   }
+
+   div.logb {
+      text-align:left;
+      padding: 0.0em;
+      float: left;
+      background-color:#c0c0c0; 
+      border: double ; 
+      margin: 0.5em;
+   }
+
+   div.name {
+      float: left;
+   }
+   div.line1 {
+      float:left;
+      width:100%;
+      background-color:#dfdfdf; 
+   }
+   div.line2 {
+      float:left;
+      width:100%;
+   }
+   div.inc {
+      float: right;
+   }
+
+
+   .code_box
+   {
+      color: black;
+      margin: 1em 0.25in;
+      padding: 0.5em;
+      background: rgb(240,240,240);
+      border-top: black dotted 1px;
+      border-left: black dotted 1px;
+      border-right: black solid 2px;
+      border-bottom: black solid 2px;
+   }
+
+
+
+   .bdotted {border-bottom: 1px dotted}
+   .bdashed {border-bottom: 1px dashed}
+   .bsolid {border-bottom: 1px solid}
+   .bdouble {border-bottom: 1px double}
+   .bgroove {border-bottom: 1px groove}
+   .bridge {border-bottom: 1px ridge}
+   .binset {border-bottom: 1px inset}
+   .boutset {border-bottom: 1px outset}
+
+   div.row1 {
+      background-color:#dfdfdf; 
+   }
+   div.row2 {
+      background-color:#f2f2f2; 
+   }
+
+   div.typedefs {
+      margin-left: 1.5em;
+      margin-top: 0.2em;
+      border: 1px dotted;
+      width: 52em;
+   }
+
+   div.tdn {
+      width: 10em;
+   }
+
+   .fullhr {
+      clear: both;
+   }
+
+   body {
+      text-align: center;
+   }
+
+   div.entire_page_header {
+      width:62.5em;  
+      text-align: left;
+      margin-top: 0.4em;
+      margin-left: auto;
+      margin-right: auto;
+   }
+   div.entire_page {
+      width:62.5em;  
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      clear:both;
+   }
+</style></head><body bgcolor="#EDF3EE"><a name="top"></a><div class="entire_page_header"><a href="http://dlib.net"><img src="dlib-logo.png"></a></div><div class="entire_page"><table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px"><tr height="100%"><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="145" height="100%"><tr><td VALIGN="TOP"><b>The Library</b><ul class="tree"><li><a href="algorithms.html">Algorithms</a></li><li><a href="api.html">API Wrappers</a></li><li><a href="bayes.html">Bayesian Nets</a></li><li><a href="compression.html">Compression</a></li><li><a href="containers.html">Containers</a></li><li><a href="graph_tools.html">Graph Tools</a></li><li><a href="imaging.html">Image Processing</a></li><li><a href="linear_algebra.html">Linear Algebra</a></li><li><a href="ml.html">Machine Learning</a></li><li><a href="metaprogramming.html">Metaprogramming</a></li><li><a href="other.html">Miscellaneous</a></li><li><a href="network.html">Networking</a></li><li><a href="optimization.html">Optimization</a></li><li><a href="parsing.html">Parsing</a></li></ul><br><b>Help/Info</b><ul class="tree"><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: C++</u></font></a><ul style="display:none;"><li><a href="3d_point_cloud_ex.cpp.html">3D_Point_Cloud</a></li><li><a href="assignment_learning_ex.cpp.html">Assignment_Learning</a></li><li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li><li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li><li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li><li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li><li><a href="bridge_ex.cpp.html">Bridge</a></li><li><a href="bsp_ex.cpp.html">BSP</a></li><li><a href="svm_c_ex.cpp.html">C-Support_Vector_Machine</a></li><li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li><li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li><li><a href="config_reader_ex.cpp.html">Config_File_Reader</a></li><li><a href="custom_trainer_ex.cpp.html">Custom_Trainers</a></li><li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li><li><a href="empirical_kernel_map_ex.cpp.html">Empirical_Kernel_Map</a></li><li><a href="face_detection_ex.cpp.html">Face_Detection</a></li><li><a href="face_landmark_detection_ex.cpp.html">Face_Landmark_Detection</a></li><li><a href="fhog_ex.cpp.html">FHOG_Feature_Extraction</a></li><li><a href="fhog_object_detector_ex.cpp.html">FHOG_Object_Detection</a></li><li><a href="graph_labeling_ex.cpp.html">Graph_Labeling</a></li><li><a href="gui_api_ex.cpp.html">GUI</a></li><li><a href="hough_transform_ex.cpp.html">Hough_Transform</a></li><li><a href="server_http_ex.cpp.html">HTTP_Server</a></li><li><a href="image_ex.cpp.html">Image</a></li><li><a href="iosockstream_ex.cpp.html">IO Socket Streams</a></li><li><a href="server_iostream_ex.cpp.html">IO Streams Server</a></li><li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li><li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li><li><a href="krr_regression_ex.cpp.html">Kernel_Ridge_Regression</a></li><li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li><li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li><li><a href="krr_classification_ex.cpp.html">KRR_Classification</a></li><li><a href="learning_to_track_ex.cpp.html">Learning_to_Track</a></li><li><a href="max_cost_assignment_ex.cpp.html">Linear_Assignment_Problems</a></li><li><a href="linear_manifold_regularizer_ex.cpp.html">Linear_Manifold_Regularizer</a></li><li><a href="mpc_ex.cpp.html">Linear_Model_Predictive_Control</a></li><li><a href="logger_ex.cpp.html">Logger</a></li><li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li><li><a href="logger_custom_output_ex.cpp.html">Logger_Custom_Output</a></li><li><a href="matrix_ex.cpp.html">Matrix</a></li><li><a href="matrix_expressions_ex.cpp.html">Matrix_Expressions</a></li><li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li><li><a href="model_selection_ex.cpp.html">Model_Selection</a></li><li><a href="multiclass_classification_ex.cpp.html">Multiclass_Classification</a></li><li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li><li><a href="mlp_ex.cpp.html">Neural_Network</a></li><li><a href="least_squares_ex.cpp.html">Non-Linear Least Squares</a></li><li><a href="svm_ex.cpp.html">Nu-Support_Vector_Machine</a></li><li><a href="integrate_function_adapt_simp_ex.cpp.html">Numerical_Integration</a></li><li><a href="object_detector_ex.cpp.html">Object_Detector</a></li><li><a href="object_detector_advanced_ex.cpp.html">Object_Detector_Advanced</a></li><li><a href="one_class_classifiers_ex.cpp.html">One_Class_Classifiers</a></li><li><a href="svm_pegasos_ex.cpp.html">Online_SVM</a></li><li><a href="optimization_ex.cpp.html">Optimization</a></li><li><a href="parallel_for_ex.cpp.html">Parallel_For_Loops</a></li><li><a href="pipe_ex.cpp.html">Pipe</a></li><li><a href="pipe_ex_2.cpp.html">Pipe_2</a></li><li><a href="quantum_computing_ex.cpp.html">Quantum_Computing</a></li><li><a href="queue_ex.cpp.html">Queue</a></li><li><a href="rank_features_ex.cpp.html">Rank_Features</a></li><li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li><li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li><li><a href="running_stats_ex.cpp.html">Running_Stats</a></li><li><a href="sequence_labeler_ex.cpp.html">Sequence_Labeling</a></li><li><a href="sequence_segmenter_ex.cpp.html">Sequence_Segmentation</a></li><li><a href="sockets_ex.cpp.html">Sockets</a></li><li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li><li><a href="svm_sparse_ex.cpp.html">Sparse_Vectors</a></li><li><a href="sqlite_ex.cpp.html">SQLite</a></li><li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li><li><a href="svm_struct_ex.cpp.html">Structural_Support_Vector_Machines</a></li><li><a href="svr_ex.cpp.html">Support_Vector_Regression</a></li><li><a href="surf_ex.cpp.html">SURF</a></li><li><a href="svm_rank_ex.cpp.html">SVM-Rank</a></li><li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li><li><a href="threads_ex.cpp.html">Threads</a></li><li><a href="thread_function_ex.cpp.html">Thread_Function</a></li><li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li><li><a href="timer_ex.cpp.html">Timer</a></li><li><a href="train_object_detector.cpp.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor_ex.cpp.html">Train_Shape_Predictor</a></li><li><a href="using_custom_kernels_ex.cpp.html">Using_Custom_Kernels</a></li><li><a href="video_tracking_ex.cpp.html">Video_Object_Tracking</a></li><li><a href="webcam_face_pose_ex.cpp.html">Webcam_Face_Pose_Estimation</a></li><li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: Python</u></font></a><ul style="display:none;"><li><a href="face_detector.py.html">Face_Detector</a></li><li><a href="face_landmark_detection.py.html">Face_Landmark_Detection</a></li><li><a href="find_candidate_object_locations.py.html">find_candidate_object_locations</a></li><li><a href="max_cost_assignment.py.html">Linear_Assignment_Problems</a></li><li><a href="sequence_segmenter.py.html">Sequence_Segmenter</a></li><li><a href="svm_struct.py.html">Structural_Support_Vector_Machines</a></li><li><a href="svm_rank.py.html">SVM-Rank</a></li><li><a href="train_object_detector.py.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor.py.html">Train_Shape_Predictor</a></li><li><a href="correlation_tracker.py.html">Video_Object_Tracking</a></li></ul></li><li><a href="faq.html">FAQ</a></li><li><a href="index.html">Home</a></li><li><a href="compile.html">How to compile</a></li><li><a href="howto_contribute.html">How to contribute</a></li><li><a href="term_index.html">Index</a></li><li><a href="intro.html">Introduction</a></li><li><a href="license.html">License</a></li><li><a href="python/index.html">Python API</a></li><li><a href="books.html">Suggested Books</a></li></ul><br><b>Current Release</b><ul class="tree"><li><a href="change_log.html">Change Log</a></li><li><a href="release_notes.html">Release Notes</a></li><li>Version: 18.16</li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"><br><br><br><br><br><br><br><br><br>
+      Last Modified:<br>Nov 17, 2013<br><br></td></tr></table></td><td VALIGN="TOP" width="100%" style="border: 1px solid rgb(102,102,102);"><center><h1>Graph Tools</h1></center><br><br><p>
+            In dlib, there are two types of graph representations.  On the one
+            hand, there are graphs based on an object which encapsulates the whole
+            graph, such as the <a href="containers.html#graph">graph</a> and 
+            <a href="containers.html#directed_graph">directed_graph</a> objects.  On the
+            other hand, there are graphs which are represented as simple vectors
+            of edges.  In this case, we use vectors of <a href="#sample_pair">sample_pair</a>
+            or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects for undirected
+            and directed graphs respectively.
+         </p></td><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="150" height="100%"><tr><td VALIGN="TOP"><b>Graph Object Based Graphs</b><ul class="tree"><li><a href="#copy_graph">copy_graph</a></li><li><a href="#copy_graph_structure">copy_graph_structure</a></li><li><a href="#create_join_tree">create_join_tree</a></li><li><a href="#create_moral_graph">create_moral_graph</a></li><li><a href="#edge">edge</a></li><li><a href="#find_connected_nodes">find_connected_nodes</a></li><li><a href="#graph_contains_directed_cycle">graph_contains_directed_cycle</a></li><li><a href="#graph_contains_length_one_cycle">graph_contains_length_one_cycle</a></li><li><a href="#graph_contains_undirected_cycle">graph_contains_undirected_cycle</a></li><li><a href="#graph_has_symmetric_edges">graph_has_symmetric_edges</a></li><li><a href="#graph_is_connected">graph_is_connected</a></li><li><a href="#is_clique">is_clique</a></li><li><a href="#is_join_tree">is_join_tree</a></li><li><a href="#is_maximal_clique">is_maximal_clique</a></li><li><a href="#triangulate_graph_and_find_cliques">triangulate_graph_and_find_cliques</a></li></ul><br><b>Creating Edge List Based Graphs</b><ul class="tree"><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Distance Functions</u></font></a><ul style="display:none;"><li><a href="#cosine_distance">cosine_distance</a></li><li><a href="#negative_dot_product_distance">negative_dot_product_distance</a></li><li><a href="#squared_euclidean_distance">squared_euclidean_distance</a></li></ul></li><li><a href="#find_approximate_k_nearest_neighbors">find_approximate_k_nearest_neighbors</a></li><li><a href="#find_k_nearest_neighbors">find_k_nearest_neighbors</a></li><li><a href="#find_k_nearest_neighbors_lsh">find_k_nearest_neighbors_lsh</a></li><li><a href="#find_percent_shortest_edges_randomly">find_percent_shortest_edges_randomly</a></li><li><a href="#ordered_sample_pair">ordered_sample_pair</a></li><li><a href="#sample_pair">sample_pair</a></li></ul><br><b>Using Edge List Based Graphs</b><ul class="tree"><li><a href="#contains_duplicate_pairs">contains_duplicate_pairs</a></li><li><a href="#convert_unordered_to_ordered">convert_unordered_to_ordered</a></li><li><a href="#find_neighbor_ranges">find_neighbor_ranges</a></li><li><a href="#is_ordered_by_index">is_ordered_by_index</a></li><li><a href="#max_index_plus_one">max_index_plus_one</a></li><li><a href="#order_by_descending_distance">order_by_descending_distance</a></li><li><a href="#order_by_distance">order_by_distance</a></li><li><a href="#order_by_distance_and_index">order_by_distance_and_index</a></li><li><a href="#order_by_index">order_by_index</a></li><li><a href="#remove_duplicate_edges">remove_duplicate_edges</a></li><li><a href="#remove_long_edges">remove_long_edges</a></li><li><a href="#remove_percent_longest_edges">remove_percent_longest_edges</a></li><li><a href="#remove_percent_shortest_edges">remove_percent_shortest_edges</a></li><li><a href="#remove_short_edges">remove_short_edges</a></li><li><a href="#use_gaussian_weights">use_gaussian_weights</a></li><li><a href="#use_weights_of_one">use_weights_of_one</a></li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"></td></tr></table></td></tr></table><a name="contains_duplicate_pairs"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">contains_duplicate_pairs</h1><BR><BR>
+            This function checks if a std::vector of <a href="#sample_pair">sample_pair</a> or 
+              <a href="#ordered_sample_pair">ordered_sample_pair</a> objects
+              contains any edge more than once.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/edge_list_graphs_abstract.h.html#contains_duplicate_pairs"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="convert_unordered_to_ordered"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">convert_unordered_to_ordered</h1><BR><BR>
+            This function takes a graph, defined by a vector of 
+            <a href="#sample_pair">sample_pair</a> objects and converts it into the equivalent
+            graph defined by a vector of <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/edge_list_graphs_abstract.h.html#convert_unordered_to_ordered"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="copy_graph"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">copy_graph</h1><BR><BR>        
+            This function takes a <a href="containers.html#graph">graph</a> or 
+            <a href="containers.html#directed_graph">directed_graph</a> and
+            makes a copy of it.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/graph_utils_abstract.h.html#copy_graph"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="copy_graph_structure"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">copy_graph_structure</h1><BR><BR>        
+            This function takes a <a href="containers.html#graph">graph</a> or 
+            <a href="containers.html#directed_graph">directed_graph</a> and copies  
+            its structure to another graph or directed_graph object.  The only 
+            restriction is that you can't copy the structure of a graph into a
+            directed_graph.  The three other possible combinations are allowed
+            however.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/graph_utils_abstract.h.html#copy_graph_structure"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="cosine_distance"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cosine_distance</h1><BR><BR>
+                This is a simple function object that computes cosine of the angle between
+                two vectors. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/function_objects_abstract.h.html#cosine_distance"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="create_join_tree"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">create_join_tree</h1><BR><BR>        
+            This function takes a <a href="containers.html#graph">graph</a> object and
+            creates a join tree for that graph.  Or in other words, this function finds a 
+            tree decomposition of the given graph.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/graph_utils_abstract.h.html#create_join_tree"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="create_moral_graph"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">create_moral_graph</h1><BR><BR>        
+            This function takes a <a href="containers.html#directed_graph">directed_graph</a>
+            and returns the moralized version of the graph in the form of a 
+            <a href="containers.html#graph">graph</a> object.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/graph_utils_abstract.h.html#create_moral_graph"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="edge"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">edge</h1><BR><BR>        
+            This function takes a <a href="containers.html#graph">graph</a> or 
+            <a href="containers.html#directed_graph">directed_graph</a> object and a 
+            pair of indices.  It returns a reference to the edge object between the two nodes
+            with the given indices. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/graph_utils_abstract.h.html#edge"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="find_approximate_k_nearest_neighbors"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">find_approximate_k_nearest_neighbors</h1><BR><BR>
+            This function is a simple approximate form of <a href="#find_k_nearest_neighbors">find_k_nearest_neighbors</a>.
+            Instead of checking all possible edges it randomly samples a large number of them and then performs 
+            exact k-nearest-neighbors on that randomly selected subset.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/edge_list_graphs_abstract.h.html#find_approximate_k_nearest_neighbors"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="find_connected_nodes"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">find_connected_nodes</h1><BR><BR>        
+            This function takes a node from a <a href="containers.html#graph">graph</a>
+            or <a href="containers.html#directed_graph">directed_graph</a> object and a 
+            <a href="containers.html#set">set</a> of unsigned longs.  It finds all the
+            nodes in the given graph that are connected to the given node by an 
+            undirected path and returns them in the set (also note that the
+            original query node is also returned in this set).
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/graph_utils_abstract.h.html#find_connected_nodes"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="find_k_nearest_neighbors"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">find_k_nearest_neighbors</h1><BR><BR>
+            This is a function which finds all the k nearest neighbors of a set of points and outputs
+            the result as a vector of <a href="#sample_pair">sample_pair</a> objects.  It takes O(n^2) time where
+            n is the number of data samples.  A faster approximate version is provided by 
+            <a href="#find_approximate_k_nearest_neighbors">find_approximate_k_nearest_neighbors</a> 
+            and <a href="#find_k_nearest_neighbors_lsh">find_k_nearest_neighbors_lsh</a>.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/edge_list_graphs_abstract.h.html#find_k_nearest_neighbors"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="find_k_nearest_neighbors_lsh"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">find_k_nearest_neighbors_lsh</h1><BR><BR>
+            This function is a simple approximate form of <a href="#find_k_nearest_neighbors">find_k_nearest_neighbors</a>.
+            It uses <a href="algorithms.html#hash_similar_angles_128">locality sensitive hashing</a> 
+            to speed up the nearest neighbor computation and is also capable of using a multi-core CPU.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/find_k_nearest_neighbors_lsh_abstract.h.html#find_k_nearest_neighbors_lsh"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="find_neighbor_ranges"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">find_neighbor_ranges</h1><BR><BR>
+            This function takes a graph, defined by a vector of 
+            <a href="#ordered_sample_pair">ordered_sample_pair</a> objects, and finds the
+            ranges that contain the edges for each node in the graph.  The output therefore
+            lets you easily locate the neighbors of any node in the graph.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/edge_list_graphs_abstract.h.html#find_neighbor_ranges"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="find_percent_shortest_edges_randomly"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">find_percent_shortest_edges_randomly</h1><BR><BR>
+            This function is a simple approximate form of <a href="#find_k_nearest_neighbors">find_k_nearest_neighbors</a>.
+            Instead of checking all possible edges it randomly samples a large number of them and
+            then returns the best ones.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/edge_list_graphs_abstract.h.html#find_percent_shortest_edges_randomly"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="linear_manifold_regularizer_ex.cpp.html">linear_manifold_regularizer_ex.cpp</a><br><br><center></center></div></a><a name="graph_contains_directed_cycle"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">graph_contains_directed_cycle</h1><BR><BR>        
+            This function checks a <a href="containers.html#directed_graph">directed_graph</a> for directed cycles.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/graph_utils_abstract.h.html#graph_contains_directed_cycle"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="graph_contains_length_one_cycle"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">graph_contains_length_one_cycle</h1><BR><BR>        
+            This function takes a <a href="containers.html#graph">graph</a>
+            or <a href="containers.html#directed_graph">directed_graph</a> object and
+            returns true if and only if the graph contains a node that has an edge that
+            links back to itself.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/graph_utils_abstract.h.html#graph_contains_length_one_cycle"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="graph_contains_undirected_cycle"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">graph_contains_undirected_cycle</h1><BR><BR>        
+            This function checks a <a href="containers.html#directed_graph">directed_graph</a> for undirected cycles.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/graph_utils_abstract.h.html#graph_contains_undirected_cycle"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="graph_has_symmetric_edges"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">graph_has_symmetric_edges</h1><BR><BR>        
+            This function checks if a <a href="containers.html#directed_graph">directed_graph</a> 
+            has a pair of nodes with just one edge between them.  If so then it
+            does not have symmetric edges.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/graph_utils_abstract.h.html#graph_has_symmetric_edges"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="graph_is_connected"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">graph_is_connected</h1><BR><BR>        
+            This function takes a <a href="containers.html#graph">graph</a> or
+            <a href="containers.html#directed_graph">directed_graph</a> object and
+            determines if the graph is connected.  That is, it returns true if and only if
+            there is an undirected path between any two nodes in the given graph.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/graph_utils_abstract.h.html#graph_is_connected"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="is_clique"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_clique</h1><BR><BR>        
+            This function takes a <a href="containers.html#graph">graph</a> and a 
+            <a href="containers.html#set">set</a> of node index values and checks 
+            if the specified set of nodes is a clique in the graph.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/graph_utils_abstract.h.html#is_clique"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="is_join_tree"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_join_tree</h1><BR><BR>        
+            This function takes two <a href="containers.html#graph">graph</a> objects and
+            checks if the second of the two graphs is a valid join tree (aka tree decomposition)
+            of the first graph.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/graph_utils_abstract.h.html#is_join_tree"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="is_maximal_clique"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_maximal_clique</h1><BR><BR>        
+            This function takes a <a href="containers.html#graph">graph</a> and a 
+            <a href="containers.html#set">set</a> of node index values and checks 
+            if the specified set of nodes is a maximal clique in the graph.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/graph_utils_abstract.h.html#is_maximal_clique"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="is_ordered_by_index"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_ordered_by_index</h1><BR><BR>
+            This function checks if a vector of <a href="#sample_pair">sample_pair</a> or
+            <a href="#ordered_sample_pair">ordered_sample_pair</a> objects is in sorted
+            order according to their index values.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/edge_list_graphs_abstract.h.html#is_ordered_by_index"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="max_index_plus_one"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">max_index_plus_one</h1><BR><BR>
+            This function finds the number that is one greater than the largest index
+            value in a std::vector of <a href="#sample_pair">sample_pair</a> or 
+            <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.  Therefore,
+            it is useful for finding out how many nodes are in an edge list graph (assuming
+            the graph contains all node indices from 0 to the largest index indicated 
+            by an edge).
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/edge_list_graphs_abstract.h.html#max_index_plus_one"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="negative_dot_product_distance"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">negative_dot_product_distance</h1><BR><BR>
+                This is a simple function object that computes -dot(v1,v2) for two
+                vectors v1 and v2.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/function_objects_abstract.h.html#negative_dot_product_distance"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="ordered_sample_pair"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">ordered_sample_pair</h1><BR><BR>
+            This object is intended to represent an edge in a directed graph 
+                which has data samples at its vertices.  Therefore, it is the directed version
+                of <a href="#sample_pair">sample_pair</a>.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/ordered_sample_pair_abstract.h.html#ordered_sample_pair"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="order_by_descending_distance"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">order_by_descending_distance</h1><BR><BR>
+            This function provides a total ordering of <a href="#sample_pair">sample_pair</a> 
+            or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects that causes
+            pairs with largest distance to be the first in a sorted list.  This function
+            can be used with std::sort().
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/sample_pair_abstract.h.html#order_by_descending_distance"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="order_by_distance"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">order_by_distance</h1><BR><BR>
+            This function provides a total ordering of <a href="#sample_pair">sample_pair</a> 
+            or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects that causes
+            pairs with smallest distance to be the first in a sorted list.  This function
+            can be used with std::sort().
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/sample_pair_abstract.h.html#order_by_distance"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="order_by_distance_and_index"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">order_by_distance_and_index</h1><BR><BR>
+              This function provides a total ordering of <a href="#sample_pair">sample_pair</a> or 
+              <a href="#ordered_sample_pair">ordered_sample_pair</a> objects that causes pairs
+              with smallest distance to be the first in a sorted list but also orders
+              samples with equal distances according to order_by_index().  This function
+              can be used with std::sort().
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/sample_pair_abstract.h.html#order_by_distance_and_index"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="order_by_index"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">order_by_index</h1><BR><BR>
+            This function provides a total ordering of <a href="#sample_pair">sample_pair</a> 
+            or <a href="#ordered_sample_pair">ordered_sample_pair</a>
+            objects that will cause pairs that represent the same edge to be adjacent 
+            when sorted.  So for example, this function can be used
+            with std::sort() to first sort a sequence of sample_pair objects and then
+            find duplicate edges.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/sample_pair_abstract.h.html#order_by_index"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="remove_duplicate_edges"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">remove_duplicate_edges</h1><BR><BR>
+            This is a simple function for removing duplicate edges (i.e. edges that compare equal 
+            according to ==) from 
+            a vector of <a href="#sample_pair">sample_pair</a> or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/edge_list_graphs_abstract.h.html#remove_duplicate_edges"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="remove_long_edges"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">remove_long_edges</h1><BR><BR>
+            This is a simple function for removing edges with a large distance value from
+            a vector of <a href="#sample_pair">sample_pair</a> or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/edge_list_graphs_abstract.h.html#remove_long_edges"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="remove_percent_longest_edges"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">remove_percent_longest_edges</h1><BR><BR>
+            This is a simple function for removing edges with a large distance value from
+            a vector of <a href="#sample_pair">sample_pair</a> or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/edge_list_graphs_abstract.h.html#remove_percent_longest_edges"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="remove_percent_shortest_edges"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">remove_percent_shortest_edges</h1><BR><BR>
+            This is a simple function for removing edges with a small distance value from
+            a vector of <a href="#sample_pair">sample_pair</a> or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/edge_list_graphs_abstract.h.html#remove_percent_shortest_edges"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="remove_short_edges"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">remove_short_edges</h1><BR><BR>
+            This is a simple function for removing edges with a small distance value from
+            a vector of <a href="#sample_pair">sample_pair</a> or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/edge_list_graphs_abstract.h.html#remove_short_edges"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="sample_pair"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">sample_pair</h1><BR><BR>
+            This object is intended to represent an edge in an undirected graph 
+                which has data samples at its vertices.  Therefore, it is the undirected version
+                of <a href="#ordered_sample_pair">ordered_sample_pair</a>.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/sample_pair_abstract.h.html#sample_pair"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="linear_manifold_regularizer_ex.cpp.html">linear_manifold_regularizer_ex.cpp</a><br><br><center></center></div></a><a name="squared_euclidean_distance"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">squared_euclidean_distance</h1><BR><BR>
+                This is a simple function object that computes squared euclidean distance
+                between two <a href="linear_algebra.html#matrix">matrix</a> objects.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/function_objects_abstract.h.html#squared_euclidean_distance"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="linear_manifold_regularizer_ex.cpp.html">linear_manifold_regularizer_ex.cpp</a><br><br><center></center></div></a><a name="triangulate_graph_and_find_cliques"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">triangulate_graph_and_find_cliques</h1><BR><BR>        
+            This function takes a <a href="containers.html#graph">graph</a> and
+            turns it into a chordal graph.  It also returns a 
+            <a href="containers.html#set">set</a> that contains
+            all the cliques present in the chordal graph.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/graph_utils_abstract.h.html#triangulate_graph_and_find_cliques"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="use_gaussian_weights"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">use_gaussian_weights</h1><BR><BR>
+                This is a simple function object that takes a single argument
+                which should be an object similar to <a href="#sample_pair">sample_pair</a>.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/function_objects_abstract.h.html#use_gaussian_weights"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="linear_manifold_regularizer_ex.cpp.html">linear_manifold_regularizer_ex.cpp</a><br><br><center></center></div></a><a name="use_weights_of_one"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">use_weights_of_one</h1><BR><BR>
+                This is a simple function object that takes a single argument
+                and always returns 1 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/function_objects_abstract.h.html#use_weights_of_one"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a></div></body></html>

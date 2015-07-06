@@ -1,0 +1,1723 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bigint_kernel_1.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_BIGINT_KERNEL_1_CPp_
+<font color='#0000FF'>#define</font> DLIB_BIGINT_KERNEL_1_CPp_
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='bigint_kernel_1.h.html'>bigint_kernel_1.h</a>"
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member/friend function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    bigint_kernel_1::
+    <b><a name='bigint_kernel_1'></a>bigint_kernel_1</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> :
+        slack<font face='Lucida Console'>(</font><font color='#979000'>25</font><font face='Lucida Console'>)</font>,
+        data<font face='Lucida Console'>(</font><font color='#0000FF'>new</font> data_record<font face='Lucida Console'>(</font>slack<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <b>{</b><b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    bigint_kernel_1::
+    <b><a name='bigint_kernel_1'></a>bigint_kernel_1</b> <font face='Lucida Console'>(</font>
+        uint32 value
+    <font face='Lucida Console'>)</font> :
+        slack<font face='Lucida Console'>(</font><font color='#979000'>25</font><font face='Lucida Console'>)</font>,
+        data<font face='Lucida Console'>(</font><font color='#0000FF'>new</font> data_record<font face='Lucida Console'>(</font>slack<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>value<font color='#5555FF'>&amp;</font><font color='#979000'>0xFFFF</font><font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>value<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFFFF</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    bigint_kernel_1::
+    <b><a name='bigint_kernel_1'></a>bigint_kernel_1</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font> :
+        slack<font face='Lucida Console'>(</font><font color='#979000'>25</font><font face='Lucida Console'>)</font>,
+        data<font face='Lucida Console'>(</font>item.data<font face='Lucida Console'>)</font>
+    <b>{</b>
+        data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    bigint_kernel_1::
+    ~<b><a name='bigint_kernel_1'></a>bigint_kernel_1</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>delete</font> data;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> bigint_kernel_1 bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font> <font face='Lucida Console'>(</font>
+                    std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>rhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used,data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> slack
+                    <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>long_add</font><font face='Lucida Console'>(</font>data,rhs.data,temp<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>bigint_kernel_1</font><font face='Lucida Console'>(</font>temp,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    bigint_kernel_1<font color='#5555FF'>&amp;</font> bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// if there are other references to our data
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used,rhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font face='Lucida Console'>)</font><font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+            data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;   
+            <font color='#BB00BB'>long_add</font><font face='Lucida Console'>(</font>data,rhs.data,temp<font face='Lucida Console'>)</font>;
+            data <font color='#5555FF'>=</font> temp;
+        <b>}</b>
+        <font color='#009900'>// if data is not big enough for the result
+</font>        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>size <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used,rhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used,rhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font face='Lucida Console'>)</font><font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>long_add</font><font face='Lucida Console'>(</font>data,rhs.data,temp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>delete</font> data;
+            data <font color='#5555FF'>=</font> temp;
+        <b>}</b>
+        <font color='#009900'>// there is enough size and no references
+</font>        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#BB00BB'>long_add</font><font face='Lucida Console'>(</font>data,rhs.data,data<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> bigint_kernel_1 bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font> <font face='Lucida Console'>(</font>
+                    data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>+</font> slack
+                    <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>long_sub</font><font face='Lucida Console'>(</font>data,rhs.data,temp<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>bigint_kernel_1</font><font face='Lucida Console'>(</font>temp,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    bigint_kernel_1<font color='#5555FF'>&amp;</font> bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// if there are other references to this data 
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+            data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#BB00BB'>long_sub</font><font face='Lucida Console'>(</font>data,rhs.data,temp<font face='Lucida Console'>)</font>;
+            data <font color='#5555FF'>=</font> temp;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#BB00BB'>long_sub</font><font face='Lucida Console'>(</font>data,rhs.data,data<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> bigint_kernel_1 bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font> <font face='Lucida Console'>(</font>
+                    data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>+</font> rhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>+</font> slack
+                    <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>long_mul</font><font face='Lucida Console'>(</font>data,rhs.data,temp<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>bigint_kernel_1</font><font face='Lucida Console'>(</font>temp,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    bigint_kernel_1<font color='#5555FF'>&amp;</font> bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// create a data_record to store the result of the multiplication in
+</font>        data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>rhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;        
+        <font color='#BB00BB'>long_mul</font><font face='Lucida Console'>(</font>data,rhs.data,temp<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// if there are other references to data
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>delete</font> data;
+        <b>}</b>
+        data <font color='#5555FF'>=</font> temp;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> bigint_kernel_1 bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+        data_record<font color='#5555FF'>*</font> remainder;
+        <font color='#0000FF'>try</font> <b>{</b>
+            remainder <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;           
+        <b>}</b> <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>delete</font> temp; <font color='#0000FF'>throw</font>; <b>}</b>
+
+        <font color='#BB00BB'>long_div</font><font face='Lucida Console'>(</font>data,rhs.data,temp,remainder<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>delete</font> remainder;
+    
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>bigint_kernel_1</font><font face='Lucida Console'>(</font>temp,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    bigint_kernel_1<font color='#5555FF'>&amp;</font> bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+
+        data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+        data_record<font color='#5555FF'>*</font> remainder;
+        <font color='#0000FF'>try</font> <b>{</b>
+            remainder <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+        <b>}</b> <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>delete</font> temp; <font color='#0000FF'>throw</font>; <b>}</b>    
+
+        <font color='#BB00BB'>long_div</font><font face='Lucida Console'>(</font>data,rhs.data,temp,remainder<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// check if there are other references to data
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+        <font color='#009900'>// if there are no references to data then it must be deleted
+</font>        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>delete</font> data;
+        <b>}</b>
+        data <font color='#5555FF'>=</font> temp;
+        <font color='#0000FF'>delete</font> remainder;
+
+        
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> bigint_kernel_1 bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+        data_record<font color='#5555FF'>*</font> remainder;
+        <font color='#0000FF'>try</font> <b>{</b>
+            remainder <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+        <b>}</b> <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>delete</font> temp; <font color='#0000FF'>throw</font>; <b>}</b>
+
+        <font color='#BB00BB'>long_div</font><font face='Lucida Console'>(</font>data,rhs.data,temp,remainder<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>delete</font> temp;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>bigint_kernel_1</font><font face='Lucida Console'>(</font>remainder,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    bigint_kernel_1<font color='#5555FF'>&amp;</font> bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+        data_record<font color='#5555FF'>*</font> remainder;
+        <font color='#0000FF'>try</font> <b>{</b>
+            remainder <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+        <b>}</b> <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>delete</font> temp; <font color='#0000FF'>throw</font>; <b>}</b>
+
+        <font color='#BB00BB'>long_div</font><font face='Lucida Console'>(</font>data,rhs.data,temp,remainder<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// check if there are other references to data
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+        <font color='#009900'>// if there are no references to data then it must be deleted
+</font>        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>delete</font> data;
+        <b>}</b>
+        data <font color='#5555FF'>=</font> remainder;
+        <font color='#0000FF'>delete</font> temp;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> bigint_kernel_1::
+    <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>is_less_than</font><font face='Lucida Console'>(</font>data,rhs.data<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> bigint_kernel_1::
+    <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>is_equal_to</font><font face='Lucida Console'>(</font>data,rhs.data<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    bigint_kernel_1<font color='#5555FF'>&amp;</font> bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>rhs<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+
+        <font color='#009900'>// if we have the only reference to our data then delete it
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>delete</font> data;
+            data <font color='#5555FF'>=</font> rhs.data;
+            data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            data <font color='#5555FF'>=</font> rhs.data;
+            data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    std::ostream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        std::ostream<font color='#5555FF'>&amp;</font> out_,
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::ostream <font color='#BB00BB'>out</font><font face='Lucida Console'>(</font>out_.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> bigint_kernel_1 bigint;
+        
+        bigint::data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> bigint::<font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>rhs.data,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+
+
+        <font color='#009900'>// get a char array big enough to hold the number in ascii format
+</font>        <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> str;
+        <font color='#0000FF'>try</font> <b>{</b>
+            str <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#0000FF'><u>char</u></font>[<font face='Lucida Console'>(</font>rhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>5</font><font color='#5555FF'>+</font><font color='#979000'>10</font>];
+        <b>}</b> <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>delete</font> temp; <font color='#0000FF'>throw</font>; <b>}</b>
+
+        <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> str_start <font color='#5555FF'>=</font> str;
+        str <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>rhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>5</font><font color='#5555FF'>+</font><font color='#979000'>9</font>;
+        <font color='#5555FF'>*</font>str <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>str;
+
+
+        uint16 remainder;
+        rhs.<font color='#BB00BB'>short_div</font><font face='Lucida Console'>(</font>temp,<font color='#979000'>10000</font>,temp,remainder<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// pull the digits out of remainder
+</font>        <font color='#0000FF'><u>char</u></font> a <font color='#5555FF'>=</font> remainder <font color='#5555FF'>%</font> <font color='#979000'>10</font> <font color='#5555FF'>+</font> '<font color='#FF0000'>0</font>';
+        remainder <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+        <font color='#0000FF'><u>char</u></font> b <font color='#5555FF'>=</font> remainder <font color='#5555FF'>%</font> <font color='#979000'>10</font> <font color='#5555FF'>+</font> '<font color='#FF0000'>0</font>';
+        remainder <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+        <font color='#0000FF'><u>char</u></font> c <font color='#5555FF'>=</font> remainder <font color='#5555FF'>%</font> <font color='#979000'>10</font> <font color='#5555FF'>+</font> '<font color='#FF0000'>0</font>';
+        remainder <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+        <font color='#0000FF'><u>char</u></font> d <font color='#5555FF'>=</font> remainder <font color='#5555FF'>%</font> <font color='#979000'>10</font> <font color='#5555FF'>+</font> '<font color='#FF0000'>0</font>';
+        remainder <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+
+
+        <font color='#5555FF'>*</font>str <font color='#5555FF'>=</font> a; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>str;
+        <font color='#5555FF'>*</font>str <font color='#5555FF'>=</font> b; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>str;
+        <font color='#5555FF'>*</font>str <font color='#5555FF'>=</font> c; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>str;
+        <font color='#5555FF'>*</font>str <font color='#5555FF'>=</font> d; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>str;
+
+
+        <font color='#009900'>// keep looping until temp represents zero
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>            
+            rhs.<font color='#BB00BB'>short_div</font><font face='Lucida Console'>(</font>temp,<font color='#979000'>10000</font>,temp,remainder<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// pull the digits out of remainder
+</font>            <font color='#0000FF'><u>char</u></font> a <font color='#5555FF'>=</font> remainder <font color='#5555FF'>%</font> <font color='#979000'>10</font> <font color='#5555FF'>+</font> '<font color='#FF0000'>0</font>';
+            remainder <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+            <font color='#0000FF'><u>char</u></font> b <font color='#5555FF'>=</font> remainder <font color='#5555FF'>%</font> <font color='#979000'>10</font> <font color='#5555FF'>+</font> '<font color='#FF0000'>0</font>';
+            remainder <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+            <font color='#0000FF'><u>char</u></font> c <font color='#5555FF'>=</font> remainder <font color='#5555FF'>%</font> <font color='#979000'>10</font> <font color='#5555FF'>+</font> '<font color='#FF0000'>0</font>';
+            remainder <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+            <font color='#0000FF'><u>char</u></font> d <font color='#5555FF'>=</font> remainder <font color='#5555FF'>%</font> <font color='#979000'>10</font> <font color='#5555FF'>+</font> '<font color='#FF0000'>0</font>';
+            remainder <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+
+            <font color='#5555FF'>*</font>str <font color='#5555FF'>=</font> a; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>str;
+            <font color='#5555FF'>*</font>str <font color='#5555FF'>=</font> b; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>str;
+            <font color='#5555FF'>*</font>str <font color='#5555FF'>=</font> c; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>str;
+            <font color='#5555FF'>*</font>str <font color='#5555FF'>=</font> d; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>str;              
+        <b>}</b>
+
+        <font color='#009900'>// throw away and extra leading zeros
+</font>        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>str;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>str <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>0</font>'<font face='Lucida Console'>)</font>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>str;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>str <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>0</font>'<font face='Lucida Console'>)</font>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>str;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>str <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>0</font>'<font face='Lucida Console'>)</font>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>str;
+
+
+        
+
+        out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> str;
+        <font color='#0000FF'>delete</font> [] str_start;
+        <font color='#0000FF'>delete</font> temp;
+        <font color='#0000FF'>return</font> out_;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    std::istream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in_,
+        bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::istream <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font>in_.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// ignore any leading whitespaces
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\t</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>'<font face='Lucida Console'>)</font>
+        <b>{</b>
+            in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// if the first digit is not an integer then this is an error
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>0</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>9</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            in_.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font>std::ios::failbit<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> in_;
+        <b>}</b>
+
+        <font color='#0000FF'><u>int</u></font> num_read;
+        bigint_kernel_1 temp;
+        <font color='#0000FF'>do</font>
+        <b>{</b>
+
+            <font color='#009900'>// try to get 4 chars from in
+</font>            num_read <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'><u>char</u></font> a <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'><u>char</u></font> b <font color='#5555FF'>=</font> <font color='#979000'>0</font>; 
+            <font color='#0000FF'><u>char</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'><u>char</u></font> d <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>0</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>9</font>'<font face='Lucida Console'>)</font>
+            <b>{</b>
+                num_read <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+                a <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>0</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>9</font>'<font face='Lucida Console'>)</font>
+            <b>{</b>
+                num_read <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+                b <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>0</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>9</font>'<font face='Lucida Console'>)</font>
+            <b>{</b>
+                num_read <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+                c <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>0</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>9</font>'<font face='Lucida Console'>)</font>
+            <b>{</b>
+                num_read <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+                d <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            
+            <font color='#009900'>// merge the for digits into an uint16
+</font>            uint16 num <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                num <font color='#5555FF'>=</font> a <font color='#5555FF'>-</font> '<font color='#FF0000'>0</font>';
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>b <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                num <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+                num <font color='#5555FF'>+</font><font color='#5555FF'>=</font> b <font color='#5555FF'>-</font> '<font color='#FF0000'>0</font>';
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                num <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+                num <font color='#5555FF'>+</font><font color='#5555FF'>=</font> c <font color='#5555FF'>-</font> '<font color='#FF0000'>0</font>';
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>d <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                num <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+                num <font color='#5555FF'>+</font><font color='#5555FF'>=</font> d <font color='#5555FF'>-</font> '<font color='#FF0000'>0</font>';
+            <b>}</b>
+
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_read <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// shift the digits in temp left by the number of new digits we just read
+</font>                temp <font color='#5555FF'>*</font><font color='#5555FF'>=</font> num_read;
+                <font color='#009900'>// add in new digits
+</font>                temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> num;
+            <b>}</b>
+
+        <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>num_read <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10000</font><font face='Lucida Console'>)</font>;
+
+
+        rhs <font color='#5555FF'>=</font> temp;
+        <font color='#0000FF'>return</font> in_;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> bigint_kernel_1 <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+        uint16 lhs,
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> bigint_kernel_1 bigint;
+        bigint::data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> bigint::<font color='#BB00BB'>data_record</font>
+                <font face='Lucida Console'>(</font>rhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>rhs.slack<font face='Lucida Console'>)</font>;
+
+        rhs.<font color='#BB00BB'>short_add</font><font face='Lucida Console'>(</font>rhs.data,lhs,temp<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>bigint_kernel_1</font><font face='Lucida Console'>(</font>temp,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> bigint_kernel_1 <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> lhs,
+        uint16 rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> bigint_kernel_1 bigint;
+        bigint::data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> bigint::<font color='#BB00BB'>data_record</font>
+                <font face='Lucida Console'>(</font>lhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>lhs.slack<font face='Lucida Console'>)</font>;
+
+        lhs.<font color='#BB00BB'>short_add</font><font face='Lucida Console'>(</font>lhs.data,rhs,temp<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>bigint_kernel_1</font><font face='Lucida Console'>(</font>temp,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    bigint_kernel_1<font color='#5555FF'>&amp;</font> bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        uint16 rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// if there are other references to this data 
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+            data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;    
+            <font color='#BB00BB'>short_add</font><font face='Lucida Console'>(</font>data,rhs,temp<font face='Lucida Console'>)</font>;
+            data <font color='#5555FF'>=</font> temp;
+        <b>}</b>
+        <font color='#009900'>// or if we need to enlarge data then do so
+</font>        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font><font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>size<font face='Lucida Console'>)</font>
+        <b>{</b>
+            data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>short_add</font><font face='Lucida Console'>(</font>data,rhs,temp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>delete</font> data;
+            data <font color='#5555FF'>=</font> temp;
+        <b>}</b>
+        <font color='#009900'>// or if there is plenty of space and no references
+</font>        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#BB00BB'>short_add</font><font face='Lucida Console'>(</font>data,rhs,data<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> bigint_kernel_1 <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+        uint16 lhs,
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> bigint_kernel_1 bigint;
+        bigint::data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> bigint::<font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>rhs.slack<font face='Lucida Console'>)</font>;
+
+        <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> lhs <font color='#5555FF'>-</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>bigint_kernel_1</font><font face='Lucida Console'>(</font>temp,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> bigint_kernel_1 <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> lhs,
+        uint16 rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> bigint_kernel_1 bigint;
+        bigint::data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> bigint::<font color='#BB00BB'>data_record</font>
+                <font face='Lucida Console'>(</font>lhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>lhs.slack<font face='Lucida Console'>)</font>;
+
+        lhs.<font color='#BB00BB'>short_sub</font><font face='Lucida Console'>(</font>lhs.data,rhs,temp<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>bigint_kernel_1</font><font face='Lucida Console'>(</font>temp,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    bigint_kernel_1<font color='#5555FF'>&amp;</font> bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        uint16 rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// if there are other references to this data 
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+            data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#BB00BB'>short_sub</font><font face='Lucida Console'>(</font>data,rhs,temp<font face='Lucida Console'>)</font>;
+            data <font color='#5555FF'>=</font> temp;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#BB00BB'>short_sub</font><font face='Lucida Console'>(</font>data,rhs,data<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> bigint_kernel_1 <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+        uint16 lhs,
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> bigint_kernel_1 bigint;
+        bigint::data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> bigint::<font color='#BB00BB'>data_record</font>
+                <font face='Lucida Console'>(</font>rhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>rhs.slack<font face='Lucida Console'>)</font>;
+
+        rhs.<font color='#BB00BB'>short_mul</font><font face='Lucida Console'>(</font>rhs.data,lhs,temp<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>bigint_kernel_1</font><font face='Lucida Console'>(</font>temp,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;        
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> bigint_kernel_1 <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> lhs,
+        uint16 rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> bigint_kernel_1 bigint;
+        bigint::data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> bigint::<font color='#BB00BB'>data_record</font>
+                <font face='Lucida Console'>(</font>lhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>lhs.slack<font face='Lucida Console'>)</font>;
+
+        lhs.<font color='#BB00BB'>short_mul</font><font face='Lucida Console'>(</font>lhs.data,rhs,temp<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>bigint_kernel_1</font><font face='Lucida Console'>(</font>temp,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;  
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    bigint_kernel_1<font color='#5555FF'>&amp;</font> bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        uint16 rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// if there are other references to this data 
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+            data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#BB00BB'>short_mul</font><font face='Lucida Console'>(</font>data,rhs,temp<font face='Lucida Console'>)</font>;
+            data <font color='#5555FF'>=</font> temp;
+        <b>}</b>
+        <font color='#009900'>// or if we need to enlarge data
+</font>        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font><font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>size<font face='Lucida Console'>)</font>
+        <b>{</b>
+            data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>short_mul</font><font face='Lucida Console'>(</font>data,rhs,temp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>delete</font> data;
+            data <font color='#5555FF'>=</font> temp;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#BB00BB'>short_mul</font><font face='Lucida Console'>(</font>data,rhs,data<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> bigint_kernel_1 <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font> <font face='Lucida Console'>(</font>
+        uint16 lhs,
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> bigint_kernel_1 bigint;
+        bigint::data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> bigint::<font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>rhs.slack<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// if rhs might not be bigger than lhs
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> lhs<font color='#5555FF'>/</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>bigint_kernel_1</font><font face='Lucida Console'>(</font>temp,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;  
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> bigint_kernel_1 <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> lhs,
+        uint16 rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> bigint_kernel_1 bigint;
+        bigint::data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> bigint::<font color='#BB00BB'>data_record</font>
+                <font face='Lucida Console'>(</font>lhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>lhs.slack<font face='Lucida Console'>)</font>;
+
+        uint16 remainder;
+        lhs.<font color='#BB00BB'>short_div</font><font face='Lucida Console'>(</font>lhs.data,rhs,temp,remainder<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>bigint_kernel_1</font><font face='Lucida Console'>(</font>temp,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;  
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    bigint_kernel_1<font color='#5555FF'>&amp;</font> bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        uint16 rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint16 remainder;
+        <font color='#009900'>// if there are other references to this data
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+            data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#BB00BB'>short_div</font><font face='Lucida Console'>(</font>data,rhs,temp,remainder<font face='Lucida Console'>)</font>;    
+            data <font color='#5555FF'>=</font> temp;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#BB00BB'>short_div</font><font face='Lucida Console'>(</font>data,rhs,data,remainder<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> bigint_kernel_1 <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font> <font face='Lucida Console'>(</font>
+        uint16 lhs,
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> bigint_kernel_1 bigint;
+        <font color='#009900'>// temp is zero by default
+</font>        bigint::data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> bigint::<font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>rhs.slack<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// if rhs is just an uint16 inside then perform the modulus
+</font>            <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> lhs <font color='#5555FF'>%</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// if rhs is bigger than lhs then the answer is lhs
+</font>            <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> lhs;
+        <b>}</b>
+        
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>bigint_kernel_1</font><font face='Lucida Console'>(</font>temp,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;  
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> bigint_kernel_1 <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> lhs,
+        uint16 rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> bigint_kernel_1 bigint;
+        bigint::data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> bigint::<font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>lhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>lhs.slack<font face='Lucida Console'>)</font>;
+
+        uint16 remainder;
+
+        lhs.<font color='#BB00BB'>short_div</font><font face='Lucida Console'>(</font>lhs.data,rhs,temp,remainder<font face='Lucida Console'>)</font>;
+        temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> remainder;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>bigint_kernel_1</font><font face='Lucida Console'>(</font>temp,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;          
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    bigint_kernel_1<font color='#5555FF'>&amp;</font> bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        uint16 rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint16 remainder;
+        <font color='#009900'>// if there are other references to this data
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+            data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#BB00BB'>short_div</font><font face='Lucida Console'>(</font>data,rhs,temp,remainder<font face='Lucida Console'>)</font>;
+            data <font color='#5555FF'>=</font> temp;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#BB00BB'>short_div</font><font face='Lucida Console'>(</font>data,rhs,data,remainder<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> remainder;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        uint16 lhs,
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>rhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> lhs <font color='#5555FF'>&lt;</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> lhs,
+        uint16 rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>lhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>lhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> rhs<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> lhs,
+        uint16 rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>lhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>lhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> rhs<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        uint16 lhs,
+        <font color='#0000FF'>const</font> bigint_kernel_1<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>rhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rhs.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> lhs<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    bigint_kernel_1<font color='#5555FF'>&amp;</font> bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        uint16 rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// check if there are other references to our data
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'>try</font> <b>{</b>
+                data <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>slack<font face='Lucida Console'>)</font>;
+            <b>}</b> <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>; <font color='#0000FF'>throw</font>; <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+        
+        <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> rhs;
+
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    bigint_kernel_1<font color='#5555FF'>&amp;</font> bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// if there are other references to this data then make a copy of it
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+            data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#BB00BB'>increment</font><font face='Lucida Console'>(</font>data,temp<font face='Lucida Console'>)</font>;
+            data <font color='#5555FF'>=</font> temp;
+        <b>}</b>
+        <font color='#009900'>// or if we need to enlarge data then do so
+</font>        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font><font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>size<font face='Lucida Console'>)</font>
+        <b>{</b>
+            data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>increment</font><font face='Lucida Console'>(</font>data,temp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>delete</font> data;
+            data <font color='#5555FF'>=</font> temp;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#BB00BB'>increment</font><font face='Lucida Console'>(</font>data,data<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> bigint_kernel_1 bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>int</u></font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        data_record<font color='#5555FF'>*</font> temp; <font color='#009900'>// this is the copy of temp we will return in the end
+</font>         
+        data_record<font color='#5555FF'>*</font> temp2 <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>increment</font><font face='Lucida Console'>(</font>data,temp2<font face='Lucida Console'>)</font>;
+        
+        temp <font color='#5555FF'>=</font> data;
+        data <font color='#5555FF'>=</font> temp2;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>bigint_kernel_1</font><font face='Lucida Console'>(</font>temp,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    bigint_kernel_1<font color='#5555FF'>&amp;</font> bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// if there are other references to this data 
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+            data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>references <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#BB00BB'>decrement</font><font face='Lucida Console'>(</font>data,temp<font face='Lucida Console'>)</font>;
+            data <font color='#5555FF'>=</font> temp;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#BB00BB'>decrement</font><font face='Lucida Console'>(</font>data,data<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> bigint_kernel_1 bigint_kernel_1::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>int</u></font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        data_record<font color='#5555FF'>*</font> temp; <font color='#009900'>// this is the copy of temp we will return in the end
+</font>         
+        data_record<font color='#5555FF'>*</font> temp2 <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>data_record</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>decrement</font><font face='Lucida Console'>(</font>data,temp2<font face='Lucida Console'>)</font>;
+        
+        temp <font color='#5555FF'>=</font> data;
+        data <font color='#5555FF'>=</font> temp2;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>bigint_kernel_1</font><font face='Lucida Console'>(</font>temp,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// private member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bigint_kernel_1::
+    <b><a name='short_add'></a>short_add</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> data,        
+        uint16 value,
+        data_record<font color='#5555FF'>*</font> result
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// put value into the carry part of temp
+</font>        uint32 temp <font color='#5555FF'>=</font> value;
+        temp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>16</font>;
+
+        
+        <font color='#0000FF'>const</font> uint16<font color='#5555FF'>*</font> number <font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+        <font color='#0000FF'>const</font> uint16<font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> number <font color='#5555FF'>+</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used; <font color='#009900'>// one past the end of number
+</font>        uint16<font color='#5555FF'>*</font> r <font color='#5555FF'>=</font> result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>number <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// add *number and the current carry
+</font>            temp <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>number <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>temp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// put the low word of temp into *r
+</font>            <font color='#5555FF'>*</font>r <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFFFF</font><font face='Lucida Console'>)</font>;
+
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>number;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r;
+        <b>}</b>
+
+        <font color='#009900'>// if there is a final carry
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>temp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+            <font color='#009900'>// store the carry in the most significant digit of the result
+</font>            <font color='#5555FF'>*</font>r <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font>; 
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bigint_kernel_1::
+    <b><a name='short_sub'></a>short_sub</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> data,        
+        uint16 value,
+        data_record<font color='#5555FF'>*</font> result
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        
+
+        <font color='#0000FF'>const</font> uint16<font color='#5555FF'>*</font> number <font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+        <font color='#0000FF'>const</font> uint16<font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> number <font color='#5555FF'>+</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+        uint16<font color='#5555FF'>*</font> r <font color='#5555FF'>=</font> result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+
+        uint32 temp <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>number <font color='#5555FF'>-</font> value;
+
+        <font color='#009900'>// put the low word of temp into *data 
+</font>        <font color='#5555FF'>*</font>r <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFFFF</font><font face='Lucida Console'>)</font>;
+
+        
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>number <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>number;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r;
+
+            <font color='#009900'>// subtract the carry from *number 
+</font>            temp <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>number <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>temp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>31</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// put the low word of temp into *r 
+</font>            <font color='#5555FF'>*</font>r <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFFFF</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// if we lost a digit in the subtraction
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>r <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'>else</font>
+                result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+        <b>}</b>
+
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bigint_kernel_1::
+    <b><a name='short_mul'></a>short_mul</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> data,        
+        uint16 value,
+        data_record<font color='#5555FF'>*</font> result
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        
+        uint32 temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+
+        <font color='#0000FF'>const</font> uint16<font color='#5555FF'>*</font> number <font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;        
+        uint16<font color='#5555FF'>*</font> r <font color='#5555FF'>=</font> result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+        <font color='#0000FF'>const</font> uint16<font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> r <font color='#5555FF'>+</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+
+
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> r <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#009900'>// multiply *data and value and add in the carry
+</font>            temp <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>number<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>uint32<font face='Lucida Console'>)</font>value <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>temp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// put the low word of temp into *data
+</font>            <font color='#5555FF'>*</font>r <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFFFF</font><font face='Lucida Console'>)</font>;
+
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>number;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r;
+        <b>}</b>
+
+        <font color='#009900'>// if there is a final carry
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>temp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+            <font color='#009900'>// put the final carry into the most significant digit of the result
+</font>            <font color='#5555FF'>*</font>r <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+        <b>}</b>
+
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bigint_kernel_1::
+    <b><a name='short_div'></a>short_div</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> data,        
+        uint16 value,   
+        data_record<font color='#5555FF'>*</font> result,
+        uint16<font color='#5555FF'>&amp;</font> rem
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        
+        uint16 remainder <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        uint32 temp;
+
+        
+
+        <font color='#0000FF'>const</font> uint16<font color='#5555FF'>*</font> number <font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number <font color='#5555FF'>+</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>const</font> uint16<font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> number <font color='#5555FF'>-</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+        uint16<font color='#5555FF'>*</font> r <font color='#5555FF'>=</font> result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number <font color='#5555FF'>+</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+
+
+        <font color='#009900'>// if we are losing a digit in this division
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>number <font color='#5555FF'>&lt;</font> value<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'>else</font>
+                result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+        <b>}</b>
+
+
+        <font color='#009900'>// perform the actual division
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>number <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+        <b>{</b>
+           
+            temp <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>number <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>uint32<font face='Lucida Console'>)</font>remainder<font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font>;
+
+            <font color='#5555FF'>*</font>r <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font color='#5555FF'>/</font>value<font face='Lucida Console'>)</font>;
+            remainder <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font color='#5555FF'>%</font>value<font face='Lucida Console'>)</font>;
+
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>number;
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>r;
+        <b>}</b>
+
+        rem <font color='#5555FF'>=</font> remainder;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bigint_kernel_1::
+    <b><a name='long_add'></a>long_add</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> lhs,
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> rhs,
+        data_record<font color='#5555FF'>*</font> result
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// put value into the carry part of temp
+</font>        uint32 temp<font color='#5555FF'>=</font><font color='#979000'>0</font>;        
+
+        uint16<font color='#5555FF'>*</font> min_num;  <font color='#009900'>// the number with the least digits used
+</font>        uint16<font color='#5555FF'>*</font> max_num;  <font color='#009900'>// the number with the most digits used
+</font>        uint16<font color='#5555FF'>*</font> min_end;  <font color='#009900'>// one past the end of min_num
+</font>        uint16<font color='#5555FF'>*</font> max_end;  <font color='#009900'>// one past the end of max_num
+</font>        uint16<font color='#5555FF'>*</font> r <font color='#5555FF'>=</font> result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+
+        uint32 max_digits_used;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>&lt;</font> rhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font face='Lucida Console'>)</font>
+        <b>{</b>
+            max_digits_used <font color='#5555FF'>=</font> rhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+            min_num <font color='#5555FF'>=</font> lhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+            max_num <font color='#5555FF'>=</font> rhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+            min_end <font color='#5555FF'>=</font> min_num <font color='#5555FF'>+</font> lhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+            max_end <font color='#5555FF'>=</font> max_num <font color='#5555FF'>+</font> rhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            max_digits_used <font color='#5555FF'>=</font> lhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+            min_num <font color='#5555FF'>=</font> rhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+            max_num <font color='#5555FF'>=</font> lhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+            min_end <font color='#5555FF'>=</font> min_num <font color='#5555FF'>+</font> rhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+            max_end <font color='#5555FF'>=</font> max_num <font color='#5555FF'>+</font> lhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+        <b>}</b>
+
+        
+
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>min_num <font color='#5555FF'>!</font><font color='#5555FF'>=</font> min_end<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// add *min_num, *max_num and the current carry
+</font>            temp <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>min_num <font color='#5555FF'>+</font> <font color='#5555FF'>*</font>max_num <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>temp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// put the low word of temp into *r
+</font>            <font color='#5555FF'>*</font>r <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFFFF</font><font face='Lucida Console'>)</font>;
+
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>min_num;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>max_num;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r;
+        <b>}</b>
+
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>max_num <font color='#5555FF'>!</font><font color='#5555FF'>=</font> max_end<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// add *max_num and the current carry
+</font>            temp <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>max_num <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>temp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// put the low word of temp into *r
+</font>            <font color='#5555FF'>*</font>r <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFFFF</font><font face='Lucida Console'>)</font>;
+
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>max_num;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r;
+        <b>}</b>        
+
+        <font color='#009900'>// check if there was a final carry
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>temp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> max_digits_used <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+            <font color='#009900'>// put the carry into the most significant digit in the result
+</font>            <font color='#5555FF'>*</font>r <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> max_digits_used;
+        <b>}</b>
+
+        
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bigint_kernel_1::
+    <b><a name='long_sub'></a>long_sub</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> lhs,
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> rhs,
+        data_record<font color='#5555FF'>*</font> result
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+
+
+        <font color='#0000FF'>const</font> uint16<font color='#5555FF'>*</font> number1 <font color='#5555FF'>=</font> lhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+        <font color='#0000FF'>const</font> uint16<font color='#5555FF'>*</font> number2 <font color='#5555FF'>=</font> rhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+        <font color='#0000FF'>const</font> uint16<font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> number2 <font color='#5555FF'>+</font> rhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+        uint16<font color='#5555FF'>*</font> r <font color='#5555FF'>=</font> result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+
+
+
+        uint32 temp <font color='#5555FF'>=</font><font color='#979000'>0</font>;
+
+        
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>number2 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#009900'>// subtract *number2 from *number1 and then subtract any carry
+</font>            temp <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>number1 <font color='#5555FF'>-</font> <font color='#5555FF'>*</font>number2 <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>temp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>31</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// put the low word of temp into *r 
+</font>            <font color='#5555FF'>*</font>r <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFFFF</font><font face='Lucida Console'>)</font>;
+
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>number1;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>number2;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r;
+        <b>}</b>
+
+        end <font color='#5555FF'>=</font> lhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number <font color='#5555FF'>+</font> lhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>number1 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#009900'>// subtract the carry from *number1 
+</font>            temp <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>number1 <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>temp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>31</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// put the low word of temp into *r 
+</font>            <font color='#5555FF'>*</font>r <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFFFF</font><font face='Lucida Console'>)</font>;
+
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>number1;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r;
+        <b>}</b>
+
+        result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> lhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+        <font color='#009900'>// adjust the number of digits used appropriately 
+</font>        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>r;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>r <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>r;
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bigint_kernel_1::
+    <b><a name='long_div'></a>long_div</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> lhs,
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> rhs,
+        data_record<font color='#5555FF'>*</font> result,
+        data_record<font color='#5555FF'>*</font> remainder
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// zero result
+</font>        result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        uint16<font color='#5555FF'>*</font> a;
+        uint16<font color='#5555FF'>*</font> b;
+        uint16<font color='#5555FF'>*</font> end;
+
+        <font color='#009900'>// copy lhs into remainder
+</font>        remainder<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> lhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+        a <font color='#5555FF'>=</font> remainder<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+        end <font color='#5555FF'>=</font> a <font color='#5555FF'>+</font> remainder<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+        b <font color='#5555FF'>=</font> lhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>a <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font>a <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>b;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>a;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>b;
+        <b>}</b>
+
+
+        <font color='#009900'>// if rhs is bigger than lhs then result == 0 and remainder == lhs
+</font>        <font color='#009900'>// so then we can quit right now
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_less_than</font><font face='Lucida Console'>(</font>lhs,rhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font>;            
+        <b>}</b>
+
+
+        <font color='#009900'>// make a temporary number
+</font>        data_record <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>lhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>+</font> slack<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// shift rhs left until it is one shift away from being larger than lhs and
+</font>        <font color='#009900'>// put the number of left shifts necessary into shifts
+</font>        uint32 shifts; 
+        shifts <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>lhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>-</font> rhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#979000'>16</font>;
+
+        <font color='#BB00BB'>shift_left</font><font face='Lucida Console'>(</font>rhs,<font color='#5555FF'>&amp;</font>temp,shifts<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// while (lhs &gt; temp)
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_less_than</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>temp,lhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>shift_left</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>temp,<font color='#5555FF'>&amp;</font>temp,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>shifts;
+        <b>}</b>
+        <font color='#009900'>// make sure lhs isn't smaller than temp
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_less_than</font><font face='Lucida Console'>(</font>lhs,<font color='#5555FF'>&amp;</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>shift_right</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>temp,<font color='#5555FF'>&amp;</font>temp<font face='Lucida Console'>)</font>;
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>shifts;
+        <b>}</b>
+
+        
+        
+        <font color='#009900'>// we want to execute the loop shifts +1 times
+</font>        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>shifts;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>shifts <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>shift_left</font><font face='Lucida Console'>(</font>result,result,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// if (temp &lt;= remainder)
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_less_than</font><font face='Lucida Console'>(</font>remainder,<font color='#5555FF'>&amp;</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>long_sub</font><font face='Lucida Console'>(</font>remainder,<font color='#5555FF'>&amp;</font>temp,remainder<font face='Lucida Console'>)</font>;
+                
+                <font color='#009900'>// increment result
+</font>                uint16<font color='#5555FF'>*</font> r <font color='#5555FF'>=</font> result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+                uint16<font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> r <font color='#5555FF'>+</font> result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>r<font face='Lucida Console'>)</font>;
+                    <font color='#009900'>// if there was no carry then we are done
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>r <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>break</font>;
+
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r;
+
+                    <font color='#009900'>// if we hit the end of r and there is still a carry then
+</font>                    <font color='#009900'>// the next digit of r is 1 and there is one more digit used
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>r <font color='#5555FF'>=</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#5555FF'>*</font>r <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>(</font>result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>break</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+            <font color='#BB00BB'>shift_right</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>temp,<font color='#5555FF'>&amp;</font>temp<font face='Lucida Console'>)</font>;
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>shifts;
+        <b>}</b>
+        
+        
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bigint_kernel_1::
+    <b><a name='long_mul'></a>long_mul</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> lhs,
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> rhs,
+        data_record<font color='#5555FF'>*</font> result
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make result be zero
+</font>        result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        
+
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> aa;
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> bb;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>&lt;</font> rhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make copies of lhs and rhs and give them an appropriate amount of
+</font>            <font color='#009900'>// extra memory so there won't be any overflows
+</font>            aa <font color='#5555FF'>=</font> lhs;
+            bb <font color='#5555FF'>=</font> rhs;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// make copies of lhs and rhs and give them an appropriate amount of
+</font>            <font color='#009900'>// extra memory so there won't be any overflows
+</font>            aa <font color='#5555FF'>=</font> rhs;
+            bb <font color='#5555FF'>=</font> lhs;
+        <b>}</b>
+        <font color='#009900'>// this is where we actually copy lhs and rhs
+</font>        data_record <font color='#BB00BB'>b</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>bb,aa<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used<font color='#5555FF'>+</font>slack<font face='Lucida Console'>)</font>; <font color='#009900'>// the larger(approximately) of lhs and rhs
+</font>
+
+        uint32 shift_value <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        uint16<font color='#5555FF'>*</font> anum <font color='#5555FF'>=</font> aa<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+        uint16<font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> anum <font color='#5555FF'>+</font> aa<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>anum <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end <font face='Lucida Console'>)</font>
+        <b>{</b>
+            uint16 bit <font color='#5555FF'>=</font> <font color='#979000'>0x0001</font>;
+ 
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>16</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// if the specified bit of a is 1
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>anum <font color='#5555FF'>&amp;</font> bit<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>shift_left</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>b,<font color='#5555FF'>&amp;</font>b,shift_value<font face='Lucida Console'>)</font>;
+                    shift_value <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#BB00BB'>long_add</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>b,result,result<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>shift_value;
+                bit <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <b>}</b>
+
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>anum;                        
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bigint_kernel_1::
+    <b><a name='shift_left'></a>shift_left</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> data,
+        data_record<font color='#5555FF'>*</font> result,
+        uint32 shift_amount
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        uint32 offset <font color='#5555FF'>=</font> shift_amount<font color='#5555FF'>/</font><font color='#979000'>16</font>;
+        shift_amount <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font color='#979000'>0xf</font>;  <font color='#009900'>// same as shift_amount %= 16;
+</font>
+        uint16<font color='#5555FF'>*</font> r <font color='#5555FF'>=</font> result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number <font color='#5555FF'>+</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>+</font> offset; <font color='#009900'>// result
+</font>        uint16<font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+        uint16<font color='#5555FF'>*</font> s <font color='#5555FF'>=</font> end <font color='#5555FF'>+</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used; <font color='#009900'>// source
+</font>        <font color='#0000FF'>const</font> uint32 temp <font color='#5555FF'>=</font> <font color='#979000'>16</font> <font color='#5555FF'>-</font> shift_amount;
+
+        <font color='#5555FF'>*</font>r <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>s<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> temp<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// set the number of digits used in the result
+</font>        <font color='#009900'>// if the upper bits from *s were zero then don't count this first word
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>r <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>+</font> offset;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>+</font> offset <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+        <b>}</b>
+        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>r;
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>s <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font>r <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>s <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> shift_amount<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>r;
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>s;
+        <b>}</b>
+        <font color='#5555FF'>*</font>r <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>s <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> shift_amount;
+
+        <font color='#009900'>// now zero the rest of the result
+</font>        end <font color='#5555FF'>=</font> result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>r <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+            <font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>r<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bigint_kernel_1::
+    <b><a name='shift_right'></a>shift_right</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> data,
+        data_record<font color='#5555FF'>*</font> result
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+
+            uint16<font color='#5555FF'>*</font> r <font color='#5555FF'>=</font> result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number; <font color='#009900'>// result
+</font>            uint16<font color='#5555FF'>*</font> s <font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number; <font color='#009900'>// source
+</font>            uint16<font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> s <font color='#5555FF'>+</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>s <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#5555FF'>*</font>r <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>s <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>s<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>15</font><font face='Lucida Console'>)</font>;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>s;
+            <b>}</b>
+            <font color='#5555FF'>*</font>r <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>s <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>1</font>;
+
+
+            <font color='#009900'>// calculate the new number for digits_used
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>r <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                    result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+                <font color='#0000FF'>else</font>
+                    result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+            <b>}</b>
+  
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> bigint_kernel_1::
+    <b><a name='is_less_than'></a>is_less_than</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> lhs,
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> rhs
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        uint32 lhs_digits_used <font color='#5555FF'>=</font> lhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+        uint32 rhs_digits_used <font color='#5555FF'>=</font> rhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+
+        <font color='#009900'>// if lhs is definitely less than rhs
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lhs_digits_used <font color='#5555FF'>&lt;</font> rhs_digits_used <font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <font color='#009900'>// if lhs is definitely greater than rhs
+</font>        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lhs_digits_used <font color='#5555FF'>&gt;</font> rhs_digits_used<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>else</font> 
+        <b>{</b>
+            uint16<font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> lhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+            uint16<font color='#5555FF'>*</font> l <font color='#5555FF'>=</font> end         <font color='#5555FF'>+</font> lhs_digits_used;
+            uint16<font color='#5555FF'>*</font> r <font color='#5555FF'>=</font> rhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number <font color='#5555FF'>+</font> rhs_digits_used;
+            
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>l <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#5555FF'>-</font><font color='#5555FF'>-</font>l;
+                <font color='#5555FF'>-</font><font color='#5555FF'>-</font>r;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>l <font color='#5555FF'>&lt;</font> <font color='#5555FF'>*</font>r<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>l <font color='#5555FF'>&gt;</font> <font color='#5555FF'>*</font>r<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+
+            <font color='#009900'>// at this point we know that they are equal
+</font>            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> bigint_kernel_1::
+    <b><a name='is_equal_to'></a>is_equal_to</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> lhs,
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> rhs
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// if lhs and rhs are definitely not equal
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>!</font><font color='#5555FF'>=</font> rhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> 
+        <b>{</b>            
+            uint16<font color='#5555FF'>*</font> l <font color='#5555FF'>=</font> lhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+            uint16<font color='#5555FF'>*</font> r <font color='#5555FF'>=</font> rhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+            uint16<font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> l <font color='#5555FF'>+</font> lhs<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+            
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>l <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>l <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#5555FF'>*</font>r<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>l;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r;
+            <b>}</b>
+
+            <font color='#009900'>// at this point we know that they are equal
+</font>            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bigint_kernel_1::
+    <b><a name='increment'></a>increment</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> source,
+        data_record<font color='#5555FF'>*</font> dest
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        uint16<font color='#5555FF'>*</font> s <font color='#5555FF'>=</font> source<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+        uint16<font color='#5555FF'>*</font> d <font color='#5555FF'>=</font> dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+        uint16<font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> s <font color='#5555FF'>+</font> source<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font>d <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>s <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+
+            <font color='#009900'>// if there was no carry then break out of the loop
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>d <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> source<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+
+                <font color='#009900'>// copy the rest of the digits over to d
+</font>                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>d; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>s;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>s <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#5555FF'>*</font>d <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>s;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>d;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>s;
+                <b>}</b>
+
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+            
+
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>s;            
+
+            <font color='#009900'>// if we have hit the end of s and there was a carry up to this point
+</font>            <font color='#009900'>// then just make the next digit 1 and add one to the digits used
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s <font color='#5555FF'>=</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>d;
+                dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> source<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+                <font color='#5555FF'>*</font>d <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>d;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bigint_kernel_1::
+    <b><a name='decrement'></a>decrement</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> source,
+        data_record<font color='#5555FF'>*</font> dest
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        uint16<font color='#5555FF'>*</font> s <font color='#5555FF'>=</font> source<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+        uint16<font color='#5555FF'>*</font> d <font color='#5555FF'>=</font> dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number;
+        uint16<font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> s <font color='#5555FF'>+</font> source<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font>d <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>s <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+
+            <font color='#009900'>// if there was no carry then break out of the loop
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>d <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0xFFFF</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// if we lost a digit in the subtraction 
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>d <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> s<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>source<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                        dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                    <font color='#0000FF'>else</font>
+                        dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> source<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used <font color='#5555FF'>=</font> source<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>digits_used;
+                <b>}</b>
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>d;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>s;
+            <b>}</b>
+
+        <b>}</b>
+
+        <font color='#009900'>// copy the rest of the digits over to d
+</font>        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>d;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>s;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>s <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font>d <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>s;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>d;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>s;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BIGINT_KERNEL_1_CPp_
+</font>
+
+</pre></body></html>

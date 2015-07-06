@@ -1,0 +1,428 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - crc32.c</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/* crc32.c -- compute the CRC-32 of a data stream
+ * Copyright (C) 1995-2006, 2010, 2011, 2012 Mark Adler
+ * For conditions of distribution and use, see copyright notice in zlib.h
+ *
+ * Thanks to Rodney Brown &lt;rbrown64@csc.com.au&gt; for his contribution of faster
+ * CRC methods: exclusive-oring 32 bits of data at a time, and pre-computing
+ * tables for updating the shift register in one step with three exclusive-ors
+ * instead of four steps with four exclusive-ors.  This results in about a
+ * factor of two increase in speed on a Power PC G4 (PPC7455) using gcc -O3.
+ */</font>
+
+<font color='#009900'>/* @(#) $Id$ */</font>
+
+<font color='#009900'>/*
+  Note on the use of DYNAMIC_CRC_TABLE: there is no mutex or semaphore
+  protection on the static variables used to control the first-use generation
+  of the crc tables.  Therefore, if you #define DYNAMIC_CRC_TABLE, you should
+  first call get_crc_table() to initialize the tables before allowing more than
+  one thread to use crc32().
+
+  DYNAMIC_CRC_TABLE and MAKECRCH can be #defined to write out crc32.h.
+ */</font>
+
+<font color='#0000FF'>#ifdef</font> MAKECRCH
+#  include <font color='#5555FF'>&lt;</font>stdio.h<font color='#5555FF'>&gt;</font>
+#  ifndef DYNAMIC_CRC_TABLE
+#    define DYNAMIC_CRC_TABLE
+#  endif <font color='#009900'>/* !DYNAMIC_CRC_TABLE */</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* MAKECRCH */</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='zutil.h.html'>zutil.h</a>"      <font color='#009900'>/* for STDC and FAR definitions */</font>
+
+<font color='#0000FF'>#define</font> local <font color='#0000FF'>static</font>
+
+<font color='#009900'>/* Definitions for doing the crc four data bytes at a time. */</font>
+<font color='#0000FF'>#if</font> <font color='#5555FF'>!</font>defined<font face='Lucida Console'>(</font>NOBYFOUR<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> defined<font face='Lucida Console'>(</font>Z_U4<font face='Lucida Console'>)</font>
+#  define BYFOUR
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> BYFOUR
+   local <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> crc32_little <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> FAR <font color='#5555FF'>*</font>, <font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+   local <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> crc32_big <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> FAR <font color='#5555FF'>*</font>, <font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+#  define TBLS <font color='#979000'>8</font>
+<font color='#0000FF'>#else</font>
+#  define TBLS <font color='#979000'>1</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* BYFOUR */</font>
+
+<font color='#009900'>/* Local functions for crc concatenation */</font>
+local <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> gf2_matrix_times <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <font color='#5555FF'>*</font>mat,
+                                         <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> vec<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>void</u></font> gf2_matrix_square <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <font color='#5555FF'>*</font>square, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <font color='#5555FF'>*</font>mat<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local uLong crc32_combine_ <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>uLong crc1, uLong crc2, z_off64_t len2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+<font color='#0000FF'>#ifdef</font> DYNAMIC_CRC_TABLE
+
+local <font color='#0000FF'>volatile</font> <font color='#0000FF'><u>int</u></font> crc_table_empty <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+local z_crc_t FAR crc_table[TBLS][<font color='#979000'>256</font>];
+local <font color='#0000FF'><u>void</u></font> make_crc_table <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#ifdef</font> MAKECRCH
+   local <font color='#0000FF'><u>void</u></font> write_table <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>FILE <font color='#5555FF'>*</font>, <font color='#0000FF'>const</font> z_crc_t FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* MAKECRCH */</font>
+<font color='#009900'>/*
+  Generate tables for a byte-wise 32-bit CRC calculation on the polynomial:
+  x^32+x^26+x^23+x^22+x^16+x^12+x^11+x^10+x^8+x^7+x^5+x^4+x^2+x+1.
+
+  Polynomials over GF(2) are represented in binary, one bit per coefficient,
+  with the lowest powers in the most significant bit.  Then adding polynomials
+  is just exclusive-or, and multiplying a polynomial by x is a right shift by
+  one.  If we call the above polynomial p, and represent a byte as the
+  polynomial q, also with the lowest power in the most significant bit (so the
+  byte 0xb1 is the polynomial x^7+x^3+x+1), then the CRC is (q*x^32) mod p,
+  where a mod b means the remainder after dividing a by b.
+
+  This calculation is done using the shift-register method of multiplying and
+  taking the remainder.  The register is initialized to zero, and for each
+  incoming bit, x^32 is added mod p to the register if the bit is a one (where
+  x^32 mod p is p+x^32 = x^26+...+1), and the register is multiplied mod p by
+  x (which is shifting right by one and adding x^32 mod p if the bit shifted
+  out is a one).  We start with the highest power (least significant bit) of
+  q and repeat for all eight bits of q.
+
+  The first table is simply the CRC of all possible eight bit values.  This is
+  all the information needed to generate CRCs on data a byte at a time for all
+  combinations of CRC register values and incoming bytes.  The remaining tables
+  allow for word-at-a-time CRC calculation for both big-endian and little-
+  endian machines, where a word is four bytes.
+*/</font>
+local <font color='#0000FF'><u>void</u></font> <b><a name='make_crc_table'></a>make_crc_table</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    z_crc_t c;
+    <font color='#0000FF'><u>int</u></font> n, k;
+    z_crc_t poly;                       <font color='#009900'>/* polynomial exclusive-or pattern */</font>
+    <font color='#009900'>/* terms of polynomial defining this crc (except x^32): */</font>
+    <font color='#0000FF'>static</font> <font color='#0000FF'>volatile</font> <font color='#0000FF'><u>int</u></font> first <font color='#5555FF'>=</font> <font color='#979000'>1</font>;      <font color='#009900'>/* flag to limit concurrent making */</font>
+    <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> p[] <font color='#5555FF'>=</font> <b>{</b><font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#979000'>4</font>,<font color='#979000'>5</font>,<font color='#979000'>7</font>,<font color='#979000'>8</font>,<font color='#979000'>10</font>,<font color='#979000'>11</font>,<font color='#979000'>12</font>,<font color='#979000'>16</font>,<font color='#979000'>22</font>,<font color='#979000'>23</font>,<font color='#979000'>26</font><b>}</b>;
+
+    <font color='#009900'>/* See if another task is already doing this (not thread-safe, but better
+       than nothing -- significantly reduces duration of vulnerability in
+       case the advice about DYNAMIC_CRC_TABLE is ignored) */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>first<font face='Lucida Console'>)</font> <b>{</b>
+        first <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#009900'>/* make exclusive-or pattern from polynomial (0xedb88320UL) */</font>
+        poly <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; n<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+            poly <font color='#5555FF'>|</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>z_crc_t<font face='Lucida Console'>)</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#979000'>31</font> <font color='#5555FF'>-</font> p[n]<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>/* generate a crc for every 8-bit value */</font>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> <font color='#979000'>256</font>; n<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+            c <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>z_crc_t<font face='Lucida Console'>)</font>n;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font>; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+                c <font color='#5555FF'>=</font> c <font color='#5555FF'>&amp;</font> <font color='#979000'>1</font> ? poly ^ <font face='Lucida Console'>(</font>c <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> : c <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>1</font>;
+            crc_table[<font color='#979000'>0</font>][n] <font color='#5555FF'>=</font> c;
+        <b>}</b>
+
+<font color='#0000FF'>#ifdef</font> BYFOUR
+        <font color='#009900'>/* generate crc for each value followed by one, two, and three zeros,
+           and then the byte reversal of those as well as the first table */</font>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> <font color='#979000'>256</font>; n<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+            c <font color='#5555FF'>=</font> crc_table[<font color='#979000'>0</font>][n];
+            crc_table[<font color='#979000'>4</font>][n] <font color='#5555FF'>=</font> <font color='#BB00BB'>ZSWAP32</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>=</font> <font color='#979000'>1</font>; k <font color='#5555FF'>&lt;</font> <font color='#979000'>4</font>; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+                c <font color='#5555FF'>=</font> crc_table[<font color='#979000'>0</font>][c <font color='#5555FF'>&amp;</font> <font color='#979000'>0xff</font>] ^ <font face='Lucida Console'>(</font>c <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+                crc_table[k][n] <font color='#5555FF'>=</font> c;
+                crc_table[k <font color='#5555FF'>+</font> <font color='#979000'>4</font>][n] <font color='#5555FF'>=</font> <font color='#BB00BB'>ZSWAP32</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* BYFOUR */</font>
+
+        crc_table_empty <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>
+    <font color='#0000FF'>else</font> <b>{</b>      <font color='#009900'>/* not first */</font>
+        <font color='#009900'>/* wait for the other guy to finish (not efficient, but rare) */</font>
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>crc_table_empty<font face='Lucida Console'>)</font>
+            ;
+    <b>}</b>
+
+<font color='#0000FF'>#ifdef</font> MAKECRCH
+    <font color='#009900'>/* write out CRC tables to crc32.h */</font>
+    <b>{</b>
+        FILE <font color='#5555FF'>*</font>out;
+
+        out <font color='#5555FF'>=</font> <font color='#BB00BB'>fopen</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>crc32.h</font>", "<font color='#CC0000'>w</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>out <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font>;
+        <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>out, "<font color='#CC0000'>/* crc32.h -- tables for rapid CRC calculation\n</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>out, "<font color='#CC0000'> * Generated automatically by crc32.c\n */\n\n</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>out, "<font color='#CC0000'>local const z_crc_t FAR </font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>out, "<font color='#CC0000'>crc_table[TBLS][256] =\n{\n  {\n</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>write_table</font><font face='Lucida Console'>(</font>out, crc_table[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+#  ifdef BYFOUR
+        <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>out, "<font color='#CC0000'>#ifdef BYFOUR\n</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>=</font> <font color='#979000'>1</font>; k <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font>; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+            <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>out, "<font color='#CC0000'>  },\n  {\n</font>"<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>write_table</font><font face='Lucida Console'>(</font>out, crc_table[k]<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>out, "<font color='#CC0000'>#endif\n</font>"<font face='Lucida Console'>)</font>;
+#  endif <font color='#009900'>/* BYFOUR */</font>
+        <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>out, "<font color='#CC0000'>  }\n};\n</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>fclose</font><font face='Lucida Console'>(</font>out<font face='Lucida Console'>)</font>;
+    <b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* MAKECRCH */</font>
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> MAKECRCH
+local <font color='#0000FF'><u>void</u></font> <b><a name='write_table'></a>write_table</b><font face='Lucida Console'>(</font>out, table<font face='Lucida Console'>)</font>
+    FILE <font color='#5555FF'>*</font>out;
+    <font color='#0000FF'>const</font> z_crc_t FAR <font color='#5555FF'>*</font>table;
+<b>{</b>
+    <font color='#0000FF'><u>int</u></font> n;
+
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> <font color='#979000'>256</font>; n<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+        <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>out, "<font color='#CC0000'>%s0x%08lxUL%s</font>", n <font color='#5555FF'>%</font> <font color='#979000'>5</font> ? "<font color='#CC0000'></font>" : "<font color='#CC0000'>    </font>",
+                <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>table[n]<font face='Lucida Console'>)</font>,
+                n <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font> ? "<font color='#CC0000'>\n</font>" : <font face='Lucida Console'>(</font>n <font color='#5555FF'>%</font> <font color='#979000'>5</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font> ? "<font color='#CC0000'>,\n</font>" : "<font color='#CC0000'>, </font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* MAKECRCH */</font>
+
+<font color='#0000FF'>#else</font> <font color='#009900'>/* !DYNAMIC_CRC_TABLE */</font>
+<font color='#009900'>/* ========================================================================
+ * Tables of CRC-32s of all single-byte values, made by make_crc_table().
+ */</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='crc32.h.html'>crc32.h</a>"
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* DYNAMIC_CRC_TABLE */</font>
+
+<font color='#009900'>/* =========================================================================
+ * This function can be used by asm versions of crc32()
+ */</font>
+<font color='#0000FF'>const</font> z_crc_t FAR <font color='#5555FF'>*</font> ZEXPORT <b><a name='get_crc_table'></a>get_crc_table</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+<font color='#0000FF'>#ifdef</font> DYNAMIC_CRC_TABLE
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>crc_table_empty<font face='Lucida Console'>)</font>
+        <font color='#BB00BB'>make_crc_table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* DYNAMIC_CRC_TABLE */</font>
+    <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> z_crc_t FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>crc_table;
+<b>}</b>
+
+<font color='#009900'>/* ========================================================================= */</font>
+<font color='#0000FF'>#define</font> DO1 crc <font color='#5555FF'>=</font> crc_table[<font color='#979000'>0</font>][<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>crc ^ <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>buf<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xff</font>] ^ <font face='Lucida Console'>(</font>crc <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> DO8 DO1; DO1; DO1; DO1; DO1; DO1; DO1; DO1
+
+<font color='#009900'>/* ========================================================================= */</font>
+<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> ZEXPORT <b><a name='crc32'></a>crc32</b><font face='Lucida Console'>(</font>crc, buf, len<font face='Lucida Console'>)</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> crc;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> FAR <font color='#5555FF'>*</font>buf;
+    uInt len;
+<b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buf <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_NULL<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>0</font>UL;
+
+<font color='#0000FF'>#ifdef</font> DYNAMIC_CRC_TABLE
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>crc_table_empty<font face='Lucida Console'>)</font>
+        <font color='#BB00BB'>make_crc_table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* DYNAMIC_CRC_TABLE */</font>
+
+<font color='#0000FF'>#ifdef</font> BYFOUR
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>ptrdiff_t<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+        z_crc_t endian;
+
+        endian <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>endian<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>crc32_little</font><font face='Lucida Console'>(</font>crc, buf, len<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>crc32_big</font><font face='Lucida Console'>(</font>crc, buf, len<font face='Lucida Console'>)</font>;
+    <b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* BYFOUR */</font>
+    crc <font color='#5555FF'>=</font> crc ^ <font color='#979000'>0xffffffffUL</font>;
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font> <b>{</b>
+        DO8;
+        len <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+    <b>}</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>len<font face='Lucida Console'>)</font> <font color='#0000FF'>do</font> <b>{</b>
+        DO1;
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>len<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>return</font> crc ^ <font color='#979000'>0xffffffffUL</font>;
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> BYFOUR
+
+<font color='#009900'>/* ========================================================================= */</font>
+<font color='#0000FF'>#define</font> DOLIT4 c ^<font color='#5555FF'>=</font> <font color='#5555FF'>*</font>buf4<font color='#5555FF'>+</font><font color='#5555FF'>+</font>; \
+        c <font color='#5555FF'>=</font> crc_table[<font color='#979000'>3</font>][c <font color='#5555FF'>&amp;</font> <font color='#979000'>0xff</font>] ^ crc_table[<font color='#979000'>2</font>][<font face='Lucida Console'>(</font>c <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xff</font>] ^ \
+            crc_table[<font color='#979000'>1</font>][<font face='Lucida Console'>(</font>c <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xff</font>] ^ crc_table[<font color='#979000'>0</font>][c <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>24</font>]
+<font color='#0000FF'>#define</font> DOLIT32 DOLIT4; DOLIT4; DOLIT4; DOLIT4; DOLIT4; DOLIT4; DOLIT4; DOLIT4
+
+<font color='#009900'>/* ========================================================================= */</font>
+local <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='crc32_little'></a>crc32_little</b><font face='Lucida Console'>(</font>crc, buf, len<font face='Lucida Console'>)</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> crc;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> FAR <font color='#5555FF'>*</font>buf;
+    <font color='#0000FF'><u>unsigned</u></font> len;
+<b>{</b>
+    <font color='#0000FF'>register</font> z_crc_t c;
+    <font color='#0000FF'>register</font> <font color='#0000FF'>const</font> z_crc_t FAR <font color='#5555FF'>*</font>buf4;
+
+    c <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>z_crc_t<font face='Lucida Console'>)</font>crc;
+    c <font color='#5555FF'>=</font> ~c;
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>ptrdiff_t<font face='Lucida Console'>)</font>buf <font color='#5555FF'>&amp;</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+        c <font color='#5555FF'>=</font> crc_table[<font color='#979000'>0</font>][<font face='Lucida Console'>(</font>c ^ <font color='#5555FF'>*</font>buf<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xff</font>] ^ <font face='Lucida Console'>(</font>c <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+        len<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+    <b>}</b>
+
+    buf4 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> z_crc_t FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>buf;
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>32</font><font face='Lucida Console'>)</font> <b>{</b>
+        DOLIT32;
+        len <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>32</font>;
+    <b>}</b>
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font> <b>{</b>
+        DOLIT4;
+        len <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+    <b>}</b>
+    buf <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>buf4;
+
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>len<font face='Lucida Console'>)</font> <font color='#0000FF'>do</font> <b>{</b>
+        c <font color='#5555FF'>=</font> crc_table[<font color='#979000'>0</font>][<font face='Lucida Console'>(</font>c ^ <font color='#5555FF'>*</font>buf<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xff</font>] ^ <font face='Lucida Console'>(</font>c <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>len<font face='Lucida Console'>)</font>;
+    c <font color='#5555FF'>=</font> ~c;
+    <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>c;
+<b>}</b>
+
+<font color='#009900'>/* ========================================================================= */</font>
+<font color='#0000FF'>#define</font> DOBIG4 c ^<font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font>buf4; \
+        c <font color='#5555FF'>=</font> crc_table[<font color='#979000'>4</font>][c <font color='#5555FF'>&amp;</font> <font color='#979000'>0xff</font>] ^ crc_table[<font color='#979000'>5</font>][<font face='Lucida Console'>(</font>c <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xff</font>] ^ \
+            crc_table[<font color='#979000'>6</font>][<font face='Lucida Console'>(</font>c <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xff</font>] ^ crc_table[<font color='#979000'>7</font>][c <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>24</font>]
+<font color='#0000FF'>#define</font> DOBIG32 DOBIG4; DOBIG4; DOBIG4; DOBIG4; DOBIG4; DOBIG4; DOBIG4; DOBIG4
+
+<font color='#009900'>/* ========================================================================= */</font>
+local <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='crc32_big'></a>crc32_big</b><font face='Lucida Console'>(</font>crc, buf, len<font face='Lucida Console'>)</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> crc;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> FAR <font color='#5555FF'>*</font>buf;
+    <font color='#0000FF'><u>unsigned</u></font> len;
+<b>{</b>
+    <font color='#0000FF'>register</font> z_crc_t c;
+    <font color='#0000FF'>register</font> <font color='#0000FF'>const</font> z_crc_t FAR <font color='#5555FF'>*</font>buf4;
+
+    c <font color='#5555FF'>=</font> <font color='#BB00BB'>ZSWAP32</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>z_crc_t<font face='Lucida Console'>)</font>crc<font face='Lucida Console'>)</font>;
+    c <font color='#5555FF'>=</font> ~c;
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>ptrdiff_t<font face='Lucida Console'>)</font>buf <font color='#5555FF'>&amp;</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+        c <font color='#5555FF'>=</font> crc_table[<font color='#979000'>4</font>][<font face='Lucida Console'>(</font>c <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>24</font><font face='Lucida Console'>)</font> ^ <font color='#5555FF'>*</font>buf<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] ^ <font face='Lucida Console'>(</font>c <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+        len<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+    <b>}</b>
+
+    buf4 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> z_crc_t FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>buf;
+    buf4<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>32</font><font face='Lucida Console'>)</font> <b>{</b>
+        DOBIG32;
+        len <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>32</font>;
+    <b>}</b>
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font> <b>{</b>
+        DOBIG4;
+        len <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+    <b>}</b>
+    buf4<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+    buf <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>buf4;
+
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>len<font face='Lucida Console'>)</font> <font color='#0000FF'>do</font> <b>{</b>
+        c <font color='#5555FF'>=</font> crc_table[<font color='#979000'>4</font>][<font face='Lucida Console'>(</font>c <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>24</font><font face='Lucida Console'>)</font> ^ <font color='#5555FF'>*</font>buf<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] ^ <font face='Lucida Console'>(</font>c <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>len<font face='Lucida Console'>)</font>;
+    c <font color='#5555FF'>=</font> ~c;
+    <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#BB00BB'>ZSWAP32</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* BYFOUR */</font>
+
+<font color='#0000FF'>#define</font> GF2_DIM <font color='#979000'>32</font>      <font color='#009900'>/* dimension of GF(2) vectors (length of CRC) */</font>
+
+<font color='#009900'>/* ========================================================================= */</font>
+local <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='gf2_matrix_times'></a>gf2_matrix_times</b><font face='Lucida Console'>(</font>mat, vec<font face='Lucida Console'>)</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <font color='#5555FF'>*</font>mat;
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> vec;
+<b>{</b>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> sum;
+
+    sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>vec<font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>vec <font color='#5555FF'>&amp;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            sum ^<font color='#5555FF'>=</font> <font color='#5555FF'>*</font>mat;
+        vec <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        mat<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+    <b>}</b>
+    <font color='#0000FF'>return</font> sum;
+<b>}</b>
+
+<font color='#009900'>/* ========================================================================= */</font>
+local <font color='#0000FF'><u>void</u></font> <b><a name='gf2_matrix_square'></a>gf2_matrix_square</b><font face='Lucida Console'>(</font>square, mat<font face='Lucida Console'>)</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <font color='#5555FF'>*</font>square;
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <font color='#5555FF'>*</font>mat;
+<b>{</b>
+    <font color='#0000FF'><u>int</u></font> n;
+
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> GF2_DIM; n<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+        square[n] <font color='#5555FF'>=</font> <font color='#BB00BB'>gf2_matrix_times</font><font face='Lucida Console'>(</font>mat, mat[n]<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>/* ========================================================================= */</font>
+local uLong <b><a name='crc32_combine_'></a>crc32_combine_</b><font face='Lucida Console'>(</font>crc1, crc2, len2<font face='Lucida Console'>)</font>
+    uLong crc1;
+    uLong crc2;
+    z_off64_t len2;
+<b>{</b>
+    <font color='#0000FF'><u>int</u></font> n;
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> row;
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> even[GF2_DIM];    <font color='#009900'>/* even-power-of-two zeros operator */</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> odd[GF2_DIM];     <font color='#009900'>/* odd-power-of-two zeros operator */</font>
+
+    <font color='#009900'>/* degenerate case (also disallow negative lengths) */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>len2 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> crc1;
+
+    <font color='#009900'>/* put operator for one zero bit in odd */</font>
+    odd[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>0xedb88320UL</font>;          <font color='#009900'>/* CRC-32 polynomial */</font>
+    row <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> <font color='#979000'>1</font>; n <font color='#5555FF'>&lt;</font> GF2_DIM; n<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+        odd[n] <font color='#5555FF'>=</font> row;
+        row <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <b>}</b>
+
+    <font color='#009900'>/* put operator for two zero bits in even */</font>
+    <font color='#BB00BB'>gf2_matrix_square</font><font face='Lucida Console'>(</font>even, odd<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/* put operator for four zero bits in odd */</font>
+    <font color='#BB00BB'>gf2_matrix_square</font><font face='Lucida Console'>(</font>odd, even<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/* apply len2 zeros to crc1 (first square will put the operator for one
+       zero byte, eight zero bits, in even) */</font>
+    <font color='#0000FF'>do</font> <b>{</b>
+        <font color='#009900'>/* apply zeros operator for this bit of len2 */</font>
+        <font color='#BB00BB'>gf2_matrix_square</font><font face='Lucida Console'>(</font>even, odd<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>len2 <font color='#5555FF'>&amp;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            crc1 <font color='#5555FF'>=</font> <font color='#BB00BB'>gf2_matrix_times</font><font face='Lucida Console'>(</font>even, crc1<font face='Lucida Console'>)</font>;
+        len2 <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        <font color='#009900'>/* if no more bits set, then done */</font>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>len2 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>break</font>;
+
+        <font color='#009900'>/* another iteration of the loop with odd and even swapped */</font>
+        <font color='#BB00BB'>gf2_matrix_square</font><font face='Lucida Console'>(</font>odd, even<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>len2 <font color='#5555FF'>&amp;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            crc1 <font color='#5555FF'>=</font> <font color='#BB00BB'>gf2_matrix_times</font><font face='Lucida Console'>(</font>odd, crc1<font face='Lucida Console'>)</font>;
+        len2 <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        <font color='#009900'>/* if no more bits set, then done */</font>
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>len2 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/* return combined crc */</font>
+    crc1 ^<font color='#5555FF'>=</font> crc2;
+    <font color='#0000FF'>return</font> crc1;
+<b>}</b>
+
+<font color='#009900'>/* ========================================================================= */</font>
+uLong ZEXPORT <b><a name='crc32_combine'></a>crc32_combine</b><font face='Lucida Console'>(</font>crc1, crc2, len2<font face='Lucida Console'>)</font>
+    uLong crc1;
+    uLong crc2;
+    z_off_t len2;
+<b>{</b>
+    <font color='#0000FF'>return</font> <font color='#BB00BB'>crc32_combine_</font><font face='Lucida Console'>(</font>crc1, crc2, len2<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+uLong ZEXPORT <b><a name='crc32_combine64'></a>crc32_combine64</b><font face='Lucida Console'>(</font>crc1, crc2, len2<font face='Lucida Console'>)</font>
+    uLong crc1;
+    uLong crc2;
+    z_off64_t len2;
+<b>{</b>
+    <font color='#0000FF'>return</font> <font color='#BB00BB'>crc32_combine_</font><font face='Lucida Console'>(</font>crc1, crc2, len2<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+</pre></body></html>

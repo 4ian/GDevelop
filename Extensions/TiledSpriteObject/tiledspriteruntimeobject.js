@@ -16,9 +16,9 @@ gdjs.TiledSpriteRuntimeObject = function(runtimeScene, objectData)
 
     var texture = runtimeScene.getGame().getImageManager().getPIXITexture(objectData.texture);
     if ( this._tiledSprite === undefined ) {
-        this._tiledSprite = new PIXI.TilingSprite(texture, 1024, 1024);
+        this._tiledSprite = new PIXI.extras.TilingSprite(texture, 1024, 1024);
     } else {
-        this._tiledSprite.setTexture(texture);
+        this._tiledSprite.texture = texture;
     }
 
     this.setWidth(objectData.width);
@@ -64,7 +64,7 @@ gdjs.TiledSpriteRuntimeObject.prototype.setY = function(y) {
 
 gdjs.TiledSpriteRuntimeObject.prototype.setTexture = function(textureName, runtimeScene) {
     var texture = runtimeScene.getGame().getImageManager().getPIXITexture(textureName);
-    this._tiledSprite.setTexture(texture);
+    this._tiledSprite.texture = texture;
     this._updateTilingSpritePosition();
 };
 

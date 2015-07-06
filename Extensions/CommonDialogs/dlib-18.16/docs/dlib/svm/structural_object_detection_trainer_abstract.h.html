@@ -1,0 +1,393 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - structural_object_detection_trainer_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_STRUCTURAL_OBJECT_DETECTION_TRAiNER_H_ABSTRACTh_
+<font color='#0000FF'>#ifdef</font> DLIB_STRUCTURAL_OBJECT_DETECTION_TRAiNER_H_ABSTRACTh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='structural_svm_object_detection_problem_abstract.h.html'>structural_svm_object_detection_problem_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/object_detector_abstract.h.html'>../image_processing/object_detector_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/box_overlap_testing_abstract.h.html'>../image_processing/box_overlap_testing_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/full_object_detection_abstract.h.html'>../image_processing/full_object_detection_abstract.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_scanner_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='structural_object_detection_trainer'></a>structural_object_detection_trainer</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON image_scanner_type
+                image_scanner_type must be an implementation of 
+                dlib/image_processing/scan_fhog_pyramid_abstract.h or
+                dlib/image_processing/scan_image_custom_abstract.h or
+                dlib/image_processing/scan_image_pyramid_abstract.h or
+                dlib/image_processing/scan_image_boxes_abstract.h
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for learning to detect objects in images based on a 
+                set of labeled images. The training procedure produces an object_detector 
+                which can be used to predict the locations of objects in new images.
+
+                Note that this is just a convenience wrapper around the structural_svm_object_detection_problem 
+                to make it look similar to all the other trainers in dlib.  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>double</u></font> scalar_type;
+        <font color='#0000FF'>typedef</font> default_memory_manager mem_manager_type;
+        <font color='#0000FF'>typedef</font> object_detector<font color='#5555FF'>&lt;</font>image_scanner_type<font color='#5555FF'>&gt;</font> trained_function_type;
+
+
+        <font color='#0000FF'>explicit</font> <b><a name='structural_object_detection_trainer'></a>structural_object_detection_trainer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_scanner_type<font color='#5555FF'>&amp;</font> scanner
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - scanner.get_num_detection_templates() &gt; 0
+            ensures
+                - #get_c() == 1
+                - this object isn't verbose
+                - #get_epsilon() == 0.1
+                - #get_num_threads() == 2
+                - #get_max_cache_size() == 5
+                - #get_match_eps() == 0.5
+                - #get_loss_per_missed_target() == 1
+                - #get_loss_per_false_alarm() == 1
+                - This object will attempt to learn a model for the given
+                  scanner object when train() is called.
+                - #get_scanner() == scanner
+                  (note that only the "configuration" of scanner is copied.
+                  I.e. the copy is done using copy_configuration())
+                - #auto_set_overlap_tester() == true
+        !*/</font>
+
+        <font color='#0000FF'>const</font> image_scanner_type<font color='#5555FF'>&amp;</font> <b><a name='get_scanner'></a>get_scanner</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the image scanner used by this object.  
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='auto_set_overlap_tester'></a>auto_set_overlap_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (this object will automatically determine an appropriate 
+                  state for the overlap tester used for non-max suppression.) then
+                    - returns true
+                    - In this case, it is determined using the find_tight_overlap_tester() 
+                      routine based on the truth_object_detections given to the 
+                      structural_object_detection_trainer::train() method.  
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_overlap_tester'></a>set_overlap_tester</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> test_box_overlap<font color='#5555FF'>&amp;</font> tester
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_overlap_tester() == tester
+                - #auto_set_overlap_tester() == false
+        !*/</font>
+
+        test_box_overlap <b><a name='get_overlap_tester'></a>get_overlap_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - auto_set_overlap_tester() == false
+            ensures
+                - returns the overlap tester object which will be used to perform non-max suppression.
+                  In particular, this function returns the overlap tester which will populate the
+                  object_detector returned by train().
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_num_threads'></a>set_num_threads</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_num_threads() == num
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_threads'></a>get_num_threads</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of threads used during training.  You should 
+                  usually set this equal to the number of processing cores on your
+                  machine.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_epsilon'></a>set_epsilon</b> <font face='Lucida Console'>(</font>
+            scalar_type eps
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - eps &gt; 0
+            ensures
+                - #get_epsilon() == eps
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_epsilon'></a>get_epsilon</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the error epsilon that determines when training should stop.
+                  Smaller values may result in a more accurate solution but take longer 
+                  to train.  You can think of this epsilon value as saying "solve the 
+                  optimization problem until the average loss per sample is within epsilon 
+                  of its optimal value".
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_cache_size'></a>set_max_cache_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_size
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_max_cache_size() == max_size
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_cache_size'></a>get_max_cache_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - During training, this object basically runs the object detector on 
+                  each image, over and over.  To speed this up, it is possible to cache
+                  the results of these detector invocations.  This function returns the 
+                  number of cache elements per training sample kept in the cache.  Note 
+                  that a value of 0 means caching is not used at all.  Note also that 
+                  each cache element takes up about sizeof(double)*scanner.get_num_dimensions()
+                  memory (where scanner is the scanner given to this object's constructor).
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_verbose'></a>be_verbose</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object will print status messages to standard out so that a 
+                  user can observe the progress of the algorithm.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_quiet'></a>be_quiet</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object will not print anything to standard out
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_oca'></a>set_oca</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> oca<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_oca() == item 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> oca <b><a name='get_oca'></a>get_oca</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a copy of the optimizer used to solve the structural SVM problem.  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_c'></a>set_c</b> <font face='Lucida Console'>(</font>
+            scalar_type C
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - C &gt; 0
+            ensures
+                - #get_c() = C
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_c'></a>get_c</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the SVM regularization parameter.  It is the parameter 
+                  that determines the trade-off between trying to fit the training 
+                  data (i.e. minimize the loss) or allowing more errors but hopefully 
+                  improving the generalization of the resulting detector.  Larger 
+                  values encourage exact fitting while smaller values of C may encourage 
+                  better generalization. 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_match_eps'></a>set_match_eps</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> eps
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt; eps &lt; 1
+            ensures
+                - #get_match_eps() == eps
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_match_eps'></a>get_match_eps</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the amount of alignment necessary for a detection to be considered
+                  as matching with a ground truth rectangle.  If it doesn't match then
+                  it is considered to be a false alarm.  To define this precisely, let
+                  A and B be two rectangles, then A and B match if and only if:
+                    A.intersect(B).area()/(A+B).area() &gt; get_match_eps()
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_loss_per_missed_target'></a>get_loss_per_missed_target</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the amount of loss experienced for failing to detect one of the
+                  targets.  If you care more about finding targets than having a low false
+                  alarm rate then you can increase this value.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_loss_per_missed_target'></a>set_loss_per_missed_target</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> loss
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - loss &gt; 0
+            ensures
+                - #get_loss_per_missed_target() == loss
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_loss_per_false_alarm'></a>get_loss_per_false_alarm</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the amount of loss experienced for emitting a false alarm detection.
+                  Or in other words, the loss for generating a detection that doesn't correspond 
+                  to one of the truth rectangles.  If you care more about having a low false
+                  alarm rate than finding all the targets then you can increase this value.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_loss_per_false_alarm'></a>set_loss_per_false_alarm</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> loss
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - loss &gt; 0
+            ensures
+                - #get_loss_per_false_alarm() == loss
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_array_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> trained_function_type <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_array_type<font color='#5555FF'>&amp;</font> images,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> truth_object_detections
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_learning_problem(images, truth_object_detections) == true
+                - it must be valid to pass images[0] into the image_scanner_type::load() method.
+                  (also, image_array_type must be an implementation of dlib/array/array_kernel_abstract.h)
+                - for all valid i, j:
+                    - truth_object_detections[i][j].num_parts() == get_scanner().get_num_movable_components_per_detection_template() 
+                    - all_parts_in_rect(truth_object_detections[i][j]) == true
+            ensures
+                - Uses the structural_svm_object_detection_problem to train an object_detector 
+                  on the given images and truth_object_detections.  
+                - returns a function F with the following properties:
+                    - F(new_image) == A prediction of what objects are present in new_image.  This
+                      is a set of rectangles indicating their positions.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_array_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> trained_function_type <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_array_type<font color='#5555FF'>&amp;</font> images,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> truth_object_detections
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_learning_problem(images, truth_object_detections) == true
+                - it must be valid to pass images[0] into the image_scanner_type::load() method.
+                  (also, image_array_type must be an implementation of dlib/array/array_kernel_abstract.h)
+                - get_scanner().get_num_movable_components_per_detection_template() == 0
+            ensures
+                - This function is identical to the above train(), except that it converts 
+                  each element of truth_object_detections into a full_object_detection by 
+                  passing it to full_object_detection's constructor taking only a rectangle.
+                  Therefore, this version of train() is a convenience function for for the 
+                  case where you don't have any movable components of the detection templates.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_array_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> trained_function_type <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_array_type<font color='#5555FF'>&amp;</font> images,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> truth_object_detections,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> ignore,
+            <font color='#0000FF'>const</font> test_box_overlap<font color='#5555FF'>&amp;</font> ignore_overlap_tester <font color='#5555FF'>=</font> <font color='#BB00BB'>test_box_overlap</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_learning_problem(images, truth_object_detections) == true
+                - it must be valid to pass images[0] into the image_scanner_type::load() method.
+                  (also, image_array_type must be an implementation of dlib/array/array_kernel_abstract.h)
+                - ignore.size() == images.size()
+                - for all valid i, j:
+                    - truth_object_detections[i][j].num_parts() == get_scanner().get_num_movable_components_per_detection_template() 
+                    - all_parts_in_rect(truth_object_detections[i][j]) == true
+            ensures
+                - Uses the structural_svm_object_detection_problem to train an object_detector 
+                  on the given images and truth_object_detections.  
+                - for all valid i:
+                    - Within images[i] any detections that match against a rectangle in
+                      ignore[i], according to ignore_overlap_tester, are ignored.  That is,
+                      the optimizer doesn't care if the detector outputs a detection that
+                      matches any of the ignore rectangles or if it fails to output a
+                      detection for an ignore rectangle.  Therefore, if there are objects
+                      in your dataset that you are unsure if you want to detect or otherwise
+                      don't care if the detector gets or doesn't then you can mark them
+                      with ignore rectangles and the optimizer will simply ignore them. 
+                - returns a function F with the following properties:
+                    - F(new_image) == A prediction of what objects are present in new_image.  This
+                      is a set of rectangles indicating their positions.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_array_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> trained_function_type <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_array_type<font color='#5555FF'>&amp;</font> images,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> truth_object_detections,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> ignore,
+            <font color='#0000FF'>const</font> test_box_overlap<font color='#5555FF'>&amp;</font> ignore_overlap_tester <font color='#5555FF'>=</font> <font color='#BB00BB'>test_box_overlap</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_learning_problem(images, truth_object_detections) == true
+                - ignore.size() == images.size()
+                - it must be valid to pass images[0] into the image_scanner_type::load() method.
+                  (also, image_array_type must be an implementation of dlib/array/array_kernel_abstract.h)
+                - get_scanner().get_num_movable_components_per_detection_template() == 0
+            ensures
+                - This function is identical to the above train(), except that it converts 
+                  each element of truth_object_detections into a full_object_detection by 
+                  passing it to full_object_detection's constructor taking only a rectangle.
+                  Therefore, this version of train() is a convenience function for for the 
+                  case where you don't have any movable components of the detection templates.
+        !*/</font>
+    <b>}</b>; 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_STRUCTURAL_OBJECT_DETECTION_TRAiNER_H_ABSTRACTh_
+</font>
+
+
+</pre></body></html>

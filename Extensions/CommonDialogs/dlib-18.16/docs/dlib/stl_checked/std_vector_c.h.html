@@ -1,0 +1,336 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - std_vector_c.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_STD_VECTOr_C_H_
+<font color='#0000FF'>#define</font> DLIB_STD_VECTOr_C_H_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>algorithm<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='std_vector_c_abstract.h.html'>std_vector_c_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../is_kind.h.html'>../is_kind.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> Allocator <font color='#5555FF'>=</font> std::allocator<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='std_vector_c'></a>std_vector_c</b> : <font color='#0000FF'>public</font> std::vector<font color='#5555FF'>&lt;</font>T,Allocator<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> std::vector<font color='#5555FF'>&lt;</font>T,Allocator<font color='#5555FF'>&gt;</font> base_type;
+    <font color='#0000FF'>public</font>:
+        <font color='#009900'>// types:
+</font>        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> Allocator::reference         reference;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> Allocator::const_reference   const_reference;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> base_type::iterator          iterator;       <font color='#009900'>// See 23.1
+</font>        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> base_type::const_iterator    const_iterator; <font color='#009900'>// See 23.1
+</font>        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> base_type::size_type         size_type;      <font color='#009900'>// See 23.1
+</font>        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> base_type::difference_type   difference_type;<font color='#009900'>// See 23.1
+</font>        <font color='#0000FF'>typedef</font> T                                     value_type;
+        <font color='#0000FF'>typedef</font> Allocator                             allocator_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> Allocator::pointer           pointer;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> Allocator::const_pointer     const_pointer;
+        <font color='#0000FF'>typedef</font> std::reverse_iterator<font color='#5555FF'>&lt;</font>iterator<font color='#5555FF'>&gt;</font>       reverse_iterator;
+        <font color='#0000FF'>typedef</font> std::reverse_iterator<font color='#5555FF'>&lt;</font>const_iterator<font color='#5555FF'>&gt;</font> const_reverse_iterator;
+
+
+        <font color='#009900'>// 23.2.4.1 construct/copy/destroy:
+</font>        <font color='#0000FF'>explicit</font> <b><a name='std_vector_c'></a>std_vector_c</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> Allocator<font color='#5555FF'>&amp;</font> alloc<font color='#5555FF'>=</font> <font color='#BB00BB'>Allocator</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> : base_type<font face='Lucida Console'>(</font>alloc<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>explicit</font> <b><a name='std_vector_c'></a>std_vector_c</b><font face='Lucida Console'>(</font>size_type n, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> value <font color='#5555FF'>=</font> <font color='#BB00BB'>T</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                              <font color='#0000FF'>const</font> Allocator<font color='#5555FF'>&amp;</font> alloc<font color='#5555FF'>=</font> <font color='#BB00BB'>Allocator</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> : base_type<font face='Lucida Console'>(</font>n, value, alloc<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> InputIterator<font color='#5555FF'>&gt;</font>
+        <b><a name='std_vector_c'></a>std_vector_c</b><font face='Lucida Console'>(</font>InputIterator first, InputIterator last,
+                     <font color='#0000FF'>const</font> Allocator<font color='#5555FF'>&amp;</font> alloc<font color='#5555FF'>=</font> <font color='#BB00BB'>Allocator</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> : base_type<font face='Lucida Console'>(</font>first,last,alloc<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <b><a name='std_vector_c'></a>std_vector_c</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T,Allocator<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x<font face='Lucida Console'>)</font> : base_type<font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        std_vector_c<font color='#5555FF'>&lt;</font>T,Allocator<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T,Allocator<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>base_type<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> InputIterator<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>InputIterator first, InputIterator last<font face='Lucida Console'>)</font>    <b>{</b> base_type::<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>first,last<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>size_type n, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> u<font face='Lucida Console'>)</font>                    <b>{</b> base_type::<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>n,u<font face='Lucida Console'>)</font>; <b>}</b>
+        allocator_type          <b><a name='get_allocator'></a>get_allocator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>           <b>{</b> <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>get_allocator</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#009900'>// iterators:
+</font>        iterator                <b><a name='begin'></a>begin</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>                         <b>{</b> <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        const_iterator          <b><a name='begin'></a>begin</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>                   <b>{</b> <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        iterator                <b><a name='end'></a>end</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>                           <b>{</b> <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        const_iterator          <b><a name='end'></a>end</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>                     <b>{</b> <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        reverse_iterator        <b><a name='rbegin'></a>rbegin</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>                        <b>{</b> <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>rbegin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        const_reverse_iterator  <b><a name='rbegin'></a>rbegin</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>                  <b>{</b> <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>rbegin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        reverse_iterator        <b><a name='rend'></a>rend</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>                          <b>{</b> <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>rend</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        const_reverse_iterator  <b><a name='rend'></a>rend</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>                    <b>{</b> <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>rend</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#009900'>// 23.2.4.2 capacity:
+</font>        size_type               <b><a name='size'></a>size</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>                    <b>{</b> <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        size_type               <b><a name='max_size'></a>max_size</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>                <b>{</b> <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>max_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font>                    <b><a name='resize'></a>resize</b><font face='Lucida Console'>(</font>size_type sz, T c <font color='#5555FF'>=</font> <font color='#BB00BB'>T</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b> base_type::<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>sz,c<font face='Lucida Console'>)</font>; <b>}</b>
+        size_type               <b><a name='capacity'></a>capacity</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>                <b>{</b> <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>capacity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>bool</u></font>                    <b><a name='empty'></a>empty</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>                   <b>{</b> <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font>                    <b><a name='reserve'></a>reserve</b><font face='Lucida Console'>(</font>size_type n<font face='Lucida Console'>)</font>            <b>{</b> base_type::<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#009900'>// element access:
+</font>        const_reference         <b><a name='at'></a>at</b><font face='Lucida Console'>(</font>size_type n<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>           <b>{</b> <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>at</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>; <b>}</b>
+        reference               <b><a name='at'></a>at</b><font face='Lucida Console'>(</font>size_type n<font face='Lucida Console'>)</font>                 <b>{</b> <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>at</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>; <b>}</b>
+
+
+        <font color='#009900'>// 23.2.4.3 modifiers:
+</font>        <font color='#0000FF'><u>void</u></font>     <b><a name='push_back'></a>push_back</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x<font face='Lucida Console'>)</font> <b>{</b> base_type::<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font>     <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>std_vector_c<font color='#5555FF'>&lt;</font>T,Allocator<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x<font face='Lucida Console'>)</font> <b>{</b> base_type::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font>     <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> base_type::<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+
+    <font color='#009900'>// ------------------------------------------------------
+</font>    <font color='#009900'>// Things that have preconditions that should be checked.
+</font>    <font color='#009900'>// ------------------------------------------------------
+</font>
+        reference <b><a name='operator'></a>operator</b>[]<font face='Lucida Console'>(</font>
+            size_type n
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>n <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\treference std_vector_c::operator[](n)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have supplied an invalid index</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tsize(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>base_type<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>[n]; 
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------
+</font>
+        const_reference <b><a name='operator'></a>operator</b>[]<font face='Lucida Console'>(</font>
+            size_type n
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>n <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\tconst_reference std_vector_c::operator[](n)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have supplied an invalid index</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tsize(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> base_type<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>[n]; 
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------
+</font>
+        reference <b><a name='front'></a>front</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\treference std_vector_c::front()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can't call front() on an empty vector</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>front</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------
+</font>
+        const_reference <b><a name='front'></a>front</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\tconst_reference std_vector_c::front()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can't call front() on an empty vector</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>front</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------
+</font>
+        reference <b><a name='back'></a>back</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\treference std_vector_c::back()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can't call back() on an empty vector</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------
+</font>
+        const_reference <b><a name='back'></a>back</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\tconst_reference std_vector_c::back()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can't call back() on an empty vector</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------
+</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='pop_back'></a>pop_back</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\tconst_reference std_vector_c::pop_back()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can't call pop_back() on an empty vector</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+            base_type::<font color='#BB00BB'>pop_back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------
+</font>
+        iterator <b><a name='insert'></a>insert</b><font face='Lucida Console'>(</font>
+            iterator position, 
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> position <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> position <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+                "<font color='#CC0000'>\titerator std_vector_c::insert(position,x)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have called insert() with an invalid position</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>position, x<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------
+</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='insert'></a>insert</b><font face='Lucida Console'>(</font>
+            iterator position, 
+            size_type n, 
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> position <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> position <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+                "<font color='#CC0000'>\tvoid std_vector_c::insert(position,n,x)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have called insert() with an invalid position</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+            base_type::<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>position, n, x<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> InputIterator<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='insert'></a>insert</b><font face='Lucida Console'>(</font>
+            iterator position,
+            InputIterator first, 
+            InputIterator last
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> position <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> position <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+                "<font color='#CC0000'>\tvoid std_vector_c::insert(position,first,last)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have called insert() with an invalid position</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+            base_type::<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>position, first, last<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------
+</font>
+        iterator <b><a name='erase'></a>erase</b><font face='Lucida Console'>(</font>
+            iterator position
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> position <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> position <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+                "<font color='#CC0000'>\titerator std_vector_c::erase(position)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have called erase() with an invalid position</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font>position<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------
+</font>
+        iterator <b><a name='erase'></a>erase</b><font face='Lucida Console'>(</font>
+            iterator first, 
+            iterator last
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> first <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> first <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> last <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> last <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\titerator std_vector_c::erase(first,last)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have called erase() with an invalid range of iterators</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> base_type::<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font>first,last<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------
+</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// Add these swaps just to make absolutely sure the specialized swap always gets called even
+</font><font color='#009900'>// if the compiler is crappy and would otherwise mess it up.
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> Allocator<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>std_vector_c<font color='#5555FF'>&lt;</font>T,Allocator<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x, std_vector_c<font color='#5555FF'>&lt;</font>T,Allocator<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> y<font face='Lucida Console'>)</font> <b>{</b> x.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>y<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> Allocator<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>std::vector<font color='#5555FF'>&lt;</font>T,Allocator<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x, std_vector_c<font color='#5555FF'>&lt;</font>T,Allocator<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> y<font face='Lucida Console'>)</font> <b>{</b> x.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>y<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> Allocator<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>std_vector_c<font color='#5555FF'>&lt;</font>T,Allocator<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x, std::vector<font color='#5555FF'>&lt;</font>T,Allocator<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> y<font face='Lucida Console'>)</font> <b>{</b> y.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std_vector_c<font color='#5555FF'>&lt;</font>T,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b> 
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>size,out<font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item[i],out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type std_vector_c</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        std_vector_c<font color='#5555FF'>&lt;</font>T, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font> 
+        <b>{</b> 
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>size,in<font face='Lucida Console'>)</font>; 
+            item.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item[i],in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type std_vector_c</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>struct</font> <b><a name='is_std_vector'></a>is_std_vector</b><font color='#5555FF'>&lt;</font>std_vector_c<font color='#5555FF'>&lt;</font>T,alloc<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>        <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_STD_VECTOr_C_H_
+</font>
+
+</pre></body></html>

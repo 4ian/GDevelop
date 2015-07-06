@@ -1,0 +1,473 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - std_vector_c_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_STD_VECTOr_C_ABSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_STD_VECTOr_C_ABSTRACT_H_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>algorithm<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> Allocator <font color='#5555FF'>=</font> std::allocator<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='std_vector_c'></a>std_vector_c</b> : <font color='#0000FF'>public</font> std::vector<font color='#5555FF'>&lt;</font>T,Allocator<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a simple wrapper around the std::vector object.  It 
+                provides an identical interface but also checks the preconditions of
+                each member function.  That is, if you violate a requires
+                clause the dlib::fatal_error exception is thrown. 
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> std::vector<font color='#5555FF'>&lt;</font>T,Allocator<font color='#5555FF'>&gt;</font> base_type;
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> Allocator::reference         reference;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> Allocator::const_reference   const_reference;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> base_type::iterator          iterator;       
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> base_type::const_iterator    const_iterator; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> base_type::size_type         size_type;      
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> base_type::difference_type   difference_type;
+        <font color='#0000FF'>typedef</font> T                                     value_type;
+        <font color='#0000FF'>typedef</font> Allocator                             allocator_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> Allocator::pointer           pointer;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> Allocator::const_pointer     const_pointer;
+        <font color='#0000FF'>typedef</font> std::reverse_iterator<font color='#5555FF'>&lt;</font>iterator<font color='#5555FF'>&gt;</font>       reverse_iterator;
+        <font color='#0000FF'>typedef</font> std::reverse_iterator<font color='#5555FF'>&lt;</font>const_iterator<font color='#5555FF'>&gt;</font> const_reverse_iterator;
+
+
+        <font color='#0000FF'>explicit</font> <b><a name='std_vector_c'></a>std_vector_c</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> Allocator<font color='#5555FF'>&amp;</font> alloc <font color='#5555FF'>=</font> <font color='#BB00BB'>Allocator</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_allocator() == alloc
+                - #size() == 0
+        !*/</font>
+
+        <font color='#0000FF'>explicit</font> <b><a name='std_vector_c'></a>std_vector_c</b> <font face='Lucida Console'>(</font>
+            size_type n, 
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> value <font color='#5555FF'>=</font> <font color='#BB00BB'>T</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            <font color='#0000FF'>const</font> Allocator<font color='#5555FF'>&amp;</font> alloc <font color='#5555FF'>=</font> <font color='#BB00BB'>Allocator</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #size() == n
+                - #get_allocator() == alloc
+                - for all valid i:
+                    - (*this)[i] == value
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> InputIterator<font color='#5555FF'>&gt;</font>
+        <b><a name='std_vector_c'></a>std_vector_c</b> <font face='Lucida Console'>(</font>
+            InputIterator first,
+            InputIterator last,
+            <font color='#0000FF'>const</font> Allocator<font color='#5555FF'>&amp;</font> alloc <font color='#5555FF'>=</font> <font color='#BB00BB'>Allocator</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #size() == std::distance(first,last)
+                - #get_allocator() == alloc
+                - std::equal(first, last, begin()) == true
+        !*/</font>
+
+        <b><a name='std_vector_c'></a>std_vector_c</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T,Allocator<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this == x
+        !*/</font>
+
+        std_vector_c<font color='#5555FF'>&lt;</font>T,Allocator<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T,Allocator<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this == x
+                - returns #*this
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> InputIterator<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>
+            InputIterator first, 
+            InputIterator last
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #size() == std::distance(first,last)
+                - std::equal(first, last, begin()) == true
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>
+            size_type n, 
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> value 
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #size() == n
+                - for all valid i:
+                    - (*this)[i] == value
+        !*/</font>
+
+        allocator_type <b><a name='get_allocator'></a>get_allocator</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the allocator used by this vector
+        !*/</font>
+        
+        iterator <b><a name='begin'></a>begin</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (size() &gt; 0) then
+                    - returns an iterator referring to the first element in 
+                      this container.
+                - else
+                    - returns end()
+        !*/</font>
+        
+        const_iterator <b><a name='begin'></a>begin</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (size() &gt; 0) then
+                    - returns a const_iterator referring to the first element in 
+                      this container.
+                - else
+                    - returns end()
+        !*/</font>
+
+        iterator <b><a name='end'></a>end</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns an iterator that represents one past the end of
+                  this container
+        !*/</font>
+
+        const_iterator <b><a name='end'></a>end</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns an iterator that represents one past the end of
+                  this container
+        !*/</font>
+
+        reverse_iterator <b><a name='rbegin'></a>rbegin</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns std::reverse_iterator(end())
+        !*/</font>
+
+        const_reverse_iterator <b><a name='rbegin'></a>rbegin</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns std::reverse_iterator(end())
+        !*/</font>
+        
+        reverse_iterator <b><a name='rend'></a>rend</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns std::reverse_iterator(begin())
+        !*/</font>
+
+        const_reverse_iterator <b><a name='rend'></a>rend</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns std::reverse_iterator(begin())
+        !*/</font>
+
+        size_type <b><a name='size'></a>size</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;  
+        <font color='#009900'>/*!
+            ensures
+                - returns end()-begin()
+                  (i.e. returns the number of elements in this container)
+        !*/</font>
+
+        size_type <b><a name='max_size'></a>max_size</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the maximum number of elements this vector can contain
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='resize'></a>resize</b><font face='Lucida Console'>(</font>
+            size_type sz, 
+            T c <font color='#5555FF'>=</font> <font color='#BB00BB'>T</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #size() == sz
+                - any element with index between 0 and sz - 1 which was in the 
+                  vector before the call to resize() retains its value and index.
+                  All other elements have a value given by c.
+        !*/</font>
+
+        size_type <b><a name='capacity'></a>capacity</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the total number of elements that the vector can hold without 
+                  requiring reallocation. 
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='empty'></a>empty</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - if (size() == 0) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='reserve'></a>reserve</b><font face='Lucida Console'>(</font>
+            size_type n
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #capacity() &gt;= n
+        !*/</font>
+
+        const_reference <b><a name='at'></a>at</b><font face='Lucida Console'>(</font>
+            size_type n
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - if (n &lt; size()) then 
+                    - returns a const reference to (*this)[n]
+                - else
+                    - throws std::out_of_range
+        !*/</font>
+
+        reference <b><a name='at'></a>at</b><font face='Lucida Console'>(</font>
+            size_type n
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - if (n &lt; size()) then 
+                    - returns a reference to (*this)[n]
+                - else
+                    - throws std::out_of_range
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='push_back'></a>push_back</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #size() == size() + 1
+                - #back() == x
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+            std_vector_c<font color='#5555FF'>&lt;</font>T,Allocator<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps the state of *this and x
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #size() == 0
+        !*/</font>
+
+        reference <b><a name='operator'></a>operator</b>[]<font face='Lucida Console'>(</font>
+            size_type n
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - n &lt; size()
+            ensures
+                - returns a reference to the nth element of this container
+        !*/</font>
+
+        const_reference <b><a name='operator'></a>operator</b>[]<font face='Lucida Console'>(</font>
+            size_type n
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - n &lt; size()
+            ensures
+                - returns a const reference to the nth element of this container
+        !*/</font>
+
+        reference <b><a name='front'></a>front</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - size() &gt; 0
+            ensures
+                - returns a reference to (*this)[0]
+        !*/</font>
+
+        const_reference <b><a name='front'></a>front</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - size() &gt; 0
+            ensures
+                - returns a const reference to (*this)[0]
+        !*/</font>
+
+        reference <b><a name='back'></a>back</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - size() &gt; 0
+            ensures
+                - returns a reference to (*this)[size()-1]
+        !*/</font>
+
+        const_reference <b><a name='back'></a>back</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - size() &gt; 0
+            ensures
+                - returns a const reference to (*this)[size()-1]
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='pop_back'></a>pop_back</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - size() &gt; 0
+            ensures
+                - #size() == size() - 1
+                - removes the last element in the vector but leaves the others
+                  unmodified.
+        !*/</font>
+
+        iterator <b><a name='insert'></a>insert</b><font face='Lucida Console'>(</font>
+            iterator position, 
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - begin() &lt;= position &amp;&amp; position &lt;= end()
+                  (i.e. position references an element in this vector object)
+            ensures
+                - #size() == size() + 1
+                - inserts a copy of x into *this before the given position
+                - returns an iterator that points to the copy of x inserted
+                  into *this
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='insert'></a>insert</b><font face='Lucida Console'>(</font>
+            iterator position, 
+            size_type n, 
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - begin() &lt;= position &amp;&amp; position &lt;= end()
+                  (i.e. position references an element in this vector object)
+            ensures
+                - #size() == size() + n
+                - inserts n copies of x into *this before the given position
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> InputIterator<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='insert'></a>insert</b><font face='Lucida Console'>(</font>
+            iterator position,
+            InputIterator first, 
+            InputIterator last
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - begin() &lt;= position &amp;&amp; position &lt;= end()
+                  (i.e. position references an element in this vector object)
+                - first and last are not iterators into *this
+            ensures
+                - #size() == size() + std::distance(last,first)
+                - inserts copies of the range of elements [first,last) into *this 
+                  before the given position
+        !*/</font>
+
+        iterator <b><a name='erase'></a>erase</b><font face='Lucida Console'>(</font>
+            iterator position
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - begin() &lt;= position &amp;&amp; position &lt; end()
+                  (i.e. position references an element in this vector object)
+            ensures
+                - #size() == size() - 1 
+                - removes the element in this vector referenced by position but
+                  leaves all other elements in this vector unmodified.
+                - if (position &lt; end()-1) then
+                    - returns an iterator referencing the element immediately 
+                      following *position prior to the erase.
+                - else
+                    - returns end()
+        !*/</font>
+
+        iterator <b><a name='erase'></a>erase</b><font face='Lucida Console'>(</font>
+            iterator first, 
+            iterator last
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - begin() &lt;= first &amp;&amp; first &lt;= last &amp;&amp; last &lt;= end()
+                  (i.e. the range [first,last) must be inside this container )
+            ensures
+                - #size() == size() - (last-first) 
+                - removes the elements in this vector referenced by the
+                  iterator range [first,last) but leaves all other elements 
+                  in this vector unmodified.
+                - if (last &lt; end()-1) then
+                    - returns an iterator referencing the element immediately 
+                      following *last prior to the erase.
+                - else
+                    - returns end()
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std_vector_c<font color='#5555FF'>&lt;</font>T,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        std_vector_c<font color='#5555FF'>&lt;</font>T, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_STD_VECTOr_C_ABSTRACT_H_
+</font>
+
+
+</pre></body></html>

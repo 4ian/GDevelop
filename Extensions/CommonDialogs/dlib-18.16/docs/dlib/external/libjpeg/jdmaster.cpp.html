@@ -1,0 +1,560 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jdmaster.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jdmaster.c
+ *
+ * Copyright (C) 1991-1997, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains master control logic for the JPEG decompressor.
+ * These routines are concerned with selecting the modules to be executed
+ * and with determining the number of passes and the work to be done in each
+ * pass.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+
+
+<font color='#009900'>/* Private state */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#0000FF'>struct</font> jpeg_decomp_master pub; <font color='#009900'>/* public fields */</font>
+
+  <font color='#0000FF'><u>int</u></font> pass_number;		<font color='#009900'>/* # of passes completed */</font>
+
+  <font color='#0000FF'><u>int</u></font> using_merged_upsample; <font color='#009900'>/* TRUE if using merged upsample/cconvert */</font>
+
+  <font color='#009900'>/* Saved references to initialized quantizer modules,
+   * in case we need to switch modes.
+   */</font>
+  <font color='#0000FF'>struct</font> jpeg_color_quantizer <font color='#5555FF'>*</font> quantizer_1pass;
+  <font color='#0000FF'>struct</font> jpeg_color_quantizer <font color='#5555FF'>*</font> quantizer_2pass;
+<b>}</b> my_decomp_master;
+
+<font color='#0000FF'>typedef</font> my_decomp_master <font color='#5555FF'>*</font> my_master_ptr;
+
+
+<font color='#009900'>/*
+ * Determine whether merged upsample/color conversion should be used.
+ * CRUCIAL: this must match the actual capabilities of jdmerge.c!
+ */</font>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='use_merged_upsample'></a>use_merged_upsample</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+<font color='#0000FF'>#ifdef</font> UPSAMPLE_MERGING_SUPPORTED
+  <font color='#009900'>/* Merging is the equivalent of plain box-filter upsampling */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>do_fancy_upsampling <font color='#5555FF'>|</font><font color='#5555FF'>|</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>CCIR601_sampling<font face='Lucida Console'>)</font>
+    <font color='#0000FF'>return</font> FALSE;
+  <font color='#009900'>/* jdmerge.c only supports YCC=&gt;RGB color conversion */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_color_space <font color='#5555FF'>!</font><font color='#5555FF'>=</font> JCS_YCbCr <font color='#5555FF'>|</font><font color='#5555FF'>|</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>3</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_space <font color='#5555FF'>!</font><font color='#5555FF'>=</font> JCS_RGB <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components <font color='#5555FF'>!</font><font color='#5555FF'>=</font> RGB_PIXELSIZE<font face='Lucida Console'>)</font>
+    <font color='#0000FF'>return</font> FALSE;
+  <font color='#009900'>/* and it only handles 2h1v or 2h2v sampling ratios */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info[<font color='#979000'>0</font>].h_samp_factor <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info[<font color='#979000'>1</font>].h_samp_factor <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info[<font color='#979000'>2</font>].h_samp_factor <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info[<font color='#979000'>0</font>].v_samp_factor <font color='#5555FF'>&gt;</font>  <font color='#979000'>2</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info[<font color='#979000'>1</font>].v_samp_factor <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info[<font color='#979000'>2</font>].v_samp_factor <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+    <font color='#0000FF'>return</font> FALSE;
+  <font color='#009900'>/* furthermore, it doesn't work if we've scaled the IDCTs differently */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info[<font color='#979000'>0</font>].DCT_scaled_size <font color='#5555FF'>!</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>min_DCT_scaled_size <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info[<font color='#979000'>1</font>].DCT_scaled_size <font color='#5555FF'>!</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>min_DCT_scaled_size <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info[<font color='#979000'>2</font>].DCT_scaled_size <font color='#5555FF'>!</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>min_DCT_scaled_size<font face='Lucida Console'>)</font>
+    <font color='#0000FF'>return</font> FALSE;
+  <font color='#009900'>/* ??? also need to test for upsample-time rescaling, when &amp; if supported */</font>
+  <font color='#0000FF'>return</font> TRUE;			<font color='#009900'>/* by golly, it'll work... */</font>
+<font color='#0000FF'>#else</font>
+  <font color='#0000FF'>return</font> FALSE;
+<font color='#0000FF'>#endif</font>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Compute output image dimensions and related values.
+ * NOTE: this is exported for possible use by application.
+ * Hence it mustn't do anything that can't be done twice.
+ * Also note that it may be called before the master module is initialized!
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_calc_output_dimensions'></a>jpeg_calc_output_dimensions</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Do computations that are needed before master selection phase */</font>
+<b>{</b>
+<font color='#0000FF'>#ifdef</font> IDCT_SCALING_SUPPORTED
+  <font color='#0000FF'><u>int</u></font> ci;
+  jpeg_component_info <font color='#5555FF'>*</font>compptr;
+<font color='#0000FF'>#endif</font>
+
+  <font color='#009900'>/* Prevent application from calling me at wrong times */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> DSTATE_READY<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#ifdef</font> IDCT_SCALING_SUPPORTED
+
+  <font color='#009900'>/* Compute actual output image dimensions and DCT scaling choices. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>scale_num <font color='#5555FF'>*</font> <font color='#979000'>8</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>scale_denom<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Provide 1/8 scaling */</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>jdiv_round_up</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_width, <font color='#979000'>8</font>L<font face='Lucida Console'>)</font>;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_height <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>jdiv_round_up</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_height, <font color='#979000'>8</font>L<font face='Lucida Console'>)</font>;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>min_DCT_scaled_size <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+  <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>scale_num <font color='#5555FF'>*</font> <font color='#979000'>4</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>scale_denom<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Provide 1/4 scaling */</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>jdiv_round_up</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_width, <font color='#979000'>4</font>L<font face='Lucida Console'>)</font>;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_height <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>jdiv_round_up</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_height, <font color='#979000'>4</font>L<font face='Lucida Console'>)</font>;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>min_DCT_scaled_size <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+  <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>scale_num <font color='#5555FF'>*</font> <font color='#979000'>2</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>scale_denom<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Provide 1/2 scaling */</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>jdiv_round_up</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_width, <font color='#979000'>2</font>L<font face='Lucida Console'>)</font>;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_height <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>jdiv_round_up</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_height, <font color='#979000'>2</font>L<font face='Lucida Console'>)</font>;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>min_DCT_scaled_size <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    <font color='#009900'>/* Provide 1/1 scaling */</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_width;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_height <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_height;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>min_DCT_scaled_size <font color='#5555FF'>=</font> DCTSIZE;
+  <b>}</b>
+  <font color='#009900'>/* In selecting the actual DCT scaling for each component, we try to
+   * scale up the chroma components via IDCT scaling rather than upsampling.
+   * This saves time if the upsampler gets to use 1:1 scaling.
+   * Note this code assumes that the supported DCT scalings are powers of 2.
+   */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>, compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+       ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, compptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'><u>int</u></font> ssize <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>min_DCT_scaled_size;
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>ssize <font color='#5555FF'>&lt;</font> DCTSIZE <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+	   <font face='Lucida Console'>(</font>compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>h_samp_factor <font color='#5555FF'>*</font> ssize <font color='#5555FF'>*</font> <font color='#979000'>2</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font>
+	    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_h_samp_factor <font color='#5555FF'>*</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>min_DCT_scaled_size<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+	   <font face='Lucida Console'>(</font>compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor <font color='#5555FF'>*</font> ssize <font color='#5555FF'>*</font> <font color='#979000'>2</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font>
+	    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor <font color='#5555FF'>*</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>min_DCT_scaled_size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+      ssize <font color='#5555FF'>=</font> ssize <font color='#5555FF'>*</font> <font color='#979000'>2</font>;
+    <b>}</b>
+    compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>DCT_scaled_size <font color='#5555FF'>=</font> ssize;
+  <b>}</b>
+
+  <font color='#009900'>/* Recompute downsampled dimensions of components;
+   * application needs to know these if using raw downsampled data.
+   */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>, compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+       ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, compptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Size in samples, after IDCT scaling */</font>
+    compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>downsampled_width <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>jdiv_round_up</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_width <font color='#5555FF'>*</font>
+		    <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>h_samp_factor <font color='#5555FF'>*</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>DCT_scaled_size<font face='Lucida Console'>)</font>,
+		    <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_h_samp_factor <font color='#5555FF'>*</font> DCTSIZE<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>downsampled_height <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>jdiv_round_up</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_height <font color='#5555FF'>*</font>
+		    <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor <font color='#5555FF'>*</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>DCT_scaled_size<font face='Lucida Console'>)</font>,
+		    <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor <font color='#5555FF'>*</font> DCTSIZE<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b>}</b>
+
+<font color='#0000FF'>#else</font> <font color='#009900'>/* !IDCT_SCALING_SUPPORTED */</font>
+
+  <font color='#009900'>/* Hardwire it to "no scaling" */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_width;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_height <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_height;
+  <font color='#009900'>/* jdinput.c has already initialized DCT_scaled_size to DCTSIZE,
+   * and has computed unscaled downsampled_width and downsampled_height.
+   */</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* IDCT_SCALING_SUPPORTED */</font>
+
+  <font color='#009900'>/* Report number of components in selected colorspace. */</font>
+  <font color='#009900'>/* Probably this should be in the color conversion module... */</font>
+  <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_space<font face='Lucida Console'>)</font> <b>{</b>
+  <font color='#0000FF'>case</font> JCS_GRAYSCALE:
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> JCS_RGB:
+<font color='#0000FF'>#if</font> RGB_PIXELSIZE <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>3</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components <font color='#5555FF'>=</font> RGB_PIXELSIZE;
+    <font color='#0000FF'>break</font>;
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* else share code with YCbCr */</font>
+  <font color='#0000FF'>case</font> JCS_YCbCr:
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> JCS_CMYK:
+  <font color='#0000FF'>case</font> JCS_YCCK:
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>default</font>:			<font color='#009900'>/* else must be same colorspace as in file */</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+    <font color='#0000FF'>break</font>;
+  <b>}</b>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_components <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantize_colors ? <font color='#979000'>1</font> :
+			      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* See if upsampler will want to emit more than one row at a time */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>use_merged_upsample</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rec_outbuf_height <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor;
+  <font color='#0000FF'>else</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rec_outbuf_height <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Several decompression processes need to range-limit values to the range
+ * 0..MAXJSAMPLE; the input value may fall somewhat outside this range
+ * due to noise introduced by quantization, roundoff error, etc.  These
+ * processes are inner loops and need to be as fast as possible.  On most
+ * machines, particularly CPUs with pipelines or instruction prefetch,
+ * a (subscript-check-less) C table lookup
+ *		x = sample_range_limit[x];
+ * is faster than explicit tests
+ *		if (x &lt; 0)  x = 0;
+ *		else if (x &gt; MAXJSAMPLE)  x = MAXJSAMPLE;
+ * These processes all use a common table prepared by the routine below.
+ *
+ * For most steps we can mathematically guarantee that the initial value
+ * of x is within MAXJSAMPLE+1 of the legal range, so a table running from
+ * -(MAXJSAMPLE+1) to 2*MAXJSAMPLE+1 is sufficient.  But for the initial
+ * limiting step (just after the IDCT), a wildly out-of-range value is 
+ * possible if the input data is corrupt.  To avoid any chance of indexing
+ * off the end of memory and getting a bad-pointer trap, we perform the
+ * post-IDCT limiting thus:
+ *		x = range_limit[x &amp; MASK];
+ * where MASK is 2 bits wider than legal sample data, ie 10 bits for 8-bit
+ * samples.  Under normal circumstances this is more than enough range and
+ * a correct output will be generated; with bogus input data the mask will
+ * cause wraparound, and we will safely generate a bogus-but-in-range output.
+ * For the post-IDCT step, we want to convert the data from signed to unsigned
+ * representation by adding CENTERJSAMPLE at the same time that we limit it.
+ * So the post-IDCT limiting table ends up looking like this:
+ *   CENTERJSAMPLE,CENTERJSAMPLE+1,...,MAXJSAMPLE,
+ *   MAXJSAMPLE (repeat 2*(MAXJSAMPLE+1)-CENTERJSAMPLE times),
+ *   0          (repeat 2*(MAXJSAMPLE+1)-CENTERJSAMPLE times),
+ *   0,1,...,CENTERJSAMPLE-1
+ * Negative inputs select values from the upper half of the table after
+ * masking.
+ *
+ * We can save some space by overlapping the start of the post-IDCT table
+ * with the simpler range limiting table.  The post-IDCT table begins at
+ * sample_range_limit + CENTERJSAMPLE.
+ *
+ * Note that the table is allocated in near data space on PCs; it's small
+ * enough and used often enough to justify this.
+ */</font>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='prepare_range_limit_table'></a>prepare_range_limit_table</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Allocate and fill in the sample_range_limit table */</font>
+<b>{</b>
+  JSAMPLE <font color='#5555FF'>*</font> table;
+  <font color='#0000FF'><u>int</u></font> i;
+
+  table <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+		<font face='Lucida Console'>(</font><font color='#979000'>5</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>MAXJSAMPLE<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> CENTERJSAMPLE<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  table <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>MAXJSAMPLE<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;	<font color='#009900'>/* allow negative subscripts of simple table */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sample_range_limit <font color='#5555FF'>=</font> table;
+  <font color='#009900'>/* First segment of "simple" table: limit[x] = 0 for x &lt; 0 */</font>
+  <font color='#BB00BB'>MEMZERO</font><font face='Lucida Console'>(</font>table <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>MAXJSAMPLE<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font>MAXJSAMPLE<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Main part of "simple" table: limit[x] = x */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> MAXJSAMPLE; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+    table[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> i;
+  table <font color='#5555FF'>+</font><font color='#5555FF'>=</font> CENTERJSAMPLE;	<font color='#009900'>/* Point to where post-IDCT table starts */</font>
+  <font color='#009900'>/* End of simple table, rest of first half of post-IDCT table */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> CENTERJSAMPLE; i <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>MAXJSAMPLE<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+    table[i] <font color='#5555FF'>=</font> MAXJSAMPLE;
+  <font color='#009900'>/* Second half of post-IDCT table */</font>
+  <font color='#BB00BB'>MEMZERO</font><font face='Lucida Console'>(</font>table <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font color='#979000'>2</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>MAXJSAMPLE<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+	  <font face='Lucida Console'>(</font><font color='#979000'>2</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>MAXJSAMPLE<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> CENTERJSAMPLE<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>MEMCOPY</font><font face='Lucida Console'>(</font>table <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font color='#979000'>4</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>MAXJSAMPLE<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> CENTERJSAMPLE<font face='Lucida Console'>)</font>,
+	  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sample_range_limit, CENTERJSAMPLE <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Master selection of decompression modules.
+ * This is done once at jpeg_start_decompress time.  We determine
+ * which modules will be used and give them appropriate initialization calls.
+ * We also initialize the decompressor input side to begin consuming data.
+ *
+ * Since jpeg_read_header has finished, we know what is in the SOF
+ * and (first) SOS markers.  We also have all the application parameter
+ * settings.
+ */</font>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='master_selection'></a>master_selection</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_master_ptr master <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_master_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>master;
+  <font color='#0000FF'><u>int</u></font> use_c_buffer;
+  <font color='#0000FF'><u>long</u></font> samplesperrow;
+  JDIMENSION jd_samplesperrow;
+
+  <font color='#009900'>/* Initialize dimensions and other stuff */</font>
+  <font color='#BB00BB'>jpeg_calc_output_dimensions</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>prepare_range_limit_table</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Width of an output scanline must be representable as JDIMENSION. */</font>
+  samplesperrow <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components;
+  jd_samplesperrow <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> samplesperrow;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> jd_samplesperrow <font color='#5555FF'>!</font><font color='#5555FF'>=</font> samplesperrow<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_WIDTH_OVERFLOW<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Initialize my private state */</font>
+  master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_number <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>using_merged_upsample <font color='#5555FF'>=</font> <font color='#BB00BB'>use_merged_upsample</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Color quantizer selection */</font>
+  master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantizer_1pass <font color='#5555FF'>=</font> NULL;
+  master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantizer_2pass <font color='#5555FF'>=</font> NULL;
+  <font color='#009900'>/* No mode changes if not using buffered-image mode. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantize_colors <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font color='#5555FF'>!</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffered_image<font face='Lucida Console'>)</font> <b>{</b>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_1pass_quant <font color='#5555FF'>=</font> FALSE;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_external_quant <font color='#5555FF'>=</font> FALSE;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_2pass_quant <font color='#5555FF'>=</font> FALSE;
+  <b>}</b>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantize_colors<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>raw_data_out<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_NOTIMPL<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* 2-pass quantizer only works in 3-component color space. */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font> <b>{</b>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_1pass_quant <font color='#5555FF'>=</font> TRUE;
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_external_quant <font color='#5555FF'>=</font> FALSE;
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_2pass_quant <font color='#5555FF'>=</font> FALSE;
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colormap <font color='#5555FF'>=</font> NULL;
+    <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colormap <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_external_quant <font color='#5555FF'>=</font> TRUE;
+    <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>two_pass_quantize<font face='Lucida Console'>)</font> <b>{</b>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_2pass_quant <font color='#5555FF'>=</font> TRUE;
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_1pass_quant <font color='#5555FF'>=</font> TRUE;
+    <b>}</b>
+
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_1pass_quant<font face='Lucida Console'>)</font> <b>{</b>
+<font color='#0000FF'>#ifdef</font> QUANT_1PASS_SUPPORTED
+      <font color='#BB00BB'>jinit_1pass_quantizer</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+      master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantizer_1pass <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+<font color='#0000FF'>#else</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_NOT_COMPILED<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+    <font color='#009900'>/* We use the 2-pass code to map to external colormaps. */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_2pass_quant <font color='#5555FF'>|</font><font color='#5555FF'>|</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_external_quant<font face='Lucida Console'>)</font> <b>{</b>
+<font color='#0000FF'>#ifdef</font> QUANT_2PASS_SUPPORTED
+      <font color='#BB00BB'>jinit_2pass_quantizer</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+      master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantizer_2pass <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+<font color='#0000FF'>#else</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_NOT_COMPILED<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+    <font color='#009900'>/* If both quantizers are initialized, the 2-pass one is left active;
+     * this is necessary for starting with quantization to an external map.
+     */</font>
+  <b>}</b>
+
+  <font color='#009900'>/* Post-processing: in particular, color conversion first */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>raw_data_out<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>using_merged_upsample<font face='Lucida Console'>)</font> <b>{</b>
+<font color='#0000FF'>#ifdef</font> UPSAMPLE_MERGING_SUPPORTED
+      <font color='#BB00BB'>jinit_merged_upsampler</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>; <font color='#009900'>/* does color conversion too */</font>
+<font color='#0000FF'>#else</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_NOT_COMPILED<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      <font color='#BB00BB'>jinit_color_deconverter</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+      <font color='#BB00BB'>jinit_upsampler</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#BB00BB'>jinit_d_post_controller</font><font face='Lucida Console'>(</font>cinfo, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_2pass_quant<font face='Lucida Console'>)</font>;
+  <b>}</b>
+  <font color='#009900'>/* Inverse DCT */</font>
+  <font color='#BB00BB'>jinit_inverse_dct</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Entropy decoding: either Huffman or arithmetic coding. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arith_code<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_ARITH_NOTIMPL<font face='Lucida Console'>)</font>;
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progressive_mode<font face='Lucida Console'>)</font> <b>{</b>
+<font color='#0000FF'>#ifdef</font> D_PROGRESSIVE_SUPPORTED
+      <font color='#BB00BB'>jinit_phuff_decoder</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_NOT_COMPILED<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b> <font color='#0000FF'>else</font>
+      <font color='#BB00BB'>jinit_huff_decoder</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Initialize principal buffer controllers. */</font>
+  use_c_buffer <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>inputctl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>has_multiple_scans <font color='#5555FF'>|</font><font color='#5555FF'>|</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffered_image;
+  <font color='#BB00BB'>jinit_d_coef_controller</font><font face='Lucida Console'>(</font>cinfo, use_c_buffer<font face='Lucida Console'>)</font>;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>raw_data_out<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>jinit_d_main_controller</font><font face='Lucida Console'>(</font>cinfo, FALSE <font color='#009900'>/* never need full buffer here */</font><font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* We can now tell the memory manager to allocate virtual arrays. */</font>
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>realize_virt_arrays<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Initialize input side of decompressor to consume first scan. */</font>
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>inputctl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>start_input_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#ifdef</font> D_MULTISCAN_FILES_SUPPORTED
+  <font color='#009900'>/* If jpeg_start_decompress will read the whole file, initialize
+   * progress monitoring appropriately.  The input step is counted
+   * as one pass.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffered_image <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>inputctl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>has_multiple_scans<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'><u>int</u></font> nscans;
+    <font color='#009900'>/* Estimate number of scans to set pass_limit. */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progressive_mode<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* Arbitrarily estimate 2 interleaved DC scans + 3 AC scans/component. */</font>
+      nscans <font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>3</font> <font color='#5555FF'>*</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      <font color='#009900'>/* For a nonprogressive multiscan file, estimate 1 scan per component. */</font>
+      nscans <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+    <b>}</b>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_counter <font color='#5555FF'>=</font> <font color='#979000'>0</font>L;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_limit <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total_iMCU_rows <font color='#5555FF'>*</font> nscans;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>completed_passes <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total_passes <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_2pass_quant ? <font color='#979000'>3</font> : <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Count the input pass as done */</font>
+    master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_number<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+  <b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* D_MULTISCAN_FILES_SUPPORTED */</font>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Per-pass setup.
+ * This is called at the beginning of each output pass.  We determine which
+ * modules will be active during this pass and give them appropriate
+ * start_pass calls.  We also set is_dummy_pass to indicate whether this
+ * is a "real" output pass or a dummy pass for color quantization.
+ * (In the latter case, jdapistd.c will crank the pass to completion.)
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='prepare_for_output_pass'></a>prepare_for_output_pass</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_master_ptr master <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_master_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>master;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.is_dummy_pass<font face='Lucida Console'>)</font> <b>{</b>
+<font color='#0000FF'>#ifdef</font> QUANT_2PASS_SUPPORTED
+    <font color='#009900'>/* Final pass of 2-pass quantization */</font>
+    master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.is_dummy_pass <font color='#5555FF'>=</font> FALSE;
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>start_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, FALSE<font face='Lucida Console'>)</font>;
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>start_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, JBUF_CRANK_DEST<font face='Lucida Console'>)</font>;
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>start_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, JBUF_CRANK_DEST<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_NOT_COMPILED<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* QUANT_2PASS_SUPPORTED */</font>
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantize_colors <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colormap <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* Select new quantization method */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>two_pass_quantize <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_2pass_quant<font face='Lucida Console'>)</font> <b>{</b>
+	cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize <font color='#5555FF'>=</font> master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantizer_2pass;
+	master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.is_dummy_pass <font color='#5555FF'>=</font> TRUE;
+      <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_1pass_quant<font face='Lucida Console'>)</font> <b>{</b>
+	cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize <font color='#5555FF'>=</font> master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantizer_1pass;
+      <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+	<font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_MODE_CHANGE<font face='Lucida Console'>)</font>;
+      <b>}</b>
+    <b>}</b>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>idct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>start_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>start_output_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>raw_data_out<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>using_merged_upsample<font face='Lucida Console'>)</font>
+	<font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cconvert<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>start_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>start_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantize_colors<font face='Lucida Console'>)</font>
+	<font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>start_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.is_dummy_pass<font face='Lucida Console'>)</font>;
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>start_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo,
+	    <font face='Lucida Console'>(</font>master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.is_dummy_pass ? JBUF_SAVE_AND_PASS : JBUF_PASS_THRU<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>start_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, JBUF_PASS_THRU<font face='Lucida Console'>)</font>;
+    <b>}</b>
+  <b>}</b>
+
+  <font color='#009900'>/* Set up progress monitor's pass info if present */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>completed_passes <font color='#5555FF'>=</font> master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_number;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total_passes <font color='#5555FF'>=</font> master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_number <font color='#5555FF'>+</font>
+				    <font face='Lucida Console'>(</font>master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.is_dummy_pass ? <font color='#979000'>2</font> : <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* In buffered-image mode, we assume one more output pass if EOI not
+     * yet reached, but no more passes if EOI has been reached.
+     */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffered_image <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>inputctl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>eoi_reached<font face='Lucida Console'>)</font> <b>{</b>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total_passes <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_2pass_quant ? <font color='#979000'>2</font> : <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Finish up at end of an output pass.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='finish_output_pass'></a>finish_output_pass</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_master_ptr master <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_master_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>master;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantize_colors<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>finish_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_number<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+<b>}</b>
+
+
+<font color='#0000FF'>#ifdef</font> D_MULTISCAN_FILES_SUPPORTED
+
+<font color='#009900'>/*
+ * Switch to a new external colormap between output passes.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_new_colormap'></a>jpeg_new_colormap</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_master_ptr master <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_master_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>master;
+
+  <font color='#009900'>/* Prevent application from calling me at wrong times */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> DSTATE_BUFIMAGE<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantize_colors <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_external_quant <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colormap <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Select 2-pass quantizer for external colormap use */</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize <font color='#5555FF'>=</font> master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantizer_2pass;
+    <font color='#009900'>/* Notify quantizer of colormap change */</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>new_color_map<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+    master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.is_dummy_pass <font color='#5555FF'>=</font> FALSE; <font color='#009900'>/* just in case */</font>
+  <b>}</b> <font color='#0000FF'>else</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_MODE_CHANGE<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* D_MULTISCAN_FILES_SUPPORTED */</font>
+
+
+<font color='#009900'>/*
+ * Initialize master decompression control and select active modules.
+ * This is performed at the start of jpeg_start_decompress.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jinit_master_decompress'></a>jinit_master_decompress</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_master_ptr master;
+
+  master <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_master_ptr<font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				  <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>my_decomp_master<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>master <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> jpeg_decomp_master <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> master;
+  master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.prepare_for_output_pass <font color='#5555FF'>=</font> prepare_for_output_pass;
+  master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.finish_output_pass <font color='#5555FF'>=</font> finish_output_pass;
+
+  master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.is_dummy_pass <font color='#5555FF'>=</font> FALSE;
+
+  <font color='#BB00BB'>master_selection</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+</pre></body></html>

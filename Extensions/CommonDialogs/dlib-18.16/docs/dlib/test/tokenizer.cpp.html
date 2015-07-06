@@ -1,0 +1,381 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - tokenizer.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>tokenizer.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+  
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.tokenizer</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> tok
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='tokenizer_kernel_test'></a>tokenizer_kernel_test</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - tok is an implementation of tokenizer_kernel_abstract.h
+        ensures
+            - runs tests on tok for compliance with the specs 
+    !*/</font>
+    <b>{</b>        
+
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        tok test;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>numbers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>0123456789</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>uppercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>ABCDEFGHIJKLMNOPQRSTUVWXYZ</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>lowercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>abcdefghijklmnopqrstuvwxyz</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_identifier_body</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>_</font>" <font color='#5555FF'>+</font> test.<font color='#BB00BB'>lowercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>
+                     test.<font color='#BB00BB'>uppercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> test.<font color='#BB00BB'>numbers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_identifier_head</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>_</font>" <font color='#5555FF'>+</font> test.<font color='#BB00BB'>lowercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>
+                     test.<font color='#BB00BB'>uppercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>stream_is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        test.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>stream_is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_identifier_body</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>_</font>" <font color='#5555FF'>+</font> test.<font color='#BB00BB'>lowercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>
+                     test.<font color='#BB00BB'>uppercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> test.<font color='#BB00BB'>numbers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_identifier_head</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>_</font>" <font color='#5555FF'>+</font> test.<font color='#BB00BB'>lowercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>
+                     test.<font color='#BB00BB'>uppercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+        tok test2;
+
+        ostringstream sout;
+        istringstream sin;
+        test2.<font color='#BB00BB'>set_stream</font><font face='Lucida Console'>(</font>sin<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test2.<font color='#BB00BB'>stream_is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>test2.<font color='#BB00BB'>get_stream</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>sin<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>int</u></font> type;
+        string token;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::END_OF_FILE<font face='Lucida Console'>)</font>;
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::END_OF_FILE<font face='Lucida Console'>)</font>;
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::END_OF_FILE<font face='Lucida Console'>)</font>;            
+
+
+        sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>  The cat 123asdf1234 ._ \n test.</font>"<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>  </font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test2.<font color='#BB00BB'>peek_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::IDENTIFIER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test2.<font color='#BB00BB'>peek_token</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>The</font>"<font face='Lucida Console'>)</font>; 
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::IDENTIFIER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>The</font>"<font face='Lucida Console'>)</font>;            
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'> </font>"<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::IDENTIFIER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>cat</font>"<font face='Lucida Console'>)</font>;            
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'> </font>"<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::NUMBER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>123</font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test2.<font color='#BB00BB'>peek_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::IDENTIFIER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test2.<font color='#BB00BB'>peek_token</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>asdf1234</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test2.<font color='#BB00BB'>peek_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::IDENTIFIER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test2.<font color='#BB00BB'>peek_token</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>asdf1234</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test2.<font color='#BB00BB'>peek_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::IDENTIFIER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test2.<font color='#BB00BB'>peek_token</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>asdf1234</font>"<font face='Lucida Console'>)</font>;
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::IDENTIFIER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>asdf1234</font>"<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'> </font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::CHAR<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>.</font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::IDENTIFIER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>_</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test2.<font color='#BB00BB'>peek_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>test2.<font color='#BB00BB'>peek_token</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'> </font>","<font color='#CC0000'>token: \"</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\"</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                     "<font color='#CC0000'>\ntoken size: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>token.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>test,test2<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test2.<font color='#BB00BB'>stream_is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>peek_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>peek_token</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'> </font>","<font color='#CC0000'>token: \"</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\"</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                     "<font color='#CC0000'>\ntoken size: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>token.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        test.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'> </font>","<font color='#CC0000'>token: \"</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\"</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                     "<font color='#CC0000'>\ntoken size: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>token.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        test.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::END_OF_LINE,"<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>\n</font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>test,test2<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>stream_is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'> </font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::IDENTIFIER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>test</font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::CHAR<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>.</font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::END_OF_FILE<font face='Lucida Console'>)</font>;
+
+
+
+
+
+
+
+
+
+
+        test2.<font color='#BB00BB'>set_identifier_token</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>_</font>" <font color='#5555FF'>+</font> test.<font color='#BB00BB'>uppercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>
+                                   test.<font color='#BB00BB'>lowercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,test.<font color='#BB00BB'>numbers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> "<font color='#CC0000'>_</font>" <font color='#5555FF'>+</font> test.<font color='#BB00BB'>uppercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                                   <font color='#5555FF'>+</font>test.<font color='#BB00BB'>lowercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>  The cat 123asdf1234 ._ \n\r test.</font>"<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>  </font>"<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::IDENTIFIER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>The</font>"<font face='Lucida Console'>)</font>;            
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'> </font>"<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::IDENTIFIER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>cat</font>"<font face='Lucida Console'>)</font>;            
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'> </font>"<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::NUMBER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>123</font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::IDENTIFIER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>asdf1234</font>"<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'> </font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::CHAR<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>.</font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::IDENTIFIER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>_</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>test,test2<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test2.<font color='#BB00BB'>stream_is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+        test.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'> </font>","<font color='#CC0000'>token: \"</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\"</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                     "<font color='#CC0000'>\ntoken size: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>token.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        test.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::END_OF_LINE,"<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>\n</font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>test,test2<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>stream_is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>\r </font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::IDENTIFIER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>test</font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::CHAR<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>.</font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::END_OF_FILE<font face='Lucida Console'>)</font>;
+
+
+
+
+
+
+
+
+
+
+
+
+
+        test2.<font color='#BB00BB'>set_identifier_token</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>uppercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>
+                                   test.<font color='#BB00BB'>lowercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,test.<font color='#BB00BB'>numbers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> test.<font color='#BB00BB'>uppercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                                   <font color='#5555FF'>+</font>test.<font color='#BB00BB'>lowercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>  The cat 123as_df1234 ._ \n test.</font>"<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>  </font>"<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::IDENTIFIER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>The</font>"<font face='Lucida Console'>)</font>;            
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'> </font>"<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::IDENTIFIER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>cat</font>"<font face='Lucida Console'>)</font>;            
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'> </font>"<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::NUMBER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>123</font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::IDENTIFIER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>as</font>"<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::CHAR<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>_</font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::IDENTIFIER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>df1234</font>"<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'> </font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::CHAR<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>.</font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::CHAR<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>_</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>test,test2<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test2.<font color='#BB00BB'>stream_is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+        test.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'> </font>","<font color='#CC0000'>token: \"</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\"</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                     "<font color='#CC0000'>\ntoken size: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>token.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        test.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::END_OF_LINE,"<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>\n</font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>test,test2<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>stream_is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'> </font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::IDENTIFIER<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>test</font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::CHAR<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>.</font>","<font color='#CC0000'>token: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token<font face='Lucida Console'>)</font>;
+
+        test2.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::END_OF_FILE<font face='Lucida Console'>)</font>;
+
+
+    <b>}</b>
+
+
+
+
+
+    <font color='#0000FF'>class</font> <b><a name='tokenizer_tester'></a>tokenizer_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='tokenizer_tester'></a>tokenizer_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_tokenizer</font>",
+                    "<font color='#CC0000'>Runs tests on the tokenizer component.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_1a</font>";
+            tokenizer_kernel_test<font color='#5555FF'>&lt;</font>tokenizer::kernel_1a<font color='#5555FF'>&gt;</font>  <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_1a_c</font>";
+            tokenizer_kernel_test<font color='#5555FF'>&lt;</font>tokenizer::kernel_1a_c<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> a;
+
+<b>}</b>
+
+
+
+</pre></body></html>

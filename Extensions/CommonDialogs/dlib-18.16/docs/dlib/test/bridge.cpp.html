@@ -1,0 +1,262 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bridge.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>bridge.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>type_safe_union.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.bridge</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> testing_port <font color='#5555FF'>=</font> <font color='#979000'>41238</font>;
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='do_test1'></a>do_test1</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::pipe<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>out</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        bridge <font color='#BB00BB'>b1</font><font face='Lucida Console'>(</font><font color='#BB00BB'>connect_to_ip_and_port</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1</font>",testing_port<font face='Lucida Console'>)</font>, <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        bridge <font color='#BB00BB'>b2</font><font face='Lucida Console'>(</font><font color='#BB00BB'>listen_on_port</font><font face='Lucida Console'>(</font>testing_port<font face='Lucida Console'>)</font>, <font color='#BB00BB'>transmit</font><font face='Lucida Console'>(</font>out<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>100</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> val <font color='#5555FF'>=</font> i;
+            out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>;
+            val <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='do_test2'></a>do_test2</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::pipe<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>out</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>echo_pipe</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        bridge <font color='#BB00BB'>b2</font><font face='Lucida Console'>(</font><font color='#BB00BB'>listen_on_port</font><font face='Lucida Console'>(</font>testing_port<font face='Lucida Console'>)</font>, <font color='#BB00BB'>transmit</font><font face='Lucida Console'>(</font>out<font face='Lucida Console'>)</font>, <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        bridge <font color='#BB00BB'>echo</font><font face='Lucida Console'>(</font><font color='#BB00BB'>connect_to_ip_and_port</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1</font>",testing_port<font face='Lucida Console'>)</font>, <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>echo_pipe<font face='Lucida Console'>)</font>, <font color='#BB00BB'>transmit</font><font face='Lucida Console'>(</font>echo_pipe<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>100</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> val <font color='#5555FF'>=</font> i;
+            out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>;
+            val <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='do_test3'></a>do_test3</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::pipe<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>out</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>echo_pipe</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+        bridge <font color='#BB00BB'>b2</font><font face='Lucida Console'>(</font><font color='#BB00BB'>listen_on_port</font><font face='Lucida Console'>(</font>testing_port<font face='Lucida Console'>)</font>, <font color='#BB00BB'>transmit</font><font face='Lucida Console'>(</font>out<font face='Lucida Console'>)</font>, <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        bridge <font color='#BB00BB'>echo</font><font face='Lucida Console'>(</font><font color='#BB00BB'>connect_to_ip_and_port</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1</font>",testing_port<font face='Lucida Console'>)</font>, <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>echo_pipe<font face='Lucida Console'>)</font>, <font color='#BB00BB'>transmit</font><font face='Lucida Console'>(</font>echo_pipe<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        b2.<font color='#BB00BB'>reconfigure</font><font face='Lucida Console'>(</font><font color='#BB00BB'>listen_on_port</font><font face='Lucida Console'>(</font>testing_port<font face='Lucida Console'>)</font>, <font color='#BB00BB'>transmit</font><font face='Lucida Console'>(</font>out<font face='Lucida Console'>)</font>, <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>100</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> val <font color='#5555FF'>=</font> i;
+            out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>;
+            val <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='do_test4'></a>do_test4</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::pipe<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>out</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>echo_pipe</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        bridge b2, echo;
+        b2.<font color='#BB00BB'>reconfigure</font><font face='Lucida Console'>(</font><font color='#BB00BB'>listen_on_port</font><font face='Lucida Console'>(</font>testing_port<font face='Lucida Console'>)</font>, <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>, <font color='#BB00BB'>transmit</font><font face='Lucida Console'>(</font>out<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        echo.<font color='#BB00BB'>reconfigure</font><font face='Lucida Console'>(</font><font color='#BB00BB'>connect_to_ip_and_port</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1</font>",testing_port<font face='Lucida Console'>)</font>, <font color='#BB00BB'>transmit</font><font face='Lucida Console'>(</font>echo_pipe<font face='Lucida Console'>)</font>, <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>echo_pipe<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>100</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> val <font color='#5555FF'>=</font> i;
+            out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>;
+            val <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='do_test5'></a>do_test5</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> pipe_size<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> type_safe_union<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font>, bridge_status<font color='#5555FF'>&gt;</font> tsu_type;
+
+        dlib::pipe<font color='#5555FF'>&lt;</font>tsu_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>out</font><font face='Lucida Console'>(</font>pipe_size<font face='Lucida Console'>)</font>;
+        dlib::pipe<font color='#5555FF'>&lt;</font>tsu_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font>pipe_size<font face='Lucida Console'>)</font>;
+        dlib::pipe<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>out_status</font><font face='Lucida Console'>(</font>pipe_size<font face='Lucida Console'>)</font>;
+
+        bridge <font color='#BB00BB'>b1</font><font face='Lucida Console'>(</font><font color='#BB00BB'>connect_to_ip_and_port</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1</font>",testing_port<font face='Lucida Console'>)</font>, <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        tsu_type msg;
+
+        msg <font color='#5555FF'>=</font> b1.<font color='#BB00BB'>get_bridge_status</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.contains<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.is_connected <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.foreign_ip <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.foreign_port <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <b>{</b>
+            bridge <font color='#BB00BB'>b2</font><font face='Lucida Console'>(</font><font color='#BB00BB'>listen_on_port</font><font face='Lucida Console'>(</font>testing_port<font face='Lucida Console'>)</font>, <font color='#BB00BB'>transmit</font><font face='Lucida Console'>(</font>out<font face='Lucida Console'>)</font>, <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>out_status<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.contains<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.is_connected <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.foreign_ip <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>127.0.0.1</font>"<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.foreign_port <font color='#5555FF'>=</font><font color='#5555FF'>=</font> testing_port<font face='Lucida Console'>)</font>;
+            msg <font color='#5555FF'>=</font> b1.<font color='#BB00BB'>get_bridge_status</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.contains<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.is_connected <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.foreign_ip <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>127.0.0.1</font>"<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.foreign_port <font color='#5555FF'>=</font><font color='#5555FF'>=</font> testing_port<font face='Lucida Console'>)</font>;
+
+            bridge_status temp;
+            out_status.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp.is_connected <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp.foreign_ip <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>127.0.0.1</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>100</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                msg <font color='#5555FF'>=</font> i;
+                out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+
+                msg.get<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.contains<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <b>}</b>
+
+        in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.contains<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.is_connected <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.foreign_ip <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>127.0.0.1</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.foreign_port <font color='#5555FF'>=</font><font color='#5555FF'>=</font> testing_port<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='do_test5_5'></a>do_test5_5</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> pipe_size<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> type_safe_union<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font>, bridge_status<font color='#5555FF'>&gt;</font> tsu_type;
+
+        dlib::pipe<font color='#5555FF'>&lt;</font>tsu_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>out</font><font face='Lucida Console'>(</font>pipe_size<font face='Lucida Console'>)</font>;
+        dlib::pipe<font color='#5555FF'>&lt;</font>tsu_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font>pipe_size<font face='Lucida Console'>)</font>;
+        dlib::pipe<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>out_status</font><font face='Lucida Console'>(</font>pipe_size<font face='Lucida Console'>)</font>;
+
+        bridge <font color='#BB00BB'>b1</font><font face='Lucida Console'>(</font><font color='#BB00BB'>connect_to_ip_and_port</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1</font>",testing_port<font face='Lucida Console'>)</font>, <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        tsu_type msg;
+
+        bridge <font color='#BB00BB'>b2</font><font face='Lucida Console'>(</font><font color='#BB00BB'>listen_on_port</font><font face='Lucida Console'>(</font>testing_port<font face='Lucida Console'>)</font>, <font color='#BB00BB'>transmit</font><font face='Lucida Console'>(</font>out<font face='Lucida Console'>)</font>, <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>out_status<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.contains<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.is_connected <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.foreign_ip <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>127.0.0.1</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.foreign_port <font color='#5555FF'>=</font><font color='#5555FF'>=</font> testing_port<font face='Lucida Console'>)</font>;
+
+        bridge_status temp;
+        out_status.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp.is_connected <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp.foreign_ip <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>127.0.0.1</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>100</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            msg <font color='#5555FF'>=</font> i;
+            out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+
+            msg.get<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.contains<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        b2.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        msg <font color='#5555FF'>=</font> b2.<font color='#BB00BB'>get_bridge_status</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.contains<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.is_connected <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.foreign_ip <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.foreign_port <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.contains<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.is_connected <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.foreign_ip <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>127.0.0.1</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.foreign_port <font color='#5555FF'>=</font><font color='#5555FF'>=</font> testing_port<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='do_test6'></a>do_test6</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::pipe<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>out</font><font face='Lucida Console'>(</font><font color='#979000'>300</font><font face='Lucida Console'>)</font>;
+
+        bridge <font color='#BB00BB'>b1</font><font face='Lucida Console'>(</font><font color='#BB00BB'>connect_to_ip_and_port</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1</font>",testing_port<font face='Lucida Console'>)</font>, <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        bridge <font color='#BB00BB'>b2</font><font face='Lucida Console'>(</font><font color='#BB00BB'>listen_on_port</font><font face='Lucida Console'>(</font>testing_port<font face='Lucida Console'>)</font>, <font color='#BB00BB'>transmit</font><font face='Lucida Console'>(</font>out<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>100</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> val <font color='#5555FF'>=</font> i;
+            out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>int</u></font> val <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+        in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+        in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>class</font> <b><a name='test_bridge'></a>test_bridge</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='test_bridge'></a>test_bridge</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_bridge</font>",
+                    "<font color='#CC0000'>Runs tests on the bridge component.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing bridge, using local port number of </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> testing_port; 
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>do_test1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>do_test2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>do_test3</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>do_test4</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>5</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>do_test5</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>do_test5_5</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>do_test6</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> a;
+
+
+
+<b>}</b>
+
+
+
+
+</pre></body></html>

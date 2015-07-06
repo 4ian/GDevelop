@@ -1,0 +1,112 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - rmutex_extension.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_RMUTEX_EXTENSIOn_
+<font color='#0000FF'>#define</font> DLIB_RMUTEX_EXTENSIOn_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel.h.html'>threads_kernel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='rmutex_extension_abstract.h.html'>rmutex_extension_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='rmutex'></a>rmutex</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                count == 0
+                thread_id == 0
+
+            CONVENTION
+                - count == lock_count()
+
+                - if (no thread currently has a lock on this mutex) then
+                    - count == 0
+                - else
+                    - count == the number of times the thread that owns this mutex has
+                      called lock()
+                    - thread_id == the id of this thread.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='rmutex'></a>rmutex</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> : s<font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>,
+            thread_id<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            count<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        ~<b><a name='rmutex'></a>rmutex</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='lock_count'></a>lock_count</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> count;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='lock'></a>lock</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> times <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> thread_id_type current_thread_id <font color='#5555FF'>=</font> <font color='#BB00BB'>get_thread_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            m.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>thread_id <font color='#5555FF'>=</font><font color='#5555FF'>=</font> current_thread_id<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// we already own this mutex in this case
+</font>                count <font color='#5555FF'>+</font><font color='#5555FF'>=</font> times;                
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// wait for our turn to claim this rmutex
+</font>                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    s.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                count <font color='#5555FF'>=</font> times;
+                thread_id <font color='#5555FF'>=</font> current_thread_id;
+            <b>}</b>
+            m.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='unlock'></a>unlock</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> times <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> thread_id_type current_thread_id <font color='#5555FF'>=</font> <font color='#BB00BB'>get_thread_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            m.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>thread_id <font color='#5555FF'>=</font><font color='#5555FF'>=</font> current_thread_id<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> times<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    s.<font color='#BB00BB'>signal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    count <font color='#5555FF'>-</font><font color='#5555FF'>=</font> times;
+                <b>}</b>
+            <b>}</b>
+            m.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        mutex m;
+        signaler s;
+        <font color='#0000FF'>mutable</font> thread_id_type thread_id;
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> count;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='rmutex'></a>rmutex</b><font face='Lucida Console'>(</font>rmutex<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        rmutex<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>rmutex<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_RMUTEX_EXTENSIOn_
+</font>
+
+</pre></body></html>

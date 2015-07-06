@@ -1,0 +1,406 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - base64_kernel_1.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_BASE64_KERNEL_1_CPp_
+<font color='#0000FF'>#define</font> DLIB_BASE64_KERNEL_1_CPp_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='base64_kernel_1.h.html'>base64_kernel_1.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>climits<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    base64::line_ending_type base64::
+    <b><a name='line_ending'></a>line_ending</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> eol_style;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> base64::
+    <b><a name='set_line_ending'></a>set_line_ending</b> <font face='Lucida Console'>(</font>
+        line_ending_type eol_style_
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        eol_style <font color='#5555FF'>=</font> eol_style_;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    base64::
+    <b><a name='base64'></a>base64</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> : 
+        encode_table<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        decode_table<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        bad_value<font face='Lucida Console'>(</font><font color='#979000'>100</font><font face='Lucida Console'>)</font>,
+        eol_style<font face='Lucida Console'>(</font>LF<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            encode_table <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#0000FF'><u>char</u></font>[<font color='#979000'>64</font>];
+            decode_table <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font>[UCHAR_MAX];
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>encode_table<font face='Lucida Console'>)</font> <font color='#0000FF'>delete</font> [] encode_table;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>decode_table<font face='Lucida Console'>)</font> <font color='#0000FF'>delete</font> [] decode_table;
+            <font color='#0000FF'>throw</font>;
+        <b>}</b>
+
+        <font color='#009900'>// now set up the tables with the right stuff
+</font>        encode_table[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>A</font>';
+        encode_table[<font color='#979000'>17</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>R</font>';
+        encode_table[<font color='#979000'>34</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>i</font>';
+        encode_table[<font color='#979000'>51</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>z</font>';
+
+        encode_table[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>B</font>';
+        encode_table[<font color='#979000'>18</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>S</font>';
+        encode_table[<font color='#979000'>35</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>j</font>';
+        encode_table[<font color='#979000'>52</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>0</font>';
+
+        encode_table[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>C</font>';
+        encode_table[<font color='#979000'>19</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>T</font>';
+        encode_table[<font color='#979000'>36</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>k</font>';
+        encode_table[<font color='#979000'>53</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>1</font>';
+
+        encode_table[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>D</font>';
+        encode_table[<font color='#979000'>20</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>U</font>';
+        encode_table[<font color='#979000'>37</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>l</font>';
+        encode_table[<font color='#979000'>54</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>2</font>';
+
+        encode_table[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>E</font>';
+        encode_table[<font color='#979000'>21</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>V</font>';
+        encode_table[<font color='#979000'>38</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>m</font>';
+        encode_table[<font color='#979000'>55</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>3</font>';
+
+        encode_table[<font color='#979000'>5</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>F</font>';
+        encode_table[<font color='#979000'>22</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>W</font>';
+        encode_table[<font color='#979000'>39</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>n</font>';
+        encode_table[<font color='#979000'>56</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>4</font>';
+
+        encode_table[<font color='#979000'>6</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>G</font>';
+        encode_table[<font color='#979000'>23</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>X</font>';
+        encode_table[<font color='#979000'>40</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>o</font>';
+        encode_table[<font color='#979000'>57</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>5</font>';
+
+        encode_table[<font color='#979000'>7</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>H</font>';
+        encode_table[<font color='#979000'>24</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>Y</font>';
+        encode_table[<font color='#979000'>41</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>p</font>';
+        encode_table[<font color='#979000'>58</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>6</font>';
+
+        encode_table[<font color='#979000'>8</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>I</font>';
+        encode_table[<font color='#979000'>25</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>Z</font>';
+        encode_table[<font color='#979000'>42</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>q</font>';
+        encode_table[<font color='#979000'>59</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>7</font>';
+
+        encode_table[<font color='#979000'>9</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>J</font>';
+        encode_table[<font color='#979000'>26</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>a</font>';
+        encode_table[<font color='#979000'>43</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>r</font>';
+        encode_table[<font color='#979000'>60</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>8</font>';
+
+        encode_table[<font color='#979000'>10</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>K</font>';
+        encode_table[<font color='#979000'>27</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>b</font>';
+        encode_table[<font color='#979000'>44</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>s</font>';
+        encode_table[<font color='#979000'>61</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>9</font>';
+
+        encode_table[<font color='#979000'>11</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>L</font>';
+        encode_table[<font color='#979000'>28</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>c</font>';
+        encode_table[<font color='#979000'>45</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>t</font>';
+        encode_table[<font color='#979000'>62</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>+</font>';
+
+        encode_table[<font color='#979000'>12</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>M</font>';
+        encode_table[<font color='#979000'>29</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>d</font>';
+        encode_table[<font color='#979000'>46</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>u</font>';
+        encode_table[<font color='#979000'>63</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>/</font>';
+
+        encode_table[<font color='#979000'>13</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>N</font>';
+        encode_table[<font color='#979000'>30</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>e</font>';
+        encode_table[<font color='#979000'>47</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>v</font>';
+
+        encode_table[<font color='#979000'>14</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>O</font>';
+        encode_table[<font color='#979000'>31</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>f</font>';
+        encode_table[<font color='#979000'>48</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>w</font>';
+
+        encode_table[<font color='#979000'>15</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>P</font>';
+        encode_table[<font color='#979000'>32</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>g</font>';
+        encode_table[<font color='#979000'>49</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>x</font>';
+
+        encode_table[<font color='#979000'>16</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>Q</font>';
+        encode_table[<font color='#979000'>33</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>h</font>';
+        encode_table[<font color='#979000'>50</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>y</font>';
+
+
+
+        <font color='#009900'>// we can now fill out the decode_table by using the encode_table
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> UCHAR_MAX; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            decode_table[i] <font color='#5555FF'>=</font> bad_value;
+        <b>}</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>64</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            decode_table[<font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font>encode_table[i]] <font color='#5555FF'>=</font> i;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    base64::
+    ~<b><a name='base64'></a>base64</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>delete</font> [] encode_table;
+        <font color='#0000FF'>delete</font> [] decode_table;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> base64::
+    <b><a name='encode'></a>encode</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in_,
+        std::ostream<font color='#5555FF'>&amp;</font> out_
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        streambuf<font color='#5555FF'>&amp;</font> in <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>in_.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        streambuf<font color='#5555FF'>&amp;</font> out <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>out_.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> inbuf[<font color='#979000'>3</font>];
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> outbuf[<font color='#979000'>4</font>];
+        streamsize status <font color='#5555FF'>=</font> in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>inbuf<font face='Lucida Console'>)</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> c1, c2, c3, c4, c5, c6;
+
+        <font color='#0000FF'><u>int</u></font> counter <font color='#5555FF'>=</font> <font color='#979000'>19</font>;
+
+        <font color='#009900'>// while we haven't hit the end of the input stream
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>counter <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                counter <font color='#5555FF'>=</font> <font color='#979000'>19</font>;
+                <font color='#009900'>// write a newline
+</font>                <font color='#0000FF'><u>char</u></font> ch;
+                <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>eol_style<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>case</font> CR:
+                        ch <font color='#5555FF'>=</font> '<font color='#FF0000'>\r</font>';
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>out.<font color='#BB00BB'>sputn</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>ch,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>!</font><font color='#5555FF'>=</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>throw</font> std::ios_base::<font color='#BB00BB'>failure</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>error occured in the base64 object</font>"<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>break</font>;
+                    <font color='#0000FF'>case</font> LF:
+                        ch <font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>';
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>out.<font color='#BB00BB'>sputn</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>ch,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>!</font><font color='#5555FF'>=</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>throw</font> std::ios_base::<font color='#BB00BB'>failure</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>error occured in the base64 object</font>"<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>break</font>;
+                    <font color='#0000FF'>case</font> CRLF:
+                        ch <font color='#5555FF'>=</font> '<font color='#FF0000'>\r</font>';
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>out.<font color='#BB00BB'>sputn</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>ch,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>!</font><font color='#5555FF'>=</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>throw</font> std::ios_base::<font color='#BB00BB'>failure</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>error occured in the base64 object</font>"<font face='Lucida Console'>)</font>;
+                        ch <font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>';
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>out.<font color='#BB00BB'>sputn</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>ch,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>!</font><font color='#5555FF'>=</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>throw</font> std::ios_base::<font color='#BB00BB'>failure</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>error occured in the base64 object</font>"<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>break</font>;
+                    <font color='#0000FF'>default</font>:
+                        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>false</font>,"<font color='#CC0000'>this should never happen</font>"<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>counter;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// encode the bytes in inbuf to base64 and write them to the output stream
+</font>                c1 <font color='#5555FF'>=</font> inbuf[<font color='#979000'>0</font>]<font color='#5555FF'>&amp;</font><font color='#979000'>0xfc</font>;
+                c2 <font color='#5555FF'>=</font> inbuf[<font color='#979000'>0</font>]<font color='#5555FF'>&amp;</font><font color='#979000'>0x03</font>;
+                c3 <font color='#5555FF'>=</font> inbuf[<font color='#979000'>1</font>]<font color='#5555FF'>&amp;</font><font color='#979000'>0xf0</font>;
+                c4 <font color='#5555FF'>=</font> inbuf[<font color='#979000'>1</font>]<font color='#5555FF'>&amp;</font><font color='#979000'>0x0f</font>;
+                c5 <font color='#5555FF'>=</font> inbuf[<font color='#979000'>2</font>]<font color='#5555FF'>&amp;</font><font color='#979000'>0xc0</font>;
+                c6 <font color='#5555FF'>=</font> inbuf[<font color='#979000'>2</font>]<font color='#5555FF'>&amp;</font><font color='#979000'>0x3f</font>;
+
+                outbuf[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> c1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>2</font>;
+                outbuf[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>c2<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>4</font><font face='Lucida Console'>)</font><font color='#5555FF'>|</font><font face='Lucida Console'>(</font>c3<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+                outbuf[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>c4<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>2</font><font face='Lucida Console'>)</font><font color='#5555FF'>|</font><font face='Lucida Console'>(</font>c5<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+                outbuf[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> c6;
+
+
+                outbuf[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> encode_table[outbuf[<font color='#979000'>0</font>]];
+                outbuf[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> encode_table[outbuf[<font color='#979000'>1</font>]];
+                outbuf[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> encode_table[outbuf[<font color='#979000'>2</font>]];
+                outbuf[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> encode_table[outbuf[<font color='#979000'>3</font>]];
+
+                <font color='#009900'>// write the encoded bytes to the output stream
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>out.<font color='#BB00BB'>sputn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>outbuf<font face='Lucida Console'>)</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font><font color='#5555FF'>!</font><font color='#5555FF'>=</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>throw</font> std::ios_base::<font color='#BB00BB'>failure</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>error occured in the base64 object</font>"<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#009900'>// get 3 more input bytes
+</font>                status <font color='#5555FF'>=</font> in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>inbuf<font face='Lucida Console'>)</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>continue</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// we are at the end of the input stream and need to add some padding
+</font>
+                <font color='#009900'>// encode the bytes in inbuf to base64 and write them to the output stream
+</font>                c1 <font color='#5555FF'>=</font> inbuf[<font color='#979000'>0</font>]<font color='#5555FF'>&amp;</font><font color='#979000'>0xfc</font>;
+                c2 <font color='#5555FF'>=</font> inbuf[<font color='#979000'>0</font>]<font color='#5555FF'>&amp;</font><font color='#979000'>0x03</font>;
+                c3 <font color='#5555FF'>=</font> inbuf[<font color='#979000'>1</font>]<font color='#5555FF'>&amp;</font><font color='#979000'>0xf0</font>;
+                c4 <font color='#5555FF'>=</font> inbuf[<font color='#979000'>1</font>]<font color='#5555FF'>&amp;</font><font color='#979000'>0x0f</font>;
+                c5 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                outbuf[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> c1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>2</font>;
+                outbuf[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>c2<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>4</font><font face='Lucida Console'>)</font><font color='#5555FF'>|</font><font face='Lucida Console'>(</font>c3<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+                outbuf[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>c4<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>2</font><font face='Lucida Console'>)</font><font color='#5555FF'>|</font><font face='Lucida Console'>(</font>c5<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+                outbuf[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>=</font>';
+
+                outbuf[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> encode_table[outbuf[<font color='#979000'>0</font>]];
+                outbuf[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> encode_table[outbuf[<font color='#979000'>1</font>]];
+                outbuf[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> encode_table[outbuf[<font color='#979000'>2</font>]];
+
+                <font color='#009900'>// write the encoded bytes to the output stream
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>out.<font color='#BB00BB'>sputn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>outbuf<font face='Lucida Console'>)</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font><font color='#5555FF'>!</font><font color='#5555FF'>=</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>throw</font> std::ios_base::<font color='#BB00BB'>failure</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>error occured in the base64 object</font>"<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#009900'>// in this case status must be 1 
+</font>            <b>{</b>
+                <font color='#009900'>// we are at the end of the input stream and need to add some padding
+</font>
+                <font color='#009900'>// encode the bytes in inbuf to base64 and write them to the output stream
+</font>                c1 <font color='#5555FF'>=</font> inbuf[<font color='#979000'>0</font>]<font color='#5555FF'>&amp;</font><font color='#979000'>0xfc</font>;
+                c2 <font color='#5555FF'>=</font> inbuf[<font color='#979000'>0</font>]<font color='#5555FF'>&amp;</font><font color='#979000'>0x03</font>;
+                c3 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                outbuf[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> c1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>2</font>;
+                outbuf[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>c2<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>4</font><font face='Lucida Console'>)</font><font color='#5555FF'>|</font><font face='Lucida Console'>(</font>c3<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+                outbuf[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>=</font>';
+                outbuf[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>=</font>';
+
+                outbuf[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> encode_table[outbuf[<font color='#979000'>0</font>]];
+                outbuf[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> encode_table[outbuf[<font color='#979000'>1</font>]];
+
+
+                <font color='#009900'>// write the encoded bytes to the output stream
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>out.<font color='#BB00BB'>sputn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>outbuf<font face='Lucida Console'>)</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font><font color='#5555FF'>!</font><font color='#5555FF'>=</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>throw</font> std::ios_base::<font color='#BB00BB'>failure</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>error occured in the base64 object</font>"<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+        <b>}</b> <font color='#009900'>// while (status != 0)
+</font>        
+
+        <font color='#009900'>// make sure the stream buffer flushes to its I/O channel
+</font>        out.<font color='#BB00BB'>pubsync</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> base64::
+    <b><a name='decode'></a>decode</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in_,
+        std::ostream<font color='#5555FF'>&amp;</font> out_
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        streambuf<font color='#5555FF'>&amp;</font> in <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>in_.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        streambuf<font color='#5555FF'>&amp;</font> out <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>out_.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> inbuf[<font color='#979000'>4</font>];
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> outbuf[<font color='#979000'>3</font>];
+        <font color='#0000FF'><u>int</u></font> inbuf_pos <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        streamsize status <font color='#5555FF'>=</font> in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>inbuf<font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// only count this character if it isn't some kind of filler
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> decode_table[inbuf[<font color='#979000'>0</font>]] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> bad_value <font face='Lucida Console'>)</font>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>inbuf_pos;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> c1, c2, c3, c4, c5, c6;
+        streamsize outsize;
+
+        <font color='#009900'>// while we haven't hit the end of the input stream
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// if we have 4 valid characters
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>inbuf_pos <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                inbuf_pos <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                <font color='#009900'>// this might be the end of the encoded data so we need to figure out if 
+</font>                <font color='#009900'>// there was any padding applied.
+</font>                outsize <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>inbuf[<font color='#979000'>3</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>=</font>'<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>inbuf[<font color='#979000'>2</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>=</font>'<font face='Lucida Console'>)</font>
+                        outsize <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                    <font color='#0000FF'>else</font>
+                        outsize <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+                <b>}</b>
+
+                <font color='#009900'>// decode the incoming characters
+</font>                inbuf[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> decode_table[inbuf[<font color='#979000'>0</font>]];
+                inbuf[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> decode_table[inbuf[<font color='#979000'>1</font>]];
+                inbuf[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> decode_table[inbuf[<font color='#979000'>2</font>]];
+                inbuf[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> decode_table[inbuf[<font color='#979000'>3</font>]];
+
+
+                <font color='#009900'>// now pack these guys into bytes rather than 6 bit chunks
+</font>                c1 <font color='#5555FF'>=</font> inbuf[<font color='#979000'>0</font>]<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>2</font>;
+                c2 <font color='#5555FF'>=</font> inbuf[<font color='#979000'>1</font>]<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>4</font>;
+                c3 <font color='#5555FF'>=</font> inbuf[<font color='#979000'>1</font>]<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>4</font>;
+                c4 <font color='#5555FF'>=</font> inbuf[<font color='#979000'>2</font>]<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>2</font>;
+                c5 <font color='#5555FF'>=</font> inbuf[<font color='#979000'>2</font>]<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>6</font>;
+                c6 <font color='#5555FF'>=</font> inbuf[<font color='#979000'>3</font>];
+
+                outbuf[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> c1<font color='#5555FF'>|</font>c2;
+                outbuf[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> c3<font color='#5555FF'>|</font>c4;
+                outbuf[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> c5<font color='#5555FF'>|</font>c6;
+
+
+                <font color='#009900'>// write the encoded bytes to the output stream
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>out.<font color='#BB00BB'>sputn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>outbuf<font face='Lucida Console'>)</font>,outsize<font face='Lucida Console'>)</font><font color='#5555FF'>!</font><font color='#5555FF'>=</font>outsize<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>throw</font> std::ios_base::<font color='#BB00BB'>failure</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>error occured in the base64 object</font>"<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#009900'>// get more input characters 
+</font>            status <font color='#5555FF'>=</font> in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>inbuf <font color='#5555FF'>+</font> inbuf_pos<font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// only count this character if it isn't some kind of filler 
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>decode_table[inbuf[inbuf_pos]] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> bad_value <font color='#5555FF'>|</font><font color='#5555FF'>|</font> inbuf[inbuf_pos] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>=</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                status <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>inbuf_pos;
+        <b>}</b> <font color='#009900'>// while (status != 0)
+</font>        
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>inbuf_pos <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            ostringstream sout;
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> inbuf_pos <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> extra characters were found at the end of the encoded data.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  This may indicate that the data stream has been truncated.</font>";
+            <font color='#009900'>// this happens if we hit EOF in the middle of decoding a 24bit block.
+</font>            <font color='#0000FF'>throw</font> <font color='#BB00BB'>decode_error</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// make sure the stream buffer flushes to its I/O channel
+</font>        out.<font color='#BB00BB'>pubsync</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BASE64_KERNEL_1_CPp_
+</font>
+
+</pre></body></html>

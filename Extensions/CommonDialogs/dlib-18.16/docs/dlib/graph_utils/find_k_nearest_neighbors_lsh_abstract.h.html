@@ -1,0 +1,105 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - find_k_nearest_neighbors_lsh_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_FIND_K_NEAREST_NEIGHBOrS_LSH_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_FIND_K_NEAREST_NEIGHBOrS_LSH_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../lsh/hashes_abstract.h.html'>../lsh/hashes_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sample_pair_abstract.h.html'>sample_pair_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type,
+        <font color='#0000FF'>typename</font> hash_function_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='hash_samples'></a>hash_samples</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> hash_function_type<font color='#5555FF'>&amp;</font> hash_funct,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> hash_function_type::result_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hashes
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - hash_funct() is threadsafe.  This means that it must be safe for multiple
+              threads to invoke the member functions of hash_funct() at the same time.
+            - vector_type is any container that looks like a std::vector or dlib::array.
+            - hash_funct must be a function object with an interface compatible with the
+              objects defined in dlib/lsh/hashes_abstract.h.  In particular, hash_funct
+              must be capable of hashing the elements in the samples vector.
+        ensures
+            - This function hashes all the elements in samples and stores the results in
+              hashes.  It will also use num_threads concurrent threads to do this.  You
+              should set this value equal to the number of processing cores on your
+              computer for maximum speed.
+            - #hashes.size() == 0
+            - for all valid i:
+                - #hashes[i] = hash_funct(samples[i])
+                  (i.e. #hashes[i] will contain the hash of samples[i])
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type,
+        <font color='#0000FF'>typename</font> distance_function_type,
+        <font color='#0000FF'>typename</font> hash_function_type,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_k_nearest_neighbors_lsh'></a>find_k_nearest_neighbors_lsh</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> distance_function_type<font color='#5555FF'>&amp;</font> dist_funct,
+        <font color='#0000FF'>const</font> hash_function_type<font color='#5555FF'>&amp;</font> hash_funct,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+        std::vector<font color='#5555FF'>&lt;</font>sample_pair, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> edges,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k_oversample <font color='#5555FF'>=</font> <font color='#979000'>20</font> 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - hash_funct and dist_funct are threadsafe.  This means that it must be safe
+              for multiple threads to invoke the member functions of these objects at the
+              same time.
+            - k &gt; 0
+            - k_oversample &gt; 0
+            - dist_funct(samples[i], samples[j]) must be a valid expression that evaluates
+              to a floating point number 
+            - vector_type is any container that looks like a std::vector or dlib::array.
+            - hash_funct must be a function object with an interface compatible with the
+              objects defined in dlib/lsh/hashes_abstract.h.  In particular, hash_funct
+              must be capable of hashing the elements in the samples vector.
+        ensures
+            - This function computes an approximate form of a k nearest neighbors graph of
+              the elements in samples.  In particular, the way it works is that it first
+              hashes all elements in samples using the provided locality sensitive hash
+              function hash_funct().  Then it performs an exact k nearest neighbors on the
+              hashes which can be done very quickly.  For each of these neighbors we
+              compute the true distance using dist_funct() and the k nearest neighbors for
+              each sample are stored into #edges.  
+            - Note that samples with an infinite distance between them are considered to be
+              not connected at all. Therefore, we exclude edges with such distances from
+              being output.
+            - for all valid i:
+                - #edges[i].distance() == dist_funct(samples[#edges[i].index1()], samples[#edges[i].index2()])
+                - #edges[i].distance() &lt; std::numeric_limits&lt;double&gt;::infinity()
+            - contains_duplicate_pairs(#edges) == false
+            - This function will use num_threads concurrent threads of processing.  You
+              should set this value equal to the number of processing cores on your
+              computer for maximum speed.
+            - The hash based k nearest neighbor step is approximate, however, you can
+              improve the output accuracy by using a larger k value for this first step.
+              Therefore, this function finds k*k_oversample nearest neighbors during the
+              first hashing based step. 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_FIND_K_NEAREST_NEIGHBOrS_LSH_ABSTRACT_Hh_
+</font>
+
+</pre></body></html>

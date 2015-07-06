@@ -52,7 +52,7 @@ scene(scene_)
 	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer1;
 
-	Create(parent, wxID_ANY, _("Edition of \"For each object\" event"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Edit the \"For each object\" event"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);

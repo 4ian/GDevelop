@@ -119,10 +119,10 @@ public:
     ///@{
 
     /**
-     * \brief Generate the code event : the platform provided by \a codeGenerator is asked for the EventMetadata associated to the event,
-     * which is then used to generate the code event ( gd::EventMetadata::codeGeneration member )
+     * \brief Generate the code event: the platform provided by \a codeGenerator is asked for the EventMetadata associated to the event,
+     * which is then used to generate the code event.
      *
-     * \warning Even if this method is virtual, you should never redefine it: Always provide the code generation using gd::EventMetadata.
+     * \warning Even if this method is virtual, you should never redefine it: always provide the code generation using gd::EventMetadata.
      * This method is virtual as some platforms could have hidden events ( such as profiling events ) needing code generation without declaring
      * the event as a part of an extension.
      *
@@ -131,8 +131,8 @@ public:
     virtual gd::String GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
 
     /**
-     * Called before events are compiled : the platform provided by \a codeGenerator is asked for the EventMetadata associated to the event,
-     * which is then used to preprocess the event ( gd::EventMetadata::codeGeneration member )
+     * Called before events are compiled: the platform provided by \a codeGenerator is asked for the EventMetadata associated to the event,
+     * which is then used to preprocess the event.
      *
      * This is only done if the event MustBePreprocessed() return true.
      *
@@ -144,7 +144,7 @@ public:
     virtual void Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsList & eventList, unsigned int indexOfTheEventInThisList);
 
     /**
-     * \brief If MustBePreprocessed is redefined to return true, the gd::EventMetadata::codeGeneration associated to the event will be called
+     * \brief If MustBePreprocessed is redefined to return true, the gd::EventMetadata::preprocessing associated to the event will be called
      * to preprocess the event.
      *
      * \see gd::BaseEvent::Preprocess
@@ -173,24 +173,35 @@ public:
     ///@{
 
     /**
-     * Return the event type
+     * \brief Return the event type
      */
-    gd::String GetType() const { return type; };
+    const gd::String & GetType() const { return type; };
 
     /**
-     * Change the event type
+     * \brief Change the event type
      */
     void SetType(gd::String type_) { type = type_; };
 
     /**
-     * Set if the event if disabled or not
+     * \brief Set if the event if disabled or not
      */
     void SetDisabled(bool disable = true) { disabled = disable; }
 
     /**
-     * True if event is disabled
+     * \brief True if event is disabled
      */
     bool IsDisabled() const { return disabled; }
+
+    /**
+     * \brief Set if the event must be folded (i.e: sub events must
+     * be hidden in the events editor).
+     */
+    void SetFolded(bool fold = true) { folded = fold; }
+
+    /**
+     * \brief True if the event should be folded in the events editor.
+     */
+    bool IsFolded() const { return folded; }
 
     ///@}
 
@@ -242,7 +253,6 @@ public:
 
     ///@}
 
-    bool            folded; ///< Here as it must be saved. Used by events editor
     mutable bool    eventHeightNeedUpdate; ///<Automatically set to true/false by the events editor
 
     std::weak_ptr<gd::BaseEvent> originalEvent; ///< Pointer only used for profiling events, so as to remember the original event from which it has been copied.
@@ -253,8 +263,9 @@ protected:
     mutable unsigned int    renderedHeight;
 
 private:
-    bool                    disabled; ///<True if the event is disabled and must not be executed
-    gd::String             type; ///<Type of the event. Must be assigned at the creation. Used for saving the event for instance.
+    bool            folded; ///< True if the subevents should be hidden in the events editor
+    bool            disabled; ///<True if the event is disabled and must not be executed
+    gd::String      type; ///<Type of the event. Must be assigned at the creation. Used for saving the event for instance.
 
     static gd::EventsList badSubEvents;
 };

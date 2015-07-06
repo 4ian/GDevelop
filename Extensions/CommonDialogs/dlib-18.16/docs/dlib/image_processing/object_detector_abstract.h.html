@@ -1,0 +1,407 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - object_detector_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_OBJECT_DeTECTOR_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_OBJECT_DeTECTOR_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='box_overlap_testing_abstract.h.html'>box_overlap_testing_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='full_object_detection_abstract.h.html'>full_object_detection_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='rect_detection'></a>rect_detection</b>
+    <b>{</b>
+        <font color='#0000FF'><u>double</u></font> detection_confidence;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> weight_index;
+        rectangle rect;
+    <b>}</b>;
+
+    <font color='#0000FF'>struct</font> <b><a name='full_detection'></a>full_detection</b>
+    <b>{</b>
+        <font color='#0000FF'><u>double</u></font> detection_confidence;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> weight_index;
+        full_object_detection rect;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_scanner_type_
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='object_detector'></a>object_detector</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON image_scanner_type_
+                image_scanner_type_ must be an implementation of 
+                dlib/image_processing/scan_image_pyramid_abstract.h or 
+                dlib/image_processing/scan_fhog_pyramid.h or 
+                dlib/image_processing/scan_image_custom.h or 
+                dlib/image_processing/scan_image_boxes_abstract.h 
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for detecting the positions of objects in an image.
+                In particular, it is a simple container to aggregate an instance of an image 
+                scanner (i.e. scan_image_pyramid, scan_fhog_pyramid, scan_image_custom, or
+                scan_image_boxes), the weight vector needed by one of these image scanners,
+                and finally an instance of test_box_overlap.  The test_box_overlap object
+                is used to perform non-max suppression on the output of the image scanner
+                object.  
+
+                Note further that this object can contain multiple weight vectors.  In this
+                case, it will run the image scanner multiple times, once with each of the
+                weight vectors.  Then it will aggregate the results from all runs, perform
+                non-max suppression and then return the results.  Therefore, the object_detector 
+                can also be used as a container for a set of object detectors that all use
+                the same image scanner but different weight vectors.  This is useful since
+                the object detection procedure has two parts.  A loading step where the
+                image is loaded into the scanner, then a detect step which uses the weight
+                vector to locate objects in the image.  Since the loading step is independent 
+                of the weight vector it is most efficient to run multiple detectors by
+                performing one load into a scanner followed by multiple detect steps.  This
+                avoids unnecessarily loading the same image into the scanner multiple times.  
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> image_scanner_type_ image_scanner_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_scanner_type::feature_vector_type feature_vector_type;
+
+        <b><a name='object_detector'></a>object_detector</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This detector won't generate any detections when
+                  presented with an image.
+                - #num_detectors() == 0
+        !*/</font>
+
+        <b><a name='object_detector'></a>object_detector</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> object_detector<font color='#5555FF'>&amp;</font> item 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is a copy of item
+                - #get_scanner() == item.get_scanner()
+                  (note that only the "configuration" of item.get_scanner() is copied.
+                  I.e. the copy is done using copy_configuration())
+        !*/</font>
+
+        <b><a name='object_detector'></a>object_detector</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_scanner_type<font color='#5555FF'>&amp;</font> scanner, 
+            <font color='#0000FF'>const</font> test_box_overlap<font color='#5555FF'>&amp;</font> overlap_tester,
+            <font color='#0000FF'>const</font> feature_vector_type<font color='#5555FF'>&amp;</font> w 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - w.size() == scanner.get_num_dimensions() + 1
+                - scanner.get_num_detection_templates() &gt; 0
+            ensures
+                - When the operator() member function is called it will
+                  invoke scanner.detect(w,dets,w(w.size()-1)), suppress
+                  overlapping detections, and then report the results.
+                - when #*this is used to detect objects, the set of
+                  output detections will never contain any overlaps
+                  with respect to overlap_tester.  That is, for all 
+                  pairs of returned detections A and B, we will always
+                  have: overlap_tester(A,B) == false
+                - #get_w() == w
+                - #get_overlap_tester() == overlap_tester
+                - #get_scanner() == scanner
+                  (note that only the "configuration" of scanner is copied.
+                  I.e. the copy is done using copy_configuration())
+                - #num_detectors() == 1
+        !*/</font>
+
+        <b><a name='object_detector'></a>object_detector</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_scanner_type<font color='#5555FF'>&amp;</font> scanner, 
+            <font color='#0000FF'>const</font> test_box_overlap<font color='#5555FF'>&amp;</font> overlap_tester,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>feature_vector_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> w 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - for all valid i:
+                    - w[i].size() == scanner.get_num_dimensions() + 1
+                - scanner.get_num_detection_templates() &gt; 0
+                - w.size() &gt; 0
+            ensures
+                - When the operator() member function is called it will invoke
+                  get_scanner().detect(w[i],dets,w[i](w[i].size()-1)) for all valid i.  Then it
+                  will take all the detections output by the calls to detect() and suppress
+                  overlapping detections, and finally report the results.
+                - when #*this is used to detect objects, the set of output detections will
+                  never contain any overlaps with respect to overlap_tester.  That is, for
+                  all pairs of returned detections A and B, we will always have:
+                    overlap_tester(A,B) == false
+                - for all valid i:
+                    - #get_w(i) == w[i]
+                - #num_detectors() == w.size()
+                - #get_overlap_tester() == overlap_tester
+                - #get_scanner() == scanner
+                  (note that only the "configuration" of scanner is copied.
+                  I.e. the copy is done using copy_configuration())
+        !*/</font>
+
+        <font color='#0000FF'>explicit</font> <b><a name='object_detector'></a>object_detector</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>object_detector<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> detectors
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - detectors.size() != 0
+                - All the detectors must use compatibly configured scanners.  That is, it
+                  must make sense for the weight vector from one detector to be used with
+                  the scanner from any other.
+                - for all valid i:
+                    - detectors[i].get_scanner().get_num_dimensions() == detectors[0].get_scanner().get_num_dimensions()
+                      (i.e. all the detectors use scanners that use the same kind of feature vectors.)
+            ensures
+                - Very much like the above constructor, this constructor takes all the
+                  given detectors and packs them into #*this.  That is, invoking operator()
+                  on #*this will run all the detectors, perform non-max suppression, and
+                  then report the results.
+                - When #*this is used to detect objects, the set of output detections will
+                  never contain any overlaps with respect to overlap_tester.  That is, for
+                  all pairs of returned detections A and B, we will always have:
+                    overlap_tester(A,B) == false
+                - #num_detectors() == The sum of detectors[i].num_detectors() for all valid i. 
+                - #get_overlap_tester() == detectors[0].get_overlap_tester()
+                - #get_scanner() == detectors[0].get_scanner()
+                  (note that only the "configuration" of scanner is copied.  I.e. the copy
+                  is done using copy_configuration())
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_detectors'></a>num_detectors</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of weight vectors in this object.  Since each weight
+                  vector logically represents an object detector, this returns the number
+                  of object detectors contained in this object.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> feature_vector_type<font color='#5555FF'>&amp;</font> <b><a name='get_w'></a>get_w</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - idx &lt; num_detectors
+            ensures
+                - returns the idx-th weight vector loaded into this object.  All the weight vectors
+                  have the same dimension and logically each represents a different detector.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> test_box_overlap<font color='#5555FF'>&amp;</font> <b><a name='get_overlap_tester'></a>get_overlap_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the overlap tester used by this object
+        !*/</font>
+
+        <font color='#0000FF'>const</font> image_scanner_type<font color='#5555FF'>&amp;</font> <b><a name='get_scanner'></a>get_scanner</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the image scanner used by this object.  
+        !*/</font>
+
+        object_detector<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> object_detector<font color='#5555FF'>&amp;</font> item 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is a copy of item
+                - #get_scanner() == item.get_scanner()
+                  (note that only the "configuration" of item.get_scanner() is 
+                  copied.  I.e. the copy is done using copy_configuration())
+                - returns #*this
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+            std::vector<font color='#5555FF'>&lt;</font>rect_detection<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dets,
+            <font color='#0000FF'><u>double</u></font> adjust_threshold <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - img == an object which can be accepted by image_scanner_type::load()
+            ensures
+                - Performs object detection on the given image and stores the detected
+                  objects into #dets.  In particular, we will have that:
+                    - #dets is sorted such that the highest confidence detections come
+                      first.  E.g. element 0 is the best detection, element 1 the next
+                      best, and so on.
+                    - #dets.size() == the number of detected objects.
+                    - #dets[i].detection_confidence == The strength of the i-th detection.
+                      Larger values indicate that the detector is more confident that
+                      #dets[i] is a correct detection rather than being a false alarm.
+                      Moreover, the detection_confidence is equal to the detection value
+                      output by the scanner minus the threshold value stored at the end of
+                      the weight vector in get_w(#dets[i].weight_index). 
+                    - #dets[i].weight_index == the index for the weight vector that
+                      generated this detection. 
+                    - #dets[i].rect == the bounding box for the i-th detection.
+                - #get_scanner() will have been loaded with img. Therefore, you can call
+                  #get_scanner().get_feature_vector() to obtain the feature vectors or
+                  #get_scanner().get_full_object_detection() to get the
+                  full_object_detections for the resulting object detection boxes.
+                - The detection threshold is adjusted by having adjust_threshold added to
+                  it.  Therefore, an adjust_threshold value &gt; 0 makes detecting objects
+                  harder while a negative value makes it easier.  Moreover, the following
+                  will be true for all valid i:
+                    - #dets[i].detection_confidence &gt;= adjust_threshold
+                  This means that, for example, you can obtain the maximum possible number
+                  of detections by setting adjust_threshold equal to negative infinity.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+            std::vector<font color='#5555FF'>&lt;</font>full_detection<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dets,
+            <font color='#0000FF'><u>double</u></font> adjust_threshold <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - img == an object which can be accepted by image_scanner_type::load()
+            ensures
+                - This function is identical to the above operator() routine, except that
+                  it outputs full_object_detections instead of rectangles.  This means that
+                  the output includes part locations.  In particular, calling this function
+                  is the same as calling the above operator() routine and then using
+                  get_scanner().get_full_object_detection() to resolve all the rectangles
+                  into full_object_detections.  Therefore, this version of operator() is
+                  simply a convenience function for performing this set of operations.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type
+            <font color='#5555FF'>&gt;</font>
+        std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+            <font color='#0000FF'>const</font> adjust_threshold <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - img == an object which can be accepted by image_scanner_type::load()
+            ensures
+                - This function is identical to the above operator() routine, except that
+                  it returns a std::vector&lt;rectangle&gt; which contains just the bounding
+                  boxes of all the detections. 
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+            std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dets,
+            <font color='#0000FF'><u>double</u></font> adjust_threshold <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - img == an object which can be accepted by image_scanner_type::load()
+            ensures
+                - performs object detection on the given image and stores the
+                  detected objects into #dets.  In particular, we will have that:
+                    - #dets is sorted such that the highest confidence detections 
+                      come first.  E.g. element 0 is the best detection, element 1 
+                      the next best, and so on.
+                    - #dets.size() == the number of detected objects.
+                    - #dets[i].first gives the "detection confidence", of the i-th
+                      detection.  This is the detection value output by the scanner minus
+                      the threshold value stored at the end of the weight vector in get_w(). 
+                    - #dets[i].second == the bounding box for the i-th detection.
+                - #get_scanner() will have been loaded with img. Therefore, you can call
+                  #get_scanner().get_feature_vector() to obtain the feature vectors or
+                  #get_scanner().get_full_object_detection() to get the
+                  full_object_detections for the resulting object detection boxes.
+                - The detection threshold is adjusted by having adjust_threshold added to
+                  it.  Therefore, an adjust_threshold value &gt; 0 makes detecting objects
+                  harder while a negative value makes it easier.  Moreover, the following
+                  will be true for all valid i:
+                    - #dets[i].first &gt;= adjust_threshold
+                  This means that, for example, you can obtain the maximum possible number
+                  of detections by setting adjust_threshold equal to negative infinity.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+            std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, full_object_detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dets,
+            <font color='#0000FF'><u>double</u></font> adjust_threshold <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - img == an object which can be accepted by image_scanner_type::load()
+            ensures
+                - This function is identical to the above operator() routine, except that
+                  it outputs full_object_detections instead of rectangles.  This means that
+                  the output includes part locations.  In particular, calling this function
+                  is the same as calling the above operator() routine and then using
+                  get_scanner().get_full_object_detection() to resolve all the rectangles
+                  into full_object_detections.  Therefore, this version of operator() is
+                  simply a convenience function for performing this set of operations.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+            std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dets,
+            <font color='#0000FF'><u>double</u></font> adjust_threshold <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - img == an object which can be accepted by image_scanner_type::load()
+            ensures
+                - This function is identical to the above operator() routine, except that
+                  it doesn't include a double valued score.  That is, it just outputs the
+                  full_object_detections.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> object_detector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support.  Note that this function only saves the
+        configuration part of item.get_scanner().  That is, we use the scanner's
+        copy_configuration() function to get a copy of the scanner that doesn't contain any
+        loaded image data and we then save just the configuration part of the scanner.
+        This means that any serialized object_detectors won't remember any images they have
+        processed but will otherwise contain all their state and be able to detect objects
+        in new images.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        object_detector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_OBJECT_DeTECTOR_ABSTRACT_Hh_
+</font>
+
+</pre></body></html>

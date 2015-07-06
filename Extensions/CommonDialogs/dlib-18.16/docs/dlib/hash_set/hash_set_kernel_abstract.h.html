@@ -1,0 +1,210 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - hash_set_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_HASH_SET_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_HASH_SET_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../general_hash/general_hash.h.html'>../general_hash/general_hash.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/enumerable.h.html'>../interfaces/enumerable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/remover.h.html'>../interfaces/remover.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>functional<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> expnum,
+        <font color='#0000FF'>typename</font> mem_manager <font color='#5555FF'>=</font> default_memory_manager,
+        <font color='#0000FF'>typename</font> compare <font color='#5555FF'>=</font> std::less<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='hash_set'></a>hash_set</b> : <font color='#0000FF'>public</font> enumerable<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&gt;</font>,
+                     <font color='#0000FF'>public</font> remover<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+
+        <font color='#009900'>/*!                
+            REQUIREMENTS ON T
+                domain must be comparable by compare where compare is a functor compatible with std::less and
+                T must be hashable by general_hash
+                (general_hash is defined in dlib/general_hash) and 
+                T must be swappable by a global swap() and
+                T must have a default constructor
+
+            REQUIREMENTS ON expnum
+                expnum &lt; 32
+                2^expnum is the number of buckets to hash items of type T into. 
+                Note that this is really just a suggestion to the hash table.
+                Implementations are free to manage the table size however is most
+                appropriate.
+
+            REQUIREMENTS ON mem_manager
+                must be an implementation of memory_manager/memory_manager_kernel_abstract.h or
+                must be an implementation of memory_manager_global/memory_manager_global_kernel_abstract.h or
+                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+                mem_manager::type can be set to anything.
+
+            POINTERS AND REFERENCES TO INTERNAL DATA
+                swap() and is_member() functions do not invalidate 
+                pointers or references to internal data.
+                All other functions have no such guarantee.
+
+            INITIAL VALUE
+                size() == 0    
+
+            ENUMERATION ORDER
+                No order is specified.  Only that each element will be visited once
+                and only once.
+
+            WHAT THIS OBJECT REPRESENTS
+                hash_set contains items of type T
+
+                This object represents an unaddressed collection 
+                of items.  Every element in a hash_set is unique.
+
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
+
+                definition of equivalent:
+                a is equivalent to b if
+                a &lt; b == false and
+                b &lt; a == false
+        !*/</font>
+        
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'>typedef</font> T type;
+            <font color='#0000FF'>typedef</font> compare compare_type;
+            <font color='#0000FF'>typedef</font> mem_manager mem_manager_type;
+
+            <b><a name='hash_set'></a>hash_set</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures 
+                    - #*this is properly initialized
+                throws
+                    - std::bad_alloc or any exception thrown by T's constructor
+            !*/</font>
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='hash_set'></a>hash_set</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>; 
+            <font color='#009900'>/*!
+                ensures
+                    - all memory associated with *this has been released
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - #*this has its initial value
+                throws
+                    - std::bad_alloc or any exception thrown by T's constructor
+                        if this exception is thrown then *this is unusable 
+                        until clear() is called and succeeds
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - is_member(item) == false
+                ensures
+                    - #is_member(item) == true 
+                    - #item has an initial value for its type 
+                    - #size() == size() + 1
+                    - #at_start() == true
+                throws 
+                    - std::bad_alloc or any exception thrown by T's constructor
+                        if add() throws then it has no effect
+            !*/</font>
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='is_member'></a>is_member</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - returns whether or not there is an element in *this equivalent 
+                      to item
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='remove'></a>remove</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item,
+                T<font color='#5555FF'>&amp;</font> item_copy
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - is_member(item) == true 
+                    - &amp;item != &amp;item_copy (i.e. item and item_copy cannot be the 
+                      same variable) 
+                ensures
+                    - #is_member(item) == false 
+                    - the element in *this equivalent to item has been removed and 
+                      swapped into #item_copy 
+                    - #size() == size() - 1
+                    - #at_start() == true
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='destroy'></a>destroy</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - is_member(item) == true 
+                ensures
+                    - #is_member(item) == false 
+                    - #size() == size() - 1
+                    - #at_start() == true
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+                hash_set<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - swaps *this and item
+            !*/</font> 
+    
+        <font color='#0000FF'>private</font>:
+
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='hash_set'></a>hash_set</b><font face='Lucida Console'>(</font>hash_set<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>            hash_set<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>hash_set<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> expnum,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        hash_set<font color='#5555FF'>&lt;</font>T,expnum,mem_manager,compare<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        hash_set<font color='#5555FF'>&lt;</font>T,expnum,mem_manager,compare<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> expnum,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        hash_set<font color='#5555FF'>&lt;</font>T,expnum,mem_manager,compare<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_HASH_SET_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

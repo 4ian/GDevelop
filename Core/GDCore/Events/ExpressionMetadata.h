@@ -10,6 +10,7 @@
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Events/InstructionMetadata.h"
 #include <memory>
+#include <functional>
 #if !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif
@@ -25,7 +26,7 @@ namespace gd
 class ExpressionCodeGenerationInformation
 {
 public:
-    ExpressionCodeGenerationInformation() : staticFunction(false) {};
+    ExpressionCodeGenerationInformation() : staticFunction(false), hasCustomCodeGenerator(false) {};
     virtual ~ExpressionCodeGenerationInformation() {};
 
     /**
@@ -56,27 +57,36 @@ public:
         return *this;
     }
 
-    /** \brief Class used to redefine instruction code generation
-     */
-    class CustomCodeGenerator
-    {
-    public:
-        virtual gd::String GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator_, gd::EventsCodeGenerationContext & context) {return "";};
-    };
-
     /**
      * \brief Set that the function must be generated using a custom code generator.
      */
-    ExpressionCodeGenerationInformation & SetCustomCodeGenerator(std::shared_ptr<CustomCodeGenerator> codeGenerator)
+    ExpressionCodeGenerationInformation & SetCustomCodeGenerator(std::function<gd::String(const std::vector<gd::Expression> & parameters,
+        gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)> codeGenerator)
     {
-        optionalCustomCodeGenerator = codeGenerator;
+        hasCustomCodeGenerator = true;
+        customCodeGenerator = codeGenerator;
         return *this;
     }
+
+    ExpressionCodeGenerationInformation & RemoveCustomCodeGenerator()
+    {
+        hasCustomCodeGenerator = false;
+        std::function<gd::String(const std::vector<gd::Expression> & parameters,
+        gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)> emptyFunction;
+        customCodeGenerator = emptyFunction;
+        return *this;
+    }
+
+    bool HasCustomCodeGenerator() const { return hasCustomCodeGenerator; }
 
     bool staticFunction;
     gd::String functionCallName;
     gd::String optionalIncludeFile;
-    std::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
+    bool hasCustomCodeGenerator;
+    std::function<gd::String(
+        const std::vector<gd::Expression> & parameters,
+        gd::EventsCodeGenerator & codeGenerator,
+        gd::EventsCodeGenerationContext & context)> customCodeGenerator;
 };
 
 /**
@@ -109,8 +119,6 @@ public:
         group = str;
         return *this;
     }
-
-    std::vector < gd::ParameterMetadata > parameters;
 
     /**
      * \see gd::InstructionMetadata::AddParameter
@@ -179,13 +187,17 @@ public:
 #if !defined(GD_NO_WX_GUI)
     const wxBitmap & GetBitmapIcon() const { return smallicon; }
 #endif
+    const gd::ParameterMetadata & GetParameter(unsigned int id) const { return parameters[id]; };
+    gd::ParameterMetadata & GetParameter(unsigned int id) { return parameters[id]; };
+    unsigned int GetParametersCount() const { return parameters.size(); };
 
+    std::vector < gd::ParameterMetadata > parameters;
 private:
     gd::String fullname;
     gd::String description;
     gd::String group;
     bool shown;
-    
+
 #if !defined(GD_NO_WX_GUI)
     wxBitmap smallicon;
 #endif

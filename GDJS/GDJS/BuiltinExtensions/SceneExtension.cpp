@@ -33,64 +33,41 @@ SceneExtension::SceneExtension()
     GetAllActions()["Scene"].SetFunctionName("gdjs.evtTools.runtimeScene.changeScene");
     GetAllActions()["Quit"].SetFunctionName("gdjs.evtTools.runtimeScene.stopGame");
 
-    {
-        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
-        {
-            virtual gd::String GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+    GetAllConditions()["Egal"].codeExtraInformation
+        .SetCustomCodeGenerator([](gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) {
+            gd::String value1Code;
             {
-                gd::String value1Code;
-                {
-                    gd::CallbacksForGeneratingExpressionCode callbacks(value1Code, codeGenerator, context);
-                    gd::ExpressionParser parser(instruction.GetParameters()[0].GetPlainString());
-                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || value1Code.empty()) value1Code = "0";
-                }
+                gd::CallbacksForGeneratingExpressionCode callbacks(value1Code, codeGenerator, context);
+                gd::ExpressionParser parser(instruction.GetParameters()[0].GetPlainString());
+                if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || value1Code.empty()) value1Code = "0";
+            }
 
-                gd::String value2Code;
-                {
-                    gd::CallbacksForGeneratingExpressionCode callbacks(value2Code, codeGenerator, context);
-                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
-                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || value2Code.empty()) value2Code = "0";
-                }
+            gd::String value2Code;
+            {
+                gd::CallbacksForGeneratingExpressionCode callbacks(value2Code, codeGenerator, context);
+                gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || value2Code.empty()) value2Code = "0";
+            }
 
-                gd::String resultingBoolean = codeGenerator.GenerateBooleanFullName("conditionTrue", context)+".val";
+            gd::String resultingBoolean = codeGenerator.GenerateBooleanFullName("conditionTrue", context)+".val";
 
-                if ( instruction.GetParameters()[1].GetPlainString() == "=" || instruction.GetParameters()[1].GetPlainString().empty() )
-                    return resultingBoolean + " = ("+value1Code+" == "+value2Code+");\n";
-                else if ( instruction.GetParameters()[1].GetPlainString() == ">")
-                    return resultingBoolean + " = ("+value1Code+" > "+value2Code+");\n";
-                else if ( instruction.GetParameters()[1].GetPlainString() == "<")
-                    return resultingBoolean + " = ("+value1Code+" < "+value2Code+");\n";
-                else if ( instruction.GetParameters()[1].GetPlainString() == "<=")
-                    return resultingBoolean + " = ("+value1Code+" <= "+value2Code+");\n";
-                else if ( instruction.GetParameters()[1].GetPlainString() == ">=")
-                    return resultingBoolean + " = ("+value1Code+" >= "+value2Code+");\n";
-                else if ( instruction.GetParameters()[1].GetPlainString() == "!=")
-                    return resultingBoolean + " = ("+value1Code+" != "+value2Code+");\n";
+            if ( instruction.GetParameters()[1].GetPlainString() == "=" || instruction.GetParameters()[1].GetPlainString().empty() )
+                return resultingBoolean + " = ("+value1Code+" == "+value2Code+");\n";
+            else if ( instruction.GetParameters()[1].GetPlainString() == ">")
+                return resultingBoolean + " = ("+value1Code+" > "+value2Code+");\n";
+            else if ( instruction.GetParameters()[1].GetPlainString() == "<")
+                return resultingBoolean + " = ("+value1Code+" < "+value2Code+");\n";
+            else if ( instruction.GetParameters()[1].GetPlainString() == "<=")
+                return resultingBoolean + " = ("+value1Code+" <= "+value2Code+");\n";
+            else if ( instruction.GetParameters()[1].GetPlainString() == ">=")
+                return resultingBoolean + " = ("+value1Code+" >= "+value2Code+");\n";
+            else if ( instruction.GetParameters()[1].GetPlainString() == "!=")
+                return resultingBoolean + " = ("+value1Code+" != "+value2Code+");\n";
 
-                return "";
-            };
-        };
-        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator;
+            return gd::String("");
+        });
 
-        GetAllConditions()["Egal"].codeExtraInformation
-            .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
-    }
-
-    StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
-        /*
-
-    AddAction("DisableInputWhenFocusIsLost",
-                   GD_T("Disable input when focus is lost"),
-                   GD_T("Set if the keyboard and mouse buttons must be taken into account even\nif the window is not active."),
-                   GD_T("Disable input when focus is lost: _PARAM1_"),
-                   GD_T("Scene"),
-                   "res/actions/window24.png",
-                   "res/actions/window.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("yesorno", GD_T("Deactivate input when focus is lost"))
-        .SetFunctionName("DisableInputWhenFocusIsLost").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-        */
-
+    StripUnimplementedInstructionsAndExpressions();
 }
 
 }

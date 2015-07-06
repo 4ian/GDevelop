@@ -1,0 +1,314 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - binary_search_tree_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_BINARY_SEARCH_TREE_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_BINARY_SEARCH_TREE_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/map_pair.h.html'>../interfaces/map_pair.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/enumerable.h.html'>../interfaces/enumerable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/remover.h.html'>../interfaces/remover.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>functional<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib 
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager <font color='#5555FF'>=</font> default_memory_manager,
+        <font color='#0000FF'>typename</font> compare <font color='#5555FF'>=</font> std::less<font color='#5555FF'>&lt;</font>domain<font color='#5555FF'>&gt;</font>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='binary_search_tree'></a>binary_search_tree</b> : <font color='#0000FF'>public</font> enumerable<font color='#5555FF'>&lt;</font>map_pair<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>, 
+                               <font color='#0000FF'>public</font> asc_pair_remover<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            REQUIREMENTS ON domain
+                domain must be comparable by compare where compare is a functor compatible with std::less and
+                domain is swappable by a global swap() and             
+                domain must have a default constructor
+
+            REQUIREMENTS ON range
+                range is swappable by a global swap() and
+                range must have a default constructor
+
+            REQUIREMENTS ON mem_manager
+                must be an implementation of memory_manager/memory_manager_kernel_abstract.h or
+                must be an implementation of memory_manager_global/memory_manager_global_kernel_abstract.h or
+                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+                mem_manager::type can be set to anything.
+
+
+            POINTERS AND REFERENCES TO INTERNAL DATA
+                swap(), count(), height(),  and operator[] functions 
+                do not invalidate pointers or references to internal data.
+
+                position_enumerator() invalidates pointers or references to 
+                data returned by element() and only by element() (i.e. pointers and
+                references returned by operator[] are still valid).
+
+                All other functions have no such guarantees.
+
+            INITIAL VALUE
+                size() == 0
+                height() == 0
+
+            ENUMERATION ORDER
+                The enumerator will iterate over the domain (and each associated
+                range element) elements in ascending order according to the compare functor.  
+                (i.e. the elements are enumerated in sorted order)              
+
+            WHAT THIS OBJECT REPRESENTS
+                this object represents a data dictionary that is built on top of some 
+                kind of binary search tree.  It maps objects of type domain to objects
+                of type range.  
+
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
+                    
+                NOTE:
+                    definition of equivalent:
+                    a is equivalent to b if
+                    a &lt; b == false and
+                    b &lt; a == false
+        !*/</font>
+
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> domain domain_type;
+        <font color='#0000FF'>typedef</font> range range_type;
+        <font color='#0000FF'>typedef</font> compare compare_type;
+        <font color='#0000FF'>typedef</font> mem_manager mem_manager_type;
+
+        <b><a name='binary_search_tree'></a>binary_search_tree</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - #*this is properly initialized
+            throws
+                - std::bad_alloc or any exception thrown by domain's or range's 
+                  constructor.
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='binary_search_tree'></a>binary_search_tree</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - all memory associated with *this has been released
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this has its initial value
+            throws
+                - std::bad_alloc or any exception thrown by domain's or range's 
+                  constructor.
+                    if this exception is thrown then *this is unusable 
+                    until clear() is called and succeeds
+        !*/</font>
+
+        <font color='#0000FF'><u>short</u></font> <b><a name='height'></a>height</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of elements in the longest path from the root 
+                  of the tree to a leaf
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='count'></a>count</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of elements in the domain of *this that are 
+                  equivalent to d
+        !*/</font> 
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+            domain<font color='#5555FF'>&amp;</font> d,
+            range<font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires    
+                - &amp;d != &amp;r (i.e. d and r cannot be the same variable)
+            ensures             
+                - adds a mapping between d and r to *this
+                - if (count(d) == 0) then
+                    - #*(*this)[d] == r
+                - else
+                    - #(*this)[d] != 0
+                - #d and #r have initial values for their types
+                - #count(d) == count(d) + 1
+                - #at_start() == true
+                - #size() == size() + 1
+            throws  
+                - std::bad_alloc or any exception thrown by domain's or range's 
+                  constructor.
+                    if add() throws then it has no effect
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='remove'></a>remove</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d,
+            domain<font color='#5555FF'>&amp;</font> d_copy,
+            range<font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - (*this)[d] != 0 
+                - &amp;d != &amp;r (i.e. d and r cannot be the same variable) 
+                - &amp;d != &amp;d_copy (i.e. d and d_copy cannot be the same variable) 
+                - &amp;r != &amp;d_copy (i.e. r and d_copy cannot be the same variable) 
+            ensures
+                - some element in the domain of *this that is equivalent to d has
+                  been removed and swapped into #d_copy.  Additionally, its 
+                  associated range element has been removed and swapped into #r.
+                - #count(d) == count(d) - 1
+                - #size() == size() - 1
+                - #at_start() == true  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='destroy'></a>destroy</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - (*this)[d] != 0 
+            ensures
+                - an element in the domain of *this equivalent to d has been removed.  
+                  The element in the range of *this associated with d has also been 
+                  removed.
+                - #count(d) == count(d) - 1
+                - #size() == size() - 1
+                - #at_start() == true  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='remove_last_in_order'></a>remove_last_in_order</b> <font face='Lucida Console'>(</font>
+            domain<font color='#5555FF'>&amp;</font> d,
+            range<font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - size() &gt; 0
+            ensures
+                - the last/biggest (according to the compare functor) element in the domain of *this has
+                  been removed and swapped into #d.  The element in the range of *this
+                  associated with #d has also been removed and swapped into #r.
+                - #count(#d) == count(#d) - 1
+                - #size() == size() - 1
+                - #at_start() == true
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='remove_current_element'></a>remove_current_element</b> <font face='Lucida Console'>(</font>
+            domain<font color='#5555FF'>&amp;</font> d,
+            range<font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - current_element_valid() == true
+            ensures
+                - the current element given by element() has been removed and swapped into d and r.
+                - #d == element().key()
+                - #r == element().value()
+                - #count(#d) == count(#d) - 1
+                - #size() == size() - 1
+                - moves the enumerator to the next element.  If element() was the last 
+                  element in enumeration order then #current_element_valid() == false 
+                  and #at_start() == false.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='position_enumerator'></a>position_enumerator</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #at_start() == false
+                - if (count(d) &gt; 0) then
+                    - #element().key() == d
+                - else if (there are any items in the domain of *this that are bigger than 
+                  d according to the compare functor) then
+                    - #element().key() == the smallest item in the domain of *this that is
+                      bigger than d according to the compare functor.
+                - else
+                    - #current_element_valid() == false
+        !*/</font>
+
+        <font color='#0000FF'>const</font> range<font color='#5555FF'>*</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (there is an element in the domain equivalent to d) then
+                    - returns a pointer to an element in the range of *this that
+                      is associated with an element in the domain of *this 
+                      equivalent to d.
+                - else
+                    - returns 0
+        !*/</font>
+
+        range<font color='#5555FF'>*</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (there is an element in the domain equivalent to d) then
+                    - returns a pointer to an element in the range of *this that
+                      is associated with an element in the domain of *this 
+                      equivalent to d.
+                - else
+                    - returns 0
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            binary_search_tree<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font> 
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='binary_search_tree'></a>binary_search_tree</b><font face='Lucida Console'>(</font>binary_search_tree<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;      
+        binary_search_tree<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>binary_search_tree<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;
+
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        binary_search_tree<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        binary_search_tree<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        binary_search_tree<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BINARY_SEARCH_TREE_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

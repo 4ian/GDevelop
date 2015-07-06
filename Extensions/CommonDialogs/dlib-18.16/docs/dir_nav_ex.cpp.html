@@ -1,0 +1,78 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - dir_nav_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use of the dir_nav component from the dlib C++ Library.
+    It prints a listing of all directories and files in the users
+    current working directory or the directory specified on the command line.  
+
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iomanip<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>dir_nav.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>algorithm<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> argc, <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>*</font> argv<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        string loc;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>argc <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+            loc <font color='#5555FF'>=</font> argv[<font color='#979000'>1</font>];
+        <font color='#0000FF'>else</font>
+            loc <font color='#5555FF'>=</font> "<font color='#CC0000'>.</font>";  <font color='#009900'>// if no argument is given then use the current working dir.
+</font>  
+        directory <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>loc<font face='Lucida Console'>)</font>;
+
+
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>directory: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>name</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>full path: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>full_name</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;        
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>is root:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>is_root</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>?"<font color='#CC0000'>yes</font>":"<font color='#CC0000'>no</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        
+        <font color='#009900'>// get all directories and files in test
+</font>        std::vector<font color='#5555FF'>&lt;</font>directory<font color='#5555FF'>&gt;</font> dirs <font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_dirs</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        std::vector<font color='#5555FF'>&lt;</font>file<font color='#5555FF'>&gt;</font> files <font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_files</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// sort the files and directories
+</font>        <font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>files.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, files.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>dirs.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, dirs.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\n\n</font>";
+
+        <font color='#009900'>// print all the subdirectories
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dirs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        &lt;DIR&gt;    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dirs[i].<font color='#BB00BB'>name</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>";
+
+        <font color='#009900'>// print all the subfiles
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> files.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>setw</font><font face='Lucida Console'>(</font><font color='#979000'>13</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> files[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> files[i].<font color='#BB00BB'>name</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>";
+
+
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\nnumber of dirs:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dirs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>number of files: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> files.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>file::file_not_found<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>file not found or accessible: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.info <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>directory::dir_not_found<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dir not found or accessible: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.info <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>directory::listing_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>listing error: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.info <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+
+
+</pre></body></html>

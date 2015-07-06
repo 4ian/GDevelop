@@ -1,0 +1,572 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - kernel.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SVm_KERNEL
+<font color='#0000FF'>#define</font> DLIB_SVm_KERNEL
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel_abstract.h.html'>kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> kernel_type <font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> kernel_derivative;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='radial_basis_kernel'></a>radial_basis_kernel</b>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type scalar_type;
+        <font color='#0000FF'>typedef</font> T sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::mem_manager_type mem_manager_type;
+
+        <font color='#009900'>// T must be capable of representing a column vector.
+</font>        <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font>T::NC <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> T::NC <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <b><a name='radial_basis_kernel'></a>radial_basis_kernel</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> scalar_type g<font face='Lucida Console'>)</font> : gamma<font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <b><a name='radial_basis_kernel'></a>radial_basis_kernel</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : gamma<font face='Lucida Console'>(</font><font color='#979000'>0.1</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <b><a name='radial_basis_kernel'></a>radial_basis_kernel</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> radial_basis_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font> : gamma<font face='Lucida Console'>(</font>k.gamma<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+
+        <font color='#0000FF'>const</font> scalar_type gamma;
+
+        scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#0000FF'>const</font> scalar_type d <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>-</font>b<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>-</font>b<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> std::<font color='#BB00BB'>exp</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>gamma<font color='#5555FF'>*</font>d<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        radial_basis_kernel<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> radial_basis_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>gamma<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> k.gamma;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> radial_basis_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> gamma <font color='#5555FF'>=</font><font color='#5555FF'>=</font> k.gamma;
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> radial_basis_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.gamma, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type radial_basis_kernel</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        radial_basis_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type scalar_type;
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font><font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item.gamma<font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type radial_basis_kernel</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='kernel_derivative'></a>kernel_derivative</b><font color='#5555FF'>&lt;</font>radial_basis_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type scalar_type;
+        <font color='#0000FF'>typedef</font> T sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::mem_manager_type mem_manager_type;
+
+        <b><a name='kernel_derivative'></a>kernel_derivative</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> radial_basis_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> k_<font face='Lucida Console'>)</font> : k<font face='Lucida Console'>(</font>k_<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+        <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x, <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> y<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// return the derivative of the rbf kernel
+</font>            temp <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>k.gamma<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>x<font color='#5555FF'>-</font>y<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>k</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> radial_basis_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> k;
+        <font color='#0000FF'>mutable</font> sample_type temp;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='polynomial_kernel'></a>polynomial_kernel</b>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type scalar_type;
+        <font color='#0000FF'>typedef</font> T sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::mem_manager_type mem_manager_type;
+
+        <font color='#009900'>// T must be capable of representing a column vector.
+</font>        <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font>T::NC <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> T::NC <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <b><a name='polynomial_kernel'></a>polynomial_kernel</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> scalar_type g, <font color='#0000FF'>const</font> scalar_type c, <font color='#0000FF'>const</font> scalar_type d<font face='Lucida Console'>)</font> : gamma<font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>, coef<font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>, degree<font face='Lucida Console'>(</font>d<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <b><a name='polynomial_kernel'></a>polynomial_kernel</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : gamma<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>, coef<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, degree<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <b><a name='polynomial_kernel'></a>polynomial_kernel</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> polynomial_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font> : gamma<font face='Lucida Console'>(</font>k.gamma<font face='Lucida Console'>)</font>, coef<font face='Lucida Console'>(</font>k.coef<font face='Lucida Console'>)</font>, degree<font face='Lucida Console'>(</font>k.degree<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>typedef</font> T type;
+        <font color='#0000FF'>const</font> scalar_type gamma;
+        <font color='#0000FF'>const</font> scalar_type coef;
+        <font color='#0000FF'>const</font> scalar_type degree;
+
+        scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#0000FF'>return</font> std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>gamma<font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>b<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> coef, degree<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        polynomial_kernel<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> polynomial_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>gamma<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> k.gamma;
+            <font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>coef<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> k.coef;
+            <font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>degree<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> k.degree;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> polynomial_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>gamma <font color='#5555FF'>=</font><font color='#5555FF'>=</font> k.gamma<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>coef <font color='#5555FF'>=</font><font color='#5555FF'>=</font> k.coef<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>degree <font color='#5555FF'>=</font><font color='#5555FF'>=</font> k.degree<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> polynomial_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.gamma, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.coef, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.degree, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type polynomial_kernel</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        polynomial_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type scalar_type;
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font><font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item.gamma<font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font><font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item.coef<font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font><font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item.degree<font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type polynomial_kernel</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='kernel_derivative'></a>kernel_derivative</b><font color='#5555FF'>&lt;</font>polynomial_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type scalar_type;
+        <font color='#0000FF'>typedef</font> T sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::mem_manager_type mem_manager_type;
+
+        <b><a name='kernel_derivative'></a>kernel_derivative</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> polynomial_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> k_<font face='Lucida Console'>)</font> : k<font face='Lucida Console'>(</font>k_<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+        <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x, <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> y<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// return the derivative of the rbf kernel
+</font>            temp <font color='#5555FF'>=</font> k.degree<font color='#5555FF'>*</font>k.gamma<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>k.gamma<font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>y<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> k.coef, k.degree<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> polynomial_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> k;
+        <font color='#0000FF'>mutable</font> sample_type temp;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='sigmoid_kernel'></a>sigmoid_kernel</b>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type scalar_type;
+        <font color='#0000FF'>typedef</font> T sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::mem_manager_type mem_manager_type;
+
+        <font color='#009900'>// T must be capable of representing a column vector.
+</font>        <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font>T::NC <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> T::NC <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <b><a name='sigmoid_kernel'></a>sigmoid_kernel</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> scalar_type g, <font color='#0000FF'>const</font> scalar_type c<font face='Lucida Console'>)</font> : gamma<font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>, coef<font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <b><a name='sigmoid_kernel'></a>sigmoid_kernel</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : gamma<font face='Lucida Console'>(</font><font color='#979000'>0.1</font><font face='Lucida Console'>)</font>, coef<font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <b><a name='sigmoid_kernel'></a>sigmoid_kernel</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sigmoid_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font> : gamma<font face='Lucida Console'>(</font>k.gamma<font face='Lucida Console'>)</font>, coef<font face='Lucida Console'>(</font>k.coef<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>typedef</font> T type;
+        <font color='#0000FF'>const</font> scalar_type gamma;
+        <font color='#0000FF'>const</font> scalar_type coef;
+
+        scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#0000FF'>return</font> std::<font color='#BB00BB'>tanh</font><font face='Lucida Console'>(</font>gamma<font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>b<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> coef<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        sigmoid_kernel<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sigmoid_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>gamma<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> k.gamma;
+            <font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>coef<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> k.coef;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sigmoid_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>gamma <font color='#5555FF'>=</font><font color='#5555FF'>=</font> k.gamma<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>coef <font color='#5555FF'>=</font><font color='#5555FF'>=</font> k.coef<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> sigmoid_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.gamma, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.coef, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type sigmoid_kernel</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        sigmoid_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type scalar_type;
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font><font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item.gamma<font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font><font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item.coef<font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type sigmoid_kernel</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='kernel_derivative'></a>kernel_derivative</b><font color='#5555FF'>&lt;</font>sigmoid_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type scalar_type;
+        <font color='#0000FF'>typedef</font> T sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::mem_manager_type mem_manager_type;
+
+        <b><a name='kernel_derivative'></a>kernel_derivative</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> sigmoid_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> k_<font face='Lucida Console'>)</font> : k<font face='Lucida Console'>(</font>k_<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+        <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x, <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> y<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// return the derivative of the rbf kernel
+</font>            temp <font color='#5555FF'>=</font> k.gamma<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>-</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font><font color='#BB00BB'>k</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> sigmoid_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> k;
+        <font color='#0000FF'>mutable</font> sample_type temp;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='linear_kernel'></a>linear_kernel</b>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type scalar_type;
+        <font color='#0000FF'>typedef</font> T sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::mem_manager_type mem_manager_type;
+
+        <font color='#009900'>// T must be capable of representing a column vector.
+</font>        <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font>T::NC <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> T::NC <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>b;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> linear_kernel<font color='#5555FF'>&amp;</font> 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> ,
+        std::ostream<font color='#5555FF'>&amp;</font> 
+    <font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> ,
+        std::istream<font color='#5555FF'>&amp;</font>  
+    <font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='kernel_derivative'></a>kernel_derivative</b><font color='#5555FF'>&lt;</font>linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type scalar_type;
+        <font color='#0000FF'>typedef</font> T sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::mem_manager_type mem_manager_type;
+
+        <b><a name='kernel_derivative'></a>kernel_derivative</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> k_<font face='Lucida Console'>)</font> : k<font face='Lucida Console'>(</font>k_<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+        <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x, <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> x;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> k;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='histogram_intersection_kernel'></a>histogram_intersection_kernel</b>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type scalar_type;
+        <font color='#0000FF'>typedef</font> T sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::mem_manager_type mem_manager_type;
+
+        scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            scalar_type temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font color='#BB00BB'>a</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>, <font color='#BB00BB'>b</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> histogram_intersection_kernel<font color='#5555FF'>&amp;</font> 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> histogram_intersection_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> ,
+        std::ostream<font color='#5555FF'>&amp;</font> 
+    <font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        histogram_intersection_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> ,
+        std::istream<font color='#5555FF'>&amp;</font>  
+    <font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='offset_kernel'></a>offset_kernel</b>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::mem_manager_type mem_manager_type;
+
+        <b><a name='offset_kernel'></a>offset_kernel</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> k, <font color='#0000FF'>const</font> scalar_type<font color='#5555FF'>&amp;</font> offset_
+        <font face='Lucida Console'>)</font> : kernel<font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font>, offset<font face='Lucida Console'>(</font>offset_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <b><a name='offset_kernel'></a>offset_kernel</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : kernel<font face='Lucida Console'>(</font>T<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, offset<font face='Lucida Console'>(</font><font color='#979000'>0.01</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <b><a name='offset_kernel'></a>offset_kernel</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> offset_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font> : kernel<font face='Lucida Console'>(</font>k.kernel<font face='Lucida Console'>)</font>, offset<font face='Lucida Console'>(</font>k.offset<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>const</font> T kernel;
+        <font color='#0000FF'>const</font> scalar_type offset;
+
+        scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>kernel</font><font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> offset;
+        <b>}</b>
+
+        offset_kernel<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> offset_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>kernel<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> k.kernel;
+            <font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>offset<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> k.offset;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> offset_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> k.kernel <font color='#5555FF'>=</font><font color='#5555FF'>=</font> kernel <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> offset <font color='#5555FF'>=</font><font color='#5555FF'>=</font> k.offset;
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> offset_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.offset, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.kernel, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type offset_kernel</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        offset_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> offset_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::scalar_type scalar_type;
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font><font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item.offset<font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font><font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item.kernel<font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type offset_kernel</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='kernel_derivative'></a>kernel_derivative</b><font color='#5555FF'>&lt;</font>offset_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::mem_manager_type mem_manager_type;
+
+        <b><a name='kernel_derivative'></a>kernel_derivative</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> offset_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> k<font face='Lucida Console'>)</font> : der<font face='Lucida Console'>(</font>k.kernel<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+        <font color='#0000FF'>const</font> sample_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x, <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> y<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>der</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        kernel_derivative<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> der;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SVm_KERNEL
+</font>
+
+
+</pre></body></html>

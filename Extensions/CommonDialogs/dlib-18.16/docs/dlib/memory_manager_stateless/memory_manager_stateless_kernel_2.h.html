@@ -1,0 +1,122 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - memory_manager_stateless_kernel_2.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MEMORY_MANAGER_STATELESs_2_
+<font color='#0000FF'>#define</font> DLIB_MEMORY_MANAGER_STATELESs_2_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='memory_manager_stateless_kernel_abstract.h.html'>memory_manager_stateless_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads.h.html'>../threads.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='memory_manager_stateless_kernel_2'></a>memory_manager_stateless_kernel_2</b>
+    <b>{</b>
+        <font color='#009900'>/*!      
+            REQUIREMENTS ON mem_manager
+                mem_manager must be an implementation of memory_manager/memory_manager_kernel_abstract.h
+
+            CONVENTION
+                this object has a single global instance of mem_manager 
+        !*/</font>
+
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'>typedef</font> T type;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> is_stateless <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'>struct</font> <b><a name='rebind'></a>rebind</b> <b>{</b>
+                <font color='#0000FF'>typedef</font> memory_manager_stateless_kernel_2<font color='#5555FF'>&lt;</font>U,mem_manager<font color='#5555FF'>&gt;</font> other;
+            <b>}</b>;
+
+            <b><a name='memory_manager_stateless_kernel_2'></a>memory_manager_stateless_kernel_2</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b> 
+                <font color='#009900'>// call this just to make sure the mutex is is initialized before 
+</font>                <font color='#009900'>// multiple threads start calling the member functions.
+</font>                <font color='#BB00BB'>global_mutex</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='memory_manager_stateless_kernel_2'></a>memory_manager_stateless_kernel_2</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            T<font color='#5555FF'>*</font> <b><a name='allocate'></a>allocate</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font><font color='#BB00BB'>global_mutex</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>global_mm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>allocate</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='deallocate'></a>deallocate</b> <font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>*</font> item
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font><font color='#BB00BB'>global_mutex</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>global_mm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>deallocate</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            T<font color='#5555FF'>*</font> <b><a name='allocate_array'></a>allocate_array</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size
+            <font face='Lucida Console'>)</font> 
+            <b>{</b> 
+                auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font><font color='#BB00BB'>global_mutex</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>global_mm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>allocate_array</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='deallocate_array'></a>deallocate_array</b> <font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>*</font> item
+            <font face='Lucida Console'>)</font> 
+            <b>{</b> 
+                auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font><font color='#BB00BB'>global_mutex</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>global_mm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>memory_manager_stateless_kernel_2<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>
+            <b>{</b><b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#0000FF'>static</font> mutex<font color='#5555FF'>&amp;</font> <b><a name='global_mutex'></a>global_mutex</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>static</font> mutex lock;
+                <font color='#0000FF'>return</font> lock;
+            <b>}</b>
+
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> mem_manager::<font color='#0000FF'>template</font> rebind<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::other rebound_mm_type; 
+
+            <font color='#0000FF'>static</font> rebound_mm_type<font color='#5555FF'>&amp;</font> <b><a name='global_mm'></a>global_mm</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'>static</font> rebound_mm_type mm;
+                <font color='#0000FF'>return</font> mm;
+            <b>}</b>
+
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='memory_manager_stateless_kernel_2'></a>memory_manager_stateless_kernel_2</b><font face='Lucida Console'>(</font>memory_manager_stateless_kernel_2<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>            memory_manager_stateless_kernel_2<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>memory_manager_stateless_kernel_2<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        memory_manager_stateless_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        memory_manager_stateless_kernel_2<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MEMORY_MANAGER_STATELESs_2_
+</font>
+
+
+
+
+</pre></body></html>

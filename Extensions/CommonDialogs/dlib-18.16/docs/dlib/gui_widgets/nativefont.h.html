@@ -1,0 +1,615 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - nativefont.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006 Keita Mochizuki 
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_IGG_FONT_RENDERER_H_
+<font color='#0000FF'>#define</font> DLIB_IGG_FONT_RENDERER_H_
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../platform.h.html'>../platform.h</a>"
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../gui_widgets.h.html'>../gui_widgets.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../unicode.h.html'>../unicode.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../smart_pointers_thread_safe.h.html'>../smart_pointers_thread_safe.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>map<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>stdio.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>stdlib.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>locale.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>WIN32<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>windows.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>mbstring.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#elif</font> defined<font face='Lucida Console'>(</font>POSIX<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>stdint.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>stdio.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>X11<font color='#5555FF'>/</font>Xlib.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>X11<font color='#5555FF'>/</font>Xutil.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>X11<font color='#5555FF'>/</font>Xlocale.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>namespace</font> nativefont
+<b>{</b>
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> font_renderer
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> dlib::uint8 byte;
+
+
+<font color='#0000FF'>#ifdef</font> WIN32
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='input2native_trait'></a>input2native_trait</b><b>{</b>
+        <b>}</b>;
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='input2native_trait'></a>input2native_trait</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>char</u></font> type_t;
+        <b>}</b>;
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='input2native_trait'></a>input2native_trait</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>wchar_t</u></font><font color='#5555FF'>&gt;</font><b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>wchar_t</u></font> type_t;
+        <b>}</b>;
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='input2native_trait'></a>input2native_trait</b><font color='#5555FF'>&lt;</font>dlib::unichar<font color='#5555FF'>&gt;</font><b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>wchar_t</u></font> type_t;
+        <b>}</b>;
+<font color='#0000FF'>#endif</font>
+        <font color='#009900'>// T : N : sizeof_source_type
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font> N<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='size2inner_trait'></a>size2inner_trait</b><b>{</b>
+        <b>}</b>;
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='size2inner_trait'></a>size2inner_trait</b><font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font><b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>char</u></font> type_t;
+        <b>}</b>;
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='size2inner_trait'></a>size2inner_trait</b><font color='#5555FF'>&lt;</font><font color='#979000'>2</font><font color='#5555FF'>&gt;</font><b>{</b>
+            <font color='#0000FF'>typedef</font> dlib::uint16 type_t;
+        <b>}</b>;
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='size2inner_trait'></a>size2inner_trait</b><font color='#5555FF'>&lt;</font><font color='#979000'>4</font><font color='#5555FF'>&gt;</font><b>{</b>
+            <font color='#0000FF'>typedef</font> dlib::unichar type_t;
+        <b>}</b>;
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font> N<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='create_helper'></a>create_helper</b><b>{</b> <b>}</b>;
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='create_helper'></a>create_helper</b><font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font><b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>char</u></font> type_t;
+            type_t <font color='#5555FF'>*</font>istr;
+            <font color='#0000FF'><u>int</u></font> len;
+            <b><a name='create_helper'></a>create_helper</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>str<font face='Lucida Console'>)</font><b>{</b>
+                len <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>strlen</font><font face='Lucida Console'>(</font>str<font face='Lucida Console'>)</font>;
+                istr <font color='#5555FF'>=</font> str;
+            <b>}</b>
+            ~<b><a name='create_helper'></a>create_helper</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b><b>}</b>
+        <b>}</b>;
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='create_helper'></a>create_helper</b><font color='#5555FF'>&lt;</font><font color='#979000'>2</font><font color='#5555FF'>&gt;</font><b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>wchar_t</u></font> type_t;
+            type_t <font color='#5555FF'>*</font>istr;
+            <font color='#0000FF'><u>bool</u></font> allocated;
+            <font color='#0000FF'><u>int</u></font> len;
+            <b><a name='create_helper'></a>create_helper</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>wchar_t</u></font> <font color='#5555FF'>*</font>str<font face='Lucida Console'>)</font><b>{</b>
+                allocated <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                len <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>wcslen</font><font face='Lucida Console'>(</font>str<font face='Lucida Console'>)</font>;
+                istr <font color='#5555FF'>=</font> str;
+            <b>}</b>
+            <b><a name='create_helper'></a>create_helper</b><font face='Lucida Console'>(</font>dlib::unichar <font color='#5555FF'>*</font>str<font face='Lucida Console'>)</font><b>{</b>
+                allocated <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                len <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'><u>int</u></font> unicount <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                dlib::unichar <font color='#5555FF'>*</font>p <font color='#5555FF'>=</font> str;
+                <font color='#0000FF'>while</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>p<font face='Lucida Console'>)</font><b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>p <font color='#5555FF'>&gt;</font> <font color='#979000'>0xffff</font><font face='Lucida Console'>)</font><b>{</b>
+                        len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+                    <b>}</b><font color='#0000FF'>else</font><b>{</b>
+                        len<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+                    <b>}</b>
+                    unicount<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+                    p<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+                <b>}</b>
+                istr <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#0000FF'><u>wchar_t</u></font>[len<font color='#5555FF'>+</font><font color='#979000'>1</font>];
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>, wi <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> unicount; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font><b>{</b>
+                    dlib::unichar high, low;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>str[i] <font color='#5555FF'>&gt;</font> <font color='#979000'>0xffff</font><font face='Lucida Console'>)</font><b>{</b>
+                        dlib::<font color='#BB00BB'>unichar_to_surrogate_pair</font><font face='Lucida Console'>(</font>str[i], high, low<font face='Lucida Console'>)</font>;
+                        istr[wi] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>wchar_t</u></font><font face='Lucida Console'>)</font>high, istr[wi<font color='#5555FF'>+</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>wchar_t</u></font><font face='Lucida Console'>)</font>low;
+                        wi <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+                    <b>}</b><font color='#0000FF'>else</font><b>{</b>
+                        istr[wi] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>wchar_t</u></font><font face='Lucida Console'>)</font>str[i];
+                        wi <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                    <b>}</b>
+                <b>}</b>
+                istr[len] <font color='#5555FF'>=</font> L'<font color='#FF0000'>\0</font>';
+            <b>}</b>
+
+            ~<b><a name='create_helper'></a>create_helper</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>allocated<font face='Lucida Console'>)</font> <font color='#0000FF'>delete</font>[] istr;
+            <b>}</b>
+        <b>}</b>;
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='create_helper'></a>create_helper</b><font color='#5555FF'>&lt;</font><font color='#979000'>4</font><font color='#5555FF'>&gt;</font><b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>wchar_t</u></font> type_t;
+            type_t <font color='#5555FF'>*</font>istr;
+            <font color='#0000FF'><u>int</u></font> len;
+            <b><a name='create_helper'></a>create_helper</b><font face='Lucida Console'>(</font>dlib::unichar <font color='#5555FF'>*</font>str<font face='Lucida Console'>)</font><b>{</b>
+                len <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>wcslen</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>wchar_t</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>str<font face='Lucida Console'>)</font>;
+                istr <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>type_t <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>str;
+            <b>}</b>
+            ~<b><a name='create_helper'></a>create_helper</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b><b>}</b>
+        <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>class</font> <b><a name='font_renderer'></a>font_renderer</b><b>{</b>
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'>struct</font> <b><a name='rgb_type'></a>rgb_type</b><b>{</b>
+                byte r, g, b;
+                <b><a name='rgb_type'></a>rgb_type</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : r<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, g<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, b<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><b>{</b><b>}</b>;
+                <b><a name='rgb_type'></a>rgb_type</b><font face='Lucida Console'>(</font>byte r_, byte g_, byte b_<font face='Lucida Console'>)</font> : r<font face='Lucida Console'>(</font>r_<font face='Lucida Console'>)</font>, g<font face='Lucida Console'>(</font>g_<font face='Lucida Console'>)</font>, b<font face='Lucida Console'>(</font>b_<font face='Lucida Console'>)</font><b>{</b><b>}</b>;
+            <b>}</b>;
+        <font color='#0000FF'>private</font>:
+
+            byte <font color='#5555FF'>*</font>image;
+            <font color='#0000FF'><u>int</u></font> width, height;
+            <font color='#0000FF'><u>void</u></font> <b><a name='destroy'></a>destroy</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b>
+                width <font color='#5555FF'>=</font> height <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>delete</font> image;
+                image <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+            <font color='#0000FF'>struct</font> <b><a name='vals_internal'></a>vals_internal</b><b>{</b>
+                <font color='#0000FF'><u>int</u></font> width, height;
+<font color='#0000FF'>#ifdef</font> WIN32
+                COLORREF <b><a name='rgb2RGB'></a>rgb2RGB</b><font face='Lucida Console'>(</font>rgb_type <font color='#5555FF'>&amp;</font>rgb<font face='Lucida Console'>)</font><b>{</b>
+                    <font color='#0000FF'>return</font> <font color='#BB00BB'>RGB</font><font face='Lucida Console'>(</font>rgb.r, rgb.g, rgb.b<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                HBITMAP hBmp, hBmpOld;
+                HDC hDCBmp;
+                BYTE <font color='#5555FF'>*</font>pixelint;
+                HFONT hFont, hFontOld;
+                HBRUSH hBrush;
+                <font color='#0000FF'><u>int</u></font> pix_width_prev, pix_height_prev;
+                <font color='#0000FF'><u>bool</u></font> first;
+                <font color='#0000FF'><u>int</u></font> ascender, descender;
+                <font color='#0000FF'><u>int</u></font> height_prev;
+                <font color='#0000FF'><u>char</u></font> attribute_prev;
+
+                <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>void</u></font> <b><a name='create'></a>create</b><font face='Lucida Console'>(</font>T <font color='#5555FF'>*</font>str, <font color='#0000FF'><u>int</u></font> height_want, <font color='#0000FF'><u>bool</u></font> italic, <font color='#0000FF'><u>bool</u></font> bold, <font color='#0000FF'><u>bool</u></font> fixed, rgb_type <font color='#5555FF'>&amp;</font>background, rgb_type <font color='#5555FF'>&amp;</font>foreground<font face='Lucida Console'>)</font><b>{</b>
+                    <font color='#0000FF'>struct</font> <b><a name='inner'></a>inner</b><b>{</b>
+                        <font color='#0000FF'>inline</font> <font color='#0000FF'>static</font> BOOL <b><a name='GetTextExtentPoint32'></a>GetTextExtentPoint32</b><font face='Lucida Console'>(</font>HDC hDC, LPCSTR str, <font color='#0000FF'><u>int</u></font> len, LPSIZE lpsize<font face='Lucida Console'>)</font><b>{</b>
+                            <font color='#0000FF'>return</font> ::<font color='#BB00BB'>GetTextExtentPoint32A</font><font face='Lucida Console'>(</font>hDC, str, len, lpsize<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>inline</font> <font color='#0000FF'>static</font> BOOL <b><a name='GetTextExtentPoint32'></a>GetTextExtentPoint32</b><font face='Lucida Console'>(</font>HDC hDC, LPCWSTR str, <font color='#0000FF'><u>int</u></font> len, LPSIZE lpsize<font face='Lucida Console'>)</font><b>{</b>
+                            <font color='#0000FF'>return</font> ::<font color='#BB00BB'>GetTextExtentPoint32W</font><font face='Lucida Console'>(</font>hDC, str, len, lpsize<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>inline</font> <font color='#0000FF'>static</font> BOOL <b><a name='TextOut'></a>TextOut</b><font face='Lucida Console'>(</font>HDC hDC, <font color='#0000FF'><u>int</u></font> nxstart, <font color='#0000FF'><u>int</u></font> nystart, LPCSTR str, <font color='#0000FF'><u>int</u></font> cbstr<font face='Lucida Console'>)</font><b>{</b>
+                            <font color='#0000FF'>return</font> ::<font color='#BB00BB'>TextOutA</font><font face='Lucida Console'>(</font>hDC, nxstart, nystart, str, cbstr<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>inline</font> <font color='#0000FF'>static</font> BOOL <b><a name='TextOut'></a>TextOut</b><font face='Lucida Console'>(</font>HDC hDC, <font color='#0000FF'><u>int</u></font> nxstart, <font color='#0000FF'><u>int</u></font> nystart, LPCWSTR str, <font color='#0000FF'><u>int</u></font> cbstr<font face='Lucida Console'>)</font><b>{</b>
+                            <font color='#0000FF'>return</font> ::<font color='#BB00BB'>TextOutW</font><font face='Lucida Console'>(</font>hDC, nxstart, nystart, str, cbstr<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>;
+
+                    create_helper<font color='#5555FF'>&lt;</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> input2native_trait<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::type_t<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>ch</font><font face='Lucida Console'>(</font>str<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hDCBmp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font><b>{</b>
+                        HWND hWnd <font color='#5555FF'>=</font> <font color='#BB00BB'>GetDesktopWindow</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        HDC hDC <font color='#5555FF'>=</font> <font color='#BB00BB'>GetDC</font><font face='Lucida Console'>(</font>hWnd<font face='Lucida Console'>)</font>;
+                        hDCBmp <font color='#5555FF'>=</font> <font color='#BB00BB'>CreateCompatibleDC</font><font face='Lucida Console'>(</font>hDC<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>ReleaseDC</font><font face='Lucida Console'>(</font>hWnd, hDC<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#BB00BB'>SetTextColor</font><font face='Lucida Console'>(</font>hDCBmp, <font color='#BB00BB'>rgb2RGB</font><font face='Lucida Console'>(</font>foreground<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>SetBkColor</font><font face='Lucida Console'>(</font>hDCBmp, <font color='#BB00BB'>rgb2RGB</font><font face='Lucida Console'>(</font>background<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'><u>char</u></font> attribute <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>italic ? <font color='#979000'>1</font> : <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>bold ? <font color='#979000'>2</font> : <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>fixed ? <font color='#979000'>4</font> : <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>hFont <font color='#5555FF'>|</font><font color='#5555FF'>|</font> height_prev <font color='#5555FF'>!</font><font color='#5555FF'>=</font> height <font color='#5555FF'>|</font><font color='#5555FF'>|</font> attribute <font color='#5555FF'>!</font><font color='#5555FF'>=</font> attribute_prev<font face='Lucida Console'>)</font><b>{</b>
+                        attribute_prev <font color='#5555FF'>=</font> attribute;
+                        height_prev <font color='#5555FF'>=</font> height_want;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hFont<font face='Lucida Console'>)</font><b>{</b>
+                            <font color='#BB00BB'>SelectObject</font><font face='Lucida Console'>(</font>hDCBmp, hFontOld<font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>DeleteObject</font><font face='Lucida Console'>(</font>hFont<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        hFont <font color='#5555FF'>=</font> <font color='#BB00BB'>CreateFont</font><font face='Lucida Console'>(</font>height_want, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, bold ? FW_BOLD : FW_DONTCARE, italic ? TRUE : FALSE, 
+                                           FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+                                           fixed ? <font face='Lucida Console'>(</font>FIXED_PITCH <font color='#5555FF'>|</font> FF_DONTCARE<font face='Lucida Console'>)</font> : <font face='Lucida Console'>(</font>VARIABLE_PITCH <font color='#5555FF'>|</font> FF_DONTCARE<font face='Lucida Console'>)</font>, NULL<font face='Lucida Console'>)</font>;
+                        hFontOld <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>HFONT<font face='Lucida Console'>)</font><font color='#BB00BB'>SelectObject</font><font face='Lucida Console'>(</font>hDCBmp, hFont<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    <b>{</b>
+                        SIZE sz;
+                        inner::<font color='#BB00BB'>GetTextExtentPoint32</font><font face='Lucida Console'>(</font>hDCBmp, ch.istr, ch.len, <font color='#5555FF'>&amp;</font>sz<font face='Lucida Console'>)</font>;
+                        width <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>sz.cx <font color='#5555FF'>+</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#979000'>4</font>;
+                        height <font color='#5555FF'>=</font> sz.cy;
+                    <b>}</b>
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pix_width_prev <font color='#5555FF'>&lt;</font> width <font color='#5555FF'>|</font><font color='#5555FF'>|</font> pix_height_prev <font color='#5555FF'>&lt;</font> height<font face='Lucida Console'>)</font><b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hBmp<font face='Lucida Console'>)</font><b>{</b>
+                            <font color='#BB00BB'>SelectObject</font><font face='Lucida Console'>(</font>hDCBmp, hBmpOld<font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>DeleteObject</font><font face='Lucida Console'>(</font>hBmp<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        pix_width_prev <font color='#5555FF'>=</font> width <font color='#5555FF'>*</font> <font color='#979000'>2</font>;
+                        pix_height_prev <font color='#5555FF'>=</font> height <font color='#5555FF'>*</font> <font color='#979000'>2</font>;
+                        BITMAPINFO bi;
+                        <font color='#BB00BB'>ZeroMemory</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>bi, <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>bi<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        bi.bmiHeader.biSize <font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>BITMAPINFOHEADER<font face='Lucida Console'>)</font>;
+                        bi.bmiHeader.biBitCount <font color='#5555FF'>=</font> <font color='#979000'>24</font>;
+                        bi.bmiHeader.biPlanes <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                        bi.bmiHeader.biWidth <font color='#5555FF'>=</font> pix_width_prev;
+                        bi.bmiHeader.biHeight <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>pix_height_prev;
+                        hBmp <font color='#5555FF'>=</font> <font color='#BB00BB'>CreateDIBSection</font><font face='Lucida Console'>(</font>NULL, <font color='#5555FF'>&amp;</font>bi, DIB_RGB_COLORS, <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>pixelint, NULL, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                        hBmpOld <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>HBITMAP<font face='Lucida Console'>)</font><font color='#BB00BB'>SelectObject</font><font face='Lucida Console'>(</font>hDCBmp, hBmp<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    <b>{</b>
+                        HBRUSH hBrush <font color='#5555FF'>=</font> <font color='#BB00BB'>CreateSolidBrush</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rgb2RGB</font><font face='Lucida Console'>(</font>background<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        RECT rc;
+                        rc.left <font color='#5555FF'>=</font> rc.top <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                        rc.right <font color='#5555FF'>=</font> pix_width_prev;
+                        rc.bottom <font color='#5555FF'>=</font> pix_height_prev;
+                        <font color='#BB00BB'>FillRect</font><font face='Lucida Console'>(</font>hDCBmp, <font color='#5555FF'>&amp;</font>rc, hBrush<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    inner::<font color='#BB00BB'>TextOut</font><font face='Lucida Console'>(</font>hDCBmp, <font color='#979000'>0</font>, <font color='#979000'>0</font>, ch.istr, ch.len<font face='Lucida Console'>)</font>;
+                    TEXTMETRICW tm;
+                    <font color='#BB00BB'>GetTextMetricsW</font><font face='Lucida Console'>(</font>hDCBmp,<font color='#5555FF'>&amp;</font>tm<font face='Lucida Console'>)</font>;
+                    ascender <font color='#5555FF'>=</font> tm.tmAscent;
+                    descender <font color='#5555FF'>=</font> tm.tmDescent;
+                <b>}</b>
+
+                <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <b><a name='vals_internal'></a>vals_internal</b><font face='Lucida Console'>(</font>T <font color='#5555FF'>*</font>str, <font color='#0000FF'><u>int</u></font> height_want, <font color='#0000FF'><u>bool</u></font> italic <font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+                    <font color='#0000FF'><u>bool</u></font> bold <font color='#5555FF'>=</font> <font color='#979000'>false</font>, <font color='#0000FF'><u>bool</u></font> fixed <font color='#5555FF'>=</font> <font color='#979000'>false</font>, rgb_type background <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, rgb_type foreground <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><b>{</b>
+                    first <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    hFont <font color='#5555FF'>=</font> NULL;
+                    hDCBmp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    hBmpOld <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    hBmp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    hDCBmp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    pixelint <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    pix_width_prev <font color='#5555FF'>=</font> pix_height_prev <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    height_prev <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                    attribute_prev <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#BB00BB'>create</font><font face='Lucida Console'>(</font>str, height_want, italic, bold, fixed, background, foreground<font face='Lucida Console'>)</font>;
+                    first <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>inline</font> <font color='#0000FF'><u>int</u></font> <b><a name='get_ascender'></a>get_ascender</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b>
+                    <font color='#0000FF'>return</font> ascender;
+                <b>}</b>
+
+                <font color='#0000FF'>inline</font> <font color='#0000FF'><u>int</u></font> <b><a name='get_descender'></a>get_descender</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b>
+                    <font color='#0000FF'>return</font> descender;
+                <b>}</b>
+
+                <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='get_pixel'></a>get_pixel</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> x, <font color='#0000FF'><u>int</u></font> y, byte <font color='#5555FF'>&amp;</font>r, byte <font color='#5555FF'>&amp;</font>g, byte <font color='#5555FF'>&amp;</font>b<font face='Lucida Console'>)</font><b>{</b>
+                    byte <font color='#5555FF'>*</font>p <font color='#5555FF'>=</font> pixelint <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>y <font color='#5555FF'>*</font> pix_width_prev <font color='#5555FF'>+</font> x<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#979000'>3</font>;
+                    r <font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>p<font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>, g <font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>p<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>, b <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>p;
+                <b>}</b>
+
+                <font color='#0000FF'><u>void</u></font> <b><a name='destroy'></a>destroy</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b>
+                    <font color='#BB00BB'>SelectObject</font><font face='Lucida Console'>(</font>hDCBmp, hBmpOld<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DeleteObject</font><font face='Lucida Console'>(</font>hBmp<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>SelectObject</font><font face='Lucida Console'>(</font>hDCBmp, hFontOld<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DeleteObject</font><font face='Lucida Console'>(</font>hFont<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DeleteDC</font><font face='Lucida Console'>(</font>hDCBmp<font face='Lucida Console'>)</font>;
+                    hFont <font color='#5555FF'>=</font> NULL;
+                    hDCBmp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    hBmpOld <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    hBmp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    hDCBmp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    pixelint <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <b>}</b>
+                ~<b><a name='vals_internal'></a>vals_internal</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b>
+                    <font color='#BB00BB'>destroy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+<font color='#0000FF'>#elif</font> defined<font face='Lucida Console'>(</font>POSIX<font face='Lucida Console'>)</font>
+                XImage <font color='#5555FF'>*</font>ximg;
+                Display <font color='#5555FF'>*</font>d;
+                GC gc;
+                XFontSet fs;
+                Pixmap pix;
+                Colormap cmap;
+                <font color='#0000FF'><u>int</u></font> ascender, descender;
+                <font color='#0000FF'><u>int</u></font> pix_width_prev, pix_height_prev;
+                <font color='#0000FF'><u>char</u></font> fontset_prev[<font color='#979000'>256</font>];
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='rgb2color'></a>rgb2color</b><font face='Lucida Console'>(</font>rgb_type col, Display <font color='#5555FF'>*</font>d, Colormap <font color='#5555FF'>&amp;</font>cmap<font face='Lucida Console'>)</font><b>{</b>
+                    XColor xcol;
+                    xcol.red <font color='#5555FF'>=</font> col.r <font color='#5555FF'>*</font> <font color='#979000'>257</font>;
+                    xcol.green <font color='#5555FF'>=</font> col.g <font color='#5555FF'>*</font> <font color='#979000'>257</font>;
+                    xcol.blue <font color='#5555FF'>=</font> col.b <font color='#5555FF'>*</font> <font color='#979000'>257</font>;
+                    <font color='#BB00BB'>XAllocColor</font><font face='Lucida Console'>(</font>d, cmap, <font color='#5555FF'>&amp;</font>xcol<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>return</font> xcol.pixel;
+                <b>}</b>
+                <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>void</u></font> <b><a name='create'></a>create</b><font face='Lucida Console'>(</font>T <font color='#5555FF'>*</font>str, <font color='#0000FF'><u>int</u></font> height_want, <font color='#0000FF'><u>bool</u></font> italic, <font color='#0000FF'><u>bool</u></font> bold, <font color='#0000FF'><u>bool</u></font> fixed, rgb_type background, rgb_type foreground<font face='Lucida Console'>)</font><b>{</b>
+                    <font color='#0000FF'>struct</font> <b><a name='inner'></a>inner</b><b>{</b>
+                        <font color='#0000FF'>inline</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> <b><a name='XTextExtents'></a>XTextExtents</b> <font face='Lucida Console'>(</font>XFontSet fs, <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>str, <font color='#0000FF'><u>int</u></font> len, XRectangle <font color='#5555FF'>*</font>ink, XRectangle <font color='#5555FF'>*</font>logical<font face='Lucida Console'>)</font><b>{</b>
+                            <font color='#0000FF'>return</font> <font color='#BB00BB'>XmbTextExtents</font><font face='Lucida Console'>(</font>fs, str, len, ink, logical<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>inline</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> <b><a name='XTextExtents'></a>XTextExtents</b> <font face='Lucida Console'>(</font>XFontSet fs, <font color='#0000FF'><u>wchar_t</u></font> <font color='#5555FF'>*</font>str, <font color='#0000FF'><u>int</u></font> len, XRectangle <font color='#5555FF'>*</font>ink, XRectangle <font color='#5555FF'>*</font>logical<font face='Lucida Console'>)</font><b>{</b>
+                            <font color='#0000FF'>return</font> <font color='#BB00BB'>XwcTextExtents</font><font face='Lucida Console'>(</font>fs, str, len, ink, logical<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>inline</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>void</u></font> <b><a name='XDrawString'></a>XDrawString</b><font face='Lucida Console'>(</font>Display <font color='#5555FF'>*</font>d, Window w, XFontSet fs, GC gc, <font color='#0000FF'><u>int</u></font> x, <font color='#0000FF'><u>int</u></font> y, <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>str, <font color='#0000FF'><u>int</u></font> num_bytes<font face='Lucida Console'>)</font><b>{</b>
+                            <font color='#BB00BB'>XmbDrawString</font><font face='Lucida Console'>(</font>d, w, fs, gc, x, y, str, num_bytes<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>inline</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>void</u></font> <b><a name='XDrawString'></a>XDrawString</b><font face='Lucida Console'>(</font>Display <font color='#5555FF'>*</font>d, Window w, XFontSet fs, GC gc, <font color='#0000FF'><u>int</u></font> x, <font color='#0000FF'><u>int</u></font> y, <font color='#0000FF'><u>wchar_t</u></font> <font color='#5555FF'>*</font>str, <font color='#0000FF'><u>int</u></font> num_bytes<font face='Lucida Console'>)</font><b>{</b>
+                            <font color='#BB00BB'>XwcDrawString</font><font face='Lucida Console'>(</font>d, w, fs, gc, x, y, str, num_bytes<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>;
+                    create_helper<font color='#5555FF'>&lt;</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>ch</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> size2inner_trait<font color='#5555FF'>&lt;</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::type_t <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>str<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>setlocale</font><font face='Lucida Console'>(</font>LC_CTYPE, "<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>d <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font><b>{</b>
+                        d <font color='#5555FF'>=</font> <font color='#BB00BB'>XOpenDisplay</font><font face='Lucida Console'>(</font>NULL<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>d <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            d <font color='#5555FF'>=</font> <font color='#BB00BB'>XOpenDisplay</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>:0.0</font>"<font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>d <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>gui_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to connect to the X display.</font>"<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                        <b>}</b>
+
+                        cmap <font color='#5555FF'>=</font> <font color='#BB00BB'>DefaultColormap</font><font face='Lucida Console'>(</font>d, <font color='#BB00BB'>DefaultScreen</font><font face='Lucida Console'>(</font>d<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'><u>char</u></font> fontset[<font color='#979000'>256</font>];
+                    <b>{</b>
+                        <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>p <font color='#5555FF'>=</font> fontset;
+                        p <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sprintf</font><font face='Lucida Console'>(</font>fontset, "<font color='#CC0000'>-*-*-%s-%c-normal--%d-*-*-*-%c</font>",
+                                     bold ? "<font color='#CC0000'>bold</font>" : "<font color='#CC0000'>medium</font>", italic ? '<font color='#FF0000'>i</font>' : '<font color='#FF0000'>r</font>', height_want, fixed ? '<font color='#FF0000'>c</font>' : '<font color='#FF0000'>p</font>'<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>fixed<font face='Lucida Console'>)</font><b>{</b>
+                            <font color='#BB00BB'>sprintf</font><font face='Lucida Console'>(</font>p, "<font color='#CC0000'>,-*-*-%s-%c-normal--%d-*-*-*-m</font>",
+                                    bold ? "<font color='#CC0000'>bold</font>" : "<font color='#CC0000'>medium</font>", italic ? '<font color='#FF0000'>i</font>' : '<font color='#FF0000'>r</font>', height_want<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>
+                    <font color='#0000FF'><u>bool</u></font> equal_font;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>strcmp</font><font face='Lucida Console'>(</font>fontset, fontset_prev<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font><b>{</b>
+                        equal_font <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    <b>}</b><font color='#0000FF'>else</font><b>{</b>
+                        equal_font <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                        <font color='#BB00BB'>strcpy</font><font face='Lucida Console'>(</font>fontset_prev, fontset<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font color='#5555FF'>*</font>mlist;
+                    <font color='#0000FF'><u>int</u></font> mcount;
+                    <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>def_str;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>equal_font<font face='Lucida Console'>)</font><b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>fs<font face='Lucida Console'>)</font><b>{</b>
+                            <font color='#BB00BB'>XFreeFontSet</font><font face='Lucida Console'>(</font>d, fs<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        fs <font color='#5555FF'>=</font> <font color='#BB00BB'>XCreateFontSet</font><font face='Lucida Console'>(</font>d, fontset, <font color='#5555FF'>&amp;</font>mlist, <font color='#5555FF'>&amp;</font>mcount, <font color='#5555FF'>&amp;</font>def_str<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>fs <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+                           <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>gui_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>gui_error: XCreateFontSet() failure</font>"<font face='Lucida Console'>)</font>;
+
+                        XFontSetExtents <font color='#5555FF'>*</font>extent;
+                        extent <font color='#5555FF'>=</font> <font color='#BB00BB'>XExtentsOfFontSet</font><font face='Lucida Console'>(</font>fs<font face='Lucida Console'>)</font>;
+                        ascender <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>extent<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_logical_extent.y;
+                        descender <font color='#5555FF'>=</font> extent<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_logical_extent.height <font color='#5555FF'>-</font> ascender;
+                        <font color='#BB00BB'>XFreeStringList</font><font face='Lucida Console'>(</font>mlist<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    XRectangle ink, logical;
+                    inner::<font color='#BB00BB'>XTextExtents</font> <font face='Lucida Console'>(</font>fs, ch.istr, ch.len, <font color='#5555FF'>&amp;</font>ink, <font color='#5555FF'>&amp;</font>logical<font face='Lucida Console'>)</font>;
+                    width <font color='#5555FF'>=</font> logical.width;
+                    height <font color='#5555FF'>=</font> height_want;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pix <font color='#5555FF'>=</font><font color='#5555FF'>=</font> None <font color='#5555FF'>|</font><font color='#5555FF'>|</font> pix_width_prev <font color='#5555FF'>&lt;</font> width <font color='#5555FF'>|</font><font color='#5555FF'>|</font> pix_height_prev <font color='#5555FF'>&lt;</font> height<font face='Lucida Console'>)</font><b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pix <font color='#5555FF'>!</font><font color='#5555FF'>=</font> None<font face='Lucida Console'>)</font><b>{</b>
+                            <font color='#BB00BB'>XFreeGC</font><font face='Lucida Console'>(</font>d, gc<font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>XFreePixmap</font><font face='Lucida Console'>(</font>d, pix<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        pix_width_prev <font color='#5555FF'>=</font> width <font color='#5555FF'>*</font> <font color='#979000'>2</font>;
+                        pix_height_prev <font color='#5555FF'>=</font> height <font color='#5555FF'>*</font> <font color='#979000'>2</font>;
+                        pix <font color='#5555FF'>=</font> <font color='#BB00BB'>XCreatePixmap</font><font face='Lucida Console'>(</font>d, <font color='#BB00BB'>DefaultRootWindow</font><font face='Lucida Console'>(</font>d<font face='Lucida Console'>)</font>, pix_width_prev, pix_height_prev, <font color='#BB00BB'>XDefaultDepth</font><font face='Lucida Console'>(</font>d, <font color='#BB00BB'>DefaultScreen</font><font face='Lucida Console'>(</font>d<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        gc <font color='#5555FF'>=</font> <font color='#BB00BB'>XCreateGC</font><font face='Lucida Console'>(</font>d, pix, <font color='#979000'>0</font>, NULL<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> backcolor <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb2color</font><font face='Lucida Console'>(</font>background, d, cmap<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>XSetForeground</font><font face='Lucida Console'>(</font>d, gc, backcolor<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>XSetBackground</font><font face='Lucida Console'>(</font>d, gc, backcolor<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>XFillRectangle</font><font face='Lucida Console'>(</font>d, pix, gc, <font color='#979000'>0</font>, <font color='#979000'>0</font>, width, height<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>XSetForeground</font><font face='Lucida Console'>(</font>d, gc, <font color='#BB00BB'>rgb2color</font><font face='Lucida Console'>(</font>foreground, d, cmap<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    inner::<font color='#BB00BB'>XDrawString</font><font face='Lucida Console'>(</font>d, pix, fs, gc, <font color='#979000'>0</font>, ascender, ch.istr, ch.len<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ximg<font face='Lucida Console'>)</font> <font color='#BB00BB'>XDestroyImage</font><font face='Lucida Console'>(</font>ximg<font face='Lucida Console'>)</font>;
+                    ximg <font color='#5555FF'>=</font> <font color='#BB00BB'>XGetImage</font><font face='Lucida Console'>(</font>d, pix, <font color='#979000'>0</font>, <font color='#979000'>0</font>, width, height, AllPlanes, ZPixmap <font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <b><a name='vals_internal'></a>vals_internal</b><font face='Lucida Console'>(</font>T <font color='#5555FF'>*</font>str, <font color='#0000FF'><u>int</u></font> height_want, <font color='#0000FF'><u>bool</u></font> italic <font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+                    <font color='#0000FF'><u>bool</u></font> bold <font color='#5555FF'>=</font> <font color='#979000'>false</font>, <font color='#0000FF'><u>bool</u></font> fixed <font color='#5555FF'>=</font> <font color='#979000'>false</font>, rgb_type background <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, rgb_type foreground <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><b>{</b>
+                    fontset_prev[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>\0</font>';
+                    ximg <font color='#5555FF'>=</font> NULL;
+                    d <font color='#5555FF'>=</font> NULL;
+                    pix <font color='#5555FF'>=</font> None;
+                    fs <font color='#5555FF'>=</font> NULL;
+                    ascender <font color='#5555FF'>=</font> descender <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                    pix_width_prev <font color='#5555FF'>=</font> pix_height_prev <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                    <font color='#BB00BB'>create</font><font face='Lucida Console'>(</font>str, height_want, italic, bold, fixed, background, foreground<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>inline</font> <font color='#0000FF'><u>int</u></font> <b><a name='get_ascender'></a>get_ascender</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b>
+                    <font color='#0000FF'>return</font> ascender;
+                <b>}</b>
+
+                <font color='#0000FF'>inline</font> <font color='#0000FF'><u>int</u></font> <b><a name='get_descender'></a>get_descender</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b>
+                    <font color='#0000FF'>return</font> descender;
+                <b>}</b>
+
+                std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,rgb_type<font color='#5555FF'>&gt;</font> col2rgb;
+                rgb_type <b><a name='color2rgb'></a>color2rgb</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> color, Display <font color='#5555FF'>*</font>d, Colormap <font color='#5555FF'>&amp;</font>cmap<font face='Lucida Console'>)</font><b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>col2rgb.<font color='#BB00BB'>count</font><font face='Lucida Console'>(</font>color<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><b>{</b>
+                        <font color='#0000FF'>return</font> col2rgb[color];
+                    <b>}</b><font color='#0000FF'>else</font><b>{</b>
+                        XColor xcol;
+                        xcol.pixel <font color='#5555FF'>=</font> color;
+                        <font color='#BB00BB'>XQueryColor</font><font face='Lucida Console'>(</font>d, cmap, <font color='#5555FF'>&amp;</font>xcol<font face='Lucida Console'>)</font>;
+                        rgb_type <font color='#BB00BB'>rgb_</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>byte<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>xcol.red<font color='#5555FF'>/</font><font color='#979000'>257</font><font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font>byte<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>xcol.green<font color='#5555FF'>/</font><font color='#979000'>257</font><font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font>byte<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>xcol.blue<font color='#5555FF'>/</font><font color='#979000'>257</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        col2rgb[color] <font color='#5555FF'>=</font> rgb_;
+                        <font color='#0000FF'>return</font> rgb_;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='get_pixel'></a>get_pixel</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> x, <font color='#0000FF'><u>int</u></font> y, byte <font color='#5555FF'>&amp;</font>r, byte <font color='#5555FF'>&amp;</font>g, byte <font color='#5555FF'>&amp;</font>b<font face='Lucida Console'>)</font><b>{</b>
+                    rgb_type c <font color='#5555FF'>=</font> <font color='#BB00BB'>color2rgb</font><font face='Lucida Console'>(</font><font color='#BB00BB'>XGetPixel</font><font face='Lucida Console'>(</font>ximg,x,y<font face='Lucida Console'>)</font>, d, cmap<font face='Lucida Console'>)</font>;
+                    r <font color='#5555FF'>=</font> c.r, g <font color='#5555FF'>=</font> c.g, b <font color='#5555FF'>=</font> c.b;
+                <b>}</b>
+
+                ~<b><a name='vals_internal'></a>vals_internal</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b>
+                    <font color='#BB00BB'>XDestroyImage</font><font face='Lucida Console'>(</font>ximg<font face='Lucida Console'>)</font>;
+
+                    <font color='#BB00BB'>XFreeGC</font><font face='Lucida Console'>(</font>d, gc<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>XFreeFontSet</font><font face='Lucida Console'>(</font>d, fs<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>XFreePixmap</font><font face='Lucida Console'>(</font>d, pix<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>XCloseDisplay</font><font face='Lucida Console'>(</font>d<font face='Lucida Console'>)</font>;
+                <b>}</b>
+<font color='#0000FF'>#endif</font>
+            <b>}</b>;
+
+            <font color='#0000FF'>struct</font> <b><a name='image_size_setter'></a>image_size_setter</b><b>{</b>
+                <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font>, <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font><b>{</b>
+                <b>}</b>
+            <b>}</b>;
+
+            <font color='#0000FF'><u>int</u></font> ascender, descender;
+            vals_internal <font color='#5555FF'>*</font>vi;
+        <font color='#0000FF'>public</font>:
+            <b><a name='font_renderer'></a>font_renderer</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : image<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, width<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, height<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><b>{</b>
+                ascender <font color='#5555FF'>=</font> descender <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                vi <font color='#5555FF'>=</font> NULL;
+            <b>}</b>
+
+            <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <b><a name='font_renderer'></a>font_renderer</b><font face='Lucida Console'>(</font>T <font color='#5555FF'>*</font>str, <font color='#0000FF'><u>int</u></font> height_want, <font color='#0000FF'><u>bool</u></font> italic <font color='#5555FF'>=</font> <font color='#979000'>false</font>, <font color='#0000FF'><u>bool</u></font> bold <font color='#5555FF'>=</font> <font color='#979000'>false</font>, <font color='#0000FF'><u>bool</u></font> fixed <font color='#5555FF'>=</font> <font color='#979000'>false</font>,         rgb_type background <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb_type</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, rgb_type foreground <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb_type</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>255</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><b>{</b>
+                <font color='#BB00BB'>render</font><font face='Lucida Console'>(</font>str, height_want, italic, bold, fixed, background, foreground<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>void</u></font> <b><a name='render'></a>render</b><font face='Lucida Console'>(</font>T <font color='#5555FF'>*</font>str, <font color='#0000FF'><u>int</u></font> height_want,
+                                             <font color='#0000FF'><u>bool</u></font> italic <font color='#5555FF'>=</font> <font color='#979000'>false</font>, <font color='#0000FF'><u>bool</u></font> bold <font color='#5555FF'>=</font> <font color='#979000'>false</font>, <font color='#0000FF'><u>bool</u></font> fixed <font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+                                             rgb_type background <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb_type</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, rgb_type foreground <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb_type</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>255</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>vi <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font><b>{</b>
+                    vi <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>vals_internal</font><font face='Lucida Console'>(</font>str, height_want, italic, bold, fixed, background, foreground<font face='Lucida Console'>)</font>;
+                <b>}</b><font color='#0000FF'>else</font><b>{</b>
+                    vi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>create</font><font face='Lucida Console'>(</font>str, height_want, italic, bold, fixed, background, foreground<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                width <font color='#5555FF'>=</font> vi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>width, height <font color='#5555FF'>=</font> vi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>height;
+                image <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> byte[width <font color='#5555FF'>*</font> height <font color='#5555FF'>*</font> <font color='#979000'>3</font>];
+                ascender <font color='#5555FF'>=</font> vi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_ascender</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                descender <font color='#5555FF'>=</font> vi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_descender</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'><u>int</u></font> h <font color='#5555FF'>=</font> height, w <font color='#5555FF'>=</font> width;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>, i3 <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> h; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font><b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> w; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i, i3 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font><b>{</b>
+                        vi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_pixel</font><font face='Lucida Console'>(</font>i, j, image[i3], image[i3<font color='#5555FF'>+</font><font color='#979000'>1</font>], image[i3<font color='#5555FF'>+</font><font color='#979000'>2</font>]<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+            ~<b><a name='font_renderer'></a>font_renderer</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>vi<font face='Lucida Console'>)</font> <font color='#0000FF'>delete</font> vi;
+                <font color='#BB00BB'>destroy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'><u>int</u></font> <b><a name='get_width'></a>get_width</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b>
+                <font color='#0000FF'>return</font> width;
+            <b>}</b>
+            <font color='#0000FF'><u>int</u></font> <b><a name='get_height'></a>get_height</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b>
+                <font color='#0000FF'>return</font> height;
+            <b>}</b>
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>int</u></font> <b><a name='get_ascender'></a>get_ascender</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b>
+                <font color='#0000FF'>return</font> ascender;
+            <b>}</b>
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>int</u></font> <b><a name='get_descender'></a>get_descender</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b>
+                <font color='#0000FF'>return</font> descender;
+            <b>}</b>
+
+            <font color='#0000FF'>const</font> byte <font color='#5555FF'>*</font><b><a name='get_image'></a>get_image</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b>
+                <font color='#0000FF'>return</font> image;
+            <b>}</b>
+        <b>}</b>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='native_font'></a>native_font</b> : <font color='#0000FF'>public</font> dlib::font 
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> ascender_;
+        <b><a name='native_font'></a>native_font</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b>
+            <font color='#BB00BB'>setlocale</font><font face='Lucida Console'>(</font>LC_CTYPE, "<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            ascender_ <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#BB00BB'>get_letter</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>x</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>typedef</font> std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font>,dlib::letter <font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font> letters_map_type;
+        letters_map_type letters;
+        font_renderer::font_renderer fl;
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='native_font'></a>native_font</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#009900'>// delete all the letter objects we have in our letters map
+</font>            letters_map_type::iterator i;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> letters.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> letters.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>delete</font> i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='has_character'></a>has_character</b> <font face='Lucida Console'>(</font>
+            dlib::unichar ch
+        <font face='Lucida Console'>)</font><font color='#0000FF'>const</font><b>{</b>
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>[ch].<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> dlib::shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>font<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_font'></a>get_font</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>static</font> dlib::shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>font<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> native_font<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> f;
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'>const</font> dlib::letter<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>dlib::unichar ch<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font><b>{</b>
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>native_font <font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_letter</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        dlib::letter<font color='#5555FF'>&amp;</font> <b><a name='get_letter'></a>get_letter</b> <font face='Lucida Console'>(</font>
+            dlib::unichar ch
+        <font face='Lucida Console'>)</font><b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>letters.<font color='#BB00BB'>count</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><b>{</b>
+                dlib::letter <font color='#5555FF'>*</font>l <font color='#5555FF'>=</font> letters.<font color='#BB00BB'>find</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+                <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>l;
+            <b>}</b>
+
+            dlib::unichar c[<font color='#979000'>2</font>];
+            c[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> ch;
+            c[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            fl.<font color='#BB00BB'>render</font><font face='Lucida Console'>(</font>c, <font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>false</font>,<font color='#979000'>false</font>,<font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ascender_ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font><b>{</b>
+                ascender_ <font color='#5555FF'>=</font> fl.<font color='#BB00BB'>get_ascender</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            std::vector<font color='#5555FF'>&lt;</font>dlib::letter::point<font color='#5555FF'>&gt;</font> v;
+            <font color='#0000FF'>const</font> font_renderer::byte <font color='#5555FF'>*</font>bp <font color='#5555FF'>=</font> fl.<font color='#BB00BB'>get_image</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> fl.<font color='#BB00BB'>get_height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font><b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> fl.<font color='#BB00BB'>get_width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i, bp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font><b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>bp<font face='Lucida Console'>)</font><b>{</b>
+                        v.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>dlib::letter::<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>i,j<font color='#5555FF'>-</font><font color='#BB00BB'>ascender</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+            dlib::letter <font color='#5555FF'>*</font>l <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> dlib::<font color='#BB00BB'>letter</font><font face='Lucida Console'>(</font>fl.<font color='#BB00BB'>get_width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>v.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            letters.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>ch,l<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>v.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font><b>{</b>
+                <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>l<font face='Lucida Console'>)</font>[i] <font color='#5555FF'>=</font> v.<font color='#BB00BB'>at</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>l;
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='height'></a>height</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>12</font>; <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='ascender'></a>ascender</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> ascender_; <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='left_overflow'></a>left_overflow</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>1</font>; <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='right_overflow'></a>right_overflow</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>2</font>; <b>}</b>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_IGG_FONT_RENDERER_H_
+</font>
+
+</pre></body></html>

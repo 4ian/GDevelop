@@ -1,0 +1,215 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - symmetric_matrix_cache.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>matrix.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>rand.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+    dlib::logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.symmetric_matrix_cache</font>"<font face='Lucida Console'>)</font>;
+
+
+    <font color='#0000FF'>class</font> <b><a name='test_symmetric_matrix_cache'></a>test_symmetric_matrix_cache</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a unit test.  When it is constructed
+                it adds itself into the testing framework.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+        <b><a name='test_symmetric_matrix_cache'></a>test_symmetric_matrix_cache</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>
+                "<font color='#CC0000'>test_symmetric_matrix_cache</font>",       <font color='#009900'>// the command line argument name for this test
+</font>                "<font color='#CC0000'>Run tests on the symmetric_matrix_cache function.</font>", <font color='#009900'>// the command line argument description
+</font>                <font color='#979000'>0</font>                     <font color='#009900'>// the number of command line arguments for this test
+</font>            <font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        dlib::rand rnd;
+
+    <font color='#009900'>// -----------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP1, <font color='#0000FF'>typename</font> EXP2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='test_colm_exp'></a>test_colm_exp</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m1,
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m2
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> m1.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+
+                <font color='#0000FF'>typename</font> colm_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font>::type c1 <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>m1,i<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>typename</font> colm_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font>::type c2 <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>m2,i<font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>c1 , c2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>m1,i<font face='Lucida Console'>)</font> , c2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>c1 , <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>m2,i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>m1,i<font face='Lucida Console'>)</font> , <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>m2,i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+            <font color='#009900'>// Get a bunch of columns at once to test out the reference
+</font>            <font color='#009900'>// counting and automatic cache expansion built into the symmetric_matrix_cache.  
+</font>            <font color='#009900'>// This test verifies that, for example, getting column 3 doesn't stomp on
+</font>            <font color='#009900'>// any of the previous columns.
+</font>            <font color='#0000FF'>typename</font> colm_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font>::type c1_0 <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>m1,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> colm_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font>::type c1_1 <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>m1,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> colm_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font>::type c1_2 <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>m1,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> colm_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font>::type c1_3 <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>m1,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> colm_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font>::type c1_4 <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>m1,<font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> colm_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font>::type c1_5 <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>m1,<font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>typename</font> colm_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font>::type c2_0 <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>m2,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> colm_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font>::type c2_1 <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>m2,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> colm_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font>::type c2_2 <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>m2,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> colm_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font>::type c2_3 <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>m2,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> colm_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font>::type c2_4 <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>m2,<font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> colm_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font>::type c2_5 <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>m2,<font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>c1_0, c2_0<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>c1_1, c2_1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>c1_2, c2_2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>c1_3, c2_3<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>c1_4, c2_4<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>c1_5, c2_5<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// -----------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP1, <font color='#0000FF'>typename</font> EXP2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='test_rowm_exp'></a>test_rowm_exp</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m1,
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m2
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> m1.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+
+                <font color='#0000FF'>typename</font> rowm_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font>::type r1 <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>m1,i<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>typename</font> rowm_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font>::type r2 <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>m2,i<font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>r1 , r2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>m1,i<font face='Lucida Console'>)</font> , r2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>r1 , <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>m2,i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>m1,i<font face='Lucida Console'>)</font> , <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>m2,i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+            <font color='#009900'>// Get a bunch of rows at once to test out the reference
+</font>            <font color='#009900'>// counting and automatic cache expansion built into the symmetric_matrix_cache.  
+</font>            <font color='#009900'>// This test verifies that, for example, getting row 3 doesn't stomp on
+</font>            <font color='#009900'>// any of the previous rows.
+</font>            <font color='#0000FF'>typename</font> rowm_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font>::type r1_0 <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>m1,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> rowm_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font>::type r1_1 <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>m1,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> rowm_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font>::type r1_2 <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>m1,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> rowm_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font>::type r1_3 <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>m1,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> rowm_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font>::type r1_4 <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>m1,<font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> rowm_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font>::type r1_5 <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>m1,<font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>typename</font> rowm_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font>::type r2_0 <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>m2,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> rowm_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font>::type r2_1 <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>m2,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> rowm_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font>::type r2_2 <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>m2,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> rowm_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font>::type r2_3 <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>m2,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> rowm_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font>::type r2_4 <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>m2,<font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> rowm_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font>::type r2_5 <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>m2,<font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>r1_0, r2_0<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>r1_1, r2_1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>r1_2, r2_2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>r1_3, r2_3<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>r1_4, r2_4<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>r1_5, r2_5<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// -----------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP1, <font color='#0000FF'>typename</font> EXP2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='test_diag_exp'></a>test_diag_exp</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m1,
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m2
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#0000FF'>typename</font> diag_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font>::type c1 <font color='#5555FF'>=</font> <font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font>m1<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> diag_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font>::type c2 <font color='#5555FF'>=</font> <font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font>m2<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>c1 , c2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font>m1<font face='Lucida Console'>)</font> , c2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>c1 , <font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font>m2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font>m1<font face='Lucida Console'>)</font> , <font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font>m2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// -----------------------------------
+</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='test_stuff'></a>test_stuff</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> csize 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>csize: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> csize;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> m <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>10</font>,<font color='#979000'>10</font>,rnd<font face='Lucida Console'>)</font>;
+
+            m <font color='#5555FF'>=</font> <font color='#BB00BB'>make_symmetric</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>symmetric_matrix_cache<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m, csize<font face='Lucida Console'>)</font>, matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>symmetric_matrix_cache<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m, csize<font face='Lucida Console'>)</font>, matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test colm/rowm</font>";
+
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> m.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>symmetric_matrix_cache<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m, csize<font face='Lucida Console'>)</font>,i<font face='Lucida Console'>)</font>, <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>,i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>symmetric_matrix_cache<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m, csize<font face='Lucida Console'>)</font>,i<font face='Lucida Console'>)</font>, <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>,i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#009900'>// things are supposed to be symmetric
+</font>                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>symmetric_matrix_cache<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m, csize<font face='Lucida Console'>)</font>,i<font face='Lucida Console'>)</font>, <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>,i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>symmetric_matrix_cache<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m, csize<font face='Lucida Console'>)</font>,i<font face='Lucida Console'>)</font>, <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>,i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test diag</font>";
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font>symmetric_matrix_cache<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m,csize<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font>matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>test_colm_exp</font><font face='Lucida Console'>(</font>symmetric_matrix_cache<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m,csize<font face='Lucida Console'>)</font>, matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_rowm_exp</font><font face='Lucida Console'>(</font>symmetric_matrix_cache<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m,csize<font face='Lucida Console'>)</font>, matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_diag_exp</font><font face='Lucida Console'>(</font>symmetric_matrix_cache<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m,csize<font face='Lucida Console'>)</font>, matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>test_colm_exp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>tmp</font><font face='Lucida Console'>(</font>symmetric_matrix_cache<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m,csize<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>tmp</font><font face='Lucida Console'>(</font>matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_rowm_exp</font><font face='Lucida Console'>(</font>symmetric_matrix_cache<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m,csize<font face='Lucida Console'>)</font>, <font color='#BB00BB'>tmp</font><font face='Lucida Console'>(</font>matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_diag_exp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>tmp</font><font face='Lucida Console'>(</font>symmetric_matrix_cache<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m,csize<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>tmp</font><font face='Lucida Console'>(</font>matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> itr <font color='#5555FF'>=</font> <font color='#979000'>0</font>; itr <font color='#5555FF'>&lt;</font> <font color='#979000'>5</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>itr<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>test_stuff</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>test_stuff</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>test_stuff</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#009900'>// Create an instance of this object.  Doing this causes this test
+</font>    <font color='#009900'>// to be automatically inserted into the testing framework whenever this cpp file
+</font>    <font color='#009900'>// is linked into the project.  Note that since we are inside an unnamed-namespace 
+</font>    <font color='#009900'>// we won't get any linker errors about the symbol a being defined multiple times. 
+</font>    test_symmetric_matrix_cache a;
+
+<b>}</b>
+
+
+
+</pre></body></html>

@@ -143,7 +143,7 @@ gdjs.SpriteAnimation = function(imageManager, animData)
  *
  * @class SpriteRuntimeObject
  * @namespace gdjs
- * @extends runtimeObject
+ * @extends gdjs.RuntimeObject
  */
 gdjs.SpriteRuntimeObject = function(runtimeScene, objectData)
 {
@@ -184,7 +184,9 @@ gdjs.SpriteRuntimeObject = function(runtimeScene, objectData)
     this._spriteInContainer = true;
     if ( this._sprite === undefined )
         this._sprite = new PIXI.Sprite(runtimeScene.getGame().getImageManager().getInvalidPIXITexture());
-    runtimeScene.getLayer("").addChildToPIXIContainer(this._sprite, this.zOrder);
+
+    var layer = runtimeScene.getLayer("");
+    if (layer) layer.addChildToPIXIContainer(this._sprite, this.zOrder);
 
 	this._updatePIXITexture();
 	this._updatePIXISprite();
@@ -199,16 +201,16 @@ gdjs.SpriteRuntimeObject.thisIsARuntimeObjectConstructor = "Sprite"; //Notify gd
  * Initialize the extra parameters that could be set for an instance.
  */
 gdjs.SpriteRuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
-    if ( initialInstanceData.customSize ) {
-        this.setWidth(initialInstanceData.width);
-        this.setHeight(initialInstanceData.height);
-    }
     if ( initialInstanceData.numberProperties ) {
         var that = this;
         gdjs.iterateOverArray(initialInstanceData.numberProperties, function(extraData) {
             if ( extraData.name === "animation" )
                 that.setAnimation(extraData.value);
         });
+    }
+    if ( initialInstanceData.customSize ) {
+        this.setWidth(initialInstanceData.width);
+        this.setHeight(initialInstanceData.height);
     }
 };
 
@@ -258,7 +260,7 @@ gdjs.SpriteRuntimeObject.prototype._updatePIXITexture = function() {
         if ( this._currentFrame < direction.frames.length ) {
             this._animationFrame = direction.frames[this._currentFrame];
             if ( this._animationFrame !== null )
-                this._sprite.setTexture(this._animationFrame.pixiTexture);
+                this._sprite.texture = this._animationFrame.pixiTexture;
 
             return;
         }
@@ -702,58 +704,57 @@ gdjs.SpriteRuntimeObject.prototype.getHeight = function() {
 };
 
 gdjs.SpriteRuntimeObject.prototype.setWidth = function(newWidth) {
+    if ( this._textureDirty ) this._updatePIXITexture();
     if ( this._spriteDirty ) this._updatePIXISprite();
     var newScaleX = newWidth/this._sprite.texture.frame.width;
-    this.setScaleX(!this._isFlippedX ? newScaleX : -newScaleX);
+    this.setScaleX(newScaleX);
 };
 
 gdjs.SpriteRuntimeObject.prototype.setHeight = function(newHeight) {
+    if ( this._textureDirty ) this._updatePIXITexture();
     if ( this._spriteDirty ) this._updatePIXISprite();
     var newScaleY = newHeight/this._sprite.texture.frame.height;
-    this.setScaleY(!this._isFlippedY ? newScaleY : -newScaleY);
+    this.setScaleY(newScaleY);
 };
 
 gdjs.SpriteRuntimeObject.prototype.setScale = function(newScale) {
     if ( newScale === Math.abs(this._scaleX) && newScale === Math.abs(this._scaleY) ) return;
+    if ( newScale < 0 ) newScale = 0;
 
-    if ( newScale > 0 ) {
-        this._scaleX = newScale;
-        this._scaleY = newScale;
-    }
-    if ( this._isFlippedX ) this._scaleX *= -1;
-    if ( this._isFlippedY ) this._scaleY *= -1;
+    this._scaleX = newScale * (this._flippedX ? -1 : 1);
+    this._scaleY = newScale * (this._flippedY ? -1 : 1);
     this._spriteDirty = true;
     this.hitBoxesDirty = true;
 };
 
 gdjs.SpriteRuntimeObject.prototype.setScaleX = function(newScale) {
     if ( newScale === Math.abs(this._scaleX) ) return;
+    if ( newScale < 0 ) newScale = 0;
 
-    if ( newScale > 0 ) this._scaleX = newScale;
-    if ( this._isFlippedX ) this._scaleX *= -1;
+    this._scaleX = newScale * (this._flippedX ? -1 : 1);
     this._spriteDirty = true;
     this.hitBoxesDirty = true;
 };
 
 gdjs.SpriteRuntimeObject.prototype.setScaleY = function(newScale) {
     if ( newScale === Math.abs(this._scaleY) ) return;
+    if ( newScale < 0 ) newScale = 0;
 
-    if ( newScale > 0 ) this._scaleY = newScale;
-    if ( this._isFlippedY ) this._scaleY *= -1;
+    this._scaleY = newScale * (this._flippedY ? -1 : 1);
     this._spriteDirty = true;
     this.hitBoxesDirty = true;
 };
 
 gdjs.SpriteRuntimeObject.prototype.getScale = function() {
-    return (this._scaleX+this._scaleY)/2.0;
+    return (Math.abs(this._scaleX)+Math.abs(this._scaleY))/2.0;
 };
 
 gdjs.SpriteRuntimeObject.prototype.getScaleY = function() {
-    return this._scaleY;
+    return Math.abs(this._scaleY);
 };
 
 gdjs.SpriteRuntimeObject.prototype.getScaleX = function() {
-    return this._scaleX;
+    return Math.abs(this._scaleX);
 };
 
 //Other :

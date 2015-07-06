@@ -1,0 +1,80 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - time_this.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_TIME_THIs_
+<font color='#0000FF'>#define</font> DLIB_TIME_THIs_
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='platform.h.html'>platform.h</a>"
+
+
+
+<font color='#0000FF'>#ifndef</font> WIN32
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sys<font color='#5555FF'>/</font>times.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>unistd.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#define</font> TIME_THIS_TO<font face='Lucida Console'>(</font>_tt_op,_tt_out<font face='Lucida Console'>)</font>                                                        \
+    <b>{</b>                                                                                       \
+        clock_t _tt_start, _tt_end;                                                         \
+        tms _tt_timesbuf;                                                                   \
+        _tt_start <font color='#5555FF'>=</font> <font color='#BB00BB'>times</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>_tt_timesbuf<font face='Lucida Console'>)</font>;                                                   \
+        _tt_op;                                                                             \
+        _tt_end <font color='#5555FF'>=</font> <font color='#BB00BB'>times</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>_tt_timesbuf<font face='Lucida Console'>)</font>;                                                     \
+        <font color='#0000FF'><u>long</u></font> _tt_ticks <font color='#5555FF'>=</font> <font color='#BB00BB'>sysconf</font><font face='Lucida Console'>(</font>_SC_CLK_TCK<font face='Lucida Console'>)</font>;                                              \
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>_tt_end<font color='#5555FF'>-</font>_tt_start<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>_tt_ticks <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>                              \
+        <b>{</b>                                                                                   \
+            _tt_out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\ntime: </font>"                                                           \
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>1000</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>_tt_end<font color='#5555FF'>-</font>_tt_start<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>_tt_ticks<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>ms\n</font>";       \
+        <b>}</b>                                                                                   \
+        <font color='#0000FF'>else</font>                                                                                \
+        <b>{</b>                                                                                   \
+            _tt_out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\ntime: </font>"                                                           \
+                      <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>_tt_end<font color='#5555FF'>-</font>_tt_start<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>_tt_ticks <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>sec\n</font>";          \
+        <b>}</b>                                                                                   \
+    <b>}</b>                                                                                       \
+
+
+<font color='#0000FF'>#define</font> TIME_THIS<font face='Lucida Console'>(</font>_tt_op<font face='Lucida Console'>)</font>  TIME_THIS_TO<font face='Lucida Console'>(</font>_tt_op,std::cout<font face='Lucida Console'>)</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> WIN32
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='windows_magic.h.html'>windows_magic.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>windows.h<font color='#5555FF'>&gt;</font>    <font color='#009900'>// for GetTickCount()
+</font><font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#define</font> TIME_THIS_TO<font face='Lucida Console'>(</font>_tt_op,_tt_out<font face='Lucida Console'>)</font>                                                        \
+    <b>{</b>                                                                                       \
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> _tt_count <font color='#5555FF'>=</font> <font color='#BB00BB'>GetTickCount</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;                                           \
+        _tt_op;                                                                             \
+        _tt_count <font color='#5555FF'>=</font> <font color='#BB00BB'>GetTickCount</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> _tt_count;                                             \
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>_tt_count <font color='#5555FF'>&lt;</font> <font color='#979000'>1000</font><font face='Lucida Console'>)</font>                                                               \
+        <b>{</b>                                                                                   \
+            _tt_out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\ntime: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> _tt_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>ms\n</font>";                                   \
+        <b>}</b>                                                                                   \
+        <font color='#0000FF'>else</font>                                                                                \
+        <b>{</b>                                                                                   \
+            _tt_out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\ntime: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>_tt_count<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>1000</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>sec\n</font>";        \
+        <b>}</b>                                                                                   \
+    <b>}</b>                                                                                       \
+
+<font color='#0000FF'>#define</font> TIME_THIS<font face='Lucida Console'>(</font>_tt_op<font face='Lucida Console'>)</font> TIME_THIS_TO<font face='Lucida Console'>(</font>_tt_op,std::cout<font face='Lucida Console'>)</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_TIME_THIs_
+</font>
+
+</pre></body></html>

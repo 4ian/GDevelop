@@ -3,6 +3,12 @@ compiler:
   - gcc
   - clang
 
+#Activate X Virtual Framebuffer to allow tests to
+#use SFML.
+before_install:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+
 install:
   - sudo apt-get update
 #Download and compile dependencies
@@ -12,7 +18,7 @@ install:
 #Compile the tests only
   - mkdir .build-tests
   - cd .build-tests
-  - cmake -DBUILD_GDJS=FALSE -DBUILD_IDE=FALSE -DBUILD_EXTENSIONS=FALSE -DBUILD_TESTS=TRUE -DNO_GUI=TRUE ..
+  - cmake -DBUILD_GDJS=FALSE -DBUILD_IDE=FALSE -DBUILD_TESTS=TRUE -DNO_GUI=TRUE ..
   - make -j 4
   - cd ..
 #Install GDJS tests dependencies
@@ -30,3 +36,5 @@ script:
 # - export LD_LIBRARY_PATH=$PWD/Binaries/Output/Release_Linux:$PWD/.build-tests/ExtLibs/SFML/lib:$LD_LIBRARY_PATH
   - Core/GDCore_tests
   - GDCpp/GDCpp_tests
+  - Extensions/PathfindingAutomatism/PathfindingAutomatism_Runtime_tests
+  - Extensions/LinkedObjects/LinkedObjects_Runtime_tests

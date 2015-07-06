@@ -5,6 +5,9 @@ Copyright (c) 2011-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#include <wx/bitmap.h>
+#endif
 #include <SFML/Graphics.hpp>
 #include <string>
 #include "GDCore/Tools/Localization.h"
@@ -18,7 +21,6 @@ This project is released under the MIT License.
 #include "GDCore/Utf8/utf8.h"
 #include "TextEntryObject.h"
 #if defined(GD_IDE_ONLY)
-#include <wx/bitmap.h>
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
@@ -87,7 +89,9 @@ void TextEntryObject::LoadEdittimeIcon()
 
 bool TextEntryObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
 {
+#if !defined(GD_NO_WX_GUI)
     thumbnail = wxBitmap("CppPlatform/Extensions/textentry.png", wxBITMAP_TYPE_ANY);
+#endif
 
     return true;
 }

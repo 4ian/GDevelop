@@ -1,0 +1,411 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - nearest_neighbor_feature_image.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_NEAREST_NEIGHBOR_FeATURE_IMAGE_Hh_
+<font color='#0000FF'>#define</font> DLIB_NEAREST_NEIGHBOR_FeATURE_IMAGE_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='nearest_neighbor_feature_image_abstract.h.html'>nearest_neighbor_feature_image_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../statistics.h.html'>../statistics.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='nearest_neighbor_feature_image'></a>nearest_neighbor_feature_image</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - nn_feats.size() == 1
+
+            CONVENTION
+                - nn_feats.size() == 1
+
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> descriptor_type;
+
+        <b><a name='nearest_neighbor_feature_image'></a>nearest_neighbor_feature_image</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='copy_configuration'></a>copy_configuration</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='copy_configuration'></a>copy_configuration</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> nearest_neighbor_feature_image<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='load'></a>load</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_dimensions'></a>get_num_dimensions</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> vector_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_basis'></a>set_basis</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> new_basis
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> descriptor_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> row,
+            <font color='#0000FF'><u>long</u></font> col
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> rectangle <b><a name='get_block_rect'></a>get_block_rect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> row,
+            <font color='#0000FF'><u>long</u></font> col
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> point <b><a name='image_to_feat_space'></a>image_to_feat_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> rectangle <b><a name='image_to_feat_space'></a>image_to_feat_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> point <b><a name='feat_to_image_space'></a>feat_to_image_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> rectangle <b><a name='feat_to_image_space'></a>feat_to_image_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+            std::ostream<font color='#5555FF'>&amp;</font> out
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+            nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+            std::istream<font color='#5555FF'>&amp;</font> in 
+        <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> feats;
+        feature_extractor fe;
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> feature_extractor::descriptor_type<font color='#5555FF'>&gt;</font> basis;
+
+        <font color='#009900'>// This is a transient variable.  It is just here so it doesn't have to be
+</font>        <font color='#009900'>// reallocated over and over inside operator()
+</font>        <font color='#0000FF'>mutable</font> descriptor_type nn_feats;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.feats, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.fe, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.basis, out<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.feats, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.fe, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.basis, in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                        nearest_neighbor_feature_image member functions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font>::
+    <b><a name='nearest_neighbor_feature_image'></a>nearest_neighbor_feature_image</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>  
+    <b>{</b>
+        nn_feats.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font>::
+    <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        feats.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        fe.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        basis.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font>::
+    <b><a name='copy_configuration'></a>copy_configuration</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        fe.<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font>::
+    <b><a name='copy_configuration'></a>copy_configuration</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> nearest_neighbor_feature_image<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        fe.<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>item.fe<font face='Lucida Console'>)</font>;
+        basis <font color='#5555FF'>=</font> item.basis;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font>::
+    <b><a name='load'></a>load</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        fe.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+
+        feats.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>fe.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, fe.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// find the nearest neighbor for each feature vector and store the
+</font>        <font color='#009900'>// result in feats.
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> feats.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> feats.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> feature_extractor::descriptor_type<font color='#5555FF'>&amp;</font> local_feat <font color='#5555FF'>=</font> <font color='#BB00BB'>fe</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'><u>double</u></font> best_dist <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> best_idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> basis.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'><u>double</u></font> dist <font color='#5555FF'>=</font> <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>local_feat <font color='#5555FF'>-</font> basis[i]<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dist <font color='#5555FF'>&lt;</font> best_dist<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        best_dist <font color='#5555FF'>=</font> dist;
+                        best_idx <font color='#5555FF'>=</font> i;
+                    <b>}</b>
+                <b>}</b>
+
+                feats[r][c] <font color='#5555FF'>=</font> best_idx;
+            <b>}</b>
+        <b>}</b>
+
+        fe.<font color='#BB00BB'>unload</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font>::
+    <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> feats.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>long</u></font> nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font>::
+    <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> feats.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>long</u></font> nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font>::
+    <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> feats.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>long</u></font> nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_num_dimensions'></a>get_num_dimensions</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> basis.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> feature_extractor<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> vector_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font>::
+    <b><a name='set_basis'></a>set_basis</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> new_basis
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        basis.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>new_basis.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, new_basis.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font>::descriptor_type<font color='#5555FF'>&amp;</font> 
+    nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>long</u></font> row,
+        <font color='#0000FF'><u>long</u></font> col
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> row <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> row <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> col <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> col <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\t descriptor_type nearest_neighbor_feature_image::operator(row,col)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t row:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> row
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t col:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> col 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        nn_feats[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>feats[row][col],<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> nn_feats;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> rectangle nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_block_rect'></a>get_block_rect</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>long</u></font> row,
+        <font color='#0000FF'><u>long</u></font> col
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> fe.<font color='#BB00BB'>get_block_rect</font><font face='Lucida Console'>(</font>row,col<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> point nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font>::
+    <b><a name='image_to_feat_space'></a>image_to_feat_space</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> fe.<font color='#BB00BB'>image_to_feat_space</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> rectangle nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font>::
+    <b><a name='image_to_feat_space'></a>image_to_feat_space</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> fe.<font color='#BB00BB'>image_to_feat_space</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> point nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font>::
+    <b><a name='feat_to_image_space'></a>feat_to_image_space</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> fe.<font color='#BB00BB'>feat_to_image_space</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> rectangle nearest_neighbor_feature_image<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font>::
+    <b><a name='feat_to_image_space'></a>feat_to_image_space</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b>
+        <font color='#0000FF'>return</font> fe.<font color='#BB00BB'>feat_to_image_space</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_NEAREST_NEIGHBOR_FeATURE_IMAGE_Hh_
+</font>
+
+
+</pre></body></html>

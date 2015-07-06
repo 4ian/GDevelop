@@ -20,7 +20,9 @@ KeyboardExtension::KeyboardExtension()
     gd::BuiltinExtensionsImplementer::ImplementsKeyboardExtension(*this);
 
     GetAllConditions()["KeyPressed"].SetFunctionName("gdjs.evtTools.input.isKeyPressed").SetIncludeFile("inputtools.js");
+    GetAllConditions()["KeyReleased"].SetFunctionName("gdjs.evtTools.input.wasKeyReleased").SetIncludeFile("inputtools.js");
     GetAllConditions()["KeyFromTextPressed"].SetFunctionName("gdjs.evtTools.input.isKeyPressed").SetIncludeFile("inputtools.js");
+    GetAllConditions()["KeyFromTextReleased"].SetFunctionName("gdjs.evtTools.input.wasKeyReleased").SetIncludeFile("inputtools.js");
     GetAllConditions()["AnyKeyPressed"].SetFunctionName("gdjs.evtTools.input.anyKeyPressed").SetIncludeFile("inputtools.js");
     GetAllStrExpressions()["LastPressedKey"].SetFunctionName("gdjs.evtTools.input.lastPressedKey").SetIncludeFile("inputtools.js");
 }

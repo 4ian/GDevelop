@@ -1,0 +1,433 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - empirical_kernel_map_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_EMPIRICAL_KERNEl_MAP_ABSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_EMPIRICAL_KERNEl_MAP_ABSTRACT_H_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel_abstract.h.html'>kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='function_abstract.h.html'>function_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='linearly_independent_subset_finder_abstract.h.html'>linearly_independent_subset_finder_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type, 
+        <font color='#0000FF'>typename</font> EXP
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='convert_to_decision_function'></a>convert_to_decision_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> projection_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> project_funct,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vect
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is_vector(vect) == true
+            - vect.size() == project_funct.out_vector_size()
+            - project_funct.out_vector_size() &gt; 0
+            - project_funct.weights.nc() == project_funct.basis_vectors.size()
+        ensures
+            - This function interprets the given vector as a point in the kernel feature space defined 
+              by the given projection function.  The return value of this function is a decision 
+              function, DF, that represents the given vector in the following sense:
+                - for all possible sample_type objects, S, it is the case that DF(S) == dot(project_funct(S), vect)
+                  (i.e. the returned decision function computes dot products, in kernel feature space, 
+                  between vect and any argument you give it.  Note also that this equality is exact, even
+                  for sample_type objects not in the span of the basis_vectors.)
+                - DF.kernel_function == project_funct.kernel_function
+                - DF.b == 0
+                - DF.basis_vectors == project_funct.basis_vectors.  
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kern_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='empirical_kernel_map'></a>empirical_kernel_map</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON kern_type
+                - must be a kernel function object as defined in dlib/svm/kernel_abstract.h
+
+            INITIAL VALUE
+                - out_vector_size() == 0
+                - basis_size() == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a map from objects of sample_type (the kind of object 
+                a kernel function operates on) to finite dimensional column vectors which 
+                represent points in the kernel feature space defined by whatever kernel 
+                is used with this object. 
+
+                To use the empirical_kernel_map you supply it with a particular kernel and a set of 
+                basis samples.  After that you can present it with new samples and it will project 
+                them into the part of kernel feature space spanned by your basis samples.   
+                
+                This means the empirical_kernel_map is a tool you can use to very easily kernelize 
+                any algorithm that operates on column vectors.  All you have to do is select a 
+                set of basis samples and then use the empirical_kernel_map to project all your 
+                data points into the part of kernel feature space spanned by those basis samples.
+                Then just run your normal algorithm on the output vectors and it will be effectively 
+                kernelized.  
+
+                Regarding methods to select a set of basis samples, if you are working with only a 
+                few thousand samples then you can just use all of them as basis samples.  
+                Alternatively, the linearly_independent_subset_finder often works well for 
+                selecting a basis set.  I also find that picking a random subset typically works 
+                well.
+
+
+                The empirical kernel map is something that has been around in the kernel methods
+                literature for a long time but is seemingly not well known.  Anyway, one of the
+                best books on the subject is the following:
+                    Learning with Kernels: Support Vector Machines, Regularization, Optimization, 
+                    and Beyond by Bernhard Schlkopf, Alexander J. Smola
+                The authors discuss the empirical kernel map as well as many other interesting 
+                topics.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> kern_type kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mem_manager_type;
+
+        <font color='#0000FF'>struct</font> <b><a name='empirical_kernel_map_error'></a>empirical_kernel_map_error</b> : <font color='#0000FF'>public</font> error;
+        <font color='#009900'>/*!
+            This is an exception class used to indicate a failure to create a 
+            kernel map from data given by the user.
+        !*/</font>
+
+        <b><a name='empirical_kernel_map'></a>empirical_kernel_map</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object has its initial value
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='load'></a>load</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> kernel,
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> basis_samples
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - T must be a dlib::matrix type or something convertible to a matrix via mat()
+                  (e.g. a std::vector)
+                - is_vector(basis_samples) == true
+                - basis_samples.size() &gt; 0
+                - kernel must be capable of operating on the elements of basis_samples.  That is,
+                  expressions such as kernel(basis_samples(0), basis_samples(0)) should make sense.
+            ensures
+                - 0 &lt; #out_vector_size() &lt;= basis_samples.size()
+                - #basis_size() == basis_samples.size()
+                - #get_kernel() == kernel
+                - This function constructs a map between normal sample_type objects and the 
+                  subspace of the kernel feature space defined by the given kernel and the
+                  given set of basis samples.  So after this function has been called you
+                  will be able to project sample_type objects into kernel feature space
+                  and obtain the resulting vector as a regular column matrix.
+                - The basis samples are loaded into this object in the order in which they
+                  are stored in basis_samples.  That is:
+                    - for all valid i: (*this)[i] == basis_samples(i)
+            throws
+                - empirical_kernel_map_error
+                    This exception is thrown if we are unable to create a kernel map.
+                    If this happens then this object will revert back to its initial value.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='load'></a>load</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> linearly_independent_subset_finder<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lisf
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #out_vector_size() == lisf.dictionary_size() 
+                - #basis_size() == lisf.dictionary_size()
+                - #get_kernel() == lisf.get_kernel()
+                - Uses the dictionary vectors from lisf as a basis set.  Thus, this function 
+                  constructs a map between normal sample_type objects and the subspace of 
+                  the kernel feature space defined by the given kernel and the given set 
+                  of basis samples.  So after this function has been called you will be 
+                  able to project sample_type objects into kernel feature space and obtain 
+                  the resulting vector as a regular column matrix.
+                - The basis samples are loaded into this object in the order in which they
+                  are stored in lisf.  That is:
+                    - for all valid i: (*this)[i] == lisf[i]
+            throws
+                - empirical_kernel_map_error
+                    This exception is thrown if we are unable to create a kernel map.  
+                    E.g.  if the lisf.size() == 0.  
+                    If this happens then this object will revert back to its initial value.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> kernel_type <b><a name='get_kernel'></a>get_kernel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - out_vector_size() != 0
+            ensures
+                - returns a copy of the kernel used by this object
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='out_vector_size'></a>out_vector_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (this object has been loaded with basis samples) then
+                    - returns the dimensionality of the vectors output by the project() function.
+                - else
+                    - returns 0
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='basis_size'></a>basis_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of basis vectors in projection_functions created
+                  by this object.  This is also equal to the number of basis vectors
+                  given to the load() function.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - idx &lt; basis_size()
+            ensures
+                - returns a const reference to the idx'th basis vector contained inside 
+                  this object.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='project'></a>project</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> sample 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - out_vector_size() != 0
+            ensures
+                - takes the given sample and projects it into the kernel feature space
+                  of out_vector_size() dimensions defined by this kernel map and 
+                  returns the resulting vector.
+                - in more precise terms, this function returns a vector such that:
+                    - The returned vector will contain out_vector_size() elements.
+                    - for any sample_type object S, the following equality is approximately true:
+                        - get_kernel()(sample,S) == dot(project(sample), project(S)).  
+                    - The approximation error in the above equality will be zero (within rounding error)
+                      if both sample_type objects involved are within the span of the set of basis 
+                      samples given to the load() function.  If they are not then there will be some 
+                      approximation error.  Note that all the basis samples are always within their
+                      own span.  So the equality is always exact for the samples given to the load() 
+                      function.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='project'></a>project</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> samp,
+            scalar_type<font color='#5555FF'>&amp;</font> projection_error
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - out_vector_size() != 0
+            ensures
+                - This function returns project(samp)
+                  (i.e. it returns the same thing as the above project() function)
+                - #projection_error == the square of the distance between the point samp 
+                  gets projected onto and samp's true image in kernel feature space.  
+                  That is, this value is equal to: 
+                    pow(convert_to_distance_function(project(samp))(samp),2)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='convert_to_decision_function'></a>convert_to_decision_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_vector(vect) == true
+                - vect.size() == out_vector_size()
+                - out_vector_size() != 0
+            ensures
+                - This function interprets the given vector as a point in the kernel feature space defined 
+                  by this empirical_kernel_map.  The return value of this function is a decision 
+                  function, DF, that represents the given vector in the following sense:
+                    - for all possible sample_type objects, S, it is the case that DF(S) == dot(project(S), vect)
+                      (i.e. the returned decision function computes dot products, in kernel feature space, 
+                      between vect and any argument you give it.  Note also that this equality is exact, even
+                      for sample_type objects not in the span of the basis samples.)
+                    - DF.kernel_function == get_kernel()
+                    - DF.b == 0
+                    - DF.basis_vectors == these will be the basis samples given to the previous call to load().  Note
+                      that it is possible for there to be fewer basis_vectors than basis samples given to load().  
+                    - DF.basis_vectors.size() == basis_size()
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> distance_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='convert_to_distance_function'></a>convert_to_distance_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            requires
+                - is_vector(vect) == true
+                - vect.size() == out_vector_size()
+                - out_vector_size() != 0
+            ensures
+                - This function interprets the given vector as a point in the kernel feature space defined 
+                  by this empirical_kernel_map.  The return value of this function is a distance 
+                  function, DF, that represents the given vector in the following sense:
+                    - for any sample_type object S, the following equality is approximately true: 
+                        - DF(S) == length(project(S) - vect)
+                          (i.e. the returned distance function computes distances, in kernel feature space, 
+                          between vect and any argument you give it. )
+                    - The approximation error in the above equality will be zero (within rounding error)
+                      if S is within the span of the set of basis samples given to the load() function.  
+                      If it is not then there will be some approximation error.  Note that all the basis 
+                      samples are always within their own span.  So the equality is always exact for the 
+                      samples given to the load() function.  Note further that the distance computed
+                      by DF(S) is always the correct distance in kernel feature space between vect and
+                      the true projection of S.  That is, the above equality is approximate only because 
+                      of potential error in the project() function, not in DF(S).
+                    - DF.kernel_function == get_kernel()
+                    - DF.b == dot(vect,vect) 
+                    - DF.basis_vectors == these will be the basis samples given to the previous call to load().  Note
+                      that it is possible for there to be fewer basis_vectors than basis samples given to load().  
+                    - DF.basis_vectors.size() == basis_size()
+        !*/</font>
+
+        <font color='#0000FF'>const</font> projection_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='get_projection_function'></a>get_projection_function</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - out_vector_size() != 0
+            ensures
+                - returns a projection_function, PF, that computes the same projection as project().
+                  That is, calling PF() on any sample will produce the same output vector as calling
+                  this-&gt;project() on that sample.
+                - PF.basis_vectors.size() == basis_size()
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type<font color='#5555FF'>&gt;</font> <b><a name='get_transformation_to'></a>get_transformation_to</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> empirical_kernel_map<font color='#5555FF'>&amp;</font> target
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - get_kernel() == target.get_kernel()
+                - out_vector_size() != 0
+                - target.out_vector_size() != 0
+            ensures
+                - A point in the kernel feature space defined by the kernel get_kernel() typically
+                  has different representations with respect to different empirical_kernel_maps.
+                  This function lets you obtain a transformation matrix that will allow you
+                  to project between these different representations. That is, this function returns 
+                  a matrix M with the following properties:    
+                    - M maps vectors represented according to *this into the representation used by target. 
+                    - M.nr() == target.out_vector_size()
+                    - M.nc() == this-&gt;out_vector_size()
+                    - Let V be a vector of this-&gt;out_vector_size() length.  Then define two distance_functions
+                      DF1 = this-&gt;convert_to_distance_function(V)
+                      DF2 = target.convert_to_distance_function(M*V)
+
+                      Then DF1(DF2) == 0 // i.e. the distance between these two points should be 0
+
+                      That is, DF1 and DF2 both represent the same point in kernel feature space.  Note
+                      that the above equality is only approximate.  If the vector V represents a point in
+                      kernel space that isn't in the span of the basis samples used by target then the 
+                      equality is approximate.  However, if it is in their span then the equality will
+                      be exact.  For example, if target's basis samples are a superset of the basis samples
+                      used by *this then the equality will always be exact (within rounding error).
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_transformation_to'></a>get_transformation_to</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> empirical_kernel_map<font color='#5555FF'>&amp;</font> target,
+            matrix<font color='#5555FF'>&lt;</font>scalar_type, <font color='#979000'>0</font>, <font color='#979000'>0</font>, mem_manager_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> tmat,
+            projection_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> partial_projection
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - get_kernel() == target.get_kernel()
+                - out_vector_size() != 0
+                - target.out_vector_size() != 0
+                - basis_size() &lt; target.basis_size()
+                - for all i &lt; basis_size(): (*this)[i] == target[i]
+                  i.e. target must contain a superset of the basis vectors contained in *this.  Moreover,
+                  it must contain them in the same order.
+            ensures
+                - The single argument version of get_transformation_to() allows you to project 
+                  vectors from one empirical_kernel_map representation to another.  This version
+                  provides a somewhat different capability.  Assuming target's basis vectors form a
+                  superset of *this's basis vectors then this form of get_transformation_to() allows
+                  you to reuse a vector from *this ekm to speed up the projection performed by target.
+                  The defining relation is given below.
+                - for any sample S: 
+                    - target.project(S) == #tmat * this-&gt;project(S) + #partial_projection(S)
+                      (this is always true to within rounding error for any S)
+                - #partial_projection.basis_vectors.size() == target.basis_vectors.size() - this-&gt;basis_vectors.size()
+                - #tmat.nr() == target.out_vector_size()
+                - #tmat.nc() == this-&gt;out_vector_size()
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            empirical_kernel_map<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps the state of *this and item
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        empirical_kernel_map<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+        empirical_kernel_map<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> empirical_kernel_map<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for empirical_kernel_map objects
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        empirical_kernel_map<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for empirical_kernel_map objects
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_EMPIRICAL_KERNEl_MAP_ABSTRACT_H_
+</font>
+
+</pre></body></html>

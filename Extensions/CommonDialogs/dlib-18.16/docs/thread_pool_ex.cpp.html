@@ -1,0 +1,206 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - thread_pool_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use of the thread_pool 
+    object from the dlib C++ Library.
+
+
+    This is a very simple example.  It creates a thread pool with 3
+    threads and then sends a few simple tasks to the pool.
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>threads.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>misc_api.h<font color='#5555FF'>&gt;</font>  <font color='#009900'>// for dlib::sleep
+</font><font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>logger.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// We will be using the dlib logger object to print out messages in this example
+</font><font color='#009900'>// because its output is timestamped and labeled with the thread that the log
+</font><font color='#009900'>// message came from.  So this will make it easier to see what is going on in 
+</font><font color='#009900'>// this example.  Here we make an instance of the logger.  See the logger 
+</font><font color='#009900'>// documentation and examples for detailed information regarding its use.
+</font>logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>main</font>"<font face='Lucida Console'>)</font>;
+
+
+<font color='#009900'>// Here we make an instance of the thread pool object
+</font>thread_pool <b><a name='tp'></a>tp</b><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>class</font> <b><a name='test'></a>test</b>
+<b>{</b>
+    <font color='#009900'>/*
+        The thread_pool accepts "tasks" from the user and schedules them for 
+        execution in one of its threads when one becomes available.  Each task 
+        is just a request to call a function.  So here we create a class called 
+        test with a few member functions which we will have the thread pool call 
+        as tasks.
+    */</font>
+<font color='#0000FF'>public</font>:
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='task'></a>task</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>task start</font>";
+
+        future<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> var;
+
+        var <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        <font color='#009900'>// Here we ask the thread pool to call this-&gt;subtask() and this-&gt;subtask2().
+</font>        <font color='#009900'>// Note that calls to add_task() will return immediately if there is an 
+</font>        <font color='#009900'>// available thread to hand the task off to.  However, if there isn't a 
+</font>        <font color='#009900'>// thread ready then add_task() blocks until there is such a thread.
+</font>        <font color='#009900'>// Also note that since task() is executed within the thread pool (see main() below)
+</font>        <font color='#009900'>// calls to add_task() will execute the requested task within the calling thread
+</font>        <font color='#009900'>// in cases where the thread pool is full.  This means it is always safe to 
+</font>        <font color='#009900'>// spawn subtasks from within another task, which is what we are doing here.
+</font>        tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>test::subtask,var<font face='Lucida Console'>)</font>; <font color='#009900'>// schedule call to this-&gt;subtask(var) 
+</font>        tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>test::subtask2<font face='Lucida Console'>)</font>;    <font color='#009900'>// schedule call to this-&gt;subtask2() 
+</font>
+        <font color='#009900'>// Since var is a future, this line will wait for the test::subtask task to 
+</font>        <font color='#009900'>// finish before allowing us to access the contents of var.  Then var will 
+</font>        <font color='#009900'>// return the integer it contains.  In this case result will be assigned 
+</font>        <font color='#009900'>// the value 2 since var was incremented by subtask().
+</font>        <font color='#0000FF'><u>int</u></font> result <font color='#5555FF'>=</font> var;
+        <font color='#009900'>// print out the result
+</font>        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>var = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> result;
+
+        <font color='#009900'>// Wait for all the tasks we have started to finish.  Note that
+</font>        <font color='#009900'>// wait_for_all_tasks() only waits for tasks which were started 
+</font>        <font color='#009900'>// by the calling thread.  So you don't have to worry about other 
+</font>        <font color='#009900'>// unrelated parts of your application interfering.  In this case
+</font>        <font color='#009900'>// it just waits for subtask2() to finish.
+</font>        tp.<font color='#BB00BB'>wait_for_all_tasks</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>task end</font>" ;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='subtask'></a>subtask</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> a<font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>200</font><font face='Lucida Console'>)</font>;
+        a <font color='#5555FF'>=</font> a <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>subtask end </font>";
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='subtask2'></a>subtask2</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>300</font><font face='Lucida Console'>)</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>subtask2 end </font>";
+    <b>}</b>
+
+<b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>class</font> <b><a name='add_value'></a>add_value</b>
+<b>{</b>
+<font color='#0000FF'>public</font>:
+    <b><a name='add_value'></a>add_value</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> value<font face='Lucida Console'>)</font>:val<font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font> <b>{</b> <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> a <font face='Lucida Console'>)</font>
+    <b>{</b>
+        a <font color='#5555FF'>+</font><font color='#5555FF'>=</font> val;
+    <b>}</b>
+
+<font color='#0000FF'>private</font>:
+    <font color='#0000FF'><u>int</u></font> val;
+<b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// tell the logger to print out everything
+</font>    dlog.<font color='#BB00BB'>set_level</font><font face='Lucida Console'>(</font>LALL<font face='Lucida Console'>)</font>;
+
+
+    dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>schedule a few tasks</font>";
+
+    test mytask;
+    <font color='#009900'>// Schedule the thread pool to call mytask.task().  Note that all forms of add_task()
+</font>    <font color='#009900'>// pass in the task object by reference.  This means you must make sure, in this case,
+</font>    <font color='#009900'>// that mytask isn't destructed until after the task has finished executing.
+</font>    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>mytask, <font color='#5555FF'>&amp;</font>test::task<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// You can also pass task objects to a thread pool by value.  So in this case we don't
+</font>    <font color='#009900'>// have to worry about keeping our own instance of the task.  Here we construct a temporary 
+</font>    <font color='#009900'>// add_value object and pass it right in and everything works like it should.
+</font>    future<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> num <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+    tp.<font color='#BB00BB'>add_task_by_value</font><font face='Lucida Console'>(</font><font color='#BB00BB'>add_value</font><font face='Lucida Console'>(</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>, num<font face='Lucida Console'>)</font>;  <font color='#009900'>// adds 7 to num
+</font>    <font color='#0000FF'><u>int</u></font> result <font color='#5555FF'>=</font> num.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>result = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> result;   <font color='#009900'>// prints result = 10
+</font>
+
+
+
+
+<font color='#009900'>// uncomment this line if your compiler supports the new C++0x lambda functions
+</font><font color='#009900'>//#define COMPILER_SUPPORTS_CPP0X_LAMBDA_FUNCTIONS
+</font><font color='#0000FF'>#ifdef</font> COMPILER_SUPPORTS_CPP0X_LAMBDA_FUNCTIONS
+
+    <font color='#009900'>// In the above examples we had to explicitly create task objects which is
+</font>    <font color='#009900'>// inconvenient.  If you have a compiler which supports C++0x lambda functions
+</font>    <font color='#009900'>// then you can use the following simpler method.
+</font>
+    <font color='#009900'>// make a task which will just log a message
+</font>    tp.<font color='#BB00BB'>add_task_by_value</font><font face='Lucida Console'>(</font>[]<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b>
+                         dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>A message from a lambda function running in another thread.</font>"; 
+                         <b>}</b><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Here we make 10 different tasks, each assigns a different value into 
+</font>    <font color='#009900'>// the elements of the vector vect.
+</font>    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>vect</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// Make a lambda function which takes vect by reference and i by value.  So what
+</font>        <font color='#009900'>// will happen is each assignment statement will run in a thread in the thread_pool.
+</font>        tp.<font color='#BB00BB'>add_task_by_value</font><font face='Lucida Console'>(</font>[<font color='#5555FF'>&amp;</font>vect,i]<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b>
+                             vect[i] <font color='#5555FF'>=</font> i;
+                             <b>}</b><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#009900'>// Wait for all tasks which were requested by the main thread to complete.
+</font>    tp.<font color='#BB00BB'>wait_for_all_tasks</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>vect[</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>]: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> vect[i];
+    <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+
+
+    <font color='#009900'>/* A possible run of this program might produce the following output (the first column is 
+       the time the log message occurred and the value in [] is the thread id for the thread
+       that generated the log message):
+
+    1 INFO  [0] main: schedule a few tasks
+    1 INFO  [1] main: task start
+    1 INFO  [0] main: result = 10
+  201 INFO  [2] main: subtask end 
+  201 INFO  [1] main: var = 2
+  201 INFO  [2] main: A message from a lambda function running in another thread.
+  301 INFO  [3] main: subtask2 end 
+  301 INFO  [1] main: task end
+  301 INFO  [0] main: vect[0]: 0
+  301 INFO  [0] main: vect[1]: 1
+  301 INFO  [0] main: vect[2]: 2
+  301 INFO  [0] main: vect[3]: 3
+  301 INFO  [0] main: vect[4]: 4
+  301 INFO  [0] main: vect[5]: 5
+  301 INFO  [0] main: vect[6]: 6
+  301 INFO  [0] main: vect[7]: 7
+  301 INFO  [0] main: vect[8]: 8
+  301 INFO  [0] main: vect[9]: 9
+    */</font>
+<b>}</b>
+
+
+
+
+
+
+</pre></body></html>

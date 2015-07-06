@@ -1,0 +1,111 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - entropy_decoder_model.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2004  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_ENTROPY_DECODER_MODEl_
+<font color='#0000FF'>#define</font> DLIB_ENTROPY_DECODER_MODEl_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='entropy_decoder_model/entropy_decoder_model_kernel_1.h.html'>entropy_decoder_model/entropy_decoder_model_kernel_1.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='entropy_decoder_model/entropy_decoder_model_kernel_2.h.html'>entropy_decoder_model/entropy_decoder_model_kernel_2.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='entropy_decoder_model/entropy_decoder_model_kernel_3.h.html'>entropy_decoder_model/entropy_decoder_model_kernel_3.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='entropy_decoder_model/entropy_decoder_model_kernel_4.h.html'>entropy_decoder_model/entropy_decoder_model_kernel_4.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='entropy_decoder_model/entropy_decoder_model_kernel_5.h.html'>entropy_decoder_model/entropy_decoder_model_kernel_5.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='entropy_decoder_model/entropy_decoder_model_kernel_6.h.html'>entropy_decoder_model/entropy_decoder_model_kernel_6.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='conditioning_class.h.html'>conditioning_class.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='memory_manager.h.html'>memory_manager.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'>typename</font> entropy_decoder
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='entropy_decoder_model'></a>entropy_decoder_model</b>
+    <b>{</b>
+        <b><a name='entropy_decoder_model'></a>entropy_decoder_model</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> conditioning_class<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font>::kernel_1a cc1;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> conditioning_class<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font>::kernel_2a cc2;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> conditioning_class<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font>::kernel_3a cc3;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> conditioning_class<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font>::kernel_4a cc4a;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> conditioning_class<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font>::kernel_4b cc4b;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> conditioning_class<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font>::kernel_4c cc4c;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> conditioning_class<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font>::kernel_4d cc4d;
+
+    <font color='#0000FF'>public</font>:
+        
+        <font color='#009900'>//----------- kernels ---------------
+</font>
+        <font color='#009900'>// kernel_1        
+</font>        <font color='#0000FF'>typedef</font>     entropy_decoder_model_kernel_1<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,cc1<font color='#5555FF'>&gt;</font>
+                    kernel_1a;
+    
+        <font color='#0000FF'>typedef</font>     entropy_decoder_model_kernel_1<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,cc2<font color='#5555FF'>&gt;</font>
+                    kernel_1b;
+
+        <font color='#0000FF'>typedef</font>     entropy_decoder_model_kernel_1<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,cc3<font color='#5555FF'>&gt;</font>
+                    kernel_1c;
+
+        <font color='#009900'>// --------------------
+</font>
+        <font color='#009900'>// kernel_2      
+</font>        <font color='#0000FF'>typedef</font>     entropy_decoder_model_kernel_2<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,cc1,cc1<font color='#5555FF'>&gt;</font>
+                    kernel_2a;
+    
+        <font color='#0000FF'>typedef</font>     entropy_decoder_model_kernel_2<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,cc2,cc2<font color='#5555FF'>&gt;</font>
+                    kernel_2b;
+
+        <font color='#0000FF'>typedef</font>     entropy_decoder_model_kernel_2<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,cc3,cc3<font color='#5555FF'>&gt;</font>
+                    kernel_2c;
+
+        <font color='#0000FF'>typedef</font>     entropy_decoder_model_kernel_2<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,cc2,cc4b<font color='#5555FF'>&gt;</font>
+                    kernel_2d;
+
+        <font color='#009900'>// --------------------
+</font>
+        <font color='#009900'>// kernel_3       
+</font>        <font color='#0000FF'>typedef</font>     entropy_decoder_model_kernel_3<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,cc1,cc4b<font color='#5555FF'>&gt;</font>
+                    kernel_3a;
+    
+        <font color='#0000FF'>typedef</font>     entropy_decoder_model_kernel_3<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,cc2,cc4b<font color='#5555FF'>&gt;</font>
+                    kernel_3b;
+
+        <font color='#0000FF'>typedef</font>     entropy_decoder_model_kernel_3<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,cc3,cc4b<font color='#5555FF'>&gt;</font>
+                    kernel_3c;
+
+        <font color='#009900'>// --------------------
+</font>
+        <font color='#009900'>// kernel_4       
+</font>        <font color='#0000FF'>typedef</font>     entropy_decoder_model_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,<font color='#979000'>200000</font>,<font color='#979000'>4</font><font color='#5555FF'>&gt;</font>
+                    kernel_4a;
+        <font color='#0000FF'>typedef</font>     entropy_decoder_model_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,<font color='#979000'>1000000</font>,<font color='#979000'>5</font><font color='#5555FF'>&gt;</font>
+                    kernel_4b;
+
+
+        <font color='#009900'>// --------------------
+</font>
+        <font color='#009900'>// kernel_5       
+</font>        <font color='#0000FF'>typedef</font>     entropy_decoder_model_kernel_5<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,<font color='#979000'>200000</font>,<font color='#979000'>4</font><font color='#5555FF'>&gt;</font>
+                    kernel_5a;
+        <font color='#0000FF'>typedef</font>     entropy_decoder_model_kernel_5<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,<font color='#979000'>1000000</font>,<font color='#979000'>5</font><font color='#5555FF'>&gt;</font>
+                    kernel_5b;
+        <font color='#0000FF'>typedef</font>     entropy_decoder_model_kernel_5<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,<font color='#979000'>2500000</font>,<font color='#979000'>7</font><font color='#5555FF'>&gt;</font>
+                    kernel_5c;
+
+
+        <font color='#009900'>// --------------------
+</font>
+        <font color='#009900'>// kernel_6       
+</font>        <font color='#0000FF'>typedef</font>     entropy_decoder_model_kernel_6<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder<font color='#5555FF'>&gt;</font>
+                    kernel_6a;
+
+
+    <b>}</b>;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ENTROPY_DECODER_MODEl_
+</font>
+
+</pre></body></html>

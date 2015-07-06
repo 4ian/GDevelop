@@ -1,0 +1,46 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - spectral_cluster_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2015  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SPECTRAL_CLUSTEr_ABSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_SPECTRAL_CLUSTEr_ABSTRACT_H_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type,
+        <font color='#0000FF'>typename</font> vector_type
+        <font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <b><a name='spectral_cluster'></a>spectral_cluster</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> k,
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_clusters
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - samples must be something with an interface compatible with std::vector.
+            - The following expression must evaluate to a double or float:
+                k(samples[i], samples[j])
+            - num_clusters &gt; 0
+        ensures
+            - Performs the spectral clustering algorithm described in the paper: 
+              On spectral clustering: Analysis and an algorithm by Ng, Jordan, and Weiss.
+              and returns the results.
+            - This function clusters the input data samples into num_clusters clusters and
+              returns a vector that indicates which cluster each sample falls into.  In
+              particular, we return an array A such that:
+                - A.size() == samples.size()
+                - A[i] == the cluster assignment of samples[i].
+                - for all valid i: 0 &lt;= A[i] &lt; num_clusters 
+            - The "similarity" of samples[i] with samples[j] is given by
+              k(samples[i],samples[j]).  This means that k() should output a number &gt;= 0
+              and the number should be larger for samples that are more similar.
+    !*/</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SPECTRAL_CLUSTEr_ABSTRACT_H_
+</font>
+
+
+</pre></body></html>

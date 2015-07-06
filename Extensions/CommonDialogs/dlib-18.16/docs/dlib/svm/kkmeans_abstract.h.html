@@ -1,0 +1,328 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - kkmeans_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_KKMEANs_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_KKMEANs_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel_abstract.h.html'>kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kcentroid_abstract.h.html'>kcentroid_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../noncopyable.h.html'>../noncopyable.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='kkmeans'></a>kkmeans</b> : <font color='#0000FF'>public</font> noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON kernel_type
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+
+            INITIAL VALUE
+                - number_of_centers() == 1
+                - get_min_change() == 0.01
+
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of a kernelized k-means clustering algorithm.  
+                It performs k-means clustering by using the kcentroid object.  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mem_manager_type;
+
+        <b><a name='kkmeans'></a>kkmeans</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> kc_ 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #number_of_centers() == 1
+                - #get_min_change() == 0.01
+                - #get_kcentroid(0) == a copy of kc_
+        !*/</font>
+
+        ~<b><a name='kkmeans'></a>kkmeans</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources associated with *this have been released
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_kcentroid'></a>set_kcentroid</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> kc_
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - for all idx:  
+                    - #get_kcentroid(idx) == a copy of kc_
+        !*/</font>
+
+        <font color='#0000FF'>const</font> kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_kcentroid'></a>get_kcentroid</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - i &lt; number_of_centers()
+            ensures
+                - returns a const reference to the ith kcentroid object contained in
+                  this object.  Each kcentroid represents one of the centers found
+                  by the k-means clustering algorithm.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> <b><a name='get_kernel'></a>get_kernel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a const reference to the kernel used by this object
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_number_of_centers'></a>set_number_of_centers</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - num &gt; 0
+            ensures
+                - #number_of_centers() == num
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_centers'></a>number_of_centers</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of centers used in this instance of the k-means clustering
+                  algorithm.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> matrix_type,
+            <font color='#0000FF'>typename</font> matrix_type2
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_type<font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> matrix_type2<font color='#5555FF'>&amp;</font> initial_centers,
+            <font color='#0000FF'><u>long</u></font> max_iter <font color='#5555FF'>=</font> <font color='#979000'>1000</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - matrix_type and matrix_type2 must either be dlib::matrix objects or convertible to dlib::matrix
+                  via mat()
+                - matrix_type::type == sample_type  (i.e. matrix_type should contain sample_type objects)
+                - matrix_type2::type == sample_type (i.e. matrix_type2 should contain sample_type objects)
+                - initial_centers.nc() == 1         (i.e. must be a column vector)
+                - samples.nc() == 1                 (i.e. must be a column vector)
+                - initial_centers.nr() == number_of_centers()
+            ensures
+                - performs k-means clustering of the given set of samples.  The initial center points
+                  are taken from the initial_centers argument.
+                - loops over the data and continues to refine the clustering until either less than 
+                  get_min_change() fraction of the data points change clusters or we have done max_iter 
+                  iterations over the data.
+                - After this function finishes you can call the operator() function below
+                  to determine which centroid a given sample is closest to.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> sample
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a number idx such that:
+                    - idx &lt; number_of_centers()
+                    - get_kcentroid(idx) == the centroid that is closest to the given
+                      sample.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_min_change'></a>set_min_change</b> <font face='Lucida Console'>(</font>
+            scalar_type min_change
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= min_change &lt; 1
+            ensures
+                - #get_min_change() == min_change
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_min_change'></a>get_min_change</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the minimum fraction of data points that need to change
+                  centers in an iteration of kmeans for the algorithm to keep going.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            kkmeans<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+        kkmeans<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        kkmeans<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> kkmeans<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for kkmeans objects
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        kkmeans<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for kkmeans objects
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type1, 
+        <font color='#0000FF'>typename</font> vector_type2, 
+        <font color='#0000FF'>typename</font> kernel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='pick_initial_centers'></a>pick_initial_centers</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>long</u></font> num_centers, 
+        vector_type1<font color='#5555FF'>&amp;</font> centers, 
+        <font color='#0000FF'>const</font> vector_type2<font color='#5555FF'>&amp;</font> samples, 
+        <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> k, 
+        <font color='#0000FF'><u>double</u></font> percentile <font color='#5555FF'>=</font> <font color='#979000'>0.01</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - num_centers &gt; 1
+            - 0 &lt;= percentile &lt; 1
+            - samples.size() &gt; 1
+            - vector_type1 == something with an interface compatible with std::vector
+            - vector_type2 == something with an interface compatible with std::vector
+            - k(samples[0],samples[0]) must be a valid expression that returns a double
+            - both centers and samples must be able to contain kernel_type::sample_type 
+              objects
+        ensures
+            - finds num_centers candidate cluster centers in the data in the samples 
+              vector.  Assumes that k is the kernel that will be used during clustering 
+              to define the space in which clustering occurs.
+            - The centers are found by looking for points that are far away from other 
+              candidate centers.  However, if the data is noisy you probably want to 
+              ignore the farthest way points since they will be outliers.  To do this 
+              set percentile to the fraction of outliers you expect the data to contain.
+            - #centers.size() == num_centers
+            - #centers == a vector containing the candidate centers found
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type1, 
+        <font color='#0000FF'>typename</font> vector_type2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='pick_initial_centers'></a>pick_initial_centers</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>long</u></font> num_centers, 
+        vector_type1<font color='#5555FF'>&amp;</font> centers, 
+        <font color='#0000FF'>const</font> vector_type2<font color='#5555FF'>&amp;</font> samples, 
+        <font color='#0000FF'><u>double</u></font> percentile <font color='#5555FF'>=</font> <font color='#979000'>0.01</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - num_centers &gt; 1
+            - 0 &lt;= percentile &lt; 1
+            - samples.size() &gt; 1
+            - vector_type1 == something with an interface compatible with std::vector
+            - vector_type2 == something with an interface compatible with std::vector
+            - Both centers and samples must be able to contain dlib::matrix based row or
+              column vectors.
+        ensures
+            - performs: pick_initial_centers(num_centers, centers, samples, linear_kernel&lt;sample_type&gt;(), percentile)
+              (i.e. this function is simply an overload that uses the linear kernel.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> array_type, 
+        <font color='#0000FF'>typename</font> sample_type,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_clusters_using_kmeans'></a>find_clusters_using_kmeans</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> array_type<font color='#5555FF'>&amp;</font> samples,
+        std::vector<font color='#5555FF'>&lt;</font>sample_type, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> centers,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter <font color='#5555FF'>=</font> <font color='#979000'>1000</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - samples.size() &gt; 0
+            - samples == a bunch of row or column vectors and they all must be of the
+              same length.
+            - centers.size() &gt; 0
+            - array_type == something with an interface compatible with std::vector
+              and it must contain row or column vectors capable of being stored in 
+              sample_type objects
+            - sample_type == a dlib::matrix capable of representing vectors
+        ensures
+            - performs regular old linear kmeans clustering on the samples.  The clustering
+              begins with the initial set of centers given as an argument to this function.
+              When it finishes #centers will contain the resulting centers.
+            - no more than max_iter iterations will be performed before this function
+              terminates.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> array_type, 
+        <font color='#0000FF'>typename</font> EXP 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='nearest_center'></a>nearest_center</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> array_type<font color='#5555FF'>&amp;</font> centers,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> sample
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - centers.size() &gt; 0
+            - sample.size() &gt; 0
+            - is_vector(sample) == true
+            - centers must be an array of vectors such that the following expression is
+              valid: length_squared(sample - centers[0]).  (e.g. centers could be a
+              std::vector of matrix objects holding column vectors).
+        ensures
+            - returns the index that identifies the element of centers that is nearest to
+              sample.  That is, returns a number IDX such that centers[IDX] is the element
+              of centers that minimizes length(centers[IDX]-sample).
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_KKMEANs_ABSTRACT_
+</font>
+
+</pre></body></html>

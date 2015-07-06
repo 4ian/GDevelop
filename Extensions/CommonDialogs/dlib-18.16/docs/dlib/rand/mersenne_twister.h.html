@@ -1,0 +1,213 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - mersenne_twister.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/* boost random/mersenne_twister.hpp header file
+ *
+ * Copyright Jens Maurer 2000-2001
+ * Distributed under the Boost Software License, Version 1.0. (See
+ * accompanying file LICENSE_1_0.txt or copy at
+ * http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * See http://www.boost.org for most recent version including documentation.
+ *
+ * $Id: mersenne_twister.hpp,v 1.20 2005/07/21 22:04:31 jmaurer Exp $
+ *
+ * Revision history
+ *  2001-02-18  moved to individual header files
+*/</font>
+
+<font color='#0000FF'>#ifndef</font> DLIB_BOOST_RANDOM_MERSENNE_TWISTER_HPP
+<font color='#0000FF'>#define</font> DLIB_BOOST_RANDOM_MERSENNE_TWISTER_HPP
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>algorithm<font color='#5555FF'>&gt;</font>     <font color='#009900'>// std::copy
+</font><font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>stdexcept<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib 
+<b>{</b>
+    <font color='#0000FF'>namespace</font> random_helpers 
+    <b>{</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#009900'>// http://www.math.keio.ac.jp/matumoto/emt.html
+</font>        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>class</font> <b><a name='UIntType'></a>UIntType</b>, 
+            <font color='#0000FF'><u>int</u></font> w, 
+            <font color='#0000FF'><u>int</u></font> n,
+            <font color='#0000FF'><u>int</u></font> m,
+            <font color='#0000FF'><u>int</u></font> r,
+            UIntType a,
+            <font color='#0000FF'><u>int</u></font> u,
+            <font color='#0000FF'><u>int</u></font> s,
+            UIntType b,
+            <font color='#0000FF'><u>int</u></font> t,
+            UIntType c,
+            <font color='#0000FF'><u>int</u></font> l,
+            UIntType val
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='mersenne_twister'></a>mersenne_twister</b>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>typedef</font> UIntType result_type;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> word_size <font color='#5555FF'>=</font> w;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> state_size <font color='#5555FF'>=</font> n;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> shift_size <font color='#5555FF'>=</font> m;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> mask_bits <font color='#5555FF'>=</font> r;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> UIntType parameter_a <font color='#5555FF'>=</font> a;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> output_u <font color='#5555FF'>=</font> u;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> output_s <font color='#5555FF'>=</font> s;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> UIntType output_b <font color='#5555FF'>=</font> b;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> output_t <font color='#5555FF'>=</font> t;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> UIntType output_c <font color='#5555FF'>=</font> c;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> output_l <font color='#5555FF'>=</font> l;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> has_fixed_range <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+            <b><a name='mersenne_twister'></a>mersenne_twister</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>seed</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+            <font color='#0000FF'>explicit</font> <b><a name='mersenne_twister'></a>mersenne_twister</b><font face='Lucida Console'>(</font>UIntType value<font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>seed</font><font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font>; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='seed'></a>seed</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>seed</font><font face='Lucida Console'>(</font><font color='#BB00BB'>UIntType</font><font face='Lucida Console'>(</font><font color='#979000'>5489</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+            <font color='#009900'>// compiler-generated copy ctor and assignment operator are fine
+</font>
+            <font color='#0000FF'><u>void</u></font> <b><a name='seed'></a>seed</b><font face='Lucida Console'>(</font>UIntType value<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// New seeding algorithm from 
+</font>                <font color='#009900'>// http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/emt19937ar.html
+</font>                <font color='#009900'>// In the previous versions, MSBs of the seed affected only MSBs of the
+</font>                <font color='#009900'>// state x[].
+</font>                <font color='#0000FF'>const</font> UIntType mask <font color='#5555FF'>=</font> ~<font color='#979000'>0</font>u;
+                x[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> value <font color='#5555FF'>&amp;</font> mask;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> n; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+                    <font color='#009900'>// See Knuth "The Art of Computer Programming" Vol. 2, 3rd ed., page 106
+</font>                    x[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>1812433253</font>UL <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>x[i<font color='#5555FF'>-</font><font color='#979000'>1</font>] ^ <font face='Lucida Console'>(</font>x[i<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font>w<font color='#5555FF'>-</font><font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> i<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> mask;
+                <b>}</b>
+            <b>}</b>
+
+            result_type <b><a name='min'></a>min</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>0</font>; <b>}</b>
+            result_type <b><a name='max'></a>max</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#009900'>// avoid "left shift count &gt;= with of type" warning
+</font>                result_type res <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> w; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    res <font color='#5555FF'>|</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font>u <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> res;
+            <b>}</b>
+
+            result_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> mersenne_twister<font color='#5555FF'>&amp;</font> item, 
+                std::ostream<font color='#5555FF'>&amp;</font> out
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.x, out<font face='Lucida Console'>)</font>;
+                dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i, out<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>
+                mersenne_twister<font color='#5555FF'>&amp;</font> item, 
+                std::istream<font color='#5555FF'>&amp;</font> in 
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.x, in<font face='Lucida Console'>)</font>;
+                dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i, in<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='twist'></a>twist</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> block<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// state representation: next output is o(x(i))
+</font>            <font color='#009900'>//   x[0]  ... x[k] x[k+1] ... x[n-1]     x[n]     ... x[2*n-1]   represents
+</font>            <font color='#009900'>//  x(i-k) ... x(i) x(i+1) ... x(i-k+n-1) x(i-k-n) ... x[i(i-k-1)]
+</font>            <font color='#009900'>// The goal is to always have x(i-n) ... x(i-1) available for
+</font>            <font color='#009900'>// operator== and save/restore.
+</font>
+            UIntType x[<font color='#979000'>2</font><font color='#5555FF'>*</font>n]; 
+            <font color='#0000FF'><u>int</u></font> i;
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>class</font> <b><a name='UIntType'></a>UIntType</b>, <font color='#0000FF'><u>int</u></font> w, <font color='#0000FF'><u>int</u></font> n, <font color='#0000FF'><u>int</u></font> m, <font color='#0000FF'><u>int</u></font> r, UIntType a, <font color='#0000FF'><u>int</u></font> u,
+            <font color='#0000FF'><u>int</u></font> s, UIntType b, <font color='#0000FF'><u>int</u></font> t, UIntType c, <font color='#0000FF'><u>int</u></font> l, UIntType val
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> mersenne_twister<font color='#5555FF'>&lt;</font>UIntType,w,n,m,r,a,u,s,b,t,c,l,val<font color='#5555FF'>&gt;</font>::<b><a name='twist'></a>twist</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> block
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> UIntType upper_mask <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>~<font color='#979000'>0</font>u<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> r;
+            <font color='#0000FF'>const</font> UIntType lower_mask <font color='#5555FF'>=</font> ~upper_mask;
+
+            <font color='#0000FF'>if</font><font face='Lucida Console'>(</font>block <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+                <font color='#0000FF'>for</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> j <font color='#5555FF'>=</font> n; j <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>n; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+                    UIntType y <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x[j<font color='#5555FF'>-</font>n] <font color='#5555FF'>&amp;</font> upper_mask<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>x[j<font color='#5555FF'>-</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>] <font color='#5555FF'>&amp;</font> lower_mask<font face='Lucida Console'>)</font>;
+                    x[j] <font color='#5555FF'>=</font> x[j<font color='#5555FF'>-</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font>m<font face='Lucida Console'>)</font>] ^ <font face='Lucida Console'>(</font>y <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> ^ <font face='Lucida Console'>(</font>y<font color='#5555FF'>&amp;</font><font color='#979000'>1</font> ? a : <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>block <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <b>{</b>
+                <font color='#009900'>// split loop to avoid costly modulo operations
+</font>                <b>{</b>  <font color='#009900'>// extra scope for MSVC brokenness w.r.t. for scope
+</font>                    <font color='#0000FF'>for</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> n<font color='#5555FF'>-</font>m; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+                        UIntType y <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x[j<font color='#5555FF'>+</font>n] <font color='#5555FF'>&amp;</font> upper_mask<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>x[j<font color='#5555FF'>+</font>n<font color='#5555FF'>+</font><font color='#979000'>1</font>] <font color='#5555FF'>&amp;</font> lower_mask<font face='Lucida Console'>)</font>;
+                        x[j] <font color='#5555FF'>=</font> x[j<font color='#5555FF'>+</font>n<font color='#5555FF'>+</font>m] ^ <font face='Lucida Console'>(</font>y <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> ^ <font face='Lucida Console'>(</font>y<font color='#5555FF'>&amp;</font><font color='#979000'>1</font> ? a : <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#0000FF'>for</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> j <font color='#5555FF'>=</font> n<font color='#5555FF'>-</font>m; j <font color='#5555FF'>&lt;</font> n<font color='#5555FF'>-</font><font color='#979000'>1</font>; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+                    UIntType y <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x[j<font color='#5555FF'>+</font>n] <font color='#5555FF'>&amp;</font> upper_mask<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>x[j<font color='#5555FF'>+</font>n<font color='#5555FF'>+</font><font color='#979000'>1</font>] <font color='#5555FF'>&amp;</font> lower_mask<font face='Lucida Console'>)</font>;
+                    x[j] <font color='#5555FF'>=</font> x[j<font color='#5555FF'>-</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font>m<font face='Lucida Console'>)</font>] ^ <font face='Lucida Console'>(</font>y <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> ^ <font face='Lucida Console'>(</font>y<font color='#5555FF'>&amp;</font><font color='#979000'>1</font> ? a : <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#009900'>// last iteration
+</font>                UIntType y <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x[<font color='#979000'>2</font><font color='#5555FF'>*</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>&amp;</font> upper_mask<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>x[<font color='#979000'>0</font>] <font color='#5555FF'>&amp;</font> lower_mask<font face='Lucida Console'>)</font>;
+                x[n<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> x[m<font color='#5555FF'>-</font><font color='#979000'>1</font>] ^ <font face='Lucida Console'>(</font>y <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> ^ <font face='Lucida Console'>(</font>y<font color='#5555FF'>&amp;</font><font color='#979000'>1</font> ? a : <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                i <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>class</font> <b><a name='UIntType'></a>UIntType</b>, <font color='#0000FF'><u>int</u></font> w, <font color='#0000FF'><u>int</u></font> n, <font color='#0000FF'><u>int</u></font> m, <font color='#0000FF'><u>int</u></font> r, UIntType a, <font color='#0000FF'><u>int</u></font> u,
+            <font color='#0000FF'><u>int</u></font> s, UIntType b, <font color='#0000FF'><u>int</u></font> t, UIntType c, <font color='#0000FF'><u>int</u></font> l, UIntType val
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> mersenne_twister<font color='#5555FF'>&lt;</font>UIntType,w,n,m,r,a,u,s,b,t,c,l,val<font color='#5555FF'>&gt;</font>::result_type
+        mersenne_twister<font color='#5555FF'>&lt;</font>UIntType,w,n,m,r,a,u,s,b,t,c,l,val<font color='#5555FF'>&gt;</font>::<b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font><font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> n<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>twist</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font><font face='Lucida Console'>(</font>i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>n<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>twist</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// Step 4
+</font>            UIntType z <font color='#5555FF'>=</font> x[i];
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+            z ^<font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>z <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> u<font face='Lucida Console'>)</font>;
+            z ^<font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>z <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> s<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font>;
+            z ^<font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>z <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> t<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> c<font face='Lucida Console'>)</font>;
+            z ^<font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>z <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> l<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> z;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <b>}</b> <font color='#009900'>// namespace random
+</font>
+
+    <font color='#0000FF'>typedef</font> random_helpers::mersenne_twister<font color='#5555FF'>&lt;</font>uint32,<font color='#979000'>32</font>,<font color='#979000'>351</font>,<font color='#979000'>175</font>,<font color='#979000'>19</font>,<font color='#979000'>0xccab8ee7</font>,<font color='#979000'>11</font>,
+    <font color='#979000'>7</font>,<font color='#979000'>0x31b6ab00</font>,<font color='#979000'>15</font>,<font color='#979000'>0xffe50000</font>,<font color='#979000'>17</font>, <font color='#979000'>0xa37d3c92</font><font color='#5555FF'>&gt;</font> mt11213b;
+
+    <font color='#009900'>// validation by experiment from mt19937.c
+</font>    <font color='#0000FF'>typedef</font> random_helpers::mersenne_twister<font color='#5555FF'>&lt;</font>uint32,<font color='#979000'>32</font>,<font color='#979000'>624</font>,<font color='#979000'>397</font>,<font color='#979000'>31</font>,<font color='#979000'>0x9908b0df</font>,<font color='#979000'>11</font>,
+    <font color='#979000'>7</font>,<font color='#979000'>0x9d2c5680</font>,<font color='#979000'>15</font>,<font color='#979000'>0xefc60000</font>,<font color='#979000'>18</font>, <font color='#979000'>3346425566</font>U<font color='#5555FF'>&gt;</font> mt19937;
+
+<b>}</b> <font color='#009900'>// namespace dlib 
+</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BOOST_RANDOM_MERSENNE_TWISTER_HPP
+</font>
+
+</pre></body></html>

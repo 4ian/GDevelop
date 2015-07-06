@@ -8,6 +8,8 @@
 #include <wx/dirdlg.h>
 #include <wx/filename.h>
 #include <wx/config.h>
+ #include <wx/dir.h>
+ #include <wx/msgdlg.h>
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/CommonTools.h"
@@ -84,6 +86,16 @@ void ProjectExportDialog::OnCloseBtClicked(wxCommandEvent& event)
 }
 void ProjectExportDialog::OnExportBtClicked(wxCommandEvent& event)
 {
+    wxDir dir(GetExportDir());
+    if (dir.IsOpened() && dir.HasFiles())
+    {
+        if (wxMessageBox(
+            wxString::Format(wxString("The export folder (%s) is not empty: all files in this folder will be erased.\nAre you sure you want to continue?"),
+            GetExportDir().c_str()),
+            _("The export folder is not empty"), wxYES_NO | wxICON_WARNING) == wxNO)
+            return;
+    }
+
     wxConfigBase::Get()->Write("Export/JS platform/LatestExportType", exportChoice->GetSelection());
     EndModal(1);
 }

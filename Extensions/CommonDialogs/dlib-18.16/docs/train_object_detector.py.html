@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+<head>
+  <title></title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <style type="text/css">
+td.linenos { background-color: #f0f0f0; padding-right: 10px; }
+span.lineno { background-color: #f0f0f0; padding: 0 5px 0 5px; }
+pre { line-height: 125%; }
+body .hll { background-color: #ffffcc }
+body  { background: #ffffff; }
+body .c { color: #008000 } /* Comment */
+body .err { border: 1px solid #FF0000 } /* Error */
+body .k { color: #0000ff } /* Keyword */
+body .cm { color: #008000 } /* Comment.Multiline */
+body .cp { color: #0000ff } /* Comment.Preproc */
+body .c1 { color: #008000 } /* Comment.Single */
+body .cs { color: #008000 } /* Comment.Special */
+body .ge { font-style: italic } /* Generic.Emph */
+body .gh { font-weight: bold } /* Generic.Heading */
+body .gp { font-weight: bold } /* Generic.Prompt */
+body .gs { font-weight: bold } /* Generic.Strong */
+body .gu { font-weight: bold } /* Generic.Subheading */
+body .kc { color: #0000ff } /* Keyword.Constant */
+body .kd { color: #0000ff } /* Keyword.Declaration */
+body .kn { color: #0000ff } /* Keyword.Namespace */
+body .kp { color: #0000ff } /* Keyword.Pseudo */
+body .kr { color: #0000ff } /* Keyword.Reserved */
+body .kt { color: #2b91af } /* Keyword.Type */
+body .s { color: #a31515 } /* Literal.String */
+body .nc { color: #2b91af } /* Name.Class */
+body .ow { color: #0000ff } /* Operator.Word */
+body .sb { color: #a31515 } /* Literal.String.Backtick */
+body .sc { color: #a31515 } /* Literal.String.Char */
+body .sd { color: #a31515 } /* Literal.String.Doc */
+body .s2 { color: #a31515 } /* Literal.String.Double */
+body .se { color: #a31515 } /* Literal.String.Escape */
+body .sh { color: #a31515 } /* Literal.String.Heredoc */
+body .si { color: #a31515 } /* Literal.String.Interpol */
+body .sx { color: #a31515 } /* Literal.String.Other */
+body .sr { color: #a31515 } /* Literal.String.Regex */
+body .s1 { color: #a31515 } /* Literal.String.Single */
+body .ss { color: #a31515 } /* Literal.String.Symbol */
+
+  </style>
+</head>
+<body>
+<h2></h2>
+
+<div class="highlight"><pre><span class="c">#!/usr/bin/python</span>
+<span class="c"># The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt</span>
+<span class="c">#</span>
+<span class="c"># This example program shows how you can use dlib to make an object</span>
+<span class="c">#   detector for things like faces, pedestrians, and any other semi-rigid</span>
+<span class="c">#   object.  In particular, we go though the steps to train the kind of sliding</span>
+<span class="c">#   window object detector first published by Dalal and Triggs in 2005 in the</span>
+<span class="c">#   paper Histograms of Oriented Gradients for Human Detection.</span>
+<span class="c">#</span>
+<span class="c"># COMPILING THE DLIB PYTHON INTERFACE</span>
+<span class="c">#   Dlib comes with a compiled python interface for python 2.7 on MS Windows. If</span>
+<span class="c">#   you are using another python version or operating system then you need to</span>
+<span class="c">#   compile the dlib python interface before you can use this file.  To do this,</span>
+<span class="c">#   run compile_dlib_python_module.bat.  This should work on any operating</span>
+<span class="c">#   system so long as you have CMake and boost-python installed.</span>
+<span class="c">#   On Ubuntu, this can be done easily by running the command:</span>
+<span class="c">#       sudo apt-get install libboost-python-dev cmake</span>
+<span class="c">#</span>
+<span class="c">#   Also note that this example requires scikit-image which can be installed</span>
+<span class="c">#   via the command:</span>
+<span class="c">#       pip install -U scikit-image</span>
+<span class="c">#   Or downloaded from http://scikit-image.org/download.html. </span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+
+<span class="kn">import</span> <span class="nn">dlib</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span>
+
+
+<span class="c"># In this example we are going to train a face detector based on the small</span>
+<span class="c"># faces dataset in the examples/faces directory.  This means you need to supply</span>
+<span class="c"># the path to this faces folder as a command line argument so we will know</span>
+<span class="c"># where it is.</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span>
+        <span class="s">&quot;Give the path to the examples/faces directory as the argument to this &quot;</span>
+        <span class="s">&quot;program. For example, if you are in the python_examples folder then &quot;</span>
+        <span class="s">&quot;execute this program by running:</span><span class="se">\n</span><span class="s">&quot;</span>
+        <span class="s">&quot;    ./<a href="train_object_detector.py.html">train_object_detector.py</a> ../examples/faces&quot;</span><span class="p">)</span>
+    <span class="nb">exit</span><span class="p">()</span>
+<span class="n">faces_folder</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+
+<span class="c"># Now let&#39;s do the training.  The train_simple_object_detector() function has a</span>
+<span class="c"># bunch of options, all of which come with reasonable default values.  The next</span>
+<span class="c"># few lines goes over some of these options.</span>
+<span class="n">options</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">simple_object_detector_training_options</span><span class="p">()</span>
+<span class="c"># Since faces are left/right symmetric we can tell the trainer to train a</span>
+<span class="c"># symmetric detector.  This helps it get the most value out of the training</span>
+<span class="c"># data.</span>
+<span class="n">options</span><span class="o">.</span><span class="n">add_left_right_image_flips</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="c"># The trainer is a kind of support vector machine and therefore has the usual</span>
+<span class="c"># SVM C parameter.  In general, a bigger C encourages it to fit the training</span>
+<span class="c"># data better but might lead to overfitting.  You must find the best C value</span>
+<span class="c"># empirically by checking how well the trained detector works on a test set of</span>
+<span class="c"># images you haven&#39;t trained on.  Don&#39;t just leave the value set at 5.  Try a</span>
+<span class="c"># few different C values and see what works best for your data.</span>
+<span class="n">options</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="c"># Tell the code how many CPU cores your computer has for the fastest training.</span>
+<span class="n">options</span><span class="o">.</span><span class="n">num_threads</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">options</span><span class="o">.</span><span class="n">be_verbose</span> <span class="o">=</span> <span class="bp">True</span>
+
+
+<span class="n">training_xml_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">faces_folder</span><span class="p">,</span> <span class="s">&quot;training.xml&quot;</span><span class="p">)</span>
+<span class="n">testing_xml_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">faces_folder</span><span class="p">,</span> <span class="s">&quot;testing.xml&quot;</span><span class="p">)</span>
+<span class="c"># This function does the actual training.  It will save the final detector to</span>
+<span class="c"># detector.svm.  The input is an XML file that lists the images in the training</span>
+<span class="c"># dataset and also contains the positions of the face boxes.  To create your</span>
+<span class="c"># own XML files you can use the imglab tool which can be found in the</span>
+<span class="c"># tools/imglab folder.  It is a simple graphical tool for labeling objects in</span>
+<span class="c"># images with boxes.  To see how to use it read the tools/imglab/README.txt</span>
+<span class="c"># file.  But for this example, we just use the training.xml file included with</span>
+<span class="c"># dlib.</span>
+<span class="n">dlib</span><span class="o">.</span><span class="n">train_simple_object_detector</span><span class="p">(</span><span class="n">training_xml_path</span><span class="p">,</span> <span class="s">&quot;detector.svm&quot;</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+
+
+
+<span class="c"># Now that we have a face detector we can test it.  The first statement tests</span>
+<span class="c"># it on the training data.  It will print(the precision, recall, and then)</span>
+<span class="c"># average precision.</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>  <span class="c"># Print blank line to create gap from previous output</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Training accuracy: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">dlib</span><span class="o">.</span><span class="n">test_simple_object_detector</span><span class="p">(</span><span class="n">training_xml_path</span><span class="p">,</span> <span class="s">&quot;detector.svm&quot;</span><span class="p">)))</span>
+<span class="c"># However, to get an idea if it really worked without overfitting we need to</span>
+<span class="c"># run it on images it wasn&#39;t trained on.  The next line does this.  Happily, we</span>
+<span class="c"># see that the object detector works perfectly on the testing images.</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Testing accuracy: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">dlib</span><span class="o">.</span><span class="n">test_simple_object_detector</span><span class="p">(</span><span class="n">testing_xml_path</span><span class="p">,</span> <span class="s">&quot;detector.svm&quot;</span><span class="p">)))</span>
+
+
+
+
+
+<span class="c"># Now let&#39;s use the detector as you would in a normal application.  First we</span>
+<span class="c"># will load it from disk.</span>
+<span class="n">detector</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">simple_object_detector</span><span class="p">(</span><span class="s">&quot;detector.svm&quot;</span><span class="p">)</span>
+
+<span class="c"># We can look at the HOG filter we learned.  It should look like a face.  Neat!</span>
+<span class="n">win_det</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">image_window</span><span class="p">()</span>
+<span class="n">win_det</span><span class="o">.</span><span class="n">set_image</span><span class="p">(</span><span class="n">detector</span><span class="p">)</span>
+
+<span class="c"># Now let&#39;s run the detector over the images in the faces folder and display the</span>
+<span class="c"># results.</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Showing detections on the images in the faces folder...&quot;</span><span class="p">)</span>
+<span class="n">win</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">image_window</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">faces_folder</span><span class="p">,</span> <span class="s">&quot;*.jpg&quot;</span><span class="p">)):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Processing file: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">dets</span> <span class="o">=</span> <span class="n">detector</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Number of faces detected: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dets</span><span class="p">)))</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dets</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Detection {}: Left: {} Top: {} Right: {} Bottom: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">k</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">left</span><span class="p">(),</span> <span class="n">d</span><span class="o">.</span><span class="n">top</span><span class="p">(),</span> <span class="n">d</span><span class="o">.</span><span class="n">right</span><span class="p">(),</span> <span class="n">d</span><span class="o">.</span><span class="n">bottom</span><span class="p">()))</span>
+
+    <span class="n">win</span><span class="o">.</span><span class="n">clear_overlay</span><span class="p">()</span>
+    <span class="n">win</span><span class="o">.</span><span class="n">set_image</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+    <span class="n">win</span><span class="o">.</span><span class="n">add_overlay</span><span class="p">(</span><span class="n">dets</span><span class="p">)</span>
+    <span class="n">dlib</span><span class="o">.</span><span class="n">hit_enter_to_continue</span><span class="p">()</span>
+
+
+
+
+
+
+
+<span class="c"># Finally, note that you don&#39;t have to use the XML based input to</span>
+<span class="c"># train_simple_object_detector().  If you have already loaded your training</span>
+<span class="c"># images and bounding boxes for the objects then you can call it as shown</span>
+<span class="c"># below.</span>
+
+<span class="c"># You just need to put your images into a list.</span>
+<span class="n">images</span> <span class="o">=</span> <span class="p">[</span><span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">faces_folder</span> <span class="o">+</span> <span class="s">&#39;/2008_002506.jpg&#39;</span><span class="p">),</span>
+          <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">faces_folder</span> <span class="o">+</span> <span class="s">&#39;/2009_004587.jpg&#39;</span><span class="p">)]</span>
+<span class="c"># Then for each image you make a list of rectangles which give the pixel</span>
+<span class="c"># locations of the edges of the boxes.</span>
+<span class="n">boxes_img1</span> <span class="o">=</span> <span class="p">([</span><span class="n">dlib</span><span class="o">.</span><span class="n">rectangle</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mi">329</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mi">78</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mi">437</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mi">186</span><span class="p">),</span>
+               <span class="n">dlib</span><span class="o">.</span><span class="n">rectangle</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mi">224</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mi">314</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mi">185</span><span class="p">),</span>
+               <span class="n">dlib</span><span class="o">.</span><span class="n">rectangle</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mi">125</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mi">65</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mi">214</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mi">155</span><span class="p">)])</span>
+<span class="n">boxes_img2</span> <span class="o">=</span> <span class="p">([</span><span class="n">dlib</span><span class="o">.</span><span class="n">rectangle</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mi">154</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mi">46</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mi">228</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mi">121</span><span class="p">),</span>
+               <span class="n">dlib</span><span class="o">.</span><span class="n">rectangle</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mi">266</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mi">280</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mi">328</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mi">342</span><span class="p">)])</span>
+<span class="c"># And then you aggregate those lists of boxes into one big list and then call</span>
+<span class="c"># train_simple_object_detector().</span>
+<span class="n">boxes</span> <span class="o">=</span> <span class="p">[</span><span class="n">boxes_img1</span><span class="p">,</span> <span class="n">boxes_img2</span><span class="p">]</span>
+
+<span class="n">detector2</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">train_simple_object_detector</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">boxes</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+<span class="c"># We could save this detector to disk by uncommenting the following.</span>
+<span class="c">#detector2.save(&#39;detector2.svm&#39;)</span>
+
+<span class="c"># Now let&#39;s look at its HOG filter!</span>
+<span class="n">win_det</span><span class="o">.</span><span class="n">set_image</span><span class="p">(</span><span class="n">detector2</span><span class="p">)</span>
+<span class="n">dlib</span><span class="o">.</span><span class="n">hit_enter_to_continue</span><span class="p">()</span>
+
+<span class="c"># Note that you don&#39;t have to use the XML based input to</span>
+<span class="c"># test_simple_object_detector().  If you have already loaded your training</span>
+<span class="c"># images and bounding boxes for the objects then you can call it as shown</span>
+<span class="c"># below.</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">Training accuracy: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">dlib</span><span class="o">.</span><span class="n">test_simple_object_detector</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">boxes</span><span class="p">,</span> <span class="n">detector2</span><span class="p">)))</span>
+</pre></div>
+</body>
+</html>

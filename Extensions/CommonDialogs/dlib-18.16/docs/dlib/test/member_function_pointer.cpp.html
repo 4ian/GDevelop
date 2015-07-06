@@ -1,0 +1,556 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - member_function_pointer.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>member_function_pointer.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.member_function_pointer</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>class</font> <b><a name='mfp_test_helper_other'></a>mfp_test_helper_other</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='mfp_test_helper_other'></a>mfp_test_helper_other</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>: i<font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>int</u></font> i;
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='go0'></a>go0</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='go1'></a>go1</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> v1
+        <font face='Lucida Console'>)</font> <b>{</b> i <font color='#5555FF'>=</font> <font color='#979000'>1</font><font color='#5555FF'>*</font>v1; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='go2'></a>go2</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> v1,<font color='#0000FF'><u>int</u></font> v2
+        <font face='Lucida Console'>)</font> <b>{</b> i <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>v1<font color='#5555FF'>*</font>v2; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='go3'></a>go3</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> v1,<font color='#0000FF'><u>int</u></font> v2,<font color='#0000FF'><u>int</u></font> v3
+        <font face='Lucida Console'>)</font> <b>{</b> i <font color='#5555FF'>=</font> <font color='#979000'>3</font><font color='#5555FF'>*</font>v1<font color='#5555FF'>*</font>v2<font color='#5555FF'>*</font>v3; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='go4'></a>go4</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> v1,<font color='#0000FF'><u>int</u></font> v2,<font color='#0000FF'><u>int</u></font> v3,<font color='#0000FF'><u>int</u></font> v4
+        <font face='Lucida Console'>)</font> <b>{</b> i <font color='#5555FF'>=</font> <font color='#979000'>4</font><font color='#5555FF'>*</font>v1<font color='#5555FF'>*</font>v2<font color='#5555FF'>*</font>v3<font color='#5555FF'>*</font>v4; <b>}</b>
+
+    <b>}</b>;
+
+
+    <font color='#0000FF'>class</font> <b><a name='mfp_test_helper'></a>mfp_test_helper</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='mfp_test_helper'></a>mfp_test_helper</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>: i<font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>int</u></font> i;
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='go0'></a>go0</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='go1'></a>go1</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> v1
+        <font face='Lucida Console'>)</font> <b>{</b> i <font color='#5555FF'>=</font> <font color='#979000'>1</font><font color='#5555FF'>*</font>v1; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='go2'></a>go2</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> v1,<font color='#0000FF'><u>int</u></font> v2
+        <font face='Lucida Console'>)</font> <b>{</b> i <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>v1<font color='#5555FF'>*</font>v2; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='go3'></a>go3</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> v1,<font color='#0000FF'><u>int</u></font> v2,<font color='#0000FF'><u>int</u></font> v3
+        <font face='Lucida Console'>)</font> <b>{</b> i <font color='#5555FF'>=</font> <font color='#979000'>3</font><font color='#5555FF'>*</font>v1<font color='#5555FF'>*</font>v2<font color='#5555FF'>*</font>v3; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='go4'></a>go4</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> v1,<font color='#0000FF'><u>int</u></font> v2,<font color='#0000FF'><u>int</u></font> v3,<font color='#0000FF'><u>int</u></font> v4
+        <font face='Lucida Console'>)</font> <b>{</b> i <font color='#5555FF'>=</font> <font color='#979000'>4</font><font color='#5555FF'>*</font>v1<font color='#5555FF'>*</font>v2<font color='#5555FF'>*</font>v3<font color='#5555FF'>*</font>v4; <b>}</b>
+
+    <b>}</b>;
+
+    <font color='#0000FF'>class</font> <b><a name='mfp_test_helper_const'></a>mfp_test_helper_const</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='mfp_test_helper_const'></a>mfp_test_helper_const</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>: i<font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>int</u></font> i;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='go0'></a>go0</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='go1'></a>go1</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> v1
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> i <font color='#5555FF'>=</font> <font color='#979000'>1</font><font color='#5555FF'>*</font>v1; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='go2'></a>go2</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> v1,<font color='#0000FF'><u>int</u></font> v2
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> i <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>v1<font color='#5555FF'>*</font>v2; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='go3'></a>go3</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> v1,<font color='#0000FF'><u>int</u></font> v2,<font color='#0000FF'><u>int</u></font> v3
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> i <font color='#5555FF'>=</font> <font color='#979000'>3</font><font color='#5555FF'>*</font>v1<font color='#5555FF'>*</font>v2<font color='#5555FF'>*</font>v3; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='go4'></a>go4</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> v1,<font color='#0000FF'><u>int</u></font> v2,<font color='#0000FF'><u>int</u></font> v3,<font color='#0000FF'><u>int</u></font> v4
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> i <font color='#5555FF'>=</font> <font color='#979000'>4</font><font color='#5555FF'>*</font>v1<font color='#5555FF'>*</font>v2<font color='#5555FF'>*</font>v3<font color='#5555FF'>*</font>v4; <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>template</font>  <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> P1 <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font>, <font color='#0000FF'>typename</font> P2 <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font>, <font color='#0000FF'>typename</font> P3 <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font>, <font color='#0000FF'>typename</font> P4 <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>class</font> <b><a name='mfp'></a>mfp</b>,
+        <font color='#0000FF'>typename</font> test_helper
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='member_function_pointer_kernel_test'></a>member_function_pointer_kernel_test</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - mfp is an implementation of member_function_pointer/member_function_pointer_kernel_abstract.h 
+        ensures
+            - runs tests on mfp for compliance with the specs
+    !*/</font>
+    <b>{</b>        
+
+
+        test_helper helper;
+
+        mfp<font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> a0, b0;
+        mfp<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> a1, b1;
+        mfp<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font>,<font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> a2, b2;
+        mfp<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font>,<font color='#0000FF'><u>int</u></font>,<font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> a3, b3;
+        mfp<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font>,<font color='#0000FF'><u>int</u></font>,<font color='#0000FF'><u>int</u></font>,<font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> a4, b4;
+
+        mfp<font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> a0c, b0c;
+        mfp<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> a1c, b1c;
+        mfp<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font>,<font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> a2c, b2c;
+        mfp<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font>,<font color='#0000FF'><u>int</u></font>,<font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> a3c, b3c;
+        mfp<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font>,<font color='#0000FF'><u>int</u></font>,<font color='#0000FF'><u>int</u></font>,<font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> a4c, b4c;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0c <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b0c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a1c <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b1c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a2c <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b2c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a3c <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b3c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4c <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b4c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>a0c <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b0c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>a1c <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b1c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>a2c <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b2c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>a3c <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b3c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>a4c <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b4c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b0.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b0c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>a0 <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>b0 <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>a0c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>b0c<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a1.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b1.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a1c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b1c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>a1 <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>b1 <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>a1c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>b1c<font face='Lucida Console'>)</font>;
+
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a2.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b2.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a2c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b2c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>a2<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>b2<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>a2c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>b2c<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a3.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b3.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a3c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b3c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>a3<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>b3<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>a3c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>b3c<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b4.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b4c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>a4<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>b4<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>a4c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>b4c<font face='Lucida Console'>)</font>;
+
+        a0.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go0<font face='Lucida Console'>)</font>;
+        a0c.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go0<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b0.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b0c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>b0<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>b0c<font face='Lucida Console'>)</font>;
+
+        a0 <font color='#5555FF'>=</font> a0;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> a0<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>a0 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> a0<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b0.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b0c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>b0<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>b0c<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>a0,b0<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>a0c,b0c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b0.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b0c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>a0<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>a0c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b0<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b0c<font face='Lucida Console'>)</font>;
+
+        a0 <font color='#5555FF'>=</font> b0;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> a0<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b0<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>a0 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b0<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b0.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b0c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0 <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>a0c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b0<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b0c<font face='Lucida Console'>)</font>;
+
+
+        a0.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        a0c.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        b0.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        b0c.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a0c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b0.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b0c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+
+        a1.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go1<font face='Lucida Console'>)</font>;
+        a1c.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go1<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a1.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a1c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b1.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b1c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>a1,b1<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>a1c,b1c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a1.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a1c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b1.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b1c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>a1<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>a1c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b1<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b1c<font face='Lucida Console'>)</font>;
+
+
+        a1 <font color='#5555FF'>=</font> b1;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> a1<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b1<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>a1 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a1.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a1c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b1.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b1c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+
+
+        a1.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        a1c.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        b1.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        b1c.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a1.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a1c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b1.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b1c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+
+        a2.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go2<font face='Lucida Console'>)</font>;
+        a2c.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go2<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a2.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a2c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b2.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b2c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>a2,b2<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>a2c,b2c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a2.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a2c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b2.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b2c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>a2<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>a2c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b2<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b2c<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>b2<font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a2c<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        a2 <font color='#5555FF'>=</font> b2;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a2 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> a2<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a2 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b2<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>a2 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a2.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a2c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b2.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b2c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+
+        a2.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        a2c.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        b2.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        b2c.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a2.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a2c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b2.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b2c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+
+        a3.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go3<font face='Lucida Console'>)</font>;
+        a3c.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go3<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a3.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a3c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b3.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b3c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>a3,b3<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>a3c,b3c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a3.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a3c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b3.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b3c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+
+        a3 <font color='#5555FF'>=</font> b3;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a3 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> a3<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a3 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b3<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>a3 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b3<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a3.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a3c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b3.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b3c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+
+
+        a3.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        a3c.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        b3.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        b3c.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a3.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a3c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b3.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b3c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+
+        a4.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go4<font face='Lucida Console'>)</font>;
+        a4c.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go4<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b4.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b4c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>a4,b4<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>a4c,b4c<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b4.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b4c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+
+        a4 <font color='#5555FF'>=</font> b4;
+        a4 <font color='#5555FF'>=</font> b4;
+        a4 <font color='#5555FF'>=</font> b4;
+        a4 <font color='#5555FF'>=</font> b4;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> a4<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b4<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>a4 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b4<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b4.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b4c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+
+
+        a4.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        a4c.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        b4.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        b4c.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b4.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b4c.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+
+        a0.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go0<font face='Lucida Console'>)</font>;
+        a0c.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go0<font face='Lucida Console'>)</font>;
+        b0 <font color='#5555FF'>=</font> a0; 
+        b0c <font color='#5555FF'>=</font> a0c;
+        helper.i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+        <font color='#BB00BB'>a0</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>helper.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        helper.i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+        <font color='#BB00BB'>b0</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>helper.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        helper.i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+        <font color='#BB00BB'>a0c</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>helper.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        helper.i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+        <font color='#BB00BB'>b0c</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>helper.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+
+        a1.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go1<font face='Lucida Console'>)</font>;
+        a1c.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go1<font face='Lucida Console'>)</font>;
+        b1 <font color='#5555FF'>=</font> a1;
+        b1c <font color='#5555FF'>=</font> a1c;
+        helper.i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+        <font color='#BB00BB'>a1</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>helper.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        helper.i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+        <font color='#BB00BB'>b1</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>helper.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font color='#5555FF'>*</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        helper.i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+        <font color='#BB00BB'>a1c</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>helper.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font color='#5555FF'>*</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+        helper.i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+        <font color='#BB00BB'>b1c</font><font face='Lucida Console'>(</font><font color='#979000'>30</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>helper.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font color='#5555FF'>*</font><font color='#979000'>30</font><font face='Lucida Console'>)</font>;
+
+
+        a2.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go2<font face='Lucida Console'>)</font>;
+        a2c.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go2<font face='Lucida Console'>)</font>;
+        b2 <font color='#5555FF'>=</font> a2;
+        b2c <font color='#5555FF'>=</font> a2c;
+        helper.i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+        <font color='#BB00BB'>a2</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>helper.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>1</font><font color='#5555FF'>*</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        helper.i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+        <font color='#BB00BB'>b2</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>helper.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>3</font><font color='#5555FF'>*</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        helper.i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+        <font color='#BB00BB'>a2c</font><font face='Lucida Console'>(</font><font color='#979000'>5</font>,<font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>helper.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>5</font><font color='#5555FF'>*</font><font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+        helper.i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+        <font color='#BB00BB'>b2c</font><font face='Lucida Console'>(</font><font color='#979000'>7</font>,<font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>helper.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>7</font><font color='#5555FF'>*</font><font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+
+
+        a3.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go3<font face='Lucida Console'>)</font>;
+        a3c.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go3<font face='Lucida Console'>)</font>;
+        b3 <font color='#5555FF'>=</font> a3;
+        b3c <font color='#5555FF'>=</font> a3c;
+        helper.i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+        <font color='#BB00BB'>a3</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>helper.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font color='#5555FF'>*</font><font color='#979000'>1</font><font color='#5555FF'>*</font><font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        helper.i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+        <font color='#BB00BB'>b3</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>5</font>,<font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>helper.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font color='#5555FF'>*</font><font color='#979000'>4</font><font color='#5555FF'>*</font><font color='#979000'>5</font><font color='#5555FF'>*</font><font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+        helper.i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+        <font color='#BB00BB'>a3c</font><font face='Lucida Console'>(</font><font color='#979000'>7</font>,<font color='#979000'>8</font>,<font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>helper.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font color='#5555FF'>*</font><font color='#979000'>7</font><font color='#5555FF'>*</font><font color='#979000'>8</font><font color='#5555FF'>*</font><font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+        helper.i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+        <font color='#BB00BB'>b3c</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>helper.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font color='#5555FF'>*</font><font color='#979000'>1</font><font color='#5555FF'>*</font><font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+
+        a4.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go4<font face='Lucida Console'>)</font>;
+        a4c.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go4<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> a4c<font face='Lucida Console'>)</font>;
+        b4 <font color='#5555FF'>=</font> a4;
+        b4c <font color='#5555FF'>=</font> a4c;
+        helper.i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+        <font color='#BB00BB'>a4</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#979000'>3</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>helper.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font color='#5555FF'>*</font><font color='#979000'>1</font><font color='#5555FF'>*</font><font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>3</font><font color='#5555FF'>*</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        helper.i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+        <font color='#BB00BB'>b4</font><font face='Lucida Console'>(</font><font color='#979000'>5</font>,<font color='#979000'>6</font>,<font color='#979000'>7</font>,<font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>helper.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font color='#5555FF'>*</font><font color='#979000'>5</font><font color='#5555FF'>*</font><font color='#979000'>6</font><font color='#5555FF'>*</font><font color='#979000'>7</font><font color='#5555FF'>*</font><font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+        helper.i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+        <font color='#BB00BB'>a4c</font><font face='Lucida Console'>(</font><font color='#979000'>9</font>,<font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>helper.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font color='#5555FF'>*</font><font color='#979000'>9</font><font color='#5555FF'>*</font><font color='#979000'>1</font><font color='#5555FF'>*</font><font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        helper.i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+        <font color='#BB00BB'>b4c</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>5</font>,<font color='#979000'>6</font>,<font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>helper.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font color='#5555FF'>*</font><font color='#979000'>4</font><font color='#5555FF'>*</font><font color='#979000'>5</font><font color='#5555FF'>*</font><font color='#979000'>6</font><font color='#5555FF'>*</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b4<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b4<font face='Lucida Console'>)</font>;
+        a4.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b4<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>a4<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> a4<font face='Lucida Console'>)</font>;
+        a4 <font color='#5555FF'>=</font> a4;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b4<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>a4<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> a4<font face='Lucida Console'>)</font>;
+        mfp_test_helper_other other;
+        a4.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>other,<font color='#5555FF'>&amp;</font>mfp_test_helper_other::go4<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b4<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> a4<font face='Lucida Console'>)</font>;
+        a4.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>helper,<font color='#5555FF'>&amp;</font>test_helper::go4<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b4<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a4 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> a4<font face='Lucida Console'>)</font>;
+
+
+
+    <b>}</b>
+
+
+
+    <font color='#0000FF'>class</font> <b><a name='member_function_pointer_tester'></a>member_function_pointer_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='member_function_pointer_tester'></a>member_function_pointer_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_member_function_pointer</font>",
+                    "<font color='#CC0000'>Runs tests on the member_function_pointer component.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            member_function_pointer_kernel_test<font color='#5555FF'>&lt;</font>member_function_pointer,mfp_test_helper<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            member_function_pointer_kernel_test<font color='#5555FF'>&lt;</font>member_function_pointer,mfp_test_helper_const<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> a;
+
+<b>}</b>
+
+
+
+</pre></body></html>

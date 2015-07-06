@@ -1,0 +1,802 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - cmd_line_parser_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_CMD_LINE_PARSER_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_CMD_LINE_PARSER_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='cmd_line_parser_kernel_abstract.h.html'>cmd_line_parser_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/enumerable.h.html'>../interfaces/enumerable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/cmd_line_parser_option.h.html'>../interfaces/cmd_line_parser_option.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../string.h.html'>../string.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> map,
+        <font color='#0000FF'>typename</font> sequence,
+        <font color='#0000FF'>typename</font> sequence2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='cmd_line_parser_kernel_1'></a>cmd_line_parser_kernel_1</b> : <font color='#0000FF'>public</font> enumerable<font color='#5555FF'>&lt;</font>cmd_line_parser_option<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON map
+                is an implementation of map/map_kernel_abstract.h 
+                is instantiated to map items of type std::basic_string&lt;charT&gt; to void*     
+
+            REQUIREMENTS ON sequence
+                is an implementation of sequence/sequence_kernel_abstract.h and
+                is instantiated with std::basic_string&lt;charT&gt;
+
+            REQUIREMENTS ON sequence2
+                is an implementation of sequence/sequence_kernel_abstract.h and
+                is instantiated with std::basic_string&lt;charT&gt;*
+
+            INITIAL VALUE
+                options.size()   == 0
+                argv.size()      == 0
+                have_parsed_line == false
+
+            CONVENTION
+                have_parsed_line           == parsed_line()
+                argv[index]                == operator[](index)
+                argv.size()                == number_of_arguments()
+                *((option_t*)options[name])  == option(name)
+                options.is_in_domain(name) == option_is_defined(name)
+        !*/</font>
+
+
+
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> charT char_type;
+        <font color='#0000FF'>typedef</font> std::basic_string<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font> string_type;
+        <font color='#0000FF'>typedef</font> cmd_line_parser_option<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font> option_type;
+
+        <font color='#009900'>// exception class
+</font>        <font color='#0000FF'>class</font> <b><a name='cmd_line_parse_error'></a>cmd_line_parse_error</b> : <font color='#0000FF'>public</font> dlib::error 
+        <b>{</b> 
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_info_string'></a>set_info_string</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::ostringstream sout;
+                <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>type<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>case</font> EINVALID_OPTION:
+                        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Command line error: '</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>narrow</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>' is not a valid option.</font>";
+                        <font color='#0000FF'>break</font>;
+                    <font color='#0000FF'>case</font> ETOO_FEW_ARGS:
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Command line error: The '</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>narrow</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>' option requires </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num 
+                                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> arguments.</font>"; 
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Command line error: The '</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>narrow</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>' option requires </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num 
+                                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> argument.</font>"; 
+                        <b>}</b>
+                        <font color='#0000FF'>break</font>;
+                    <font color='#0000FF'>case</font> ETOO_MANY_ARGS:
+                        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Command line error: The '</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>narrow</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>' option does not take any arguments.\n</font>";
+                        <font color='#0000FF'>break</font>;
+                    <font color='#0000FF'>default</font>:
+                        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Command line error.</font>";
+                        <font color='#0000FF'>break</font>;
+                <b>}</b>
+                <font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>info<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>wrap_string</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <font color='#0000FF'>public</font>: 
+            <b><a name='cmd_line_parse_error'></a>cmd_line_parse_error</b><font face='Lucida Console'>(</font>
+                error_type t,
+                <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> _item
+            <font face='Lucida Console'>)</font> :
+                dlib::error<font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>,
+                item<font face='Lucida Console'>(</font>_item<font face='Lucida Console'>)</font>,
+                num<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b> <font color='#BB00BB'>set_info_string</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;<b>}</b>
+
+            <b><a name='cmd_line_parse_error'></a>cmd_line_parse_error</b><font face='Lucida Console'>(</font>
+                error_type t,
+                <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> _item,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> _num
+            <font face='Lucida Console'>)</font> :
+                dlib::error<font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>,
+                item<font face='Lucida Console'>(</font>_item<font face='Lucida Console'>)</font>,
+                num<font face='Lucida Console'>(</font>_num<font face='Lucida Console'>)</font>
+            <b>{</b> <font color='#BB00BB'>set_info_string</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;<b>}</b>
+
+            <b><a name='cmd_line_parse_error'></a>cmd_line_parse_error</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> :
+                dlib::error<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                item<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                num<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b> <font color='#BB00BB'>set_info_string</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;<b>}</b>
+
+            ~<b><a name='cmd_line_parse_error'></a>cmd_line_parse_error</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font> item;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num;
+        <b>}</b>;
+
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>class</font> <b><a name='option_t'></a>option_t</b> : <font color='#0000FF'>public</font> cmd_line_parser_option<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font>
+        <b>{</b>
+            <font color='#009900'>/*!
+                INITIAL VALUE
+                    options.size()      == 0
+
+                CONVENTION
+                    name_                == name()
+                    description_         == description()
+                    number_of_arguments_ == number_of_arguments()
+                    options[N][arg]      == argument(arg,N)
+                    num_present          == count()                    
+            !*/</font>
+
+            <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> <b><a name='cmd_line_parser_kernel_1'></a>cmd_line_parser_kernel_1</b><font color='#5555FF'>&lt;</font>charT,map,sequence,sequence2<font color='#5555FF'>&gt;</font>;
+
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='name'></a>name</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> name_; <b>}</b>
+
+            <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='group_name'></a>group_name</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> group_name_; <b>}</b>
+
+            <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='description'></a>description</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> description_; <b>}</b>
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_arguments'></a>number_of_arguments</b><font face='Lucida Console'>(</font> 
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> number_of_arguments_; <b>}</b>
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='count'></a>count</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_present; <b>}</b>
+
+            <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='argument'></a>argument</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> arg,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> N
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>  
+                <font color='#009900'>// make sure requires clause is not broken
+</font>                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> N <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>count</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> arg <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                    "<font color='#CC0000'>\tconst string_type&amp; cmd_line_parser_option::argument(unsigned long,unsigned long)</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments were given to this function.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:                  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tN:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> N
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\targ:                   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> arg 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tname():                </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>narrow</font><font face='Lucida Console'>(</font><font color='#BB00BB'>name</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tcount():               </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>count</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnumber_of_arguments(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                    <font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>return</font> options[N][arg]; 
+            <b>}</b>
+
+        <font color='#0000FF'>protected</font>:
+
+            <b><a name='option_t'></a>option_t</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> : 
+                num_present<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b><b>}</b>
+
+            ~<b><a name='option_t'></a>option_t</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#009900'>/*!
+                ensures
+                    - #count() == 0
+                    - clears everything out of options and frees memory
+            !*/</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> options.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>delete</font> [] options[i];
+                <b>}</b>
+                options.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                num_present <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+            <font color='#009900'>// data members
+</font>            std::basic_string<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font> name_;
+            std::basic_string<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font> group_name_;
+            std::basic_string<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font> description_;
+            sequence2 options;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> number_of_arguments_;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_present;
+
+
+
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='option_t'></a>option_t</b><font face='Lucida Console'>(</font>option_t<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>            option_t<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>option_t<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>        <b>}</b>;
+
+    <font color='#009900'>// --------------------------
+</font>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='cmd_line_parser_kernel_1'></a>cmd_line_parser_kernel_1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='cmd_line_parser_kernel_1'></a>cmd_line_parser_kernel_1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='parse'></a>parse</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> argc,
+            <font color='#0000FF'>const</font> charT<font color='#5555FF'>*</font><font color='#5555FF'>*</font> argv
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='parse'></a>parse</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> argc,
+            charT<font color='#5555FF'>*</font><font color='#5555FF'>*</font> argv
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>parse</font><font face='Lucida Console'>(</font>argc, <font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> charT<font color='#5555FF'>*</font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>argv<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='parsed_line'></a>parsed_line</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='option_is_defined'></a>option_is_defined</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> string_type<font color='#5555FF'>&amp;</font> name
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add_option'></a>add_option</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> string_type<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> string_type<font color='#5555FF'>&amp;</font> description,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> number_of_arguments <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_group_name'></a>set_group_name</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> string_type<font color='#5555FF'>&amp;</font> group_name
+        <font face='Lucida Console'>)</font>;
+
+        string_type <b><a name='get_group_name'></a>get_group_name</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> group_name; <b>}</b>
+
+        <font color='#0000FF'>const</font> cmd_line_parser_option<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='option'></a>option</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> string_type<font color='#5555FF'>&amp;</font> name
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_arguments'></a>number_of_arguments</b><font face='Lucida Console'>(</font> 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> string_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            cmd_line_parser_kernel_1<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// functions from the enumerable interface
+</font>        <font color='#0000FF'><u>bool</u></font> <b><a name='at_start'></a>at_start</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> options.<font color='#BB00BB'>at_start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> options.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='current_element_valid'></a>current_element_valid</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> options.<font color='#BB00BB'>current_element_valid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>const</font> cmd_line_parser_option<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>cmd_line_parser_option<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>options.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        cmd_line_parser_option<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>cmd_line_parser_option<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>options.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='move_next'></a>move_next</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> options.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> options.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// data members
+</font>        map options;
+        sequence argv;
+        <font color='#0000FF'><u>bool</u></font> have_parsed_line;
+        string_type group_name;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='cmd_line_parser_kernel_1'></a>cmd_line_parser_kernel_1</b><font face='Lucida Console'>(</font>cmd_line_parser_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        cmd_line_parser_kernel_1<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>cmd_line_parser_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;   
+   
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> map,
+        <font color='#0000FF'>typename</font> sequence,
+        <font color='#0000FF'>typename</font> sequence2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        cmd_line_parser_kernel_1<font color='#5555FF'>&lt;</font>charT,map,sequence,sequence2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        cmd_line_parser_kernel_1<font color='#5555FF'>&lt;</font>charT,map,sequence,sequence2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> map,
+        <font color='#0000FF'>typename</font> sequence,
+        <font color='#0000FF'>typename</font> sequence2
+        <font color='#5555FF'>&gt;</font>
+    cmd_line_parser_kernel_1<font color='#5555FF'>&lt;</font>charT,map,sequence,sequence2<font color='#5555FF'>&gt;</font>::
+    <b><a name='cmd_line_parser_kernel_1'></a>cmd_line_parser_kernel_1</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> :
+        have_parsed_line<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> map,
+        <font color='#0000FF'>typename</font> sequence,
+        <font color='#0000FF'>typename</font> sequence2
+        <font color='#5555FF'>&gt;</font>
+    cmd_line_parser_kernel_1<font color='#5555FF'>&lt;</font>charT,map,sequence,sequence2<font color='#5555FF'>&gt;</font>::
+    ~<b><a name='cmd_line_parser_kernel_1'></a>cmd_line_parser_kernel_1</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// delete all option_t objects in options
+</font>        options.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>options.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>delete</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>option_t<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>options.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> map,
+        <font color='#0000FF'>typename</font> sequence,
+        <font color='#0000FF'>typename</font> sequence2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> cmd_line_parser_kernel_1<font color='#5555FF'>&lt;</font>charT,map,sequence,sequence2<font color='#5555FF'>&gt;</font>::
+    <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        have_parsed_line <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        argv.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// delete all option_t objects in options
+</font>        options.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>options.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>delete</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>option_t<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>options.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        options.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> map,
+        <font color='#0000FF'>typename</font> sequence,
+        <font color='#0000FF'>typename</font> sequence2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> cmd_line_parser_kernel_1<font color='#5555FF'>&lt;</font>charT,map,sequence,sequence2<font color='#5555FF'>&gt;</font>::
+    <b><a name='parse'></a>parse</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>int</u></font> argc_,
+        <font color='#0000FF'>const</font> charT<font color='#5555FF'>*</font><font color='#5555FF'>*</font> argv
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+        <font color='#009900'>// make sure there aren't any arguments hanging around from the last time
+</font>        <font color='#009900'>// parse was called
+</font>        <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>argv.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make sure that the options have been cleared of any arguments since
+</font>        <font color='#009900'>// the last time parse() was called
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>have_parsed_line<font face='Lucida Console'>)</font>
+        <b>{</b>
+            options.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>options.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>option_t<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>options.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;                
+            <b>}</b>
+            options.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// this tells us if we have seen -- on the command line all by itself
+</font>        <font color='#009900'>// or not.  
+</font>        <font color='#0000FF'><u>bool</u></font> escape <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> argc <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>argc_<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>try</font> 
+        <b>{</b>     
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> argc; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>            
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>argv[i][<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>charT,'<font color='#FF0000'>-</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>escape<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// we are looking at the start of an option                
+</font>
+                    <font color='#009900'>// --------------------------------------------------------------------
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>argv[i][<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>charT,'<font color='#FF0000'>-</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#009900'>// we are looking at the start of a "long named" option
+</font>                        string_type temp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>argv[i][<font color='#979000'>2</font>];
+                        string_type first_argument;
+                        <font color='#0000FF'>typename</font> string_type::size_type pos <font color='#5555FF'>=</font> temp.<font color='#BB00BB'>find_first_of</font><font face='Lucida Console'>(</font><font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>charT,'<font color='#FF0000'>=</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        <font color='#009900'>// This variable will be 1 if there is an argument supplied via the = sign
+</font>                        <font color='#009900'>// and 0 otherwise.
+</font>                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> extra_argument <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pos <font color='#5555FF'>!</font><font color='#5555FF'>=</font> string_type::npos<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#009900'>// there should be an extra argument
+</font>                            extra_argument <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                            first_argument <font color='#5555FF'>=</font> temp.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font>pos<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                            temp <font color='#5555FF'>=</font> temp.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,pos<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+
+                        <font color='#009900'>// make sure this name is defined
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>options.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#009900'>// the long name is not a valid option                            
+</font>                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>argv[i][<font color='#979000'>2</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>charT,'<font color='#FF0000'>\0</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#009900'>// there was nothing after the -- on the command line
+</font>                                escape <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                                <font color='#0000FF'>continue</font>;
+                            <b>}</b>
+                            <font color='#0000FF'>else</font>
+                            <b>{</b>
+                                <font color='#009900'>// there was something after the command line but it 
+</font>                                <font color='#009900'>// wasn't a valid option
+</font>                                <font color='#0000FF'>throw</font> <font color='#BB00BB'>cmd_line_parse_error</font><font face='Lucida Console'>(</font>EINVALID_OPTION,temp<font face='Lucida Console'>)</font>;
+                            <b>}</b>                            
+                        <b>}</b>
+                        
+
+                        option_t<font color='#5555FF'>*</font> o <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>option_t<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>options[temp]<font face='Lucida Console'>)</font>;
+
+                        <font color='#009900'>// check the number of arguments after this option and make sure
+</font>                        <font color='#009900'>// it is correct
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>argc <font color='#5555FF'>+</font> extra_argument <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> i<font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            <font color='#009900'>// there are too few arguments
+</font>                            <font color='#0000FF'>throw</font> <font color='#BB00BB'>cmd_line_parse_error</font><font face='Lucida Console'>(</font>ETOO_FEW_ARGS,temp,o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;    
+                        <b>}</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>extra_argument <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> first_argument.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            <font color='#009900'>// if there would be exactly the right number of arguments if 
+</font>                            <font color='#009900'>// the first_argument wasn't empty
+</font>                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>argc <font color='#5555FF'>=</font><font color='#5555FF'>=</font> o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> i<font face='Lucida Console'>)</font>
+                                <font color='#0000FF'>throw</font> <font color='#BB00BB'>cmd_line_parse_error</font><font face='Lucida Console'>(</font>ETOO_FEW_ARGS,temp,o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;    
+                            <font color='#0000FF'>else</font>
+                            <b>{</b>
+                                <font color='#009900'>// in this case we just ignore the trailing = and parse everything
+</font>                                <font color='#009900'>// the same.
+</font>                                extra_argument <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                            <b>}</b>
+                        <b>}</b>
+                        <font color='#009900'>// you can't force an option that doesn't have any arguments to take
+</font>                        <font color='#009900'>// one by using the --option=arg syntax
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>extra_argument <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>throw</font> <font color='#BB00BB'>cmd_line_parse_error</font><font face='Lucida Console'>(</font>ETOO_MANY_ARGS,temp<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        
+
+
+
+
+
+                        <font color='#009900'>// at this point we know that the option is ok and we should
+</font>                        <font color='#009900'>// populate its options object
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+
+                            string_type<font color='#5555FF'>*</font> stemp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> string_type[o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>];
+                            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                            <font color='#009900'>// add the argument after the = sign if one is present
+</font>                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>extra_argument<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                stemp[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> first_argument;
+                                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j;
+                            <b>}</b>
+
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; j <font color='#5555FF'>&lt;</font> o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                            <b>{</b>                            
+                                stemp[j] <font color='#5555FF'>=</font> argv[i<font color='#5555FF'>+</font>j<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>-</font>extra_argument];
+                            <b>}</b>
+                            o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>options.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>options.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,stemp<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_present <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+
+                        <font color='#009900'>// adjust the value of i to account for the arguments to 
+</font>                        <font color='#009900'>// this option
+</font>                        i <font color='#5555FF'>+</font><font color='#5555FF'>=</font> o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> extra_argument;
+                    <b>}</b>
+                    <font color='#009900'>// --------------------------------------------------------------------
+</font>                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#009900'>// we are looking at the start of a list of a single char options
+</font>
+                        <font color='#009900'>// make sure there is something in this string other than -
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>argv[i][<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>charT,'<font color='#FF0000'>\0</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>throw</font> <font color='#BB00BB'>cmd_line_parse_error</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;                            
+                        <b>}</b>
+
+                        string_type temp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>argv[i][<font color='#979000'>1</font>];
+                        <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> string_type::size_type num <font color='#5555FF'>=</font> temp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> num; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            string_type name;
+                            <font color='#009900'>// Doing this instead of name = temp[k] seems to avoid a bug in g++ (Ubuntu/Linaro 4.5.2-8ubuntu4) 4.5.2
+</font>                            <font color='#009900'>// which results in name[0] having the wrong value.
+</font>                            name.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                            name[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> temp[k];
+
+
+                            <font color='#009900'>// make sure this name is defined
+</font>                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>options.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>name<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#009900'>// the name is not a valid option
+</font>                                <font color='#0000FF'>throw</font> <font color='#BB00BB'>cmd_line_parse_error</font><font face='Lucida Console'>(</font>EINVALID_OPTION,name<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+
+                            option_t<font color='#5555FF'>*</font> o <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>option_t<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>options[name]<font face='Lucida Console'>)</font>;
+
+                            <font color='#009900'>// if there are chars immediately following this option
+</font>                            <font color='#0000FF'><u>int</u></font> delta <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num <font color='#5555FF'>!</font><font color='#5555FF'>=</font> k<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                delta <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                            <b>}</b>
+
+                            <font color='#009900'>// check the number of arguments after this option and make sure
+</font>                            <font color='#009900'>// it is correct                            
+</font>                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>argc <font color='#5555FF'>+</font> delta <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> i<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#009900'>// there are too few arguments
+</font>                                std::ostringstream sout;
+                                <font color='#0000FF'>throw</font> <font color='#BB00BB'>cmd_line_parse_error</font><font face='Lucida Console'>(</font>ETOO_FEW_ARGS,name,o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;    
+                            <b>}</b>
+
+                            
+                            o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_present <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+                            <font color='#009900'>// at this point we know that the option is ok and we should
+</font>                            <font color='#009900'>// populate its options object
+</font>                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                string_type<font color='#5555FF'>*</font> stemp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> string_type[o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>];
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>delta <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    temp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>argv[i][<font color='#979000'>2</font><font color='#5555FF'>+</font>k];
+                                    k <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>num;  <font color='#009900'>// this ensures that the argument to this 
+</font>                                              <font color='#009900'>// option isn't going to be treated as a 
+</font>                                              <font color='#009900'>// list of options
+</font>                                    
+                                    stemp[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> temp;
+                                <b>}</b>
+                                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>delta; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    stemp[j<font color='#5555FF'>+</font>delta] <font color='#5555FF'>=</font> argv[i<font color='#5555FF'>+</font>j<font color='#5555FF'>+</font><font color='#979000'>1</font>];
+                                <b>}</b>
+                                o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>options.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>options.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,stemp<font face='Lucida Console'>)</font>;
+
+                                <font color='#009900'>// adjust the value of i to account for the arguments to 
+</font>                                <font color='#009900'>// this option
+</font>                                i <font color='#5555FF'>+</font><font color='#5555FF'>=</font> o<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>delta;
+                            <b>}</b>
+                        <b>}</b> <font color='#009900'>// for (unsigned long k = 0; k &lt; num; ++k)
+</font>                    <b>}</b>
+                    <font color='#009900'>// --------------------------------------------------------------------
+</font>
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// this is just a normal argument
+</font>                    string_type temp <font color='#5555FF'>=</font> argv[i];
+                    <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>argv.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>argv.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,temp<font face='Lucida Console'>)</font>;             
+                <b>}</b>
+
+            <b>}</b>
+            have_parsed_line <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+        <b>{</b>
+            have_parsed_line <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+            <font color='#009900'>// clear all the option objects
+</font>            options.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>options.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>option_t<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>options.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;                
+            <b>}</b>
+            options.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>throw</font>;            
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> map,
+        <font color='#0000FF'>typename</font> sequence,
+        <font color='#0000FF'>typename</font> sequence2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> cmd_line_parser_kernel_1<font color='#5555FF'>&lt;</font>charT,map,sequence,sequence2<font color='#5555FF'>&gt;</font>::
+    <b><a name='parsed_line'></a>parsed_line</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> have_parsed_line;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> map,
+        <font color='#0000FF'>typename</font> sequence,
+        <font color='#0000FF'>typename</font> sequence2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> cmd_line_parser_kernel_1<font color='#5555FF'>&lt;</font>charT,map,sequence,sequence2<font color='#5555FF'>&gt;</font>::
+    <b><a name='option_is_defined'></a>option_is_defined</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> string_type<font color='#5555FF'>&amp;</font> name
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> options.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>name<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> map,
+        <font color='#0000FF'>typename</font> sequence,
+        <font color='#0000FF'>typename</font> sequence2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> cmd_line_parser_kernel_1<font color='#5555FF'>&lt;</font>charT,map,sequence,sequence2<font color='#5555FF'>&gt;</font>::
+    <b><a name='set_group_name'></a>set_group_name</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> string_type<font color='#5555FF'>&amp;</font> group_name_
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        group_name <font color='#5555FF'>=</font> group_name_;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> map,
+        <font color='#0000FF'>typename</font> sequence,
+        <font color='#0000FF'>typename</font> sequence2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> cmd_line_parser_kernel_1<font color='#5555FF'>&lt;</font>charT,map,sequence,sequence2<font color='#5555FF'>&gt;</font>::
+    <b><a name='add_option'></a>add_option</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> string_type<font color='#5555FF'>&amp;</font> name,
+        <font color='#0000FF'>const</font> string_type<font color='#5555FF'>&amp;</font> description,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> number_of_arguments
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        option_t<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> option_t;
+        <font color='#0000FF'>try</font>
+        <b>{</b> 
+            temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>name_ <font color='#5555FF'>=</font> name;
+            temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>group_name_ <font color='#5555FF'>=</font> group_name;
+            temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>description_ <font color='#5555FF'>=</font> description;
+            temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>number_of_arguments_ <font color='#5555FF'>=</font> number_of_arguments;
+            <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> t <font color='#5555FF'>=</font> temp;
+            string_type <font color='#BB00BB'>n</font><font face='Lucida Console'>(</font>name<font face='Lucida Console'>)</font>;
+            options.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>n,t<font face='Lucida Console'>)</font>; 
+        <b>}</b><font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>delete</font> temp; <font color='#0000FF'>throw</font>;<b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> map,
+        <font color='#0000FF'>typename</font> sequence,
+        <font color='#0000FF'>typename</font> sequence2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> cmd_line_parser_option<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> cmd_line_parser_kernel_1<font color='#5555FF'>&lt;</font>charT,map,sequence,sequence2<font color='#5555FF'>&gt;</font>::
+    <b><a name='option'></a>option</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> string_type<font color='#5555FF'>&amp;</font> name
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>cmd_line_parser_option<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>options[name]<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> map,
+        <font color='#0000FF'>typename</font> sequence,
+        <font color='#0000FF'>typename</font> sequence2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> cmd_line_parser_kernel_1<font color='#5555FF'>&lt;</font>charT,map,sequence,sequence2<font color='#5555FF'>&gt;</font>::
+    <b><a name='number_of_arguments'></a>number_of_arguments</b><font face='Lucida Console'>(</font> 
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> argv.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> map,
+        <font color='#0000FF'>typename</font> sequence,
+        <font color='#0000FF'>typename</font> sequence2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> cmd_line_parser_kernel_1<font color='#5555FF'>&lt;</font>charT,map,sequence,sequence2<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> argv[index];
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> map,
+        <font color='#0000FF'>typename</font> sequence,
+        <font color='#0000FF'>typename</font> sequence2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> cmd_line_parser_kernel_1<font color='#5555FF'>&lt;</font>charT,map,sequence,sequence2<font color='#5555FF'>&gt;</font>::
+    <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        cmd_line_parser_kernel_1<font color='#5555FF'>&lt;</font>charT,map,sequence,sequence2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        options.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.options<font face='Lucida Console'>)</font>;
+        argv.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.argv<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>have_parsed_line,item.have_parsed_line<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CMD_LINE_PARSER_KERNEl_1_
+</font>
+
+</pre></body></html>

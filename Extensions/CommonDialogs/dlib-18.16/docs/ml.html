@@ -1,0 +1,1341 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html xmlns:gcse="googleCustomSearch"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="shortcut icon" href="dlib-icon.ico"><meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I="><meta name="google-site-verification" content="DGSSJMKDomaDaDTIRJ8jDkv0YMx9Cz7OESbXHjjr6Jw"><title>dlib C++ Library
+   - Machine Learning</title><script language="JavaScript">
+
+// ---------------------------------------------
+// --- Name:    Easy DHTML Treeview           --
+// --- Author:  D.D. de Kerf                  --
+// --- Version: 0.2          Date: 13-6-2001  --
+// ---------------------------------------------
+function Toggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "minus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "plus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+function BigToggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigminus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigplus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+</script><style type="text/css">
+   body {margin:0px;}
+   pre {margin:0px;}
+
+   ul.tree  li { list-style: none;  margin-left:10px;} 
+   ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
+   ul.tree  li ul { margin-left:10px; padding:0px; }
+
+   li#term { list-style: none; }
+
+   div.component {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      padding: 0.7em;
+   }
+
+   div.question {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      margin-bottom: 90%;
+      padding: 0.7em;
+   }
+
+   div.function {
+      background-color:white; 
+      border: 2px solid rgb(102,102,255); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.class {
+      background-color:white; 
+      border: 2px solid rgb(255,102,102); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.extension {
+      background-color:#FDFDFD; 
+      border: 1px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.0em;
+      padding: 0.7em;
+   }
+
+   div.logb {
+      text-align:left;
+      padding: 0.0em;
+      float: left;
+      background-color:#c0c0c0; 
+      border: double ; 
+      margin: 0.5em;
+   }
+
+   div.name {
+      float: left;
+   }
+   div.line1 {
+      float:left;
+      width:100%;
+      background-color:#dfdfdf; 
+   }
+   div.line2 {
+      float:left;
+      width:100%;
+   }
+   div.inc {
+      float: right;
+   }
+
+
+   .code_box
+   {
+      color: black;
+      margin: 1em 0.25in;
+      padding: 0.5em;
+      background: rgb(240,240,240);
+      border-top: black dotted 1px;
+      border-left: black dotted 1px;
+      border-right: black solid 2px;
+      border-bottom: black solid 2px;
+   }
+
+
+
+   .bdotted {border-bottom: 1px dotted}
+   .bdashed {border-bottom: 1px dashed}
+   .bsolid {border-bottom: 1px solid}
+   .bdouble {border-bottom: 1px double}
+   .bgroove {border-bottom: 1px groove}
+   .bridge {border-bottom: 1px ridge}
+   .binset {border-bottom: 1px inset}
+   .boutset {border-bottom: 1px outset}
+
+   div.row1 {
+      background-color:#dfdfdf; 
+   }
+   div.row2 {
+      background-color:#f2f2f2; 
+   }
+
+   div.typedefs {
+      margin-left: 1.5em;
+      margin-top: 0.2em;
+      border: 1px dotted;
+      width: 52em;
+   }
+
+   div.tdn {
+      width: 10em;
+   }
+
+   .fullhr {
+      clear: both;
+   }
+
+   body {
+      text-align: center;
+   }
+
+   div.entire_page_header {
+      width:62.5em;  
+      text-align: left;
+      margin-top: 0.4em;
+      margin-left: auto;
+      margin-right: auto;
+   }
+   div.entire_page {
+      width:62.5em;  
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      clear:both;
+   }
+</style></head><body bgcolor="#EDF3EE"><a name="top"></a><div class="entire_page_header"><a href="http://dlib.net"><img src="dlib-logo.png"></a></div><div class="entire_page"><table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px"><tr height="100%"><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="145" height="100%"><tr><td VALIGN="TOP"><b>The Library</b><ul class="tree"><li><a href="algorithms.html">Algorithms</a></li><li><a href="api.html">API Wrappers</a></li><li><a href="bayes.html">Bayesian Nets</a></li><li><a href="compression.html">Compression</a></li><li><a href="containers.html">Containers</a></li><li><a href="graph_tools.html">Graph Tools</a></li><li><a href="imaging.html">Image Processing</a></li><li><a href="linear_algebra.html">Linear Algebra</a></li><li><a href="ml.html">Machine Learning</a></li><li><a href="metaprogramming.html">Metaprogramming</a></li><li><a href="other.html">Miscellaneous</a></li><li><a href="network.html">Networking</a></li><li><a href="optimization.html">Optimization</a></li><li><a href="parsing.html">Parsing</a></li></ul><br><b>Help/Info</b><ul class="tree"><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: C++</u></font></a><ul style="display:none;"><li><a href="3d_point_cloud_ex.cpp.html">3D_Point_Cloud</a></li><li><a href="assignment_learning_ex.cpp.html">Assignment_Learning</a></li><li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li><li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li><li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li><li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li><li><a href="bridge_ex.cpp.html">Bridge</a></li><li><a href="bsp_ex.cpp.html">BSP</a></li><li><a href="svm_c_ex.cpp.html">C-Support_Vector_Machine</a></li><li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li><li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li><li><a href="config_reader_ex.cpp.html">Config_File_Reader</a></li><li><a href="custom_trainer_ex.cpp.html">Custom_Trainers</a></li><li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li><li><a href="empirical_kernel_map_ex.cpp.html">Empirical_Kernel_Map</a></li><li><a href="face_detection_ex.cpp.html">Face_Detection</a></li><li><a href="face_landmark_detection_ex.cpp.html">Face_Landmark_Detection</a></li><li><a href="fhog_ex.cpp.html">FHOG_Feature_Extraction</a></li><li><a href="fhog_object_detector_ex.cpp.html">FHOG_Object_Detection</a></li><li><a href="graph_labeling_ex.cpp.html">Graph_Labeling</a></li><li><a href="gui_api_ex.cpp.html">GUI</a></li><li><a href="hough_transform_ex.cpp.html">Hough_Transform</a></li><li><a href="server_http_ex.cpp.html">HTTP_Server</a></li><li><a href="image_ex.cpp.html">Image</a></li><li><a href="iosockstream_ex.cpp.html">IO Socket Streams</a></li><li><a href="server_iostream_ex.cpp.html">IO Streams Server</a></li><li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li><li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li><li><a href="krr_regression_ex.cpp.html">Kernel_Ridge_Regression</a></li><li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li><li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li><li><a href="krr_classification_ex.cpp.html">KRR_Classification</a></li><li><a href="learning_to_track_ex.cpp.html">Learning_to_Track</a></li><li><a href="max_cost_assignment_ex.cpp.html">Linear_Assignment_Problems</a></li><li><a href="linear_manifold_regularizer_ex.cpp.html">Linear_Manifold_Regularizer</a></li><li><a href="mpc_ex.cpp.html">Linear_Model_Predictive_Control</a></li><li><a href="logger_ex.cpp.html">Logger</a></li><li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li><li><a href="logger_custom_output_ex.cpp.html">Logger_Custom_Output</a></li><li><a href="matrix_ex.cpp.html">Matrix</a></li><li><a href="matrix_expressions_ex.cpp.html">Matrix_Expressions</a></li><li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li><li><a href="model_selection_ex.cpp.html">Model_Selection</a></li><li><a href="multiclass_classification_ex.cpp.html">Multiclass_Classification</a></li><li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li><li><a href="mlp_ex.cpp.html">Neural_Network</a></li><li><a href="least_squares_ex.cpp.html">Non-Linear Least Squares</a></li><li><a href="svm_ex.cpp.html">Nu-Support_Vector_Machine</a></li><li><a href="integrate_function_adapt_simp_ex.cpp.html">Numerical_Integration</a></li><li><a href="object_detector_ex.cpp.html">Object_Detector</a></li><li><a href="object_detector_advanced_ex.cpp.html">Object_Detector_Advanced</a></li><li><a href="one_class_classifiers_ex.cpp.html">One_Class_Classifiers</a></li><li><a href="svm_pegasos_ex.cpp.html">Online_SVM</a></li><li><a href="optimization_ex.cpp.html">Optimization</a></li><li><a href="parallel_for_ex.cpp.html">Parallel_For_Loops</a></li><li><a href="pipe_ex.cpp.html">Pipe</a></li><li><a href="pipe_ex_2.cpp.html">Pipe_2</a></li><li><a href="quantum_computing_ex.cpp.html">Quantum_Computing</a></li><li><a href="queue_ex.cpp.html">Queue</a></li><li><a href="rank_features_ex.cpp.html">Rank_Features</a></li><li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li><li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li><li><a href="running_stats_ex.cpp.html">Running_Stats</a></li><li><a href="sequence_labeler_ex.cpp.html">Sequence_Labeling</a></li><li><a href="sequence_segmenter_ex.cpp.html">Sequence_Segmentation</a></li><li><a href="sockets_ex.cpp.html">Sockets</a></li><li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li><li><a href="svm_sparse_ex.cpp.html">Sparse_Vectors</a></li><li><a href="sqlite_ex.cpp.html">SQLite</a></li><li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li><li><a href="svm_struct_ex.cpp.html">Structural_Support_Vector_Machines</a></li><li><a href="svr_ex.cpp.html">Support_Vector_Regression</a></li><li><a href="surf_ex.cpp.html">SURF</a></li><li><a href="svm_rank_ex.cpp.html">SVM-Rank</a></li><li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li><li><a href="threads_ex.cpp.html">Threads</a></li><li><a href="thread_function_ex.cpp.html">Thread_Function</a></li><li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li><li><a href="timer_ex.cpp.html">Timer</a></li><li><a href="train_object_detector.cpp.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor_ex.cpp.html">Train_Shape_Predictor</a></li><li><a href="using_custom_kernels_ex.cpp.html">Using_Custom_Kernels</a></li><li><a href="video_tracking_ex.cpp.html">Video_Object_Tracking</a></li><li><a href="webcam_face_pose_ex.cpp.html">Webcam_Face_Pose_Estimation</a></li><li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: Python</u></font></a><ul style="display:none;"><li><a href="face_detector.py.html">Face_Detector</a></li><li><a href="face_landmark_detection.py.html">Face_Landmark_Detection</a></li><li><a href="find_candidate_object_locations.py.html">find_candidate_object_locations</a></li><li><a href="max_cost_assignment.py.html">Linear_Assignment_Problems</a></li><li><a href="sequence_segmenter.py.html">Sequence_Segmenter</a></li><li><a href="svm_struct.py.html">Structural_Support_Vector_Machines</a></li><li><a href="svm_rank.py.html">SVM-Rank</a></li><li><a href="train_object_detector.py.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor.py.html">Train_Shape_Predictor</a></li><li><a href="correlation_tracker.py.html">Video_Object_Tracking</a></li></ul></li><li><a href="faq.html">FAQ</a></li><li><a href="index.html">Home</a></li><li><a href="compile.html">How to compile</a></li><li><a href="howto_contribute.html">How to contribute</a></li><li><a href="term_index.html">Index</a></li><li><a href="intro.html">Introduction</a></li><li><a href="license.html">License</a></li><li><a href="python/index.html">Python API</a></li><li><a href="books.html">Suggested Books</a></li></ul><br><b>Current Release</b><ul class="tree"><li><a href="change_log.html">Change Log</a></li><li><a href="release_notes.html">Release Notes</a></li><li>Version: 18.16</li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"><br><br><br><br><br><br><br><br><br>
+      Last Modified:<br>Apr 29, 2015<br><br></td></tr></table></td><td VALIGN="TOP" width="100%" style="border: 1px solid rgb(102,102,102);"><center><h1>Machine Learning</h1></center><br><br><a href="ml_guide.svg"><img src="ml_guide.svg" border="0" height="" width="100%" alt=""></a><p>   
+            A major design goal of this portion of the library is to provide a highly modular and
+            simple architecture for dealing with kernel algorithms. Towards this end, dlib takes a generic
+            programming approach using C++ templates. In particular, each algorithm is parameterized
+            to allow a user to supply either one of the predefined dlib kernels (e.g. <a href="#radial_basis_kernel">RBF</a> operating
+            on <a href="linear_algebra.html#matrix">column vectors</a>), or a new 
+            <a href="using_custom_kernels_ex.cpp.html">user defined kernel</a>. 
+            Moreover, the implementations of the algorithms are totally separated from the data on 
+            which they operate. This makes the dlib implementation generic enough to operate on 
+            any kind of data, be it column vectors, images, or some other form of structured data. 
+            All that is necessary is an appropriate kernel.
+         </p><a name="Paper%20Describing%20dlib%20Machine%20Learning"></a><h3>Paper Describing dlib Machine Learning</h3><pre>
+Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09a.pdf">Dlib-ml: A Machine Learning Toolkit</a>. 
+   <i>Journal of Machine Learning Research</i> 10, pp. 1755-1758, 2009
+
+@Article{dlib09,
+  author = {Davis E. King},
+  title = {Dlib-ml: A Machine Learning Toolkit},
+  journal = {Journal of Machine Learning Research},
+  year = {2009},
+  volume = {10},
+  pages = {1755-1758},
+}
+         </pre></td><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="150" height="100%"><tr><td VALIGN="TOP"><center><a name="Primary%20Algorithms"></a><h2><u>Primary Algorithms</u></h2></center><b>Binary Classification</b><ul class="tree"><li><a href="#rvm_trainer">rvm_trainer</a></li><li><a href="#svm_c_ekm_trainer">svm_c_ekm_trainer</a></li><li><a href="#svm_c_linear_dcd_trainer">svm_c_linear_dcd_trainer</a></li><li><a href="#svm_c_linear_trainer">svm_c_linear_trainer</a></li><li><a href="#svm_c_trainer">svm_c_trainer</a></li><li><a href="#svm_nu_trainer">svm_nu_trainer</a></li><li><a href="#svm_pegasos">svm_pegasos</a></li><li><a href="#train_probabilistic_decision_function">train_probabilistic_decision_function</a></li></ul><br><b>Multiclass Classification</b><ul class="tree"><li><a href="#one_vs_all_trainer">one_vs_all_trainer</a></li><li><a href="#one_vs_one_trainer">one_vs_one_trainer</a></li><li><a href="#svm_multiclass_linear_trainer">svm_multiclass_linear_trainer</a></li></ul><br><b>Regression</b><ul class="tree"><li><a href="#krls">krls</a></li><li><a href="#krr_trainer">krr_trainer</a></li><li><a href="#mlp">mlp</a></li><li><a href="#rbf_network_trainer">rbf_network_trainer</a></li><li><a href="#rls">rls</a></li><li><a href="#rr_trainer">rr_trainer</a></li><li><a href="#rvm_regression_trainer">rvm_regression_trainer</a></li><li><a href="#svr_linear_trainer">svr_linear_trainer</a></li><li><a href="#svr_trainer">svr_trainer</a></li></ul><br><b>Structured Prediction</b><ul class="tree"><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Core Tools</u></font></a><ul style="display:none;"><li><a href="#structural_svm_problem">structural_svm_problem</a></li><li><a href="#structural_svm_problem_threaded">structural_svm_problem_threaded</a></li><li><a href="#svm_struct_controller_node">svm_struct_controller_node</a></li><li><a href="#svm_struct_processing_node">svm_struct_processing_node</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Problem Instances</u></font></a><ul style="display:none;"><li><a href="#structural_svm_assignment_problem">structural_svm_assignment_problem</a></li><li><a href="#structural_svm_graph_labeling_problem">structural_svm_graph_labeling_problem</a></li><li><a href="#structural_svm_object_detection_problem">structural_svm_object_detection_problem</a></li><li><a href="#structural_svm_sequence_labeling_problem">structural_svm_sequence_labeling_problem</a></li></ul></li><li><a href="#shape_predictor_trainer">shape_predictor_trainer</a></li><li><a href="#structural_assignment_trainer">structural_assignment_trainer</a></li><li><a href="#structural_graph_labeling_trainer">structural_graph_labeling_trainer</a></li><li><a href="#structural_object_detection_trainer">structural_object_detection_trainer</a></li><li><a href="#structural_sequence_labeling_trainer">structural_sequence_labeling_trainer</a></li><li><a href="#structural_sequence_segmentation_trainer">structural_sequence_segmentation_trainer</a></li><li><a href="#structural_track_association_trainer">structural_track_association_trainer</a></li><li><a href="#svm_rank_trainer">svm_rank_trainer</a></li></ul><br><b>Clustering</b><ul class="tree"><li><a href="#chinese_whispers">chinese_whispers</a></li><li><a href="#find_clusters_using_kmeans">find_clusters_using_kmeans</a></li><li><a href="#kkmeans">kkmeans</a></li><li><a href="#modularity">modularity</a></li><li><a href="#nearest_center">nearest_center</a></li><li><a href="#newman_cluster">newman_cluster</a></li><li><a href="#pick_initial_centers">pick_initial_centers</a></li><li><a href="#spectral_cluster">spectral_cluster</a></li></ul><br><b>Unsupervised</b><ul class="tree"><li><a href="#cca">cca</a></li><li><a href="#empirical_kernel_map">empirical_kernel_map</a></li><li><a href="#kcentroid">kcentroid</a></li><li><a href="#linearly_independent_subset_finder">linearly_independent_subset_finder</a></li><li><a href="#sammon_projection">sammon_projection</a></li><li><a href="#svm_one_class_trainer">svm_one_class_trainer</a></li><li><a href="#vector_normalizer">vector_normalizer</a></li><li><a href="#vector_normalizer_pca">vector_normalizer_pca</a></li></ul><br><b>Semi-Supervised/Metric Learning</b><ul class="tree"><li><a href="#compute_lda_transform">compute_lda_transform</a></li><li><a href="#discriminant_pca">discriminant_pca</a></li><li><a href="#linear_manifold_regularizer">linear_manifold_regularizer</a></li><li><a href="#vector_normalizer_frobmetric">vector_normalizer_frobmetric</a></li></ul><br><b>Reinforcement Learning</b><ul class="tree"><li><a href="#lspi">lspi</a></li></ul><br><b>Feature Selection</b><ul class="tree"><li><a href="#rank_features">rank_features</a></li><li><a href="#rank_unlabeled_training_samples">rank_unlabeled_training_samples</a></li><li><a href="#sort_basis_vectors">sort_basis_vectors</a></li></ul><br><center><a name="Other%20Tools"></a><h2><u>Other Tools</u></h2></center><b>Validation</b><ul class="tree"><li><a href="#average_precision">average_precision</a></li><li><a href="#cross_validate_assignment_trainer">cross_validate_assignment_trainer</a></li><li><a href="#cross_validate_graph_labeling_trainer">cross_validate_graph_labeling_trainer</a></li><li><a href="#cross_validate_multiclass_trainer">cross_validate_multiclass_trainer</a></li><li><a href="#cross_validate_object_detection_trainer">cross_validate_object_detection_trainer</a></li><li><a href="#cross_validate_ranking_trainer">cross_validate_ranking_trainer</a></li><li><a href="#cross_validate_regression_trainer">cross_validate_regression_trainer</a></li><li><a href="#cross_validate_sequence_labeler">cross_validate_sequence_labeler</a></li><li><a href="#cross_validate_sequence_segmenter">cross_validate_sequence_segmenter</a></li><li><a href="#cross_validate_track_association_trainer">cross_validate_track_association_trainer</a></li><li><a href="#cross_validate_trainer">cross_validate_trainer</a></li><li><a href="#cross_validate_trainer_threaded">cross_validate_trainer_threaded</a></li><li><a href="#equal_error_rate">equal_error_rate</a></li><li><a href="#test_assignment_function">test_assignment_function</a></li><li><a href="#test_binary_decision_function">test_binary_decision_function</a></li><li><a href="#test_graph_labeling_function">test_graph_labeling_function</a></li><li><a href="#test_multiclass_decision_function">test_multiclass_decision_function</a></li><li><a href="#test_object_detection_function">test_object_detection_function</a></li><li><a href="#test_ranking_function">test_ranking_function</a></li><li><a href="#test_regression_function">test_regression_function</a></li><li><a href="#test_sequence_labeler">test_sequence_labeler</a></li><li><a href="#test_sequence_segmenter">test_sequence_segmenter</a></li><li><a href="#test_shape_predictor">test_shape_predictor</a></li><li><a href="#test_track_association_function">test_track_association_function</a></li></ul><br><b>Trainer Adapters</b><ul class="tree"><li><a href="#batch">batch</a></li><li><a href="#batch_cached">batch_cached</a></li><li><a href="#null_trainer">null_trainer</a></li><li><a href="#probabilistic">probabilistic</a></li><li><a href="#reduced">reduced</a></li><li><a href="#reduced2">reduced2</a></li><li><a href="#roc_c1_trainer">roc_c1_trainer</a></li><li><a href="#roc_c2_trainer">roc_c2_trainer</a></li><li><a href="#verbose_batch">verbose_batch</a></li><li><a href="#verbose_batch_cached">verbose_batch_cached</a></li></ul><br><b>Kernels</b><ul class="tree"><li><a href="#histogram_intersection_kernel">histogram_intersection_kernel</a></li><li><a href="#linear_kernel">linear_kernel</a></li><li><a href="#offset_kernel">offset_kernel</a></li><li><a href="#polynomial_kernel">polynomial_kernel</a></li><li><a href="#radial_basis_kernel">radial_basis_kernel</a></li><li><a href="#sigmoid_kernel">sigmoid_kernel</a></li><li><a href="#sparse_histogram_intersection_kernel">sparse_histogram_intersection_kernel</a></li><li><a href="#sparse_linear_kernel">sparse_linear_kernel</a></li><li><a href="#sparse_polynomial_kernel">sparse_polynomial_kernel</a></li><li><a href="#sparse_radial_basis_kernel">sparse_radial_basis_kernel</a></li><li><a href="#sparse_sigmoid_kernel">sparse_sigmoid_kernel</a></li></ul><br><b>Function Objects</b><ul class="tree"><li><a href="#assignment_function">assignment_function</a></li><li><a href="#decision_function">decision_function</a></li><li><a href="#distance_function">distance_function</a></li><li><a href="#graph_labeler">graph_labeler</a></li><li><a href="#multiclass_linear_decision_function">multiclass_linear_decision_function</a></li><li><a href="#normalized_function">normalized_function</a></li><li><a href="#one_vs_all_decision_function">one_vs_all_decision_function</a></li><li><a href="#one_vs_one_decision_function">one_vs_one_decision_function</a></li><li><a href="#policy">policy</a></li><li><a href="#probabilistic_decision_function">probabilistic_decision_function</a></li><li><a href="#probabilistic_function">probabilistic_function</a></li><li><a href="#projection_function">projection_function</a></li><li><a href="#sequence_labeler">sequence_labeler</a></li><li><a href="#sequence_segmenter">sequence_segmenter</a></li><li><a href="#track_association_function">track_association_function</a></li></ul><br><b>Data IO</b><ul class="tree"><li><a href="#fix_nonzero_indexing">fix_nonzero_indexing</a></li><li><a href="#load_image_dataset">load_image_dataset</a></li><li><a href="#load_image_dataset_metadata">load_image_dataset_metadata</a></li><li><a href="#load_libsvm_formatted_data">load_libsvm_formatted_data</a></li><li><a href="#save_image_dataset_metadata">save_image_dataset_metadata</a></li><li><a href="#save_libsvm_formatted_data">save_libsvm_formatted_data</a></li></ul><br><b>Miscellaneous</b><ul class="tree"><li><a href="#approximate_distance_function">approximate_distance_function</a></li><li><a href="#compute_mean_squared_distance">compute_mean_squared_distance</a></li><li><a href="#count_ranking_inversions">count_ranking_inversions</a></li><li><a href="#fill_lisf">fill_lisf</a></li><li><a href="#find_gamma_with_big_centroid_gap">find_gamma_with_big_centroid_gap</a></li><li><a href="#is_assignment_problem">is_assignment_problem</a></li><li><a href="#is_binary_classification_problem">is_binary_classification_problem</a></li><li><a href="#is_forced_assignment_problem">is_forced_assignment_problem</a></li><li><a href="#is_graph_labeling_problem">is_graph_labeling_problem</a></li><li><a href="#is_learning_problem">is_learning_problem</a></li><li><a href="#is_ranking_problem">is_ranking_problem</a></li><li><a href="#is_sequence_labeling_problem">is_sequence_labeling_problem</a></li><li><a href="#is_sequence_segmentation_problem">is_sequence_segmentation_problem</a></li><li><a href="#is_track_association_problem">is_track_association_problem</a></li><li><a href="#kernel_matrix">kernel_matrix</a></li><li><a href="#learn_platt_scaling">learn_platt_scaling</a></li><li><a href="#process_sample">process_sample</a></li><li><a href="#randomize_samples">randomize_samples</a></li><li><a href="#ranking_pair">ranking_pair</a></li><li><a href="#select_all_distinct_labels">select_all_distinct_labels</a></li><li><a href="#simplify_linear_decision_function">simplify_linear_decision_function</a></li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"></td></tr></table></td></tr></table><a name="approximate_distance_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">approximate_distance_function</h1><BR><BR>
+              This function attempts to find a <a href="#distance_function">distance_function</a> object which is close
+              to a target distance_function.  That is, it searches for an X such that target(X) is
+              minimized.  Critically, X may be set to use fewer basis vectors than the target.   
+
+              <p>The optimization begins with an initial guess supplied by the user 
+              and searches for an X which locally minimizes target(X).  Since
+              this problem can have many local minima the quality of the starting point
+              can significantly influence the results.   </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/reduced_abstract.h.html#approximate_distance_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="assignment_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">assignment_function</h1><BR><BR>
+                This object is a tool for solving the optimal assignment problem given a 
+                user defined method for computing the quality of any particular assignment. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/assignment_function_abstract.h.html#assignment_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="assignment_learning_ex.cpp.html">assignment_learning_ex.cpp</a><br><br><center></center></div></a><a name="average_precision"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">average_precision</h1><BR><BR>
+            This function computes the average precision of a ranking.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/average_precision_abstract.h.html#average_precision"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="batch"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">batch</h1><BR><BR>
+            This is a convenience function for creating 
+            <a href="#batch_trainer">batch_trainer</a> objects.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/pegasos_abstract.h.html#batch"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_pegasos_ex.cpp.html">svm_pegasos_ex.cpp</a><br><br><center></center></div></a><a name="batch_cached"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">batch_cached</h1><BR><BR>
+            This is a convenience function for creating 
+            <a href="#batch_trainer">batch_trainer</a> objects that are setup
+            to use a kernel matrix cache.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/pegasos_abstract.h.html#batch_cached"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="batch_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">batch_trainer</h1><BR><BR>
+               This is a batch trainer object that is meant to wrap online trainer objects 
+               that create <a href="#decision_function">decision_functions</a>.  It
+               turns an online learning algorithm such as <a href="#svm_pegasos">svm_pegasos</a>
+               into a batch learning object.  This allows you to use objects like
+               svm_pegasos with functions (e.g. <a href="#cross_validate_trainer">cross_validate_trainer</a>)
+               that expect batch mode training objects. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/pegasos_abstract.h.html#batch_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="cca"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cca</h1><BR><BR>
+              This function performs a canonical correlation analysis between two sets
+              of vectors.  Additionally, it is designed to be very fast, even for large
+              datasets of over a million high dimensional vectors.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/cca_abstract.h.html#cca"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="chinese_whispers"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">chinese_whispers</h1><BR><BR>
+             This function performs the clustering algorithm described in the paper
+             <blockquote>Chinese Whispers - an Efficient Graph Clustering Algorithm and its
+              Application to Natural Language Processing Problems by Chris Biemann.</blockquote> 
+             In particular, this is a method for automatically clustering the nodes in a
+             graph into groups.  The method is able to automatically determine the number
+             of clusters.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/clustering.h&gt;</tt></font></B><BR><b><a href="dlib/clustering/chinese_whispers_abstract.h.html#chinese_whispers"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="compute_lda_transform"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">compute_lda_transform</h1><BR><BR>
+            This function performs the dimensionality reducing version of linear
+            discriminant analysis.  That is, you give it a set of labeled vectors and it
+            returns a linear transform that maps the input vectors into a new space that
+            is good for distinguishing between the different classes. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/lda_abstract.h.html#compute_lda_transform"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="compute_mean_squared_distance"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">compute_mean_squared_distance</h1><BR><BR>
+            This is a function that simply finds the average squared distance between all
+            pairs of a set of data samples.  It is often convenient to use the reciprocal
+            of this value as the estimate of the gamma parameter of the 
+            <a href="#radial_basis_kernel">radial_basis_kernel</a>.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/feature_ranking_abstract.h.html#compute_mean_squared_distance"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="count_ranking_inversions"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">count_ranking_inversions</h1><BR><BR>
+            Given two sets of objects, X and Y, and an ordering relationship defined
+            between their elements, this function counts how many times we see an element
+            in the set Y ordered before an element in the set X.   Additionally, this
+            routine executes efficiently in O(n*log(n)) time via the use of quick sort.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/ranking_tools_abstract.h.html#count_ranking_inversions"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="cross_validate_assignment_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cross_validate_assignment_trainer</h1><BR><BR>
+            Performs k-fold cross validation on a user supplied assignment trainer object such
+            as the <a href="#structural_assignment_trainer">structural_assignment_trainer</a>
+            and returns the fraction of assignments predicted correctly.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/cross_validate_assignment_trainer_abstract.h.html#cross_validate_assignment_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="assignment_learning_ex.cpp.html">assignment_learning_ex.cpp</a><br><br><center></center></div></a><a name="cross_validate_graph_labeling_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cross_validate_graph_labeling_trainer</h1><BR><BR>
+            Performs k-fold cross validation on a user supplied graph labeling trainer object such
+            as the <a href="#structural_graph_labeling_trainer">structural_graph_labeling_trainer</a>
+            and returns the fraction of assignments predicted correctly.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/cross_validate_graph_labeling_trainer_abstract.h.html#cross_validate_graph_labeling_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="graph_labeling_ex.cpp.html">graph_labeling_ex.cpp</a><br><br><center></center></div></a><a name="cross_validate_multiclass_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cross_validate_multiclass_trainer</h1><BR><BR>
+            Performs k-fold cross validation on a user supplied multiclass classification trainer object such
+            as the <a href="#one_vs_one_trainer">one_vs_one_trainer</a>.  The result is described by a 
+            confusion matrix.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/cross_validate_multiclass_trainer_abstract.h.html#cross_validate_multiclass_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="multiclass_classification_ex.cpp.html">multiclass_classification_ex.cpp</a>,
+               <a href="custom_trainer_ex.cpp.html">custom_trainer_ex.cpp</a><br><br><center></center></div></a><a name="cross_validate_object_detection_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cross_validate_object_detection_trainer</h1><BR><BR>
+            Performs k-fold cross validation on a user supplied object detection trainer such
+            as the <a href="#structural_object_detection_trainer">structural_object_detection_trainer</a> 
+            and returns the precision and recall. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/cross_validate_object_detection_trainer_abstract.h.html#cross_validate_object_detection_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="object_detector_ex.cpp.html">object_detector_ex.cpp</a>,
+               <a href="object_detector_advanced_ex.cpp.html">object_detector_advanced_ex.cpp</a>,
+               <a href="train_object_detector.cpp.html">train_object_detector.cpp</a><br><br><center></center></div></a><a name="cross_validate_ranking_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cross_validate_ranking_trainer</h1><BR><BR>
+            Performs k-fold cross validation on a user supplied ranking trainer object such
+            as the <a href="#svm_rank_trainer">svm_rank_trainer</a>
+            and returns the fraction of ranking pairs ordered correctly as well as the mean
+            average precision. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/ranking_tools_abstract.h.html#cross_validate_ranking_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_rank_ex.cpp.html">svm_rank_ex.cpp</a><BR>Python Example Programs: <a href="svm_rank.py.html">svm_rank.py</a><br><br><center></center></div></a><a name="cross_validate_regression_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cross_validate_regression_trainer</h1><BR><BR>
+            Performs k-fold cross validation on a user supplied regression trainer object such
+            as the <a href="#svr_trainer">svr_trainer</a> and returns the mean squared error
+            and R-squared value.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/cross_validate_regression_trainer_abstract.h.html#cross_validate_regression_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svr_ex.cpp.html">svr_ex.cpp</a><br><br><center></center></div></a><a name="cross_validate_sequence_labeler"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cross_validate_sequence_labeler</h1><BR><BR>
+            Performs k-fold cross validation on a user supplied sequence labeling trainer object such
+            as the <a href="#structural_sequence_labeling_trainer">structural_sequence_labeling_trainer</a>
+            and returns a confusion matrix describing the results.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/cross_validate_sequence_labeler_abstract.h.html#cross_validate_sequence_labeler"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="sequence_labeler_ex.cpp.html">sequence_labeler_ex.cpp</a><br><br><center></center></div></a><a name="cross_validate_sequence_segmenter"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cross_validate_sequence_segmenter</h1><BR><BR>
+            Performs k-fold cross validation on a user supplied sequence segmentation trainer object such
+            as the <a href="#structural_sequence_segmentation_trainer">structural_sequence_segmentation_trainer</a>
+            and returns the resulting precision, recall, and F1-score. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/cross_validate_sequence_segmenter_abstract.h.html#cross_validate_sequence_segmenter"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="sequence_segmenter_ex.cpp.html">sequence_segmenter_ex.cpp</a><BR>Python Example Programs: <a href="sequence_segmenter.py.html">sequence_segmenter.py</a>,
+               <br><br><center></center></div></a><a name="cross_validate_track_association_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cross_validate_track_association_trainer</h1><BR><BR>
+            Performs k-fold cross validation on a user supplied track association trainer object such
+            as the <a href="#structural_track_association_trainer">structural_track_association_trainer</a>
+            and returns the fraction of detections which were correctly associated to their tracks.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/cross_validate_track_association_trainer_abstract.h.html#cross_validate_track_association_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="learning_to_track_ex.cpp.html">learning_to_track_ex.cpp</a><br><br><center></center></div></a><a name="cross_validate_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cross_validate_trainer</h1><BR><BR>
+               Performs k-fold cross validation on a user supplied binary classification trainer object such
+               as the <a href="#svm_nu_trainer">svm_nu_trainer</a> or <a href="#rbf_network_trainer">rbf_network_trainer</a>.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_abstract.h.html#cross_validate_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_ex.cpp.html">svm_ex.cpp</a>,
+               <a href="model_selection_ex.cpp.html">model_selection_ex.cpp</a><br><br><center></center></div></a><a name="cross_validate_trainer_threaded"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cross_validate_trainer_threaded</h1><BR><BR>
+               Performs k-fold cross validation on a user supplied binary classification trainer object such
+               as the <a href="#svm_nu_trainer">svm_nu_trainer</a> or <a href="#rbf_network_trainer">rbf_network_trainer</a>.  
+               This function does the same thing as <a href="#cross_validate_trainer">cross_validate_trainer</a>
+               except this function also allows you to specify how many threads of execution to use.
+               So you can use this function to take advantage of a multi-core system to perform
+               cross validation faster.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_threaded_abstract.h.html#cross_validate_trainer_threaded"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="decision_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">decision_function</h1><BR><BR>
+                This object represents a classification or regression function that was 
+                learned by a kernel based learning algorithm.  Therefore, it is a function 
+                object that takes a sample object and returns a scalar value.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/function_abstract.h.html#decision_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_ex.cpp.html">svm_ex.cpp</a><br><br><center></center></div></a><a name="discriminant_pca"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">discriminant_pca</h1><BR><BR>
+                This object implements the Discriminant PCA technique described in the paper:
+                  <blockquote>
+                    A New Discriminant Principal Component Analysis Method with Partial Supervision (2009)
+                    by Dan Sun and Daoqiang Zhang
+                  </blockquote>
+                This algorithm is basically a straightforward generalization of the classical PCA
+                technique to handle partially labeled data.  It is useful if you want to learn a linear
+                dimensionality reduction rule using a bunch of data that is partially labeled.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/dpca_abstract.h.html#discriminant_pca"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="distance_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">distance_function</h1><BR><BR>
+                This object represents a point in kernel induced feature space. 
+                You may use this object to find the distance from the point it 
+                represents to points in input space as well as other points
+                represented by distance_functions.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/function_abstract.h.html#distance_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="empirical_kernel_map"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">empirical_kernel_map</h1><BR><BR><p>
+                This object represents a map from objects of sample_type (the kind of object 
+                a <a href="dlib/svm/kernel_abstract.h.html#Kernel_Function_Objects">kernel function</a> 
+                operates on) to finite dimensional column vectors which 
+                represent points in the kernel feature space defined by whatever kernel 
+                is used with this object. 
+            </p><p>
+                To use the empirical_kernel_map you supply it with a particular kernel and a set of 
+                basis samples.  After that you can present it with new samples and it will project 
+                them into the part of kernel feature space spanned by your basis samples.   
+            </p><p>
+                This means the empirical_kernel_map is a tool you can use to very easily kernelize 
+                any algorithm that operates on column vectors.  All you have to do is select a 
+                set of basis samples and then use the empirical_kernel_map to project all your 
+                data points into the part of kernel feature space spanned by those basis samples.
+                Then just run your normal algorithm on the output vectors and it will be effectively 
+                kernelized.  
+            </p><p>
+                Regarding methods to select a set of basis samples, if you are working with only a 
+                few thousand samples then you can just use all of them as basis samples.  
+                Alternatively, the 
+                <a href="#linearly_independent_subset_finder">linearly_independent_subset_finder</a> 
+                often works well for selecting a basis set.  I also find that picking a 
+                <a href="algorithms.html#random_subset_selector">random subset</a> typically works well.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/empirical_kernel_map_abstract.h.html#empirical_kernel_map"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="empirical_kernel_map_ex.cpp.html">empirical_kernel_map_ex.cpp</a>,
+               <a href="linear_manifold_regularizer_ex.cpp.html">linear_manifold_regularizer_ex.cpp</a><br><br><center></center></div></a><a name="equal_error_rate"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">equal_error_rate</h1><BR><BR>
+              This function finds a threshold that best separates the elements of two
+              vectors by selecting the threshold with equal error rate.  It also reports
+              the value of the equal error rate.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/lda_abstract.h.html#equal_error_rate"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="fill_lisf"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">fill_lisf</h1><BR><BR>
+               This is a simple function for filling a 
+               <a href="#linearly_independent_subset_finder">linearly_independent_subset_finder</a>
+               with data points by using random sampling.   
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/linearly_independent_subset_finder_abstract.h.html#fill_lisf"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="empirical_kernel_map_ex.cpp.html">empirical_kernel_map_ex.cpp</a><br><br><center></center></div></a><a name="find_clusters_using_kmeans"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">find_clusters_using_kmeans</h1><BR><BR>
+            This is just a simple linear kmeans clustering implementation.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/clustering.h&gt;</tt></font></B><BR><b><a href="dlib/svm/kkmeans_abstract.h.html#find_clusters_using_kmeans"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="find_gamma_with_big_centroid_gap"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">find_gamma_with_big_centroid_gap</h1><BR><BR>
+            This is a function that tries to pick a reasonable default value for the
+            gamma parameter of the <a href="#radial_basis_kernel">radial_basis_kernel</a>.  It
+            picks the parameter that gives the largest separation between the centroids, in 
+            kernel feature space, of two classes of data.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/feature_ranking_abstract.h.html#find_gamma_with_big_centroid_gap"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="rank_features_ex.cpp.html">rank_features_ex.cpp</a><br><br><center></center></div></a><a name="fix_nonzero_indexing"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">fix_nonzero_indexing</h1><BR><BR>
+            This is a simple function that takes a std::vector of 
+            <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a> 
+            and makes sure they are zero-indexed (e.g. makes sure the first index value is zero).   
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/data_io.h&gt;</tt></font></B><BR><b><a href="dlib/data_io/libsvm_io_abstract.h.html#fix_nonzero_indexing"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="graph_labeler"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">graph_labeler</h1><BR><BR>
+            This object is a tool for labeling each node in a <a href="containers.html#graph">graph</a> 
+            with a value of true or false, subject to a labeling consistency constraint between 
+            nodes that share an edge.  In particular, this object is useful for 
+            representing a graph labeling model learned via some machine learning 
+            method, such as the <a href="#structural_graph_labeling_trainer">structural_graph_labeling_trainer</a>.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_cuts.h&gt;</tt></font></B><BR><b><a href="dlib/graph_cuts/graph_labeler_abstract.h.html#graph_labeler"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="graph_labeling_ex.cpp.html">graph_labeling_ex.cpp</a><br><br><center></center></div></a><a name="histogram_intersection_kernel"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">histogram_intersection_kernel</h1><BR><BR>
+                This object represents a histogram intersection kernel for use with
+                kernel learning machines.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/kernel_abstract.h.html#histogram_intersection_kernel"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="is_assignment_problem"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_assignment_problem</h1><BR><BR>
+            This function takes a set of training data for an assignment problem
+            and reports back if it could possibly be a well formed assignment problem.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_abstract.h.html#is_assignment_problem"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="is_binary_classification_problem"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_binary_classification_problem</h1><BR><BR>
+             This function simply takes two vectors, the first containing feature vectors and
+             the second containing labels, and reports back if the two could possibly 
+             contain data for a well formed classification problem.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_abstract.h.html#is_binary_classification_problem"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="is_forced_assignment_problem"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_forced_assignment_problem</h1><BR><BR>
+            This function takes a set of training data for a forced assignment problem
+            and reports back if it could possibly be a well formed forced assignment problem.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_abstract.h.html#is_forced_assignment_problem"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="is_graph_labeling_problem"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_graph_labeling_problem</h1><BR><BR>
+            This function takes a set of training data for a graph labeling problem
+            and reports back if it could possibly be a well formed problem.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/structural_svm_graph_labeling_problem_abstract.h.html#is_graph_labeling_problem"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="is_learning_problem"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_learning_problem</h1><BR><BR>
+             This function simply takes two vectors, the first containing feature vectors and
+             the second containing labels, and reports back if the two could possibly 
+             contain data for a well formed learning problem.  In this case it just means
+             that the two vectors have the same length and aren't empty.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_abstract.h.html#is_learning_problem"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="is_ranking_problem"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_ranking_problem</h1><BR><BR>
+            This function takes a set of training data for a learning-to-rank problem
+            and reports back if it could possibly be a well formed problem.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/ranking_tools_abstract.h.html#is_ranking_problem"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="is_sequence_labeling_problem"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_sequence_labeling_problem</h1><BR><BR>
+            This function takes a set of training data for a sequence labeling problem
+            and reports back if it could possibly be a well formed sequence labeling problem.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_abstract.h.html#is_sequence_labeling_problem"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="is_sequence_segmentation_problem"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_sequence_segmentation_problem</h1><BR><BR>
+            This function takes a set of training data for a sequence segmentation problem
+            and reports back if it could possibly be a well formed sequence segmentation problem.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_abstract.h.html#is_sequence_segmentation_problem"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="is_track_association_problem"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_track_association_problem</h1><BR><BR>
+            This function takes a set of training data for a track association learning problem
+            and reports back if it could possibly be a well formed track association problem.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_abstract.h.html#is_track_association_problem"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="kcentroid"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">kcentroid</h1><BR><BR>
+
+                This object represents a weighted sum of sample points in a kernel induced
+                feature space.  It can be used to kernelize any algorithm that requires only
+                the ability to perform vector addition, subtraction, scalar multiplication,
+                and inner products.  
+
+                  <p>
+                An example use of this object is as an online algorithm for recursively estimating 
+                the centroid of a sequence of training points.  This object then allows you to 
+                compute the distance between the centroid and any test points.  So you can use 
+                this object to predict how similar a test point is to the data this object has 
+                been trained on (larger distances from the centroid indicate dissimilarity/anomalous 
+                points).  
+                  </p><p>
+                The object internally keeps a set of "dictionary vectors" 
+                that are used to represent the centroid.  It manages these vectors using the 
+                sparsification technique described in the paper The Kernel Recursive Least 
+                Squares Algorithm by Yaakov Engel.  This technique allows us to keep the 
+                number of dictionary vectors down to a minimum.  In fact, the object has a 
+                user selectable tolerance parameter that controls the trade off between 
+                accuracy and number of stored dictionary vectors.
+                  </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/kcentroid_abstract.h.html#kcentroid"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="kcentroid_ex.cpp.html">kcentroid_ex.cpp</a><br><br><center></center></div></a><a name="kernel_matrix"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">kernel_matrix</h1><BR><BR>
+            This is a simple set of functions that makes it easy to turn a kernel 
+            object and a set of samples into a kernel matrix.  It takes these two
+            things and returns a <a href="dlib/matrix/matrix_exp_abstract.h.html#matrix_exp">matrix expression</a>
+            that represents the kernel matrix.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/kernel_matrix_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="kkmeans"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">kkmeans</h1><BR><BR>
+                This is an implementation of a kernelized k-means clustering algorithm.  
+                It performs k-means clustering by using the <a href="#kcentroid">kcentroid</a> object.  
+                <p>
+                   If you want to use the linear kernel (i.e. do a normal k-means clustering) then you
+                   should use the <a href="#find_clusters_using_kmeans">find_clusters_using_kmeans</a> routine.
+                </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/clustering.h&gt;</tt></font></B><BR><b><a href="dlib/svm/kkmeans_abstract.h.html#kkmeans"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="kkmeans_ex.cpp.html">kkmeans_ex.cpp</a><br><br><center></center></div></a><a name="krls"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">krls</h1><BR><BR>
+                This is an implementation of the kernel recursive least squares algorithm 
+                described in the paper The Kernel Recursive Least Squares Algorithm by Yaakov Engel.
+            <p>
+                The long and short of this algorithm is that it is an online kernel based 
+                regression algorithm.  You give it samples (x,y) and it learns the function
+                f(x) == y.  For a detailed description of the algorithm read the above paper.
+            </p><p>
+                  Note that if you want to use the linear kernel then you would
+                  be better off using the <a href="#rls">rls</a> object as it
+                  is optimized for this case.
+               </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/krls_abstract.h.html#krls"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="krls_ex.cpp.html">krls_ex.cpp</a>,
+               <a href="krls_filter_ex.cpp.html">krls_filter_ex.cpp</a><br><br><center></center></div></a><a name="krr_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">krr_trainer</h1><BR><BR><p>
+               Performs kernel ridge regression and outputs a <a href="#decision_function">decision_function</a> that 
+               represents the learned function. 
+            </p>
+            The implementation is done using the <a href="#empirical_kernel_map">empirical_kernel_map</a> and 
+            <a href="#linearly_independent_subset_finder">linearly_independent_subset_finder</a> to kernelize
+            the <a href="#rr_trainer">rr_trainer</a> object.  Thus it allows you to run the algorithm on large 
+            datasets and obtain sparse outputs.  It is also capable of automatically estimating its 
+            regularization parameter using leave-one-out cross-validation.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/krr_trainer_abstract.h.html#krr_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="krr_regression_ex.cpp.html">krr_regression_ex.cpp</a>,
+               <a href="krr_classification_ex.cpp.html">krr_classification_ex.cpp</a><br><br><center></center></div></a><a name="learn_platt_scaling"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">learn_platt_scaling</h1><BR><BR><p>
+              This function is an implementation of the algorithm described in the following
+              papers: 
+              <blockquote>
+                Probabilistic Outputs for Support Vector Machines and Comparisons to
+                Regularized Likelihood Methods by John C. Platt.  March 26, 1999
+                <br><br>
+                A Note on Platt's Probabilistic Outputs for Support Vector Machines
+                by Hsuan-Tien Lin, Chih-Jen Lin, and Ruby C. Weng
+              </blockquote></p><p>
+               This function is the tool used to implement the 
+               <a href="#train_probabilistic_decision_function">train_probabilistic_decision_function</a> routine.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_abstract.h.html#learn_platt_scaling"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="linearly_independent_subset_finder"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">linearly_independent_subset_finder</h1><BR><BR><p>
+                This is an implementation of an online algorithm for recursively finding a
+                set (aka dictionary) of linearly independent vectors in a kernel induced 
+                feature space.  To use it you decide how large you would like the dictionary 
+                to be and then you feed it sample points.  
+            </p><p>
+                The implementation uses the Approximately Linearly Dependent metric described 
+                in the paper The Kernel Recursive Least Squares Algorithm by Yaakov Engel to 
+                decide which points are more linearly independent than others.  The metric is 
+                simply the squared distance between a test point and the subspace spanned by 
+                the set of dictionary vectors.
+            </p><p>
+                Each time you present this object with a new sample point  
+                it calculates the projection distance and if it is sufficiently large then this 
+                new point is included into the dictionary.  Note that this object can be configured 
+                to have a maximum size.  Once the max dictionary size is reached each new point 
+                kicks out a previous point.  This is done by removing the dictionary vector that 
+                has the smallest projection distance onto the others.  That is, the "least linearly 
+                independent" vector is removed to make room for the new one.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/linearly_independent_subset_finder_abstract.h.html#linearly_independent_subset_finder"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="empirical_kernel_map_ex.cpp.html">empirical_kernel_map_ex.cpp</a><br><br><center></center></div></a><a name="linear_kernel"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">linear_kernel</h1><BR><BR>
+                This object represents a linear function kernel for use with
+                kernel learning machines.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/kernel_abstract.h.html#linear_kernel"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="linear_manifold_regularizer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">linear_manifold_regularizer</h1><BR><BR><p>
+                Many learning algorithms attempt to minimize a function that, at a high 
+                level, looks like this:   
+<pre>
+   f(w) == complexity + training_set_error
+</pre></p><p>
+                The idea is to find the set of parameters, w, that gives low error on 
+                your training data but also is not "complex" according to some particular
+                measure of complexity.  This strategy of penalizing complexity is 
+                usually called regularization.
+               </p><p>
+                In the above setting, all the training data consists of labeled samples.  
+                However, it would be nice to be able to benefit from unlabeled data.  
+                The idea of manifold regularization is to extract useful information from 
+                unlabeled data by first defining which data samples are "close" to each other 
+                (perhaps by using their 3 <a href="graph_tools.html#find_k_nearest_neighbors">nearest neighbors</a>) 
+                and then adding a term to 
+                the above function that penalizes any decision rule which produces 
+                different outputs on data samples which we have designated as being close.
+               </p><p>
+                It turns out that it is possible to transform these manifold regularized learning
+                problems into the normal form shown above by applying a certain kind of 
+                preprocessing to all our data samples.  Once this is done we can use a 
+                normal learning algorithm, such as the <a href="#svm_c_linear_trainer">svm_c_linear_trainer</a>, 
+                on just the
+                labeled data samples and obtain the same output as the manifold regularized
+                learner would have produced.  
+               </p><p>
+                The linear_manifold_regularizer is a tool for creating this preprocessing 
+                transformation.  In particular, the transformation is linear.  That is, it 
+                is just a matrix you multiply with all your samples.  For a more detailed 
+                discussion of this topic you should consult the following paper.  In 
+                particular, see section 4.2.  This object computes the inverse T matrix 
+                described in that section.
+               <blockquote>
+                    Linear Manifold Regularization for Large Scale Semi-supervised Learning
+                    by Vikas Sindhwani, Partha Niyogi, and Mikhail Belkin
+               </blockquote></p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/manifold_regularization.h&gt;</tt></font></B><BR><b><a href="dlib/manifold_regularization/linear_manifold_regularizer_abstract.h.html#linear_manifold_regularizer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="linear_manifold_regularizer_ex.cpp.html">linear_manifold_regularizer_ex.cpp</a><br><br><center></center></div></a><a name="load_image_dataset"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">load_image_dataset</h1><BR><BR>
+            This is a function which loads the list of images indicated by an
+            <a href="#load_image_dataset_metadata">image dataset metadata file</a>
+            as well as the box locations for each image.  It makes loading the
+            data necessary to train an <a href="imaging.html#object_detector">object_detector</a> 
+            a little more convenient.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/data_io.h&gt;</tt></font></B><BR><b><a href="dlib/data_io/load_image_dataset_abstract.h.html#load_image_dataset"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="fhog_object_detector_ex.cpp.html">fhog_object_detector_ex.cpp</a>,
+               <a href="train_object_detector.cpp.html">train_object_detector.cpp</a><br><br><center></center></div></a><a name="load_image_dataset_metadata"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">load_image_dataset_metadata</h1><BR><BR>
+            dlib comes with a graphical tool for annotating images with
+            labeled rectangles.  The tool produces an XML file containing these
+            annotations.  Therefore, load_image_dataset_metadata() is a routine
+            for parsing these XML files.  Note also that this is the metadata
+            format used by the image labeling tool included with dlib in the
+            tools/imglab folder.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/data_io.h&gt;</tt></font></B><BR><b><a href="dlib/data_io/image_dataset_metadata.h.html#load_image_dataset_metadata"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="load_libsvm_formatted_data"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">load_libsvm_formatted_data</h1><BR><BR>
+            This is a function that loads the data from a file that uses
+            the LIBSVM format.  It loads the data into a std::vector of
+            <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a>.
+            If you want to load data into dense vectors (i.e.
+            dlib::matrix objects) then you can use the <a href="linear_algebra.html#sparse_to_dense">sparse_to_dense</a>
+            function to perform the conversion.  Also, some LIBSVM formatted files number
+            their features beginning with 1 rather than 0.  If this bothers you, then you
+            can fix it by using the <a href="#fix_nonzero_indexing">fix_nonzero_indexing</a> function
+            on the data after it is loaded.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/data_io.h&gt;</tt></font></B><BR><b><a href="dlib/data_io/libsvm_io_abstract.h.html#load_libsvm_formatted_data"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="lspi"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">lspi</h1><BR><BR>
+            This object is an implementation of the reinforcement learning algorithm
+            described in the following paper:
+            <blockquote>
+               Lagoudakis, Michail G., and Ronald Parr. "Least-squares policy
+               iteration." The Journal of Machine Learning Research 4 (2003):
+               1107-1149.
+            </blockquote><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/control.h&gt;</tt></font></B><BR><b><a href="dlib/control/lspi_abstract.h.html#lspi"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="mlp"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">mlp</h1><BR><BR><p>
+                This object represents a multilayer layer perceptron network that is
+                trained using the back propagation algorithm.  The training algorithm also
+                incorporates the momentum method.  That is, each round of back propagation
+                training also adds a fraction of the previous update.  This fraction
+                is controlled by the momentum term set in the constructor.  
+            </p><p>
+               It is worth noting that a MLP is, in general, very inferior to modern
+               kernel algorithms such as the support vector machine.  So if you haven't
+               tried any other techniques with your data you really should.  
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/mlp.h&gt;</tt></font></B><BR><b><a href="dlib/mlp/mlp_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="mlp_ex.cpp.html">mlp_ex.cpp</a><BR><BR><B>Implementations:</B><blockquote><a href="dlib/mlp/mlp_kernel_1.h.html">mlp_kernel_1</a>:
+                  <br> 
+                  This is implemented in the obvious way.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for mlp_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><center></center></div></a><a name="modularity"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">modularity</h1><BR><BR>
+            This function computes the modularity of a particular graph clustering.  This
+            is a number that tells you how good the clustering is.  In particular, it 
+            is the measure optimized by the <a href="#newman_cluster">newman_cluster</a> 
+            routine.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/clustering.h&gt;</tt></font></B><BR><b><a href="dlib/clustering/modularity_clustering_abstract.h.html#modularity"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="multiclass_linear_decision_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">multiclass_linear_decision_function</h1><BR><BR>
+                This object represents a multiclass classifier built out of a set of 
+                binary classifiers.  Each binary classifier is used to vote for the 
+                correct multiclass label using a one vs. all strategy.  Therefore, 
+                if you have N classes then there will be N binary classifiers inside 
+                this object.  Additionally, this object is linear in the sense that
+                each of these binary classifiers is a simple linear plane.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/function_abstract.h.html#multiclass_linear_decision_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="nearest_center"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">nearest_center</h1><BR><BR>
+            This function takes a list of cluster centers and a query vector
+            and identifies which cluster center is nearest to the query vector. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/clustering.h&gt;</tt></font></B><BR><b><a href="dlib/svm/kkmeans_abstract.h.html#nearest_center"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="newman_cluster"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">newman_cluster</h1><BR><BR>
+             This function performs the clustering algorithm described in the paper
+             <blockquote>Modularity and community structure in networks by M. E. J. Newman.</blockquote> 
+             In particular, this is a method for automatically clustering the nodes in a
+             graph into groups.  The method is able to automatically determine the number
+             of clusters and does not have any parameters.  In general, it is a very good
+             clustering technique.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/clustering.h&gt;</tt></font></B><BR><b><a href="dlib/clustering/modularity_clustering_abstract.h.html#newman_cluster"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="normalized_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">normalized_function</h1><BR><BR>
+                This object represents a container for another function
+                object and an instance of the <a href="#vector_normalizer">vector_normalizer</a> object.  
+
+                It automatically normalizes all inputs before passing them
+                off to the contained function object.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/function_abstract.h.html#normalized_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_ex.cpp.html">svm_ex.cpp</a><br><br><center></center></div></a><a name="null_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">null_trainer</h1><BR><BR>
+            This is a convenience function for creating 
+            <a href="#null_trainer_type">null_trainer_type</a>
+            objects.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/null_trainer_abstract.h.html#null_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="null_trainer_type"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">null_trainer_type</h1><BR><BR>
+                This object is a simple tool for turning a <a href="#decision_function">decision_function</a> 
+                (or any object with an interface compatible with decision_function)
+                into a trainer object that always returns the original decision
+                function when you try to train with it.  
+
+               <p>
+                dlib contains a few "training post processing" algorithms (e.g. 
+                <a href="#reduced">reduced</a> and <a href="#reduced2">reduced2</a>).  These tools 
+                take in a trainer object,
+                tell it to perform training, and then they take the output decision
+                function and do some kind of post processing to it.  The null_trainer_type 
+                object is useful because you can use it to run an already
+                learned decision function through the training post processing
+                algorithms by turning a decision function into a null_trainer_type
+                and then giving it to a post processor.  
+               </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/null_trainer_abstract.h.html#null_trainer_type"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="offset_kernel"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">offset_kernel</h1><BR><BR>
+                This object represents a kernel with a fixed value offset
+                added to it.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/kernel_abstract.h.html#offset_kernel"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="one_vs_all_decision_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">one_vs_all_decision_function</h1><BR><BR>
+                This object represents a multiclass classifier built out
+                of a set of binary classifiers.  Each binary classifier
+                is used to vote for the correct multiclass label using a 
+                one vs. all strategy.  Therefore, if you have N classes then
+                there will be N binary classifiers inside this object.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/one_vs_all_decision_function_abstract.h.html#one_vs_all_decision_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="one_vs_all_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">one_vs_all_trainer</h1><BR><BR>
+                This object is a tool for turning a bunch of binary classifiers
+                into a multiclass classifier.  It does this by training the binary
+                classifiers in a one vs. all fashion.  That is, if you have N possible
+                classes then it trains N binary classifiers which are then used
+                to vote on the identity of a test sample.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/one_vs_all_trainer_abstract.h.html#one_vs_all_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="one_vs_one_decision_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">one_vs_one_decision_function</h1><BR><BR>
+                This object represents a multiclass classifier built out
+                of a set of binary classifiers.  Each binary classifier
+                is used to vote for the correct multiclass label using a 
+                one vs. one strategy.  Therefore, if you have N classes then
+                there will be N*(N-1)/2 binary classifiers inside this object.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/one_vs_one_decision_function_abstract.h.html#one_vs_one_decision_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="multiclass_classification_ex.cpp.html">multiclass_classification_ex.cpp</a>,
+               <a href="custom_trainer_ex.cpp.html">custom_trainer_ex.cpp</a><br><br><center></center></div></a><a name="one_vs_one_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">one_vs_one_trainer</h1><BR><BR>
+                This object is a tool for turning a bunch of binary classifiers
+                into a multiclass classifier.  It does this by training the binary
+                classifiers in a one vs. one fashion.  That is, if you have N possible
+                classes then it trains N*(N-1)/2 binary classifiers which are then used
+                to vote on the identity of a test sample.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/one_vs_one_trainer_abstract.h.html#one_vs_one_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="multiclass_classification_ex.cpp.html">multiclass_classification_ex.cpp</a>,
+               <a href="custom_trainer_ex.cpp.html">custom_trainer_ex.cpp</a><br><br><center></center></div></a><a name="pick_initial_centers"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">pick_initial_centers</h1><BR><BR>
+            This is a function that you can use to seed data clustering algorithms
+            like the <a href="#kkmeans">kkmeans</a> clustering method.  What it 
+            does is pick reasonable starting points for clustering by basically
+            trying to find a set of points that are all far away from each other.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/clustering.h&gt;</tt></font></B><BR><b><a href="dlib/svm/kkmeans_abstract.h.html#pick_initial_centers"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="kkmeans_ex.cpp.html">kkmeans_ex.cpp</a><br><br><center></center></div></a><a name="policy"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">policy</h1><BR><BR>
+                This is a policy (i.e. a control law) based on a linear function approximator.
+                You can use a tool like <a href="#lspi">lspi</a> to learn the parameters
+                of a policy.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/control.h&gt;</tt></font></B><BR><b><a href="dlib/control/approximate_linear_models_abstract.h.html#policy"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="polynomial_kernel"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">polynomial_kernel</h1><BR><BR>
+                This object represents a polynomial kernel for use with
+                kernel learning machines.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/kernel_abstract.h.html#polynomial_kernel"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="probabilistic"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">probabilistic</h1><BR><BR>
+            This is a trainer adapter which simply runs the trainer it is given though the
+            <a href="#train_probabilistic_decision_function">train_probabilistic_decision_function</a>
+            function.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_abstract.h.html#probabilistic"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="probabilistic_decision_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">probabilistic_decision_function</h1><BR><BR>
+                This object represents a binary decision function for use with
+                kernel-based learning-machines.  It returns an 
+                estimate of the probability that a given sample is in the +1 class. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/function_abstract.h.html#probabilistic_decision_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_ex.cpp.html">svm_ex.cpp</a><br><br><center></center></div></a><a name="probabilistic_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">probabilistic_function</h1><BR><BR>
+                This object represents a binary decision function for use with
+                any kind of binary classifier.  It returns an 
+                estimate of the probability that a given sample is in the +1 class. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/function_abstract.h.html#probabilistic_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="process_sample"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">process_sample</h1><BR><BR>
+                This object holds a training sample for a reinforcement learning algorithm 
+                (e.g. <a href="#lspi">lspi</a>).
+                In particular, it contains a state, action, reward, next state sample from
+                some process.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/control.h&gt;</tt></font></B><BR><b><a href="dlib/control/approximate_linear_models_abstract.h.html#process_sample"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="projection_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">projection_function</h1><BR><BR>
+               This object represents a function that takes a data sample and projects
+               it into kernel feature space.  The result is a real valued column vector that 
+               represents a point in a kernel feature space.   Instances of
+               this object are created using the 
+               <a href="#empirical_kernel_map">empirical_kernel_map</a>.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/function_abstract.h.html#projection_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="linear_manifold_regularizer_ex.cpp.html">linear_manifold_regularizer_ex.cpp</a><br><br><center></center></div></a><a name="radial_basis_kernel"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">radial_basis_kernel</h1><BR><BR>
+                This object represents a radial basis function kernel for use with
+                kernel learning machines.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/kernel_abstract.h.html#radial_basis_kernel"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_ex.cpp.html">svm_ex.cpp</a><br><br><center></center></div></a><a name="randomize_samples"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">randomize_samples</h1><BR><BR>
+               Randomizes the order of samples in a column vector containing sample data.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_abstract.h.html#randomize_samples"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_ex.cpp.html">svm_ex.cpp</a><br><br><center></center></div></a><a name="ranking_pair"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">ranking_pair</h1><BR><BR>
+                This object is used to contain a ranking example.  Therefore, ranking_pair
+                objects are used to represent training examples for learning-to-rank tasks,
+                such as those used by the <a href="#svm_rank_trainer">svm_rank_trainer</a>.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/ranking_tools_abstract.h.html#ranking_pair"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_rank_ex.cpp.html">svm_rank_ex.cpp</a><BR>Python Example Programs: <a href="svm_rank.py.html">svm_rank.py</a><br><br><center></center></div></a><a name="rank_features"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rank_features</h1><BR><BR>
+             Finds a ranking of the top N (a user supplied parameter) features in a set of data 
+             from a two class classification problem.  It  
+              does this by computing the distance between the centroids of both classes in kernel defined 
+              feature space.  Good features are then ones that result in the biggest separation between
+              the two centroids. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/feature_ranking_abstract.h.html#rank_features"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="rank_features_ex.cpp.html">rank_features_ex.cpp</a><br><br><center></center></div></a><a name="rank_unlabeled_training_samples"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rank_unlabeled_training_samples</h1><BR><BR>
+            This routine implements an active learning method for selecting the most
+            informative data sample to label out of a set of unlabeled samples. 
+            In particular, it implements the MaxMin Margin and Ratio Margin methods 
+            described in the paper:
+            <blockquote>
+                Support Vector Machine Active Learning with Applications to Text Classification
+                by Simon Tong and Daphne Koller.
+            </blockquote><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/active_learning_abstract.h.html#rank_unlabeled_training_samples"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="rbf_network_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rbf_network_trainer</h1><BR><BR>
+               Trains a radial basis function network and outputs a <a href="#decision_function">decision_function</a>. 
+               This object can be used for either regression or binary classification problems.
+               It's worth pointing out that this object is essentially an unregularized version 
+               of <a href="#krr_trainer">kernel ridge regression</a>.  This means 
+               you should really prefer to use kernel ridge regression instead.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/rbf_network_abstract.h.html#rbf_network_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="reduced"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">reduced</h1><BR><BR>
+            This is a convenience function for creating 
+            <a href="#reduced_decision_function_trainer">reduced_decision_function_trainer</a>
+            objects.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/reduced_abstract.h.html#reduced"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="reduced2"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">reduced2</h1><BR><BR>
+            This is a convenience function for creating 
+            <a href="#reduced_decision_function_trainer2">reduced_decision_function_trainer2</a>
+            objects.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/reduced_abstract.h.html#reduced2"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_ex.cpp.html">svm_ex.cpp</a><br><br><center></center></div></a><a name="reduced_decision_function_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">reduced_decision_function_trainer</h1><BR><BR>
+               This is a batch trainer object that is meant to wrap other batch trainer objects 
+               that create <a href="#decision_function">decision_function</a> objects.
+               It performs post processing on the output decision_function objects 
+               with the intent of representing the decision_function with fewer 
+               basis vectors.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/reduced_abstract.h.html#reduced_decision_function_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="reduced_decision_function_trainer2"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">reduced_decision_function_trainer2</h1><BR><BR><p>
+               This is a batch trainer object that is meant to wrap other batch trainer objects 
+               that create <a href="#decision_function">decision_function</a> objects.
+               It performs post processing on the output decision_function objects 
+               with the intent of representing the decision_function with fewer 
+               basis vectors.  
+               </p><p>
+               It begins by performing the same post processing as
+               the <a href="#reduced_decision_function_trainer">reduced_decision_function_trainer</a>
+               object but it also performs a global gradient based optimization 
+               to further improve the results.  The gradient based optimization is
+               implemented using the <a href="#approximate_distance_function">approximate_distance_function</a> routine.
+               </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/reduced_abstract.h.html#reduced_decision_function_trainer2"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_ex.cpp.html">svm_ex.cpp</a><br><br><center></center></div></a><a name="rls"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rls</h1><BR><BR>
+            This is an implementation of the linear version of the recursive least 
+            squares algorithm.  It accepts training points incrementally and, at 
+            each step, maintains the solution to the following optimization problem:
+            <blockquote>
+               find w minimizing: 0.5*dot(w,w) + C*sum_i(y_i - trans(x_i)*w)^2
+            </blockquote>
+            Where (x_i,y_i) are training pairs.  x_i is some vector and y_i is a target
+            scalar value.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/rls_abstract.h.html#rls"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="roc_c1_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">roc_c1_trainer</h1><BR><BR>
+            This is a convenience function for creating 
+            <a href="#roc_trainer_type">roc_trainer_type</a> objects that are
+            setup to pick a point on the ROC curve with respect to the +1 class.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/roc_trainer_abstract.h.html#roc_c1_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="roc_c2_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">roc_c2_trainer</h1><BR><BR>
+            This is a convenience function for creating 
+            <a href="#roc_trainer_type">roc_trainer_type</a> objects that are
+            setup to pick a point on the ROC curve with respect to the -1 class.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/roc_trainer_abstract.h.html#roc_c2_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="roc_trainer_type"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">roc_trainer_type</h1><BR><BR>
+                This object is a simple trainer post processor that allows you to 
+                easily adjust the bias term in a trained decision_function object.
+                That is, this object lets you pick a point on the ROC curve and 
+                it will adjust the bias term appropriately.  
+
+               <p>
+                So for example, suppose you wanted to set the bias term so that
+                the accuracy of your decision function on +1 labeled samples was 99%.
+                To do this you would use an instance of this object declared as follows:
+                <tt>roc_trainer_type&lt;trainer_type&gt;(your_trainer, 0.99, +1);</tt></p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/roc_trainer_abstract.h.html#roc_trainer_type"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="rr_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rr_trainer</h1><BR><BR><p>
+               Performs linear ridge regression and outputs a <a href="#decision_function">decision_function</a> that 
+               represents the learned function.  In particular, this object can only be used with
+               the <a href="#linear_kernel">linear_kernel</a>.  It is optimized for the linear case where
+               the number of features in each sample vector is small (i.e. on the order of 1000 or less since the 
+               algorithm is cubic in the number of features.).  
+               If you want to use a nonlinear kernel then you should use the <a href="#krr_trainer">krr_trainer</a>.
+            </p>
+              This object is capable of automatically estimating its regularization parameter using 
+              leave-one-out cross-validation.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/rr_trainer_abstract.h.html#rr_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="rvm_regression_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rvm_regression_trainer</h1><BR><BR><p>
+               Trains a relevance vector machine for solving regression problems.  
+               Outputs a <a href="#decision_function">decision_function</a> that represents the learned 
+               regression function. 
+            </p>
+               The implementation of the RVM training algorithm used by this library is based
+               on the following paper:
+               <blockquote>
+                Tipping, M. E. and A. C. Faul (2003). Fast marginal likelihood maximisation 
+                for sparse Bayesian models. In C. M. Bishop and B. J. Frey (Eds.), Proceedings 
+                of the Ninth International Workshop on Artificial Intelligence and Statistics, 
+                Key West, FL, Jan 3-6.
+               </blockquote><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/rvm_abstract.h.html#rvm_regression_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="rvm_regression_ex.cpp.html">rvm_regression_ex.cpp</a><br><br><center></center></div></a><a name="rvm_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rvm_trainer</h1><BR><BR><p>
+               Trains a relevance vector machine for solving binary classification problems.  
+               Outputs a <a href="#decision_function">decision_function</a> that represents the learned classifier. 
+            </p>
+               The implementation of the RVM training algorithm used by this library is based
+               on the following paper:
+               <blockquote>
+                Tipping, M. E. and A. C. Faul (2003). Fast marginal likelihood maximisation 
+                for sparse Bayesian models. In C. M. Bishop and B. J. Frey (Eds.), Proceedings 
+                of the Ninth International Workshop on Artificial Intelligence and Statistics, 
+                Key West, FL, Jan 3-6.
+               </blockquote><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/rvm_abstract.h.html#rvm_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="rvm_ex.cpp.html">rvm_ex.cpp</a><br><br><center></center></div></a><a name="sammon_projection"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">sammon_projection</h1><BR><BR>
+                This is a function object that computes the Sammon projection of a set
+                of N points in a L-dimensional vector space onto a d-dimensional space
+                (d &lt; L), according to the paper:
+                <blockquote>
+                    A Nonlinear Mapping for Data Structure Analysis (1969) by J.W. Sammon
+                </blockquote><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/sammon_abstract.h.html#sammon_projection"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="save_image_dataset_metadata"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">save_image_dataset_metadata</h1><BR><BR>
+            This routine is a tool for saving labeled image metadata to an 
+            XML file.  In particular, this routine saves the metadata into a
+            form which can be read by the <a href="#load_image_dataset_metadata">load_image_dataset_metadata</a>
+            routine.  Note also that this is the metadata
+            format used by the image labeling tool included with dlib in the
+            tools/imglab folder.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/data_io.h&gt;</tt></font></B><BR><b><a href="dlib/data_io/image_dataset_metadata.h.html#save_image_dataset_metadata"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="save_libsvm_formatted_data"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">save_libsvm_formatted_data</h1><BR><BR>
+            This is actually a pair of overloaded functions.  Between the two of them
+            they let you save <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse</a> 
+            or dense data vectors to file using the LIBSVM format.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/data_io.h&gt;</tt></font></B><BR><b><a href="dlib/data_io/libsvm_io_abstract.h.html#save_libsvm_formatted_data"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="select_all_distinct_labels"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">select_all_distinct_labels</h1><BR><BR>
+              This is a function which determines all distinct values present in a 
+              std::vector and returns the result.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/multiclass_tools_abstract.h.html#select_all_distinct_labels"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="sequence_labeler"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">sequence_labeler</h1><BR><BR>
+               This object is a tool for doing sequence labeling.  In particular,
+               it is capable of representing sequence labeling models such as
+               those produced by Hidden Markov SVMs or Conditional Random fields.
+               See the following papers for an introduction to these techniques:
+               <blockquote>
+                    Hidden Markov Support Vector Machines by 
+                     Y. Altun, I. Tsochantaridis, T. Hofmann
+                  <br>
+                    Shallow Parsing with Conditional Random Fields by 
+                     Fei Sha and Fernando Pereira
+               </blockquote><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/sequence_labeler_abstract.h.html#sequence_labeler"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="sequence_labeler_ex.cpp.html">sequence_labeler_ex.cpp</a><br><br><center></center></div></a><a name="sequence_segmenter"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">sequence_segmenter</h1><BR><BR>
+                This object is a tool for segmenting a sequence of objects into a set of
+                non-overlapping chunks.  An example sequence segmentation task is to take
+                English sentences and identify all the named entities.  In this example,
+                you would be using a sequence_segmenter to find all the chunks of
+                contiguous words which refer to proper names.
+
+               <p>
+                Internally, the sequence_segmenter uses the BIO (Begin, Inside, Outside) or
+                BILOU (Begin, Inside, Last, Outside, Unit) sequence tagging model.
+                Moreover, it is implemented using a <a href="#sequence_labeler">sequence_labeler</a>
+                object and therefore sequence_segmenter objects are examples of
+                chain structured conditional random field style sequence
+                taggers. 
+               </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/sequence_segmenter_abstract.h.html#sequence_segmenter"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="sequence_segmenter_ex.cpp.html">sequence_segmenter_ex.cpp</a><BR>Python Example Programs: <a href="sequence_segmenter.py.html">sequence_segmenter.py</a>,
+               <br><br><center></center></div></a><a name="shape_predictor_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">shape_predictor_trainer</h1><BR><BR>
+               This object is a tool for training <a href="imaging.html#shape_predictor">shape_predictors</a> 
+               based on annotated training images.  Its implementation uses the algorithm described in:
+                <blockquote>
+                    One Millisecond Face Alignment with an Ensemble of Regression Trees
+                    by Vahid Kazemi and Josephine Sullivan, CVPR 2014
+                </blockquote>
+               It is capable of learning high quality shape models.  For example, this is an example output
+               for one of the faces in the HELEN face dataset: <br><br><img src="face_landmarking_example.png" border="0" height="" width="" alt=""><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/shape_predictor_abstract.h.html#shape_predictor_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="train_shape_predictor_ex.cpp.html">train_shape_predictor_ex.cpp</a><BR>Python Example Programs: <a href="train_shape_predictor.py.html">train_shape_predictor.py</a><br><br><center></center></div></a><a name="sigmoid_kernel"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">sigmoid_kernel</h1><BR><BR>
+                This object represents a sigmoid kernel for use with
+                kernel learning machines.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/kernel_abstract.h.html#sigmoid_kernel"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="simplify_linear_decision_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">simplify_linear_decision_function</h1><BR><BR>
+            This is a set of functions that takes various forms of linear <a href="#decision_function">decision functions</a>
+            and collapses them down so that they only compute a single dot product when invoked. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/simplify_linear_decision_function_abstract.h.html#simplify_linear_decision_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="sort_basis_vectors"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">sort_basis_vectors</h1><BR><BR>
+              A kernel based learning method ultimately needs to select a set of basis functions
+              represented by a particular choice of kernel and a set of basis vectors.  
+              sort_basis_vectors() is a function which attempts to perform supervised
+              basis set selection.  In particular, you give it a candidate set of basis
+              vectors and it sorts them according to how useful they are for solving
+              a particular decision problem.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/sort_basis_vectors_abstract.h.html#sort_basis_vectors"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="sparse_histogram_intersection_kernel"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">sparse_histogram_intersection_kernel</h1><BR><BR>
+                This object represents a histogram intersection kernel kernel for use with
+                kernel learning machines that operate on 
+                <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a>.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/sparse_kernel_abstract.h.html#sparse_histogram_intersection_kernel"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="sparse_linear_kernel"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">sparse_linear_kernel</h1><BR><BR>
+                This object represents a linear kernel for use with
+                kernel learning machines that operate on
+                <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a>.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/sparse_kernel_abstract.h.html#sparse_linear_kernel"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="sparse_polynomial_kernel"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">sparse_polynomial_kernel</h1><BR><BR>
+                This object represents a polynomial kernel for use with
+                kernel learning machines that operate on
+                <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a>.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/sparse_kernel_abstract.h.html#sparse_polynomial_kernel"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="sparse_radial_basis_kernel"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">sparse_radial_basis_kernel</h1><BR><BR>
+                This object represents a radial basis function kernel for use with
+                kernel learning machines that operate on
+                <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a>.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/sparse_kernel_abstract.h.html#sparse_radial_basis_kernel"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="sparse_sigmoid_kernel"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">sparse_sigmoid_kernel</h1><BR><BR>
+                This object represents a sigmoid kernel for use with
+                kernel learning machines that operate on 
+                <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a>.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/sparse_kernel_abstract.h.html#sparse_sigmoid_kernel"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="spectral_cluster"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">spectral_cluster</h1><BR><BR>
+             This function performs the clustering algorithm described in the paper
+             <blockquote>On spectral clustering: Analysis and an algorithm by Ng, Jordan, and Weiss.</blockquote><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/clustering.h&gt;</tt></font></B><BR><b><a href="dlib/clustering/spectral_cluster_abstract.h.html#spectral_cluster"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="kkmeans_ex.cpp.html">kkmeans_ex.cpp</a><br><br><center></center></div></a><a name="structural_assignment_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">structural_assignment_trainer</h1><BR><BR>
+                This object is a tool for learning to solve an assignment problem based
+                on a training dataset of example assignments.  The training procedure produces an 
+                <a href="#assignment_function">assignment_function</a> object which can be used 
+                to predict the assignments of new data.
+
+
+                Note that this is just a convenience wrapper around the 
+                <a href="#structural_svm_assignment_problem">structural_svm_assignment_problem</a> 
+                to make it look similar to all the other trainers in dlib.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/structural_assignment_trainer_abstract.h.html#structural_assignment_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="assignment_learning_ex.cpp.html">assignment_learning_ex.cpp</a><br><br><center></center></div></a><a name="structural_graph_labeling_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">structural_graph_labeling_trainer</h1><BR><BR>
+                This object is a tool for learning to solve a graph labeling problem based
+                on a training dataset of example labeled <a href="containers.html#graph">graphs</a>. 
+                The training procedure produces a <a href="#graph_labeler">graph_labeler</a> object 
+                which can be used to predict the labelings of new graphs.
+
+               <p>
+               To elaborate, a graph labeling problem is a task to learn a binary classifier which 
+               predicts the label of each node in a graph.  Additionally, we have information in 
+               the form of edges between nodes where edges are present when we believe the 
+               linked nodes are likely to have the same label.  Therefore, part of a graph labeling 
+               problem is to learn to score each edge in terms of how strongly the edge should enforce 
+               labeling consistency between its two nodes.  
+               </p><p>
+                Note that this is just a convenience wrapper around the 
+                <a href="#structural_svm_graph_labeling_problem">structural_svm_graph_labeling_problem</a> 
+                to make it look similar to all the other trainers in dlib.   You might also
+                consider reading the book
+                <i><a href="http://www.nowozin.net/sebastian/papers/nowozin2011structured-tutorial.pdf">Structured 
+                Prediction and Learning in Computer Vision</a></i> by Sebastian 
+                Nowozin and Christoph H. Lampert since it contains a good introduction to machine learning
+                methods such as the algorithm implemented by the structural_graph_labeling_trainer.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/structural_graph_labeling_trainer_abstract.h.html#structural_graph_labeling_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="graph_labeling_ex.cpp.html">graph_labeling_ex.cpp</a><br><br><center></center></div></a><a name="structural_object_detection_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">structural_object_detection_trainer</h1><BR><BR>
+               This object is a tool for learning to detect objects in images based on a set of labeled images.  
+               The training procedure produces an <a href="imaging.html#object_detector">object_detector</a> which
+               can be used to predict the locations of objects in new images. 
+               It learns the parameter vector by formulating the problem as a <a href="#structural_svm_problem">structural SVM problem</a>.  
+               The exact details of the method are described in the paper 
+               <a href="http://arxiv.org/abs/1502.00046">Max-Margin Object Detection</a> by Davis E. King.
+               <p>
+               Note that this is just a convenience wrapper around the 
+               <a href="#structural_svm_object_detection_problem">structural_svm_object_detection_problem</a>
+               to make it look similar to all the other trainers in dlib.  
+               </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/structural_object_detection_trainer_abstract.h.html#structural_object_detection_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="fhog_object_detector_ex.cpp.html">fhog_object_detector_ex.cpp</a>,
+               <a href="object_detector_ex.cpp.html">object_detector_ex.cpp</a>,
+               <a href="object_detector_advanced_ex.cpp.html">object_detector_advanced_ex.cpp</a>,
+               <a href="train_object_detector.cpp.html">train_object_detector.cpp</a><BR>Python Example Programs: <a href="train_object_detector.py.html">train_object_detector.py</a><br><br><center></center></div></a><a name="structural_sequence_labeling_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">structural_sequence_labeling_trainer</h1><BR><BR>
+                This object is a tool for learning to do sequence labeling based
+                on a set of training data.  The training procedure produces a
+                <a href="#sequence_labeler">sequence_labeler</a> object which can 
+                be use to predict the labels of new data sequences.
+               <p>
+               Note that this is just a convenience wrapper around the 
+               <a href="#structural_svm_sequence_labeling_problem">structural_svm_sequence_labeling_problem</a>
+               to make it look similar to all the other trainers in dlib.  
+               </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/structural_sequence_labeling_trainer_abstract.h.html#structural_sequence_labeling_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="sequence_labeler_ex.cpp.html">sequence_labeler_ex.cpp</a><br><br><center></center></div></a><a name="structural_sequence_segmentation_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">structural_sequence_segmentation_trainer</h1><BR><BR>
+                This object is a tool for learning to do sequence segmentation based on a
+                set of training data.  The training procedure produces a <a href="#sequence_segmenter">sequence_segmenter</a>
+                object which can be used to identify the sub-segments of new data sequences.
+               <p>
+                  This object internally uses the <a href="#structural_sequence_labeling_trainer">structural_sequence_labeling_trainer</a> 
+                  to solve the learning problem.  
+               </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/structural_sequence_segmentation_trainer_abstract.h.html#structural_sequence_segmentation_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="sequence_segmenter_ex.cpp.html">sequence_segmenter_ex.cpp</a><BR>Python Example Programs: <a href="sequence_segmenter.py.html">sequence_segmenter.py</a>,
+               <br><br><center></center></div></a><a name="structural_svm_assignment_problem"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">structural_svm_assignment_problem</h1><BR><BR>
+                This object is a tool for learning the parameters needed to use
+                an <a href="#assignment_function">assignment_function</a> object.  
+                It learns the parameters by formulating the problem as a 
+                <a href="#structural_svm_problem">structural SVM problem</a>.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/structural_svm_assignment_problem_abstract.h.html#structural_svm_assignment_problem"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="structural_svm_graph_labeling_problem"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">structural_svm_graph_labeling_problem</h1><BR><BR>
+                This object is a tool for learning the weight vectors needed to use
+                a <a href="#graph_labeler">graph_labeler</a> object.  
+                It learns the parameter vectors by 
+                formulating the problem as a <a href="#structural_svm_problem">structural SVM problem</a>.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/structural_svm_graph_labeling_problem_abstract.h.html#structural_svm_graph_labeling_problem"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="structural_svm_object_detection_problem"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">structural_svm_object_detection_problem</h1><BR><BR>
+               This object is a tool for learning the parameter vector needed to use
+               a <a href="imaging.html#scan_fhog_pyramid">scan_fhog_pyramid</a>,
+               <a href="imaging.html#scan_image_pyramid">scan_image_pyramid</a>,
+               <a href="imaging.html#scan_image_boxes">scan_image_boxes</a>, or
+               <a href="imaging.html#scan_image_custom">scan_image_custom</a> object.  
+
+            <p>
+               It learns the parameter vector by formulating the problem as a <a href="#structural_svm_problem">structural SVM problem</a>.  
+               The exact details of the method are described in the paper 
+               <a href="http://arxiv.org/abs/1502.00046">Max-Margin Object Detection</a> by Davis E. King.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/structural_svm_object_detection_problem_abstract.h.html#structural_svm_object_detection_problem"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="structural_svm_problem"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">structural_svm_problem</h1><BR><BR>
+                This object, when used with the <a href="optimization.html#oca">oca</a> optimizer, is a tool 
+                for solving the optimization problem associated 
+                with a structural support vector machine.  A structural SVM is a supervised 
+                machine learning method for learning to predict complex outputs.  This is
+                contrasted with a binary classifier which makes only simple yes/no
+                predictions.  A structural SVM, on the other hand, can learn to predict
+                complex outputs such as entire parse trees or DNA sequence alignments.  To
+                do this, it learns a function F(x,y) which measures how well a particular
+                data sample x matches a label y.  When used for prediction, the best label
+                for a new x is given by the y which maximizes F(x,y).   
+
+                <br><br>
+
+                For an introduction to structured support vector machines you should consult 
+                the following paper: 
+                <blockquote>
+                    Predicting Structured Objects with Support Vector Machines by 
+                    Thorsten Joachims, Thomas Hofmann, Yisong Yue, and Chun-nam Yu
+                </blockquote>
+
+                For a more detailed discussion of the particular algorithm implemented by this
+                object see the following paper:  
+                <blockquote>
+                    T. Joachims, T. Finley, Chun-Nam Yu, Cutting-Plane Training of Structural SVMs, 
+                    Machine Learning, 77(1):27-59, 2009.
+                </blockquote>
+                Note that this object is essentially a tool for solving the 1-Slack structural
+                SVM with margin-rescaling.  Specifically, see Algorithm 3 in the above referenced 
+                paper.
+
+               <br><br>
+                Finally, for a very detailed introduction to this subject, you should consider the book:
+                <blockquote><i><a href="http://www.nowozin.net/sebastian/papers/nowozin2011structured-tutorial.pdf">Structured 
+                     Prediction and Learning in Computer Vision</a></i> by Sebastian Nowozin and 
+                     Christoph H. Lampert
+                </blockquote><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/structural_svm_problem_abstract.h.html#structural_svm_problem"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_struct_ex.cpp.html">svm_struct_ex.cpp</a><BR>Python Example Programs: <a href="svm_struct.py.html">svm_struct.py</a>,
+               <br><br><center></center></div></a><a name="structural_svm_problem_threaded"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">structural_svm_problem_threaded</h1><BR><BR>
+            This is just a version of the <a href="#structural_svm_problem">structural_svm_problem</a> 
+            which is capable of using multiple cores/threads at a time.  You should use it if
+            you have a multi-core CPU and the separation oracle takes a long time to compute.  Or even better, if you
+            have multiple computers then you can use the <a href="#svm_struct_controller_node">svm_struct_controller_node</a>
+            to distribute the work across many computers.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/structural_svm_problem_threaded_abstract.h.html#structural_svm_problem_threaded"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_struct_ex.cpp.html">svm_struct_ex.cpp</a><br><br><center></center></div></a><a name="structural_svm_sequence_labeling_problem"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">structural_svm_sequence_labeling_problem</h1><BR><BR>
+                This object is a tool for learning the weight vector needed to use
+                a <a href="#sequence_labeler">sequence_labeler</a> object.  
+
+                It learns the parameter vector by formulating the problem as a 
+                <a href="#structural_svm_problem">structural SVM problem</a>.  
+                The general approach is discussed in the paper:
+                <blockquote>
+                    Hidden Markov Support Vector Machines by 
+                    Y. Altun, I. Tsochantaridis, T. Hofmann
+                </blockquote>
+                While the particular optimization strategy used is the method from: 
+                <blockquote>
+                    T. Joachims, T. Finley, Chun-Nam Yu, Cutting-Plane Training of 
+                    Structural SVMs, Machine Learning, 77(1):27-59, 2009.
+                </blockquote><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/structural_svm_sequence_labeling_problem_abstract.h.html#structural_svm_sequence_labeling_problem"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="structural_track_association_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">structural_track_association_trainer</h1><BR><BR>
+                This object is a tool for learning to solve a track association problem.  That
+                is, it takes in a set of training data and outputs a 
+                <a href="#track_association_function">track_association_function</a>
+                you can use to do detection to track association.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/structural_track_association_trainer_abstract.h.html#structural_track_association_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="learning_to_track_ex.cpp.html">learning_to_track_ex.cpp</a><br><br><center></center></div></a><a name="svm_c_ekm_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">svm_c_ekm_trainer</h1><BR><BR>
+                This object represents a tool for training the C formulation of 
+                a support vector machine for solving binary classification problems.   
+                It is implemented using the <a href="#empirical_kernel_map">empirical_kernel_map</a>
+                to kernelize the <a href="#svm_c_linear_trainer">svm_c_linear_trainer</a>.  This makes it a very fast algorithm
+                capable of learning from very large datasets.
+
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_c_ekm_trainer_abstract.h.html#svm_c_ekm_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="svm_c_linear_dcd_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">svm_c_linear_dcd_trainer</h1><BR><BR>
+                This object represents a tool for training the C formulation of 
+                a support vector machine to solve binary classification problems. 
+                It is optimized for the case where linear kernels are used and  
+                is implemented using the method described in the 
+                following paper:
+                <blockquote>
+                    A Dual Coordinate Descent Method for Large-scale Linear SVM
+                    by Cho-Jui Hsieh, Kai-Wei Chang, and Chih-Jen Lin
+                </blockquote>
+
+                This trainer has the ability to disable the bias term and also
+                to force the last element of the learned weight vector to be 1.
+                Additionally, it can be warm-started from the solution to a previous
+                training run.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_c_linear_dcd_trainer_abstract.h.html#svm_c_linear_dcd_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="one_class_classifiers_ex.cpp.html">one_class_classifiers_ex.cpp</a><br><br><center></center></div></a><a name="svm_c_linear_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">svm_c_linear_trainer</h1><BR><BR>
+                This object represents a tool for training the C formulation of 
+                a support vector machine to solve binary classification problems. 
+                It is optimized for the case where linear kernels are used and  
+                is implemented using the <a href="optimization.html#oca">oca</a>  
+                optimizer and uses the exact line search described in the 
+                following paper:
+                <blockquote>
+                    Optimized Cutting Plane Algorithm for Large-Scale Risk Minimization
+                      by  Vojtech Franc, Soren Sonnenburg; Journal of Machine Learning 
+                      Research, 10(Oct):2157--2192, 2009. 
+                </blockquote>
+
+               This trainer has the ability to restrict the learned weights to non-negative
+               values.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_c_linear_trainer_abstract.h.html#svm_c_linear_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_sparse_ex.cpp.html">svm_sparse_ex.cpp</a><br><br><center></center></div></a><a name="svm_c_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">svm_c_trainer</h1><BR><BR><p>
+               Trains a C support vector machine for solving binary classification problems 
+               and outputs a <a href="#decision_function">decision_function</a>. 
+               It is implemented using the <a href="optimization.html#solve_qp3_using_smo">SMO</a> algorithm.
+            </p>
+               The implementation of the C-SVM training algorithm used by this library is based
+               on the following paper:
+               <ul><li>Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
+                     machines, 2001. Software available at 
+                     <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm">http://www.csie.ntu.edu.tw/~cjlin/libsvm</a></li></ul><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_c_trainer_abstract.h.html#svm_c_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_c_ex.cpp.html">svm_c_ex.cpp</a><br><br><center></center></div></a><a name="svm_multiclass_linear_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">svm_multiclass_linear_trainer</h1><BR><BR>
+                This object represents a tool for training a multiclass support 
+                vector machine.  It is optimized for the case where linear kernels 
+                are used and implemented using the <a href="#structural_svm_problem">structural_svm_problem</a>
+                object.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_multiclass_linear_trainer_abstract.h.html#svm_multiclass_linear_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="svm_nu_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">svm_nu_trainer</h1><BR><BR><p>
+               Trains a nu support vector machine for solving binary classification problems and 
+               outputs a <a href="#decision_function">decision_function</a>. 
+               It is implemented using the <a href="optimization.html#solve_qp2_using_smo">SMO</a> algorithm.
+            </p>
+               The implementation of the nu-svm training algorithm used by this library is based
+               on the following excellent papers:
+               <ul><li>Chang and Lin, Training {nu}-Support Vector Classifiers: Theory and Algorithms</li><li>Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
+                     machines, 2001. Software available at 
+                     <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm">http://www.csie.ntu.edu.tw/~cjlin/libsvm</a></li></ul><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_nu_trainer_abstract.h.html#svm_nu_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_ex.cpp.html">svm_ex.cpp</a>,
+               <a href="model_selection_ex.cpp.html">model_selection_ex.cpp</a><br><br><center></center></div></a><a name="svm_one_class_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">svm_one_class_trainer</h1><BR><BR><p>
+               Trains a one-class support vector classifier and outputs a <a href="#decision_function">decision_function</a>. 
+               It is implemented using the <a href="optimization.html#solve_qp3_using_smo">SMO</a> algorithm.
+            </p>
+               The implementation of the one-class training algorithm used by this library is based
+               on the following paper:
+               <ul><li>Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
+                     machines, 2001. Software available at 
+                     <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm">http://www.csie.ntu.edu.tw/~cjlin/libsvm</a></li></ul><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_one_class_trainer_abstract.h.html#svm_one_class_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="one_class_classifiers_ex.cpp.html">one_class_classifiers_ex.cpp</a><br><br><center></center></div></a><a name="svm_pegasos"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">svm_pegasos</h1><BR><BR>
+                This object implements an online algorithm for training a support 
+                vector machine for solving binary classification problems.  
+
+            <p>
+                The implementation of the Pegasos algorithm used by this object is based
+                on the following excellent paper:
+               <blockquote>
+                    Pegasos: Primal estimated sub-gradient solver for SVM (2007)
+                    by Shai Shalev-Shwartz, Yoram Singer, Nathan Srebro 
+                    In ICML 
+               </blockquote></p><p>
+                This SVM training algorithm has two interesting properties.  First, the 
+                pegasos algorithm itself converges to the solution in an amount of time
+                unrelated to the size of the training set (in addition to being quite fast
+                to begin with).  This makes it an appropriate algorithm for learning from
+                very large datasets.  Second, this object uses the <a href="#kcentroid">kcentroid</a> object 
+                to maintain a sparse approximation of the learned decision function.  
+                This means that the number of support vectors in the resulting decision 
+                function is also unrelated to the size of the dataset (in normal SVM
+                training algorithms, the number of support vectors grows approximately 
+                linearly with the size of the training set).  
+            </p><p>
+              However, if you are considering using svm_pegasos, you should also try the 
+              <a href="#svm_c_linear_trainer">svm_c_linear_trainer</a> for linear
+              kernels or <a href="#svm_c_ekm_trainer">svm_c_ekm_trainer</a> for non-linear
+              kernels since these other trainers are, usually, faster and easier to use
+              than svm_pegasos.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/pegasos_abstract.h.html#svm_pegasos"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_pegasos_ex.cpp.html">svm_pegasos_ex.cpp</a>,
+               <a href="svm_sparse_ex.cpp.html">svm_sparse_ex.cpp</a><br><br><center></center></div></a><a name="svm_rank_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">svm_rank_trainer</h1><BR><BR>
+                This object represents a tool for training a ranking support vector machine
+                using linear kernels.  In particular, this object is a tool for training
+                the Ranking SVM described in the paper: 
+                <blockquote>
+                    Optimizing Search Engines using Clickthrough Data by Thorsten Joachims
+                </blockquote>
+                Finally, note that the implementation of this object is done using the 
+                <a href="optimization.html#oca">oca</a> optimizer and 
+                <a href="#count_ranking_inversions">count_ranking_inversions</a> method.
+                This means that it runs in O(n*log(n)) time, making it suitable for use
+                with large datasets.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_rank_trainer_abstract.h.html#svm_rank_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_rank_ex.cpp.html">svm_rank_ex.cpp</a><BR>Python Example Programs: <a href="svm_rank.py.html">svm_rank.py</a><br><br><center></center></div></a><a name="svm_struct_controller_node"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">svm_struct_controller_node</h1><BR><BR>
+            This object is a tool for distributing the work involved in solving a 
+            <a href="#structural_svm_problem">structural_svm_problem</a> across many computers.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/structural_svm_distributed_abstract.h.html#svm_struct_controller_node"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="svm_struct_processing_node"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">svm_struct_processing_node</h1><BR><BR>
+            This object is a tool for distributing the work involved in solving a 
+            <a href="#structural_svm_problem">structural_svm_problem</a> across many computers.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/structural_svm_distributed_abstract.h.html#svm_struct_processing_node"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="svr_linear_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">svr_linear_trainer</h1><BR><BR>
+                This object implements a trainer for performing epsilon-insensitive support
+                vector regression.  It uses the <a href="optimization.html#oca">oca</a> 
+                optimizer so it is very efficient at solving this problem when
+                linear kernels are used, making it suitable for use with large
+                datasets. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svr_linear_trainer_abstract.h.html#svr_linear_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="svr_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">svr_trainer</h1><BR><BR><p>
+                This object implements a trainer for performing epsilon-insensitive support 
+                vector regression.  It is implemented using the <a href="optimization.html#solve_qp3_using_smo">SMO</a> algorithm, 
+                allowing the use of non-linear kernels.
+                If you are interested in performing support vector regression with a linear kernel and you
+                have a lot of training data then you should use the <a href="#svr_linear_trainer">svr_linear_trainer</a>
+                which is highly optimized for this case.
+            </p>
+                The implementation of the eps-SVR training algorithm used by this object is based
+                on the following paper:
+               <ul><li>Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
+                     machines, 2001. Software available at 
+                     <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm">http://www.csie.ntu.edu.tw/~cjlin/libsvm</a></li></ul><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svr_trainer_abstract.h.html#svr_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svr_ex.cpp.html">svr_ex.cpp</a><br><br><center></center></div></a><a name="test_assignment_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">test_assignment_function</h1><BR><BR>
+            Tests an <a href="#assignment_function">assignment_function</a> on a set of data 
+            and returns the fraction of assignments predicted correctly.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/cross_validate_assignment_trainer_abstract.h.html#test_assignment_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="assignment_learning_ex.cpp.html">assignment_learning_ex.cpp</a><br><br><center></center></div></a><a name="test_binary_decision_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">test_binary_decision_function</h1><BR><BR>
+            Tests a <a href="#decision_function">decision_function</a> that represents a binary decision function and
+            returns the test accuracy.  
+
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_abstract.h.html#test_binary_decision_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="test_graph_labeling_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">test_graph_labeling_function</h1><BR><BR>
+            Tests a <a href="#graph_labeler">graph_labeler</a> on a set of data 
+            and returns the fraction of labels predicted correctly.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/cross_validate_graph_labeling_trainer_abstract.h.html#test_graph_labeling_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="test_multiclass_decision_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">test_multiclass_decision_function</h1><BR><BR>
+            Tests a multiclass decision function (e.g. <a href="#one_vs_one_decision_function">one_vs_one_decision_function</a>)
+            and returns a confusion matrix describing the results.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/cross_validate_multiclass_trainer_abstract.h.html#test_multiclass_decision_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="multiclass_classification_ex.cpp.html">multiclass_classification_ex.cpp</a>,
+               <a href="custom_trainer_ex.cpp.html">custom_trainer_ex.cpp</a><br><br><center></center></div></a><a name="test_object_detection_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">test_object_detection_function</h1><BR><BR>
+            Tests an object detector such
+            as the <a href="imaging.html#object_detector">object_detector</a> 
+            and returns the precision and recall. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/cross_validate_object_detection_trainer_abstract.h.html#test_object_detection_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="fhog_object_detector_ex.cpp.html">fhog_object_detector_ex.cpp</a>,
+               <a href="object_detector_ex.cpp.html">object_detector_ex.cpp</a>,
+               <a href="object_detector_advanced_ex.cpp.html">object_detector_advanced_ex.cpp</a>,
+               <a href="train_object_detector.cpp.html">train_object_detector.cpp</a><br><br><center></center></div></a><a name="test_ranking_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">test_ranking_function</h1><BR><BR>
+            Tests a <a href="#decision_function">decision_function</a>'s ability to correctly 
+            rank a dataset and returns the resulting ranking accuracy and mean average precision metrics.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/ranking_tools_abstract.h.html#test_ranking_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_rank_ex.cpp.html">svm_rank_ex.cpp</a><BR>Python Example Programs: <a href="svm_rank.py.html">svm_rank.py</a><br><br><center></center></div></a><a name="test_regression_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">test_regression_function</h1><BR><BR>
+            Tests a regression function (e.g. <a href="#decision_function">decision_function</a>)
+            and returns the mean squared error and R-squared value.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/cross_validate_regression_trainer_abstract.h.html#test_regression_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="test_sequence_labeler"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">test_sequence_labeler</h1><BR><BR>
+            Tests a <a href="#sequence_labeler">sequence_labeler</a> on a set of data 
+            and returns a confusion matrix describing the results.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/cross_validate_sequence_labeler_abstract.h.html#test_sequence_labeler"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="sequence_labeler_ex.cpp.html">sequence_labeler_ex.cpp</a><br><br><center></center></div></a><a name="test_sequence_segmenter"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">test_sequence_segmenter</h1><BR><BR>
+            Tests a <a href="#sequence_segmenter">sequence_segmenter</a> on a set of data 
+            and returns the resulting precision, recall, and F1-score.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/cross_validate_sequence_segmenter_abstract.h.html#test_sequence_segmenter"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="sequence_segmenter_ex.cpp.html">sequence_segmenter_ex.cpp</a><BR>Python Example Programs: <a href="sequence_segmenter.py.html">sequence_segmenter.py</a>,
+               <br><br><center></center></div></a><a name="test_shape_predictor"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">test_shape_predictor</h1><BR><BR>
+            Tests a <a href="imaging.html#shape_predictor">shape_predictor</a>'s ability to correctly 
+            predict the part locations of objects.  The output is the average distance (measured in pixels) between
+            each part and its true location.  You can optionally normalize each distance using a 
+            user supplied scale.  For example, when performing face landmarking, you might want to
+            normalize the distances by the interocular distance.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/shape_predictor_abstract.h.html#test_shape_predictor"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="train_shape_predictor_ex.cpp.html">train_shape_predictor_ex.cpp</a><BR>Python Example Programs: <a href="train_shape_predictor.py.html">train_shape_predictor.py</a><br><br><center></center></div></a><a name="test_track_association_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">test_track_association_function</h1><BR><BR>
+            Tests a <a href="#track_association_function">track_association_function</a> on a set of data 
+            and returns the fraction of detections which were correctly associated to their tracks.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/svm/cross_validate_track_association_trainer_abstract.h.html#test_track_association_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="learning_to_track_ex.cpp.html">learning_to_track_ex.cpp</a><br><br><center></center></div></a><a name="track_association_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">track_association_function</h1><BR><BR>
+                This object is a tool that helps you implement an object tracker.  So for
+                example, if you wanted to track people moving around in a video then this
+                object can help.  In particular, imagine you have a tool for detecting the
+                positions of each person in an image.  Then you can run this person
+                detector on the video and at each time step, i.e. at each frame, you get a
+                set of person detections.  However, that by itself doesn't tell you how
+                many people there are in the video and where they are moving to and from.
+                To get that information you need to figure out which detections match each
+                other from frame to frame.  This is where the track_association_function
+                comes in.  It performs the detection to track association.  It will also do
+                some of the track management tasks like creating a new track when a
+                detection doesn't match any of the existing tracks.
+
+               <p>
+                  Internally, this object is implemented using the 
+                  <a href="#assignment_function">assignment_function</a> object.  
+                In fact, it's really just a thin wrapper around assignment_function and
+                exists just to provide a more convenient interface to users doing detection
+                to track association.   
+               </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/track_association_function_abstract.h.html#track_association_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="learning_to_track_ex.cpp.html">learning_to_track_ex.cpp</a><br><br><center></center></div></a><a name="train_probabilistic_decision_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">train_probabilistic_decision_function</h1><BR><BR><p>
+               Trains a <a href="#probabilistic_function">probabilistic_function</a> using 
+               some sort of binary classification trainer object such as the <a href="#svm_nu_trainer">svm_nu_trainer</a> or
+               <a href="#krr_trainer">krr_trainer</a>.
+            </p>
+            The probability model is created by using the technique described in the following papers:
+            <blockquote>
+                Probabilistic Outputs for Support Vector Machines and
+                Comparisons to Regularized Likelihood Methods by 
+                John C. Platt.  March 26, 1999
+            </blockquote><blockquote>
+                A Note on Platt's Probabilistic Outputs for Support Vector Machines
+                by Hsuan-Tien Lin, Chih-Jen Lin, and Ruby C. Weng
+            </blockquote><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/svm_abstract.h.html#train_probabilistic_decision_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_ex.cpp.html">svm_ex.cpp</a><br><br><center></center></div></a><a name="vector_normalizer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">vector_normalizer</h1><BR><BR>
+                This object represents something that can learn to normalize a set 
+                of column vectors.  In particular, normalized column vectors should 
+                have zero mean and a variance of one.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/statistics_abstract.h.html#vector_normalizer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_ex.cpp.html">svm_ex.cpp</a><br><br><center></center></div></a><a name="vector_normalizer_frobmetric"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">vector_normalizer_frobmetric</h1><BR><BR>
+                This object is a tool for performing the FrobMetric distance metric
+                learning algorithm described in the following paper:
+                <blockquote>
+                    A Scalable Dual Approach to Semidefinite Metric Learning
+                    By Chunhua Shen, Junae Kim, Lei Wang, in CVPR 2011
+                </blockquote>
+                Therefore, this object is a tool that takes as input training triplets
+                (anchor, near, far) of vectors and attempts to learn a linear
+                transformation T such that:
+                <blockquote><tt>length(T*anchor-T*near) + 1 &lt; length(T*anchor - T*far)</tt></blockquote>
+                That is, you give a bunch of anchor vectors and for each anchor vector you
+                specify some vectors which should be near to it and some that should be far
+                form it.  This object then tries to find a transformation matrix that makes
+                the "near" vectors close to their anchors while the "far" vectors are
+                farther away.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/vector_normalizer_frobmetric_abstract.h.html#vector_normalizer_frobmetric"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="vector_normalizer_pca"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">vector_normalizer_pca</h1><BR><BR>
+                This object represents something that can learn to normalize a set 
+                of column vectors.  In particular, normalized column vectors should 
+                have zero mean and a variance of one.  
+
+                This object also uses principal component analysis for the purposes 
+                of reducing the number of elements in a vector.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/statistics_abstract.h.html#vector_normalizer_pca"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="verbose_batch"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">verbose_batch</h1><BR><BR>
+            This is a convenience function for creating 
+            <a href="#batch_trainer">batch_trainer</a> objects.  This function
+            generates a batch_trainer that will print status messages to standard
+            output so that you can observe the progress of a training algorithm.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/pegasos_abstract.h.html#verbose_batch"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="svm_pegasos_ex.cpp.html">svm_pegasos_ex.cpp</a><br><br><center></center></div></a><a name="verbose_batch_cached"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">verbose_batch_cached</h1><BR><BR>
+            This is a convenience function for creating 
+            <a href="#batch_trainer">batch_trainer</a> objects.  This function
+            generates a batch_trainer that will print status messages to standard
+            output so that you can observe the progress of a training algorithm.
+            It will also be configured to use a kernel matrix cache.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/svm.h&gt;</tt></font></B><BR><b><a href="dlib/svm/pegasos_abstract.h.html#verbose_batch_cached"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a></div></body></html>

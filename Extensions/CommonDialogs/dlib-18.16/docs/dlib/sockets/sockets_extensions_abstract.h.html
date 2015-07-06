@@ -1,0 +1,302 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sockets_extensions_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SOCKETS_EXTENSIONs_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_SOCKETS_EXTENSIONs_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sockets_kernel_abstract.h.html'>sockets_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../smart_pointers.h.html'>../smart_pointers.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../error.h.html'>../error.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='invalid_network_address'></a>invalid_network_address</b> : <font color='#0000FF'>public</font> dlib::error 
+    <b>{</b> 
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is the exception thrown by network_address's constructor if the
+                input is invalid.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='network_address'></a>network_address</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is simply a container for two things:
+                    - A host machine address which is either an IP address or DNS name
+                      for a machine.
+                    - A port number.
+            
+                Together, these things define a machine and port on that machine.
+        !*/</font>
+
+        <b><a name='network_address'></a>network_address</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - host_address == ""
+                - #port == 0
+        !*/</font>
+
+        <b><a name='network_address'></a>network_address</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> full_address
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - interprets full_address as a network address of the form:
+                    host_address:port
+                  and assigns each part into #host_address and #port.  For example,
+                  network_address("localhost:80") would result in a network_address
+                  object where host_address was "localhost" and port was 80.
+            throws
+                - invalid_network_address
+                    This exception is thrown if the full_address string can't be
+                    interpreted as a valid network address.
+        !*/</font>
+
+        <b><a name='network_address'></a>network_address</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> full_address
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - full_address == a valid pointer to a null terminated string
+            ensures
+                - Invoking this constructor is equivalent to performing 
+                  network_address(std::string(full_address))
+        !*/</font>
+
+        <b><a name='network_address'></a>network_address</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> host_address_,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port_
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #host_address == host_address_
+                - #port == port_
+        !*/</font>
+            
+
+        std::string host_address;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> network_address<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> network_address<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - provides a total ordering over network_address objects so you can use them in
+              the standard associative containers.  The ordering is defined such that if
+              you sorted network addresses they would sort first on the host_address string
+              and then, for network_address objects with equal host_address, they would
+              sort on the port number
+    !*/</font>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> network_address<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> network_address<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns true if a and b contain exactly the same address and false otherwise.
+              That is, the following must be true for this function to return true:
+                - a.host_address == b.host_address
+                - a.port == b.port
+              Note that this means that two addresses which are logically equivalent but
+              written differently will not compare equal.  For example, suppose example.com
+              has the IP address 10.1.1.1.  Then network_address("10.1.1.1:80") and
+              network_address("example.com:80") really refer to the same network resource
+              but will nevertheless not compare equal since.
+    !*/</font>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> network_address<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> network_address<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns !(a == b)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> network_address<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - provides serialization support
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>
+        network_address<font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - provides deserialization support
+    !*/</font>
+
+    std::ostream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        std::ostream<font color='#5555FF'>&amp;</font> out,
+        <font color='#0000FF'>const</font> network_address<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - writes the given network_address to the output stream.  The format is the
+              host_address, then a colon, then the port number.  So for example:
+                cout &lt;&lt; network_address("localhost", 80);
+              would print:
+                localhost:80
+            - returns #out 
+    !*/</font>
+
+    std::istream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in,
+        network_address<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - reads a network_address from the given input stream.  The expected format is
+              the same as the one used to print them by the above operator&lt;&lt;() routine. 
+            - returns #in
+            - if (there is an error reading the network_address) then
+                - #in.good() == false
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    connection<font color='#5555FF'>*</font> <b><a name='connect'></a>connect</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> host_or_ip,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a connection object that is connected to the given host at the 
+              given port
+        throws
+            - dlib::socket_error
+                This exception is thrown if there is some problem that prevents us from
+                creating the connection
+            - std::bad_alloc
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    connection<font color='#5555FF'>*</font> <b><a name='connect'></a>connect</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> network_address<font color='#5555FF'>&amp;</font> addr
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns connect(addr.host_address, addr_port);
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    connection<font color='#5555FF'>*</font> <b><a name='connect'></a>connect</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> host_or_ip,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a connection object that is connected to the given host at the 
+              given port.  
+            - blocks for at most timeout milliseconds
+        throws
+            - dlib::socket_error
+                This exception is thrown if there is some problem that prevents us from
+                creating the connection or if timeout milliseconds elapses before the
+                connect is successful.
+            - std::bad_alloc
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_ip_address'></a>is_ip_address</b> <font face='Lucida Console'>(</font>
+        std::string ip
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - if (ip is a valid ip address) then
+                - returns true
+            - else
+                - returns false
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='close_gracefully'></a>close_gracefully</b> <font face='Lucida Console'>(</font>
+        connection<font color='#5555FF'>*</font> con,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout <font color='#5555FF'>=</font> <font color='#979000'>500</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - con == a valid pointer to a connection object or 0
+        ensures
+            - This function does nothing if con == 0, otherwise it performs the following:
+                - performs a graceful close of the given connection and if it takes longer
+                  than timeout milliseconds to complete then forces the connection closed. 
+                    - Specifically, a graceful close means that the outgoing part of con is
+                      closed (a FIN is sent) and then we wait for the other end to to close
+                      their end of the connection.  This way any data still on its way to
+                      the other end of the connection will be received properly.
+                - This function will block until the graceful close is completed or we
+                  timeout.
+                - calls "delete con;".  Thus con is no longer a valid pointer after this
+                  function has finished.
+        throws
+            - std::bad_alloc or dlib::thread_error
+                If either of these exceptions are thrown con will still be closed via
+                "delete con;" 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='close_gracefully'></a>close_gracefully</b> <font face='Lucida Console'>(</font>
+        scoped_ptr<font color='#5555FF'>&lt;</font>connection<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> con,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout <font color='#5555FF'>=</font> <font color='#979000'>500</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - con == a valid pointer to a connection object or con.get() == 0
+        ensures
+            - This function does nothing if con.get() == 0, otherwise it performs the
+              following:
+                - performs a graceful close of the given connection and if it takes longer
+                  than timeout milliseconds to complete then forces the connection closed. 
+                    - Specifically, a graceful close means that the outgoing part of con is
+                      closed (a FIN is sent) and then we wait for the other end to to close
+                      their end of the connection.  This way any data still on its way to
+                      the other end of the connection will be received properly.
+                - This function will block until the graceful close is completed or we
+                  timeout.
+                - #con.get() == 0.  Thus con is no longer a valid pointer after this
+                  function has finished.
+        throws
+            - std::bad_alloc or dlib::thread_error
+                If either of these exceptions are thrown con will still be closed and
+                deleted (i.e. #con.get() == 0).
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SOCKETS_EXTENSIONs_ABSTRACT_
+</font>
+
+
+</pre></body></html>

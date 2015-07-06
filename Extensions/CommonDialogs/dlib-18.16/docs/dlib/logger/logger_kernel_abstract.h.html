@@ -1,0 +1,432 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - logger_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_LOGGER_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_LOGGER_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads.h.html'>../threads.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='log_level'></a>log_level</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a simple named level to log at.  It contains a numeric 
+                priority and a name to use in the logging messages.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+        <b><a name='log_level'></a>log_level</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> priority_, 
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> name_
+        <font face='Lucida Console'>)</font>;  
+        <font color='#009900'>/*!
+            ensures
+                - #priority = priority_
+                - the first 19 characters of name_ are copied into name and name
+                  is null terminated.
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> log_level<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> priority <font color='#5555FF'>&lt;</font>  rhs.priority; <b>}</b>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> log_level<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> priority <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> rhs.priority; <b>}</b>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> log_level<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> priority <font color='#5555FF'>&gt;</font>  rhs.priority; <b>}</b>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> log_level<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> priority <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> rhs.priority; <b>}</b>
+
+        <font color='#0000FF'><u>int</u></font> priority;
+        <font color='#0000FF'><u>char</u></font> name[<font color='#979000'>20</font>];
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> std::ostream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>std::ostream<font color='#5555FF'>&amp;</font> out, <font color='#0000FF'>const</font> log_level<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - performs out &lt;&lt; item.name
+            - returns out
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> log_level <b><a name='LALL'></a>LALL</b>  <font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,"<font color='#CC0000'>ALL</font>"<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> log_level <b><a name='LNONE'></a>LNONE</b> <font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,"<font color='#CC0000'>NONE</font>"<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> log_level <b><a name='LTRACE'></a>LTRACE</b><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>100</font>,"<font color='#CC0000'>TRACE</font>"<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> log_level <b><a name='LDEBUG'></a>LDEBUG</b><font face='Lucida Console'>(</font><font color='#979000'>0</font>   ,"<font color='#CC0000'>DEBUG</font>"<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> log_level <b><a name='LINFO'></a>LINFO</b> <font face='Lucida Console'>(</font><font color='#979000'>100</font> ,"<font color='#CC0000'>INFO </font>"<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> log_level <b><a name='LWARN'></a>LWARN</b> <font face='Lucida Console'>(</font><font color='#979000'>200</font> ,"<font color='#CC0000'>WARN </font>"<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> log_level <b><a name='LERROR'></a>LERROR</b><font face='Lucida Console'>(</font><font color='#979000'>300</font> ,"<font color='#CC0000'>ERROR</font>"<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> log_level <b><a name='LFATAL'></a>LFATAL</b><font face='Lucida Console'>(</font><font color='#979000'>400</font> ,"<font color='#CC0000'>FATAL</font>"<font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='set_all_logging_output_streams'></a>set_all_logging_output_streams</b> <font face='Lucida Console'>(</font>
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - for all loggers L (even loggers not yet constructed):
+                - #L.output_streambuf() == out.rdbuf() 
+                - Removes any previous output hook from L.  So now the logger
+                  L will write all its messages to the given output stream.
+        throws
+            - std::bad_alloc
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>print_header_type<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>
+        std::ostream<font color='#5555FF'>&amp;</font> out, 
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> logger_name, 
+        <font color='#0000FF'>const</font> log_level<font color='#5555FF'>&amp;</font> l,
+        <font color='#0000FF'>const</font> uint64 thread_id
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='set_all_logging_headers'></a>set_all_logging_headers</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> print_header_type<font color='#5555FF'>&amp;</font> new_header
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - for all loggers L (even loggers not yet constructed):
+                - #L.logger_header() == new_header 
+        throws
+            - std::bad_alloc
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='set_all_logging_output_hooks'></a>set_all_logging_output_hooks</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> object,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>hook<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> logger_name, 
+                        <font color='#0000FF'>const</font> log_level<font color='#5555FF'>&amp;</font> l,
+                        <font color='#0000FF'>const</font> uint64 thread_id,
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> message_to_log<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - for all loggers L (even loggers not yet constructed):
+                - #L.output_streambuf() == 0
+                - performs the equivalent to calling L.set_output_hook(object, hook);
+                  (i.e. sets all loggers so that they will use the given hook function)
+        throws
+            - std::bad_alloc
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='set_all_logging_output_hooks'></a>set_all_logging_output_hooks</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> object
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - calls set_all_logging_output_hooks(object, &amp;T::log);
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='set_all_logging_levels'></a>set_all_logging_levels</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> log_level<font color='#5555FF'>&amp;</font> new_level
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - for all loggers L (even loggers not yet constructed):
+                - #L.level() == new_level
+        throws
+            - std::bad_alloc
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='print_default_logger_header'></a>print_default_logger_header</b> <font face='Lucida Console'>(</font>
+        std::ostream<font color='#5555FF'>&amp;</font> out,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> logger_name,
+        <font color='#0000FF'>const</font> log_level<font color='#5555FF'>&amp;</font> l,
+        <font color='#0000FF'>const</font> uint64 thread_id
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is not called more than once at a time (i.e. is not called from multiple
+              threads at the same time).
+        ensures
+            - let MS be the number of milliseconds since program start.  
+            - prints a string to out in the form:  "MS l.name [thread_id] logger_name:"
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='logger'></a>logger</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - name() == a user supplied value given to the constructor
+                - The values of level(), output_streambuf(), logger_header(), and
+                  auto_flush() are inherited from the parent of this logger. 
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a logging output stream in the style of the log4j
+                logger available for Java.  
+                
+                Additionally, the logger doesn't perform any memory allocations during
+                each logging action.  It just writes directly into the user supplied output
+                stream.  Alternatively, if you use a logging output hook no memory allocations
+                are performed either.  Logging just goes straight into a memory buffer
+                which gets passed to the user supplied logging hook.
+
+            DEFAULTS
+                If the user hasn't specified values for the four inherited values level(),
+                output_streambuf(), logger_header(), or auto_flush() then the default
+                values will be used.  The defaults are as follows:
+                - level() == LERROR
+                - output_streambuf() == std::cout.rdbuf() (i.e. the default is to log
+                  to standard output).  
+                - logger_header() == print_default_logger_header
+                - auto_flush() == true
+            
+            THREAD SAFETY
+                All methods of this class are thread safe.  Note that it is safe to 
+                chain calls to operator &lt;&lt; such as:
+                    log &lt;&lt; LINFO &lt;&lt; "message " &lt;&lt; variable &lt;&lt; " more message";
+                The logger ensures that the entire statement executes atomically so the 
+                message won't be broken up by other loggers in other threads.
+        !*/</font>
+
+        <font color='#0000FF'>class</font> <b><a name='logger_stream'></a>logger_stream</b>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='is_enabled'></a>is_enabled</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - returns true if this logger stream will print out items
+                      given to it by the &lt;&lt; operator.  returns false otherwise.
+            !*/</font>
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+            logger_stream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - if (is_enabled()) then
+                        - writes item to this output stream
+                    - returns *this
+            !*/</font>
+        <b>}</b>;
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='logger'></a>logger</b> <font face='Lucida Console'>(</font>  
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> name_
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - name_ != ""
+            ensures                
+                - #*this is properly initialized
+                - #name() == name_
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='logger'></a>logger</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - any resources associated with *this have been released
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='name'></a>name</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the name of this logger
+        !*/</font>
+
+        logger_stream <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> log_level<font color='#5555FF'>&amp;</font> l
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (l.priority &gt;= level().priority) then
+                    - returns a logger_stream with is_enabled() == true.  I.e. this
+                      returned stream will write its output to the I/O destination 
+                      used by this logger object.
+                - else
+                    - returns a logger stream with is_enabled() == false 
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_child_of'></a>is_child_of</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> logger<font color='#5555FF'>&amp;</font> log
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if ( (name().find(log.name() + ".") == 0) || (log.name() == name()) ) then
+                    - returns true
+                      (i.e. if log.name() + "." is a prefix of name() or if both *this and log
+                      have the same name then return true)
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'>const</font> log_level <b><a name='level'></a>level</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the current log level of this logger.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_level'></a>set_level</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> log_level<font color='#5555FF'>&amp;</font> new_level
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - for all loggers L such that L.is_child_of(*this) == true:
+                    - #L.level() == new_level
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='auto_flush'></a>auto_flush</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if the output stream is flushed after every logged message.
+                  returns false otherwise.  (Note that flushing only does anything if
+                  the logger is set to use an output stream rather than a hook)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_auto_flush'></a>set_auto_flush</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>bool</u></font> enabled
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - for all loggers L such that L.is_child_of(*this) == true:
+                    - #L.auto_flush() == enabled 
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+                
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_output_hook'></a>set_output_hook</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>hook<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> logger_name, 
+                            <font color='#0000FF'>const</font> log_level<font color='#5555FF'>&amp;</font> l,
+                            <font color='#0000FF'>const</font> uint64 thread_id,
+                            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> message_to_log<font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - hook is a valid pointer to a member function in T 
+            ensures
+                - for all loggers L such that L.is_child_of(*this) == true:
+                    - #L.output_streambuf() == 0
+                    - #L will not send its log messages to an ostream object anymore.  Instead
+                      it will call the given hook member function (i.e. (object.*hook)(name,l,id,msg) )
+                      for each message that needs to be logged.
+                    - The arguments to the hook function have the following meanings:
+                        - logger_name == The name of the logger that is printing the log message.
+                        - l == The level of the logger that is printing the log message.
+                        - thread_id == A number that uniquely identifies the thread trying to log
+                          the message.  Note that this number is unique among all threads, past and
+                          present.  Also note that this id is not the same one returned by
+                          get_thread_id().
+                        - message_to_log == the actual text of the message the user is giving to
+                          the logger object to log.
+                    - All hook functions will also only be called one at a time. This means
+                      that hook functions don't need to be thread safe.
+        !*/</font>
+
+        std::streambuf<font color='#5555FF'>*</font> <b><a name='output_streambuf'></a>output_streambuf</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (an output hook isn't set) then
+                    - returns the output stream buffer that this logger writes all
+                      messages to.
+                - else
+                    - returns 0
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_output_stream'></a>set_output_stream</b> <font face='Lucida Console'>(</font>
+            std::ostream<font color='#5555FF'>&amp;</font> out
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - for all loggers L such that L.is_child_of(*this) == true:
+                    - #L.output_streambuf() == out.rdbuf() 
+                    - Removes any previous output hook from L.  So now the logger
+                      L will write all its messages to the given output stream.
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        print_header_type <b><a name='logger_header'></a>logger_header</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the function that is called to print the header information 
+                  onto each logged message.  The arguments to the function have the following
+                  meanings:
+                    - out == The output stream this function writes the header to.
+                    - logger_name == The name of the logger that is printing the log message.
+                    - l == The level of the logger that is printing the log message.
+                    - thread_id == A number that uniquely identifies the thread trying to log
+                      the message.  Note that this number is unique among all threads, past and
+                      present.  Also note that this id is not the same one returned by
+                      get_thread_id().
+                - This logger_header function will also only be called once at a time. This means
+                  the logger_header function doesn't need to be thread safe.
+                - the logger_header function is only used when output_streambuf() != 0
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_logger_header'></a>set_logger_header</b> <font face='Lucida Console'>(</font>
+            print_header_type print_header
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - for all loggers L such that L.is_child_of(*this) == true:
+                    - #L.logger_header() == print_header 
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='logger'></a>logger</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> logger<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        logger<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> logger<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;    
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LOGGER_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

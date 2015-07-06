@@ -43,8 +43,11 @@ void CallbacksForGeneratingExpressionCode::OnStaticFunction(gd::String functionN
     codeGenerator.AddIncludeFile(expressionInfo.codeExtraInformation.optionalIncludeFile);
 
     //Launch custom code generator if needed
-    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>() )
-    { plainExpression += expressionInfo.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(parameters, codeGenerator, context); return; }
+    if (expressionInfo.codeExtraInformation.HasCustomCodeGenerator())
+    {
+        plainExpression += expressionInfo.codeExtraInformation.customCodeGenerator(parameters, codeGenerator, context);
+        return;
+    }
 
     //Special case: For strings expressions, function without name is a string.
     if ( GetReturnType() == "string" && functionName.empty() )
@@ -82,8 +85,11 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(gd::String functionN
     if ( parameters.empty() ) return;
 
     //Launch custom code generator if needed
-    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>() )
-    { plainExpression += expressionInfo.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(parameters, codeGenerator, context); return; }
+    if ( expressionInfo.codeExtraInformation.HasCustomCodeGenerator() )
+    {
+        plainExpression += expressionInfo.codeExtraInformation.customCodeGenerator(parameters, codeGenerator, context);
+        return;
+    }
 
     //Prepare parameters
     std::vector<gd::String> parametersCode = codeGenerator.GenerateParametersCodes(parameters, expressionInfo.parameters, context);
@@ -128,8 +134,11 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(gd::String
     if ( parameters.size() < 2 ) return;
 
     //Launch custom code generator if needed
-    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>() )
-    { plainExpression += expressionInfo.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(parameters, codeGenerator, context); return; }
+    if ( expressionInfo.codeExtraInformation.HasCustomCodeGenerator() )
+    {
+        plainExpression += expressionInfo.codeExtraInformation.customCodeGenerator(parameters, codeGenerator, context);
+        return;
+    }
 
     //Prepare parameters
     std::vector<gd::String> parametersCode = codeGenerator.GenerateParametersCodes(parameters, expressionInfo.parameters, context);

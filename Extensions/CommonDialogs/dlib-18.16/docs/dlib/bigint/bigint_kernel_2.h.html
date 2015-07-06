@@ -1,0 +1,570 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bigint_kernel_2.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_BIGINT_KERNEl_2_
+<font color='#0000FF'>#define</font> DLIB_BIGINT_KERNEl_2_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='bigint_kernel_abstract.h.html'>bigint_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iosfwd<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib::relational_operators; <font color='#009900'>// defined in algs.h
+</font>
+    <font color='#0000FF'>class</font> <b><a name='bigint_kernel_2'></a>bigint_kernel_2</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                slack               == 25
+                data-&gt;number[0]     == 0 
+                data-&gt;size          == slack 
+                data-&gt;references    == 1 
+                data-&gt;digits_used   == 1
+                
+
+            CONVENTION
+                slack  == the number of extra digits placed into the number when it is 
+                    created.  the slack value should never be less than 1
+
+                data-&gt;number == pointer to an array of data-&gt;size uint16s.
+                    data represents a string of base 65535 numbers with data[0] being
+                    the least significant bit and data[data-&gt;digits_used-1] being the most 
+                    significant
+
+
+                NOTE: In the comments I will consider a word to be a 16 bit value
+
+
+                data-&gt;digits_used == the number of significant digits in the number.
+                    data-&gt;digits_used tells us the number of used elements in the 
+                    data-&gt;number array so everything beyond data-&gt;number[data-&gt;digits_used-1] 
+                    is undefined
+
+                data-&gt;references == the number of bigint_kernel_2 objects which refer
+                    to this data_record
+        !*/</font>
+
+
+        <font color='#0000FF'>struct</font> <b><a name='data_record'></a>data_record</b>
+        <b>{</b>
+
+
+            <font color='#0000FF'>explicit</font> <b><a name='data_record'></a>data_record</b><font face='Lucida Console'>(</font>
+                uint32 size_
+            <font face='Lucida Console'>)</font> : 
+                size<font face='Lucida Console'>(</font>size_<font face='Lucida Console'>)</font>,
+                number<font face='Lucida Console'>(</font><font color='#0000FF'>new</font> uint16[size_]<font face='Lucida Console'>)</font>,
+                references<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,
+                digits_used<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b><font color='#5555FF'>*</font>number <font color='#5555FF'>=</font> <font color='#979000'>0</font>;<b>}</b>
+            <font color='#009900'>/*!
+                ensures
+                    - initializes *this to represent zero
+            !*/</font>
+
+            <b><a name='data_record'></a>data_record</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> data_record<font color='#5555FF'>&amp;</font> item,
+                uint32 additional_size
+            <font face='Lucida Console'>)</font> :
+                size<font face='Lucida Console'>(</font>item.digits_used <font color='#5555FF'>+</font> additional_size<font face='Lucida Console'>)</font>,
+                number<font face='Lucida Console'>(</font><font color='#0000FF'>new</font> uint16[size]<font face='Lucida Console'>)</font>,
+                references<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,
+                digits_used<font face='Lucida Console'>(</font>item.digits_used<font face='Lucida Console'>)</font>
+            <b>{</b>
+                uint16<font color='#5555FF'>*</font> source <font color='#5555FF'>=</font> item.number;
+                uint16<font color='#5555FF'>*</font> dest <font color='#5555FF'>=</font> number;
+                uint16<font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> source <font color='#5555FF'>+</font> digits_used;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>source <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#5555FF'>*</font>dest <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>source;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>dest;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>source;
+                <b>}</b>
+            <b>}</b>
+            <font color='#009900'>/*!
+                ensures
+                    - *this is a copy of item except with 
+                      size == item.digits_used + additional_size
+            !*/</font>
+
+            ~<b><a name='data_record'></a>data_record</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>delete</font> [] number;
+            <b>}</b>
+
+
+            <font color='#0000FF'>const</font> uint32 size;
+            uint16<font color='#5555FF'>*</font> number;
+            uint32 references;            
+            uint32 digits_used;
+
+        <font color='#0000FF'>private</font>:
+            <font color='#009900'>// no copy constructor
+</font>            <b><a name='data_record'></a>data_record</b> <font face='Lucida Console'>(</font> data_record<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;
+        <b>}</b>;
+
+
+        <font color='#009900'>// note that the second parameter is just there 
+</font>        <font color='#009900'>// to resolve the ambiguity between this constructor and 
+</font>        <font color='#009900'>// bigint_kernel_2(uint32)
+</font>        <font color='#0000FF'>explicit</font> <b><a name='bigint_kernel_2'></a>bigint_kernel_2</b> <font face='Lucida Console'>(</font>
+            data_record<font color='#5555FF'>*</font> data_, <font color='#0000FF'><u>int</u></font>
+        <font face='Lucida Console'>)</font>: slack<font face='Lucida Console'>(</font><font color='#979000'>25</font><font face='Lucida Console'>)</font>,data<font face='Lucida Console'>(</font>data_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - *this is initialized with data_ as its data member
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='bigint_kernel_2'></a>bigint_kernel_2</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <b><a name='bigint_kernel_2'></a>bigint_kernel_2</b> <font face='Lucida Console'>(</font>
+            uint32 value
+        <font face='Lucida Console'>)</font>;
+
+        <b><a name='bigint_kernel_2'></a>bigint_kernel_2</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='bigint_kernel_2'></a>bigint_kernel_2</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> bigint_kernel_2 <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        bigint_kernel_2<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> bigint_kernel_2 <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        bigint_kernel_2<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> bigint_kernel_2 <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        bigint_kernel_2<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> bigint_kernel_2 <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        bigint_kernel_2<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> bigint_kernel_2 <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        bigint_kernel_2<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        bigint_kernel_2<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>friend</font> std::ostream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+            std::ostream<font color='#5555FF'>&amp;</font> out,
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>friend</font> std::istream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in,
+            bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        bigint_kernel_2<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> bigint_kernel_2 <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font>
+        <font face='Lucida Console'>)</font>;
+
+        bigint_kernel_2<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> bigint_kernel_2 <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint_kernel_2 <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint_kernel_2 <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        bigint_kernel_2<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint_kernel_2 <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint_kernel_2 <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        bigint_kernel_2<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint_kernel_2 <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint_kernel_2 <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        bigint_kernel_2<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint_kernel_2 <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font> <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint_kernel_2 <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        bigint_kernel_2<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint_kernel_2 <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font> <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint_kernel_2 <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        bigint_kernel_2<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+
+        bigint_kernel_2<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            bigint_kernel_2<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <b>{</b> data_record<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> data; data <font color='#5555FF'>=</font> item.data; item.data <font color='#5555FF'>=</font> temp; <b>}</b>
+
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>double</u></font> t;
+        <font color='#0000FF'>typedef</font> std::complex<font color='#5555FF'>&lt;</font>t<font color='#5555FF'>&gt;</font> ct;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='fft'></a>fft</b><font face='Lucida Console'>(</font>
+            ct<font color='#5555FF'>*</font> data, 
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> len
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - len == x^n for some integer n (i.e. len is a power of 2)
+                - len &gt; 0
+            ensures
+                - #data == the FT decimation in frequency of data
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='ifft'></a>ifft</b><font face='Lucida Console'>(</font>
+            ct<font color='#5555FF'>*</font> data, 
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> len
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - len == x^n for some integer n (i.e. len is a power of 2)
+                - len &gt; 0
+            ensures
+                - #data == the inverse decimation in frequency of data. 
+                  (i.e. the inverse of what fft(data,len,-1) does to data)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='long_add'></a>long_add</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> lhs,
+            <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> rhs,
+            data_record<font color='#5555FF'>*</font> result
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - result-&gt;size &gt;= max(lhs-&gt;digits_used,rhs-&gt;digits_used) + 1
+            ensures
+                - result == lhs + rhs
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='long_sub'></a>long_sub</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> lhs,
+            <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> rhs,
+            data_record<font color='#5555FF'>*</font> result
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - lhs &gt;= rhs 
+                - result-&gt;size &gt;= lhs-&gt;digits_used
+            ensures
+                - result == lhs - rhs
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='long_div'></a>long_div</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> lhs,
+            <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> rhs,
+            data_record<font color='#5555FF'>*</font> result,
+            data_record<font color='#5555FF'>*</font> remainder
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires 
+                - rhs != 0 
+                - result-&gt;size &gt;= lhs-&gt;digits_used 
+                - remainder-&gt;size &gt;= lhs-&gt;digits_used 
+                - each parameter is unique (i.e. lhs != result, lhs != remainder, etc.)
+            ensures
+                - result == lhs / rhs
+                - remainder == lhs % rhs
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='long_mul'></a>long_mul</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> lhs,
+            <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> rhs,
+            data_record<font color='#5555FF'>*</font> result
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - result-&gt;size &gt;= lhs-&gt;digits_used + rhs-&gt;digits_used 
+                - result != lhs 
+                - result != rhs
+            ensures
+                - result == lhs * rhs
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='short_add'></a>short_add</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> data,
+            uint16 value,
+            data_record<font color='#5555FF'>*</font> result            
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - result-&gt;size &gt;= data-&gt;size + 1
+            ensures
+                - result == data + value
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='short_sub'></a>short_sub</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> data,
+            uint16 value,
+            data_record<font color='#5555FF'>*</font> result
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - data &gt;= value 
+                - result-&gt;size &gt;= data-&gt;digits_used
+            ensures
+                - result == data - value
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='short_mul'></a>short_mul</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> data,
+            uint16 value,
+            data_record<font color='#5555FF'>*</font> result            
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - result-&gt;size &gt;= data-&gt;digits_used + 1
+            ensures
+                - result == data * value
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='short_div'></a>short_div</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> data,            
+            uint16 value,
+            data_record<font color='#5555FF'>*</font> result,
+            uint16<font color='#5555FF'>&amp;</font> remainder
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - value != 0 
+                - result-&gt;size &gt;= data-&gt;digits_used
+            ensures
+                - result = data*value 
+                - remainder = data%value
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='shift_left'></a>shift_left</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> data,
+            data_record<font color='#5555FF'>*</font> result,
+            uint32 shift_amount
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - result-&gt;size &gt;= data-&gt;digits_used + shift_amount/8 + 1
+            ensures
+                - result == data &lt;&lt; shift_amount
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='shift_right'></a>shift_right</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> data,
+            data_record<font color='#5555FF'>*</font> result
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - result-&gt;size &gt;= data-&gt;digits_used 
+            ensures
+                - result == data &gt;&gt; 1
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_less_than'></a>is_less_than</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> lhs,
+            <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*! 
+            ensures
+                - returns true if lhs &lt; rhs 
+                - returns false otherwise
+        !*/</font> 
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_equal_to'></a>is_equal_to</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> lhs,
+            <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if lhs == rhs 
+                - returns false otherwise
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='increment'></a>increment</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> source,
+            data_record<font color='#5555FF'>*</font> dest
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - dest-&gt;size &gt;= source-&gt;digits_used + 1
+            ensures
+                - dest = source + 1
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='decrement'></a>decrement</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> data_record<font color='#5555FF'>*</font> source,
+            data_record<font color='#5555FF'>*</font> dest
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                source != 0
+            ensuers
+                dest = source - 1
+        !*/</font>
+
+        <font color='#009900'>// member data
+</font>        <font color='#0000FF'>const</font> uint32 slack;
+        data_record<font color='#5555FF'>*</font> data;     
+        
+        
+
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        bigint_kernel_2<font color='#5555FF'>&amp;</font> a,
+        bigint_kernel_2<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint_kernel_2<font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b> 
+        std::ios::fmtflags oldflags <font color='#5555FF'>=</font> out.<font color='#BB00BB'>flags</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;  
+        out.<font color='#BB00BB'>flags</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> item <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'> </font>'; 
+        out.<font color='#BB00BB'>flags</font><font face='Lucida Console'>(</font>oldflags<font face='Lucida Console'>)</font>; 
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>out<font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error serializing object of type bigint_kernel_c</font>"<font face='Lucida Console'>)</font>; 
+    <b>}</b>   
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        bigint_kernel_2<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        std::ios::fmtflags oldflags <font color='#5555FF'>=</font> in.<font color='#BB00BB'>flags</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;  
+        in.<font color='#BB00BB'>flags</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        in <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> item; in.<font color='#BB00BB'>flags</font><font face='Lucida Console'>(</font>oldflags<font face='Lucida Console'>)</font>; 
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>'<font face='Lucida Console'>)</font>
+        <b>{</b>
+            item <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error deserializing object of type bigint_kernel_c</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>   
+
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='bigint_kernel_2.cpp.html'>bigint_kernel_2.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BIGINT_KERNEl_2_
+</font>
+
+</pre></body></html>

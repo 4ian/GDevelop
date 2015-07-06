@@ -63,7 +63,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
     extension.AddAction("SetWindowSize",
                    _("Change the size of the screen"),
                    _("This action change the size of the game window."),
-                   _("Change window size : _PARAM1_x_PARAM2_"),
+                   _("Change window size: _PARAM1_x_PARAM2_"),
                    _("Game's window"),
                    "res/actions/window24.png",
                    "res/actions/window.png")

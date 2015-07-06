@@ -1,0 +1,94 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - equalize_histogram_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_EQUALIZE_HISTOGRAm_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_EQUALIZE_HISTOGRAm_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/generic_image.h.html'>../image_processing/generic_image.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='equalize_histogram'></a>equalize_histogram</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - Let pixel_type be the type of pixel in either input or output images, then we
+              must have:
+                - pixel_traits&lt;pixel_type&gt;::has_alpha == false
+                - pixel_traits&lt;pixel_type&gt;::is_unsigned == true 
+            - For the input image pixel type, we have the additional requirement that:
+                - pixel_traits&lt;pixel_type&gt;::max() &lt;= 65535 
+        ensures
+            - #out_img == the histogram equalized version of in_img
+            - #out_img.nc() == in_img.nc()
+            - #out_img.nr() == in_img.nr()
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='equalize_histogram'></a>equalize_histogram</b> <font face='Lucida Console'>(</font>
+        image_type<font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - it is valid to call equalize_histogram(img,img)
+        ensures
+            - calls equalize_histogram(img,img);
+    !*/</font>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'><u>long</u></font> R,
+        <font color='#0000FF'><u>long</u></font> C,
+        <font color='#0000FF'>typename</font> MM
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='get_histogram'></a>get_histogram</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img,
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,R,C,MM<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hist
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - Let pixel_type denote the type of pixel in in_img, then we must have:
+                - pixel_traits&lt;pixel_type&gt;::is_unsigned == true 
+                - pixel_traits&lt;pixel_type&gt;::max() &lt;= 65535 
+            - hist must be capable of representing a column vector of length 
+              pixel_traits&lt;typename in_image_type&gt;::max(). I.e. if R and C are nonzero
+              then they must be values that don't conflict with the previous sentence.
+        ensures
+            - #hist.size() == pixel_traits&lt;typename in_image_type&gt;::max()
+            - #hist.nc() == 1 || #hist.nr() == 1 (i.e. hist is either a row or column vector)
+            - #hist == the histogram for in_img.  I.e. it is the case that for all
+              valid i:
+                - hist(i) == the number of times a pixel with intensity i appears
+                  in in_img
+    !*/</font>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_EQUALIZE_HISTOGRAm_ABSTRACT_
+</font>
+
+
+</pre></body></html>

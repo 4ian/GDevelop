@@ -1,0 +1,1680 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bayes_utils.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_BAYES_UTILs_
+<font color='#0000FF'>#define</font> DLIB_BAYES_UTILs_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='bayes_utils_abstract.h.html'>bayes_utils_abstract.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../string.h.html'>../string.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../map.h.html'>../map.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../rand.h.html'>../rand.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array.h.html'>../array.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../set.h.html'>../set.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../noncopyable.h.html'>../noncopyable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../smart_pointers.h.html'>../smart_pointers.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../graph.h.html'>../graph.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>algorithm<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='assignment'></a>assignment</b> 
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='assignment'></a>assignment</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <b><a name='assignment'></a>assignment</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            a.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value <font color='#5555FF'>=</font> a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                vals.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>idx,value<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        assignment<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>rhs<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+
+            <font color='#BB00BB'>assignment</font><font face='Lucida Console'>(</font>rhs<font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            vals.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>  
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+
+            <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            item.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                item.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> item.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> item.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='has_index'></a>has_index</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> vals.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>has_index</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> ,
+                         "<font color='#CC0000'>\tvoid assignment::add(idx)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can't add the same index to an assignment object more than once</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tidx:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+            vals.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>idx, value<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>has_index</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> ,
+                         "<font color='#CC0000'>\tunsigned long assignment::operator[](idx)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can't access an index value if it isn't already in the object</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tidx:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> vals[idx];
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>has_index</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> ,
+                         "<font color='#CC0000'>\tunsigned long assignment::operator[](idx)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can't access an index value if it isn't already in the object</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tidx:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> vals[idx];
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            assignment<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            vals.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.vals<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='remove'></a>remove</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>has_index</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> ,
+                         "<font color='#CC0000'>\tunsigned long assignment::remove(idx)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can't remove an index value if it isn't already in the object</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tidx:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+            vals.<font color='#BB00BB'>destroy</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> vals.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> vals.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='move_next'></a>move_next</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> vals.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        map_pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>current_element_valid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+                        "<font color='#CC0000'>\tmap_pair&lt;unsigned long,unsigned long&gt;&amp; assignment::element()</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tyou can't access the current element if it doesn't exist</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> vals.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> map_pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>current_element_valid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+                        "<font color='#CC0000'>\tconst map_pair&lt;unsigned long,unsigned long&gt;&amp; assignment::element() const</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tyou can't access the current element if it doesn't exist</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> vals.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='at_start'></a>at_start</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> vals.<font color='#BB00BB'>at_start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='current_element_valid'></a>current_element_valid</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> vals.<font color='#BB00BB'>current_element_valid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> item,
+            std::ostream<font color='#5555FF'>&amp;</font> out 
+        <font face='Lucida Console'>)</font>   
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.vals, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+            assignment<font color='#5555FF'>&amp;</font> item,
+            std::istream<font color='#5555FF'>&amp;</font> in
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.vals, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'>mutable</font> dlib::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::kernel_1b_c vals;
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> std::ostream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        std::ostream<font color='#5555FF'>&amp;</font> out,
+        <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> a
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        a.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>(</font>";
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>:</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>, </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>:</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>)</font>";
+        <font color='#0000FF'>return</font> out;
+    <b>}</b>
+
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        assignment<font color='#5555FF'>&amp;</font> a,
+        assignment<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+
+<font color='#009900'>// ------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='joint_probability_table'></a>joint_probability_table</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - table.size() == 0
+
+            CONVENTION
+                - size() == table.size()
+                - probability(a) == table[a]
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='joint_probability_table'></a>joint_probability_table</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> joint_probability_table<font color='#5555FF'>&amp;</font> t
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            t.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>t.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                assignment a <font color='#5555FF'>=</font> t.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>double</u></font> p <font color='#5555FF'>=</font> t.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>set_probability</font><font face='Lucida Console'>(</font>a,p<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <b><a name='joint_probability_table'></a>joint_probability_table</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        joint_probability_table<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> joint_probability_table<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>rhs<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+            <font color='#BB00BB'>joint_probability_table</font><font face='Lucida Console'>(</font>rhs<font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_probability'></a>set_probability</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'><u>double</u></font> p
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0.0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> p <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1.0</font>,
+                        "<font color='#CC0000'>\tvoid&amp; joint_probability_table::set_probability(a,p)</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tyou have given an invalid probability value</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tp:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> p 
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\ta:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a 
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>table.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                table[a] <font color='#5555FF'>=</font> p;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                assignment <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+                table.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp,p<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='has_entry_for'></a>has_entry_for</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> table.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add_probability'></a>add_probability</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'><u>double</u></font> p
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0.0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> p <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1.0</font>,
+                        "<font color='#CC0000'>\tvoid&amp; joint_probability_table::add_probability(a,p)</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tyou have given an invalid probability value</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tp:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> p 
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\ta:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a 
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>table.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                table[a] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> p;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>table[a] <font color='#5555FF'>&gt;</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font>
+                    table[a] <font color='#5555FF'>=</font> <font color='#979000'>1.0</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                assignment <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+                table.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp,p<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='probability'></a>probability</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> table[a];
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            table.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> table.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='move_next'></a>move_next</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> table.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> table.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        map_pair<font color='#5555FF'>&lt;</font>assignment,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>current_element_valid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+                        "<font color='#CC0000'>\tmap_pair&lt;assignment,double&gt;&amp; joint_probability_table::element()</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tyou can't access the current element if it doesn't exist</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> table.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> map_pair<font color='#5555FF'>&lt;</font>assignment,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>current_element_valid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+                        "<font color='#CC0000'>\tconst map_pair&lt;assignment,double&gt;&amp; joint_probability_table::element() const</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tyou can't access the current element if it doesn't exist</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> table.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='at_start'></a>at_start</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> table.<font color='#BB00BB'>at_start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='current_element_valid'></a>current_element_valid</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> table.<font color='#BB00BB'>current_element_valid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='marginalize'></a>marginalize</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> vars,
+            joint_probability_table<font color='#5555FF'>&amp;</font> out
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            out.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>double</u></font> p;
+            <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                assignment a;
+                <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> asrc <font color='#5555FF'>=</font> <font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                p <font color='#5555FF'>=</font> <font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                asrc.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>asrc.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>vars.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>asrc.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        a.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>asrc.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, asrc.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                out.<font color='#BB00BB'>add_probability</font><font face='Lucida Console'>(</font>a,p<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='marginalize'></a>marginalize</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> var,
+            joint_probability_table<font color='#5555FF'>&amp;</font> out
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            out.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>double</u></font> p;
+            <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                assignment a;
+                <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> asrc <font color='#5555FF'>=</font> <font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                p <font color='#5555FF'>=</font> <font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                asrc.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>asrc.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> asrc.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        a.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>asrc.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, asrc.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                out.<font color='#BB00BB'>add_probability</font><font face='Lucida Console'>(</font>a,p<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='normalize'></a>normalize</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>double</u></font> sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font><font color='#5555FF'>=</font> sum;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            joint_probability_table<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            table.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.table<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> joint_probability_table<font color='#5555FF'>&amp;</font> item,
+            std::ostream<font color='#5555FF'>&amp;</font> out 
+        <font face='Lucida Console'>)</font>   
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.table, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+            joint_probability_table<font color='#5555FF'>&amp;</font> item,
+            std::istream<font color='#5555FF'>&amp;</font> in
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.table, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        dlib::map<font color='#5555FF'>&lt;</font>assignment, <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>&gt;</font>::kernel_1b_c table;
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        joint_probability_table<font color='#5555FF'>&amp;</font> a,
+        joint_probability_table<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='conditional_probability_table'></a>conditional_probability_table</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - table.size() == 0
+
+            CONVENTION
+                - if (table.is_in_domain(ps) &amp;&amp; value &lt; num_vals &amp;&amp; table[ps](value) &gt;= 0) then
+                    - has_entry_for(value,ps) == true
+                    - probability(value,ps) == table[ps](value)
+                - else
+                    - has_entry_for(value,ps) == false 
+
+                - num_values() == num_vals
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='conditional_probability_table'></a>conditional_probability_table</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_num_values'></a>set_num_values</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            num_vals <font color='#5555FF'>=</font> num;
+            table.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='has_entry_for'></a>has_entry_for</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value,
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> ps
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>table.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>ps<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> value <font color='#5555FF'>&lt;</font> num_vals <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> table[ps]<font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_values'></a>num_values</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_vals; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_probability'></a>set_probability</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value,
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> ps,
+            <font color='#0000FF'><u>double</u></font> p
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> value <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#979000'>0.0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> p <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1.0</font> ,
+                         "<font color='#CC0000'>\tvoid conditional_probability_table::set_probability()</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tinvalid arguments to set_probability</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tvalue: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> value 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnum_values(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tp:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> p 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tps:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> ps 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>table.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>ps<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                table[ps]<font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> p;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>num_vals<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>set_all_elements</font><font face='Lucida Console'>(</font>dist,<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> p;
+                assignment <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>ps<font face='Lucida Console'>)</font>;
+                table.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp,dist<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='probability'></a>probability</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value,
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> ps 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> value <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>has_entry_for</font><font face='Lucida Console'>(</font>value,ps<font face='Lucida Console'>)</font> ,
+                         "<font color='#CC0000'>\tvoid conditional_probability_table::probability()</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tinvalid arguments to probability</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tvalue:        </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> value 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnum_values(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tps:           </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> ps 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> table[ps]<font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            table.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            num_vals <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='empty_table'></a>empty_table</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            table.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            conditional_probability_table<font color='#5555FF'>&amp;</font> item 
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>num_vals, item.num_vals<font face='Lucida Console'>)</font>;
+            table.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.table<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> conditional_probability_table<font color='#5555FF'>&amp;</font> item,
+            std::ostream<font color='#5555FF'>&amp;</font> out 
+        <font face='Lucida Console'>)</font>   
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.table, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.num_vals, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+            conditional_probability_table<font color='#5555FF'>&amp;</font> item,
+            std::istream<font color='#5555FF'>&amp;</font> in
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.table, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.num_vals, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        dlib::map<font color='#5555FF'>&lt;</font>assignment, matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::kernel_1b_c table;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_vals;
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        conditional_probability_table<font color='#5555FF'>&amp;</font> a,
+        conditional_probability_table<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='bayes_node'></a>bayes_node</b> : noncopyable
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='bayes_node'></a>bayes_node</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            is_instantiated <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            value_ <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='value'></a>value</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> value_;<b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_value'></a>set_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_value
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> new_value <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                         "<font color='#CC0000'>\tvoid bayes_node::set_value(new_value)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnew_value must be less than the number of possible values for this node</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnew_value:            </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> new_value 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\ttable().num_values(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:                 </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+            value_ <font color='#5555FF'>=</font> new_value;
+        <b>}</b>
+
+        conditional_probability_table<font color='#5555FF'>&amp;</font> <b><a name='table'></a>table</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> table_; <b>}</b>
+
+        <font color='#0000FF'>const</font> conditional_probability_table<font color='#5555FF'>&amp;</font> <b><a name='table'></a>table</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> table_; <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_evidence'></a>is_evidence</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> is_instantiated; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_as_nonevidence'></a>set_as_nonevidence</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> is_instantiated <font color='#5555FF'>=</font> <font color='#979000'>false</font>; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_as_evidence'></a>set_as_evidence</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> is_instantiated <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            bayes_node<font color='#5555FF'>&amp;</font> item 
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>value_, item.value_<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>is_instantiated, item.is_instantiated<font face='Lucida Console'>)</font>;
+            table_.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.table_<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bayes_node<font color='#5555FF'>&amp;</font> item,
+            std::ostream<font color='#5555FF'>&amp;</font> out 
+        <font face='Lucida Console'>)</font>   
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.value_, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.is_instantiated, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.table_, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+            bayes_node<font color='#5555FF'>&amp;</font> item,
+            std::istream<font color='#5555FF'>&amp;</font> in
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.value_, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.is_instantiated, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.table_, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value_; 
+        <font color='#0000FF'><u>bool</u></font> is_instantiated;
+        conditional_probability_table table_;
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        bayes_node<font color='#5555FF'>&amp;</font> a,
+        bayes_node<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> bayes_node_utils
+    <b>{</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='node_num_values'></a>node_num_values</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n
+        <font face='Lucida Console'>)</font>  
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> n <font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                         "<font color='#CC0000'>\tvoid bayes_node_utils::node_num_values(bn, n)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tbn.number_of_nodes():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>num_values</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_node_value'></a>set_node_value</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> val
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> n <font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> val <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>node_num_values</font><font face='Lucida Console'>(</font>bn,n<font face='Lucida Console'>)</font>,
+                         "<font color='#CC0000'>\tvoid bayes_node_utils::set_node_value(bn, n, val)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tval:                   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> val 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tbn.number_of_nodes():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnode_num_values(bn,n): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>node_num_values</font><font face='Lucida Console'>(</font>bn,n<font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+            bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>set_value</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='node_value'></a>node_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> n <font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                         "<font color='#CC0000'>\tunsigned long bayes_node_utils::node_value(bn, n)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tbn.number_of_nodes():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='node_is_evidence'></a>node_is_evidence</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> n <font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                         "<font color='#CC0000'>\tbool bayes_node_utils::node_is_evidence(bn, n)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tbn.number_of_nodes():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>is_evidence</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_node_as_evidence'></a>set_node_as_evidence</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> n <font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                         "<font color='#CC0000'>\tvoid bayes_node_utils::set_node_as_evidence(bn, n)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tbn.number_of_nodes():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+            bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>set_as_evidence</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_node_as_nonevidence'></a>set_node_as_nonevidence</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> n <font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                         "<font color='#CC0000'>\tvoid bayes_node_utils::set_node_as_nonevidence(bn, n)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tbn.number_of_nodes():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+            bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>set_as_nonevidence</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_node_num_values'></a>set_node_num_values</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> n <font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                         "<font color='#CC0000'>\tvoid bayes_node_utils::set_node_num_values(bn, n, num)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tbn.number_of_nodes():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+            bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>set_num_values</font><font face='Lucida Console'>(</font>num<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>double</u></font> <b><a name='node_probability'></a>node_probability</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value,
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> parents 
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> n <font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> value <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>node_num_values</font><font face='Lucida Console'>(</font>bn,n<font face='Lucida Console'>)</font>,
+                         "<font color='#CC0000'>\tdouble bayes_node_utils::node_probability(bn, n, value, parents)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tvalue:                 </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> value 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tbn.number_of_nodes():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnode_num_values(bn,n): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>node_num_values</font><font face='Lucida Console'>(</font>bn,n<font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> parents.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                         "<font color='#CC0000'>\tdouble bayes_node_utils::node_probability(bn, n, value, parents)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn:                             </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tparents.size():                </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> parents.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tb.node(n).number_of_parents(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+            parents.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>parents.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> parents.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> bn.<font color='#BB00BB'>has_edge</font><font face='Lucida Console'>(</font>x, n<font face='Lucida Console'>)</font>,
+                             "<font color='#CC0000'>\tdouble bayes_node_utils::node_probability(bn, n, value, parents)</font>"
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tx: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x 
+                <font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> parents[x] <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>node_num_values</font><font face='Lucida Console'>(</font>bn,x<font face='Lucida Console'>)</font>,
+                             "<font color='#CC0000'>\tdouble bayes_node_utils::node_probability(bn, n, value, parents)</font>"
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tx:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x 
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tparents[x]:            </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> parents[x] 
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnode_num_values(bn,x): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>node_num_values</font><font face='Lucida Console'>(</font>bn,x<font face='Lucida Console'>)</font> 
+                <font face='Lucida Console'>)</font>;
+            <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+            <font color='#0000FF'>return</font> bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>value, parents<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_node_probability'></a>set_node_probability</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value,
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> parents,
+            <font color='#0000FF'><u>double</u></font> p
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> n <font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> value <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>node_num_values</font><font face='Lucida Console'>(</font>bn,n<font face='Lucida Console'>)</font>,
+                         "<font color='#CC0000'>\tvoid bayes_node_utils::set_node_probability(bn, n, value, parents, p)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tp:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> p 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tvalue:                 </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> value 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tbn.number_of_nodes():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnode_num_values(bn,n): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>node_num_values</font><font face='Lucida Console'>(</font>bn,n<font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> parents.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                         "<font color='#CC0000'>\tvoid bayes_node_utils::set_node_probability(bn, n, value, parents, p)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn:                             </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tp:                             </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> p 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tparents.size():                </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> parents.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tbn.node(n).number_of_parents(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> <font color='#979000'>0.0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> p <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1.0</font>,
+                         "<font color='#CC0000'>\tvoid bayes_node_utils::set_node_probability(bn, n, value, parents, p)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tp: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> p 
+            <font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+            parents.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>parents.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> parents.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> bn.<font color='#BB00BB'>has_edge</font><font face='Lucida Console'>(</font>x, n<font face='Lucida Console'>)</font>,
+                             "<font color='#CC0000'>\tvoid bayes_node_utils::set_node_probability(bn, n, value, parents, p)</font>"
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tx: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x 
+                <font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> parents[x] <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>node_num_values</font><font face='Lucida Console'>(</font>bn,x<font face='Lucida Console'>)</font>,
+                             "<font color='#CC0000'>\tvoid bayes_node_utils::set_node_probability(bn, n, value, parents, p)</font>"
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tx:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x 
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tparents[x]:            </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> parents[x] 
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnode_num_values(bn,x): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>node_num_values</font><font face='Lucida Console'>(</font>bn,x<font face='Lucida Console'>)</font> 
+                <font face='Lucida Console'>)</font>;
+            <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+            bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>set_probability</font><font face='Lucida Console'>(</font>value,parents,p<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> assignment <b><a name='node_first_parent_assignment'></a>node_first_parent_assignment</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> n <font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                         "<font color='#CC0000'>\tconst assignment bayes_node_utils::node_first_parent_assignment(bn, n)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+            <font face='Lucida Console'>)</font>;
+
+            assignment a;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_parents <font color='#5555FF'>=</font> bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num_parents; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                a.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>parent</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>return</font> a;
+        <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='node_next_parent_assignment'></a>node_next_parent_assignment</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n,
+            assignment<font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> n <font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                         "<font color='#CC0000'>\tbool bayes_node_utils::node_next_parent_assignment(bn, n, a)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                         "<font color='#CC0000'>\tbool bayes_node_utils::node_next_parent_assignment(bn, n, a)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn:                             </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\ta.size():                      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tbn.node(n).number_of_parents(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+            a.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> bn.<font color='#BB00BB'>has_edge</font><font face='Lucida Console'>(</font>x, n<font face='Lucida Console'>)</font>,
+                             "<font color='#CC0000'>\tbool bayes_node_utils::node_next_parent_assignment(bn, n, a)</font>"
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tx: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x 
+                <font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> a[x] <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>node_num_values</font><font face='Lucida Console'>(</font>bn,x<font face='Lucida Console'>)</font>,
+                             "<font color='#CC0000'>\tbool bayes_node_utils::node_next_parent_assignment(bn, n, a)</font>"
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tx:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x 
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\ta[x]:                  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a[x] 
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnode_num_values(bn,x): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>node_num_values</font><font face='Lucida Console'>(</font>bn,x<font face='Lucida Console'>)</font> 
+                <font face='Lucida Console'>)</font>;
+            <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+            <font color='#009900'>// basically this loop just adds 1 to the assignment but performs
+</font>            <font color='#009900'>// carries if necessary
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> p <font color='#5555FF'>=</font> <font color='#979000'>0</font>; p <font color='#5555FF'>&lt;</font> a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>p<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pindex <font color='#5555FF'>=</font> bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>parent</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                a[pindex] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+                <font color='#009900'>// if we need to perform a carry
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a[pindex] <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>node_num_values</font><font face='Lucida Console'>(</font>bn,pindex<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    a[pindex] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// no carry necessary so we are done
+</font>                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#009900'>// we got through the entire loop which means a carry propagated all the way out
+</font>            <font color='#009900'>// so there must not be any more valid assignments left
+</font>            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='node_cpt_filled_out'></a>node_cpt_filled_out</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> n <font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                         "<font color='#CC0000'>\tbool bayes_node_utils::node_cpt_filled_out(bn, n)</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tn:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tbn.number_of_nodes():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_values <font color='#5555FF'>=</font> <font color='#BB00BB'>node_num_values</font><font face='Lucida Console'>(</font>bn,n<font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>const</font> conditional_probability_table<font color='#5555FF'>&amp;</font> table <font color='#5555FF'>=</font> bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now loop over all the possible parent assignments for this node
+</font>            assignment <font color='#BB00BB'>a</font><font face='Lucida Console'>(</font><font color='#BB00BB'>node_first_parent_assignment</font><font face='Lucida Console'>(</font>bn,n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>do</font>
+            <b>{</b>
+                <font color='#0000FF'><u>double</u></font> sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#009900'>// make sure that this assignment has an entry for all the values this node can take one
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>0</font>; value <font color='#5555FF'>&lt;</font> num_values; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>value<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>table.<font color='#BB00BB'>has_entry_for</font><font face='Lucida Console'>(</font>value,a<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                    <font color='#0000FF'>else</font>
+                        sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> table.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>value,a<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#009900'>// check if the sum of probabilities equals 1 as it should
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>sum<font color='#5555FF'>-</font><font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>node_next_parent_assignment</font><font face='Lucida Console'>(</font>bn,n,a<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='bayesian_network_gibbs_sampler'></a>bayesian_network_gibbs_sampler</b> : noncopyable
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='bayesian_network_gibbs_sampler'></a>bayesian_network_gibbs_sampler</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            rnd.<font color='#BB00BB'>set_seed</font><font face='Lucida Console'>(</font><font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>time</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='sample_graph'></a>sample_graph</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> bn
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bayes_node_utils;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>n<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>node_is_evidence</font><font face='Lucida Console'>(</font>bn, n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>continue</font>;
+
+                samples.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#BB00BB'>node_num_values</font><font face='Lucida Console'>(</font>bn,n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+                <font color='#009900'>// obtain the probability distribution for this node
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>set_node_value</font><font face='Lucida Console'>(</font>bn, n, i<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>node_probability</font><font face='Lucida Console'>(</font>bn, n<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_children</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                        <font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#BB00BB'>node_probability</font><font face='Lucida Console'>(</font>bn, bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>child</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#009900'>//normalize samples
+</font>                samples <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>;
+
+
+                <font color='#009900'>// select a random point in the probability distribution
+</font>                <font color='#0000FF'><u>double</u></font> prob <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// now find the point in the distribution this probability corresponds to
+</font>                <font color='#0000FF'><u>long</u></font> j;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>prob <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>break</font>;
+                    <font color='#0000FF'>else</font>
+                        prob <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#BB00BB'>set_node_value</font><font face='Lucida Console'>(</font>bn, n, j<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>double</u></font> <b><a name='node_probability'></a>node_probability</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n 
+        <font face='Lucida Console'>)</font> 
+        <font color='#009900'>/*!
+            requires
+                - n &lt; bn.number_of_nodes()
+            ensures
+                - computes the probability of node n having its current value given
+                  the current values of its parents in the network bn
+        !*/</font>
+        <b>{</b>
+            v.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                v.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>parent</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>parent</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>return</font> bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, v<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        assignment v;
+
+        dlib::rand rnd;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> samples; 
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> bayesian_network_join_tree_helpers
+    <b>{</b>
+        <font color='#0000FF'>class</font> <b><a name='bnjt'></a>bnjt</b>
+        <b>{</b>
+            <font color='#009900'>/*!
+                this object is the base class used in this pimpl idiom
+            !*/</font>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>virtual</font> ~<b><a name='bnjt'></a>bnjt</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='probability'></a>probability</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+            <font face='Lucida Console'>)</font>  <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='bnjt_impl'></a>bnjt_impl</b> : <font color='#0000FF'>public</font> bnjt
+        <b>{</b>
+            <font color='#009900'>/*!
+                This object is the implementation in the pimpl idiom
+            !*/</font>
+
+        <font color='#0000FF'>public</font>:
+
+            <b><a name='bnjt_impl'></a>bnjt_impl</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> bn,
+                <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> join_tree
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>create_bayesian_network_join_tree</font><font face='Lucida Console'>(</font>bn, join_tree, join_tree_values<font face='Lucida Console'>)</font>;
+
+                cliques.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// figure out which cliques contain each node
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> cliques.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// find the smallest clique that contains node with index i
+</font>                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> smallest_clique <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> join_tree.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>n<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> size<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            size <font color='#5555FF'>=</font> join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                            smallest_clique <font color='#5555FF'>=</font> n;
+                        <b>}</b>
+                    <b>}</b>
+
+                    cliques[i] <font color='#5555FF'>=</font> smallest_clique;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='probability'></a>probability</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+            <b>{</b>
+                join_tree_values.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>cliques[idx]<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>marginalize</font><font face='Lucida Console'>(</font>idx, table<font face='Lucida Console'>)</font>;
+                table.<font color='#BB00BB'>normalize</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                var.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                var.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>;
+                dist.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>table.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// read the probabilities out of the table and into the row matrix
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> table.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    var[idx] <font color='#5555FF'>=</font> i;
+                    <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> table.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>var<font face='Lucida Console'>)</font>; 
+                <b>}</b>
+
+                <font color='#0000FF'>return</font> dist;
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+            graph<font color='#5555FF'>&lt;</font> joint_probability_table, joint_probability_table <font color='#5555FF'>&gt;</font>::kernel_1a_c join_tree_values;
+            array<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> cliques;
+            <font color='#0000FF'>mutable</font> joint_probability_table table;
+            <font color='#0000FF'>mutable</font> assignment var;
+            <font color='#0000FF'>mutable</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> dist;
+           
+
+        <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> set_type, <font color='#0000FF'>typename</font> node_type<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'><u>bool</u></font> <b><a name='set_contains_all_parents_of_node'></a>set_contains_all_parents_of_node</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> set_type<font color='#5555FF'>&amp;</font> set,
+                <font color='#0000FF'>const</font> node_type<font color='#5555FF'>&amp;</font> node
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> node.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>set.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>node.<font color='#BB00BB'>parent</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <b>}</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+
+        <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+                <font color='#0000FF'>typename</font> V
+                <font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'><u>void</u></font> <b><a name='pass_join_tree_message'></a>pass_join_tree_message</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> join_tree,
+                V<font color='#5555FF'>&amp;</font> bn_join_tree ,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> from,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> to
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bayes_node_utils;
+                <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> U::edge_type<font color='#5555FF'>&amp;</font> e <font color='#5555FF'>=</font> <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>join_tree, from, to<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>typename</font> V::edge_type<font color='#5555FF'>&amp;</font> old_s <font color='#5555FF'>=</font> <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>bn_join_tree, from, to<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> V::edge_type joint_prob_table;
+
+                joint_prob_table new_s;
+                bn_join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>from<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>marginalize</font><font face='Lucida Console'>(</font>e, new_s<font face='Lucida Console'>)</font>;
+
+                joint_probability_table <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>new_s<font face='Lucida Console'>)</font>;
+                <font color='#009900'>// divide new_s by old_s and store the result in temp.
+</font>                <font color='#009900'>// if old_s is empty then that is the same as if it was all 1s
+</font>                <font color='#009900'>// so we don't have to do this if that is the case.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>old_s.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    temp.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    old_s.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        old_s.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>old_s.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                            temp.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>  <font color='#5555FF'>/</font><font color='#5555FF'>=</font> old_s.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#009900'>// now multiply temp by d and store the results in d
+</font>                joint_probability_table<font color='#5555FF'>&amp;</font> d <font color='#5555FF'>=</font> bn_join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>to<font face='Lucida Console'>)</font>.data;
+                d.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>d.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    assignment a; 
+                    <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> asrc <font color='#5555FF'>=</font> d.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    asrc.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>asrc.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>e.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>asrc.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                            a.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>asrc.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, asrc.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    d.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font><font color='#5555FF'>=</font> temp.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+
+                <b>}</b>
+
+                <font color='#009900'>// store new_s in old_s
+</font>                new_s.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>old_s<font face='Lucida Console'>)</font>;
+
+            <b>}</b>
+
+        <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+                <font color='#0000FF'>typename</font> V
+                <font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'><u>void</u></font> <b><a name='create_bayesian_network_join_tree'></a>create_bayesian_network_join_tree</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> bn,
+                <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> join_tree,
+                V<font color='#5555FF'>&amp;</font> bn_join_tree 
+            <font face='Lucida Console'>)</font>
+            <font color='#009900'>/*!
+                requires
+                    - bn is a proper bayesian network
+                    - join_tree is the join tree for that bayesian network
+                ensures
+                    - bn_join_tree == the output of the join tree algorithm for bayesian network inference.  
+                      So each node in this graph contains a joint_probability_table for the clique
+                      in the corresponding node in the join_tree graph.
+            !*/</font>
+            <b>{</b>
+                <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bayes_node_utils;
+                bn_join_tree.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>copy_graph_structure</font><font face='Lucida Console'>(</font>join_tree, bn_join_tree<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// we need to keep track of which node is "in" each clique for the purposes of 
+</font>                <font color='#009900'>// initializing the tables in each clique.  So this vector will be used to do that
+</font>                <font color='#009900'>// and a value of join_tree.number_of_nodes() means that the node with 
+</font>                <font color='#009900'>// that index is unassigned.
+</font>                std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>node_assigned_to</font><font face='Lucida Console'>(</font>bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,join_tree.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// populate evidence with all the evidence node indices and their values
+</font>                dlib::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::kernel_1b_c evidence;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>node_is_evidence</font><font face='Lucida Console'>(</font>bn, i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> i;
+                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value <font color='#5555FF'>=</font> <font color='#BB00BB'>node_value</font><font face='Lucida Console'>(</font>bn, i<font face='Lucida Console'>)</font>;
+                        evidence.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>idx,value<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+
+
+                <font color='#009900'>// initialize the bn join tree
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> join_tree.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'><u>bool</u></font> contains_evidence <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> indices;
+                    assignment value;
+
+                    <font color='#009900'>// loop over all the nodes in this clique in the join tree.  In this loop 
+</font>                    <font color='#009900'>// we are making an assignment with all the values of the nodes it represents set to 0
+</font>                    join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        indices.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>;
+                        value.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>;
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>evidence.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                            contains_evidence <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    <b>}</b>
+
+                    <font color='#009900'>// now loop over all possible combinations of values that the nodes this 
+</font>                    <font color='#009900'>// clique in the join tree can take on.  We do this by counting by one through all
+</font>                    <font color='#009900'>// legal values
+</font>                    <font color='#0000FF'><u>bool</u></font> more_assignments <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>more_assignments<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        bn_join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>set_probability</font><font face='Lucida Console'>(</font>value,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                        <font color='#009900'>// account for any evidence
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>contains_evidence<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#009900'>// loop over all the nodes in this cluster
+</font>                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> indices.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#009900'>// if the current node is an evidence node
+</font>                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>evidence.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>indices[j]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> indices[j];
+                                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> evidence_value <font color='#5555FF'>=</font> evidence[idx];
+                                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>value[idx] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> evidence_value<font face='Lucida Console'>)</font>
+                                        bn_join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>set_probability</font><font face='Lucida Console'>(</font>value , <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                                <b>}</b>
+                            <b>}</b>
+                        <b>}</b>
+
+
+                        <font color='#009900'>// now check if any of the nodes in this cluster also have their parents in this cluster
+</font>                        join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                            <font color='#009900'>// if this clique contains all the parents of this node and also hasn't
+</font>                            <font color='#009900'>// been assigned to another clique
+</font>                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>set_contains_all_parents_of_node</font><font face='Lucida Console'>(</font>join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data,  bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                                <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> node_assigned_to[idx] <font color='#5555FF'>|</font><font color='#5555FF'>|</font> node_assigned_to[idx] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> join_tree.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#009900'>// note that this node is now assigned to this clique 
+</font>                                node_assigned_to[idx] <font color='#5555FF'>=</font> i;
+                                <font color='#009900'>// node idx has all its parents in the cluster
+</font>                                assignment parent_values;
+                                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pidx <font color='#5555FF'>=</font> bn.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>.<font color='#BB00BB'>parent</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                                    parent_values.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>pidx, value[pidx]<font face='Lucida Console'>)</font>;
+                                <b>}</b>
+
+                                <font color='#0000FF'><u>double</u></font> temp <font color='#5555FF'>=</font> bn_join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font>;
+                                bn_join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>set_probability</font><font face='Lucida Console'>(</font>value, temp <font color='#5555FF'>*</font> <font color='#BB00BB'>node_probability</font><font face='Lucida Console'>(</font>bn, idx, value[idx], parent_values<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                            <b>}</b>
+                        <b>}</b>
+
+
+                        <font color='#009900'>// now advance the value variable to its next possible state if there is one
+</font>                        more_assignments <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                        value.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>value.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            value.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                            <font color='#009900'>// if overflow
+</font>                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>value.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>node_num_values</font><font face='Lucida Console'>(</font>bn, value.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                value.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                            <b>}</b>
+                            <font color='#0000FF'>else</font>
+                            <b>{</b>
+                                more_assignments <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                                <font color='#0000FF'>break</font>;
+                            <b>}</b>
+                        <b>}</b>
+
+                    <b>}</b> <font color='#009900'>// end while (more_assignments) 
+</font>                <b>}</b> 
+
+
+
+
+                <font color='#009900'>// the tree is now initialized.  Now all we need to do is perform the propagation and
+</font>                <font color='#009900'>// we are done
+</font>                dlib::array<font color='#5555FF'>&lt;</font>dlib::set<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::compare_1b_c<font color='#5555FF'>&gt;</font> remaining_msg_to_send;
+                dlib::array<font color='#5555FF'>&lt;</font>dlib::set<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::compare_1b_c<font color='#5555FF'>&gt;</font> remaining_msg_to_receive;
+                remaining_msg_to_receive.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>join_tree.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                remaining_msg_to_send.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>join_tree.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> remaining_msg_to_receive.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp;
+                        temp <font color='#5555FF'>=</font> idx; remaining_msg_to_receive[i].<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                        temp <font color='#5555FF'>=</font> idx; remaining_msg_to_send[i].<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#009900'>// now remaining_msg_to_receive[i] contains all the nodes that node i hasn't yet received
+</font>                <font color='#009900'>// a message from.
+</font>                <font color='#009900'>// we will consider node 0 to be the root node.
+</font>
+
+                <font color='#0000FF'><u>bool</u></font> message_sent <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::iterator iter;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>message_sent<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    message_sent <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> remaining_msg_to_send.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#009900'>// if node i hasn't sent any messages but has received all but one then send a message to the one
+</font>                        <font color='#009900'>// node who hasn't sent i a message
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>remaining_msg_to_send[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> remaining_msg_to_receive[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> to;
+                            <font color='#009900'>// get the last remaining thing from this set
+</font>                            remaining_msg_to_receive[i].<font color='#BB00BB'>remove_any</font><font face='Lucida Console'>(</font>to<font face='Lucida Console'>)</font>;
+
+                            <font color='#009900'>// send the message
+</font>                            <font color='#BB00BB'>pass_join_tree_message</font><font face='Lucida Console'>(</font>join_tree, bn_join_tree, i, to<font face='Lucida Console'>)</font>;
+
+                            <font color='#009900'>// record that we sent this message
+</font>                            remaining_msg_to_send[i].<font color='#BB00BB'>destroy</font><font face='Lucida Console'>(</font>to<font face='Lucida Console'>)</font>;
+                            remaining_msg_to_receive[to].<font color='#BB00BB'>destroy</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+
+                            <font color='#009900'>// put to back in since we still need to receive it
+</font>                            remaining_msg_to_receive[i].<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>to<font face='Lucida Console'>)</font>;
+                            message_sent <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>remaining_msg_to_receive[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> remaining_msg_to_send[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> to;
+                            remaining_msg_to_send[i].<font color='#BB00BB'>remove_any</font><font face='Lucida Console'>(</font>to<font face='Lucida Console'>)</font>;
+                            remaining_msg_to_receive[to].<font color='#BB00BB'>destroy</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>pass_join_tree_message</font><font face='Lucida Console'>(</font>join_tree, bn_join_tree, i, to<font face='Lucida Console'>)</font>;
+                            message_sent <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                        <b>}</b>
+                    <b>}</b>
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>remaining_msg_to_receive[<font color='#979000'>0</font>].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#009900'>// send a message to all of the root nodes neighbors unless we have already sent out he messages
+</font>                        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>remaining_msg_to_send[<font color='#979000'>0</font>].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> to;
+                            remaining_msg_to_send[<font color='#979000'>0</font>].<font color='#BB00BB'>remove_any</font><font face='Lucida Console'>(</font>to<font face='Lucida Console'>)</font>;
+                            remaining_msg_to_receive[to].<font color='#BB00BB'>destroy</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>pass_join_tree_message</font><font face='Lucida Console'>(</font>join_tree, bn_join_tree, <font color='#979000'>0</font>, to<font face='Lucida Console'>)</font>;
+                            message_sent <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                        <b>}</b>
+                    <b>}</b>
+
+
+                <b>}</b>
+
+            <b>}</b>
+
+        <b>}</b>;
+    <b>}</b>
+
+    <font color='#0000FF'>class</font> <b><a name='bayesian_network_join_tree'></a>bayesian_network_join_tree</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            use the pimpl idiom to push the template arguments from the class level to the
+            constructor level
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'>typename</font> U
+            <font color='#5555FF'>&gt;</font>
+        <b><a name='bayesian_network_join_tree'></a>bayesian_network_join_tree</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> join_tree
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> ,
+                        "<font color='#CC0000'>\tbayesian_network_join_tree::bayesian_network_join_tree(bn,join_tree)</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have given an invalid bayesian network</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:              </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                    <font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>is_join_tree</font><font face='Lucida Console'>(</font>bn, join_tree<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> ,
+                        "<font color='#CC0000'>\tbayesian_network_join_tree::bayesian_network_join_tree(bn,join_tree)</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have given an invalid join tree for the supplied bayesian network</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:              </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                    <font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>graph_contains_length_one_cycle</font><font face='Lucida Console'>(</font>bn<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+                        "<font color='#CC0000'>\tbayesian_network_join_tree::bayesian_network_join_tree(bn,join_tree)</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have given an invalid bayesian network</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:              </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                    <font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>graph_is_connected</font><font face='Lucida Console'>(</font>bn<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+                        "<font color='#CC0000'>\tbayesian_network_join_tree::bayesian_network_join_tree(bn,join_tree)</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have given an invalid bayesian network</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:              </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                    <font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>bayes_node_utils::<font color='#BB00BB'>node_cpt_filled_out</font><font face='Lucida Console'>(</font>bn,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+                        "<font color='#CC0000'>\tbayesian_network_join_tree::bayesian_network_join_tree(bn,join_tree)</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have given an invalid bayesian network. </font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou must finish filling out the conditional_probability_table of node </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:              </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                    <font face='Lucida Console'>)</font>;
+            <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+            impl.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> bayesian_network_join_tree_helpers::bnjt_impl<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>bn, join_tree<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            num_nodes <font color='#5555FF'>=</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='probability'></a>probability</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> idx <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> ,
+                        "<font color='#CC0000'>\tconst matrix&lt;double,1&gt; bayesian_network_join_tree::probability(idx)</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have specified an invalid node index</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tidx:               </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx 
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnumber_of_nodes(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:              </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                    <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> impl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_nodes'></a>number_of_nodes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_nodes; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            bayesian_network_join_tree<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>num_nodes, item.num_nodes<font face='Lucida Console'>)</font>;
+            impl.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.impl<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        scoped_ptr<font color='#5555FF'>&lt;</font>bayesian_network_join_tree_helpers::bnjt<font color='#5555FF'>&gt;</font> impl;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_nodes;
+
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        bayesian_network_join_tree<font color='#5555FF'>&amp;</font> a,
+        bayesian_network_join_tree<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BAYES_UTILs_
+</font>
+
+</pre></body></html>

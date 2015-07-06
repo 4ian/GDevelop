@@ -1,0 +1,492 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - vector_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_VECTOR_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_VECTOR_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>functional<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> <font color='#979000'>3</font>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='vector'></a>vector</b> : <font color='#0000FF'>public</font> matrix<font color='#5555FF'>&lt;</font>T,NR,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T
+                T should be some object that provides an interface that is 
+                compatible with double, float, int, long and the like.
+
+            REQUIREMENTS ON NR
+                NR == 3 || NR == 2
+
+            INITIAL VALUE
+                x() == 0 
+                y() == 0 
+                z() == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a three dimensional vector.  If NR == 2 then
+                this object is limited to representing points on the XY plane where
+                Z is set to 0.
+
+                Also note that this object performs the appropriate integer and 
+                floating point conversions and promotions when vectors of mixed
+                type are used together.  For example:
+                    vector&lt;int,3&gt; vi;
+                    vector&lt;double,2&gt; vd;
+                    vd + vi == a vector&lt;double,3&gt; object type since that is what
+                               is needed to contain the result of vi+vd without
+                               any loss of information.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> T type;
+        
+        <b><a name='vector'></a>vector</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+               - #*this has been properly initialized
+        !*/</font>
+
+        <b><a name='vector'></a>vector</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T _x,
+            <font color='#0000FF'>const</font> T _y,
+            <font color='#0000FF'>const</font> T _z
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - NR == 3
+            ensures
+                - #x() == _x 
+                - #y() == _y 
+                - #z() == _z 
+        !*/</font>
+
+        <b><a name='vector'></a>vector</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T _x,
+            <font color='#0000FF'>const</font> T _y
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - NR == 2
+            ensures
+                - #x() == _x 
+                - #y() == _y 
+                - #z() == 0
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U, <font color='#0000FF'><u>long</u></font> NRv<font color='#5555FF'>&gt;</font>
+        <b><a name='vector'></a>vector</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font>U,NRv<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> v
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - Initializes *this with the contents of v and does any rounding if necessary and also 
+                  takes care of converting between 2 and 3 dimensional vectors.
+                - if (U is a real valued type like float or double and T is an integral type like long) then
+                    - if (NR == 3) then
+                        - #x() == floor(v.x() + 0.5)
+                        - #y() == floor(v.y() + 0.5)
+                        - #z() == floor(v.z() + 0.5)
+                    - else // NR == 2
+                        - #x() == floor(v.x() + 0.5)
+                        - #y() == floor(v.y() + 0.5)
+                        - #z() == 0
+                - else
+                    - if (NR == 3) then
+                        - #x() == v.x() 
+                        - #y() == v.y() 
+                        - #z() == v.z() 
+                    - else // NR == 2
+                        - #x() == v.x() 
+                        - #y() == v.y() 
+                        - #z() == 0
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <b><a name='vector'></a>vector</b> <font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - m.size() == NR
+                - m.nr() == 1 || m.nc() == 1 (i.e. m must be a row or column matrix)
+            ensures
+                - Initializes *this with the contents of m and does any rounding if necessary and also 
+                  takes care of converting between 2 and 3 dimensional vectors.
+                - if (m contains real valued values like float or double and T is an integral type like long) then
+                    - #x() == floor(m(0) + 0.5)
+                    - #y() == floor(m(1) + 0.5)
+                    - if (NR == 3) then
+                        - #z() == floor(m(2) + 0.5)
+                    - else
+                        - #z() == 0
+                - else
+                    - #x() == m(0)
+                    - #y() == m(1)
+                    - if (NR == 3) then
+                        - #z() == m(2)
+                    - else
+                        - #z() == 0
+        !*/</font>
+
+        ~<b><a name='vector'></a>vector</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources associated with *this have been released
+        !*/</font>
+
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='length'></a>length</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the length of the vector
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='length_squared'></a>length_squared</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns length()*length() 
+        !*/</font>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='x'></a>x</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a reference to the x component of the vector
+        !*/</font>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='y'></a>y</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a reference to the y component of the vector
+        !*/</font>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='z'></a>z</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - NR == 3 (this function actually doesn't exist when NR != 3)
+            ensures
+                - returns a reference to the z component of the vector
+        !*/</font>
+
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='x'></a>x</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a const reference to the x component of the vector
+        !*/</font>
+
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='y'></a>y</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a const reference to the y component of the vector
+        !*/</font>
+
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='z'></a>z</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (NR == 3) then
+                    - returns a const reference to the z component of the vector
+                - else
+                    - return 0
+                      (there isn't really a z in this case so we just return 0)
+        !*/</font>
+
+        T <b><a name='dot'></a>dot</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the result of the dot product between *this and rhs
+        !*/</font>
+
+        vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> <b><a name='cross'></a>cross</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the result of the cross product between *this and rhs
+        !*/</font>
+
+        vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,NR<font color='#5555FF'>&gt;</font> <b><a name='normalize'></a>normalize</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a vector with length() == 1 and in the same direction as *this
+        !*/</font>
+
+        vector <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the result of adding *this to rhs
+        !*/</font>
+
+        vector <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the result of subtracting rhs from *this
+        !*/</font>
+
+        vector <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns -1*(*this) 
+        !*/</font>
+
+        vector <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the result of dividing *this by rhs 
+        !*/</font>
+
+        vector<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #x() == rhs.x() 
+                - #y() == rhs.y() 
+                - #z() == rhs.z()
+                - returns #*this
+        !*/</font>
+
+        vector<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this == *this + rhs
+                - returns #*this
+        !*/</font>
+
+        vector<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this == *this - rhs
+                - returns #*this
+        !*/</font>
+
+        vector<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this == *this * rhs
+                - returns #*this
+        !*/</font>
+
+        vector<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this == *this / rhs
+                - returns #*this
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U, <font color='#0000FF'><u>long</u></font> NR2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font>U,NR2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (x() == rhs.x() &amp;&amp; y() == rhs.y() &amp;&amp; z() == rhs.z()) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U, <font color='#0000FF'><u>long</u></font> NR2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font>U,NR2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns !((*this) == rhs)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            vector<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U, <font color='#0000FF'><u>long</u></font> NR<font color='#5555FF'>&gt;</font>
+    vector <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font>T,NR<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&amp;</font> lhs,
+        <font color='#0000FF'>const</font> U rhs
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns the result of multiplying the scalar rhs by lhs
+    !*/</font>
+    
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U, <font color='#0000FF'><u>long</u></font> NR<font color='#5555FF'>&gt;</font>
+    vector <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> U lhs,
+        <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font>T,NR<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&amp;</font> rhs   
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*! 
+        ensures
+            - returns the result of multiplying the scalar lhs by rhs
+    !*/</font>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        vector<font color='#5555FF'>&lt;</font>T,NR<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&amp;</font> a, 
+        vector<font color='#5555FF'>&lt;</font>T,NR<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font>T,NR<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        vector<font color='#5555FF'>&lt;</font>T,NR<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    std::ostream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        std::ostream<font color='#5555FF'>&amp;</font> out, 
+        <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        ensures
+            - writes item to out in the form "(x, y, z)"
+    !*/</font>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    std::istream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in, 
+        vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        ensures
+            - reads a vector from the input stream in and stores it in #item.
+              The data in the input stream should be of the form (x, y, z)
+    !*/</font>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    std::ostream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        std::ostream<font color='#5555FF'>&amp;</font> out, 
+        <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        ensures
+            - writes item to out in the form "(x, y)"
+    !*/</font>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    std::istream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in, 
+        vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        ensures
+            - reads a vector from the input stream in and stores it in #item.
+              The data in the input stream should be of the form (x, y)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <a name='point'/><font color='#009900'>/*!A point
+        This is just a typedef of the vector object. 
+    !*/</font>
+
+    <font color='#0000FF'>typedef</font> vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> point;
+
+    <a name='dpoint'/><font color='#009900'>/*!A dpoint
+        This is just a typedef of the vector object. 
+    !*/</font>
+
+    <font color='#0000FF'>typedef</font> vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> dpoint;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>namespace</font> std
+<b>{</b>
+    <font color='#009900'>/*!
+        Define std::less&lt;vector&lt;T,3&gt; &gt; so that you can use vectors in the associative containers.
+    !*/</font>
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='less'></a>less</b><font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> binary_function<font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> ,dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> ,<font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#0000FF'>if</font>      <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> b.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> b.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>z</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>z</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>z</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> b.<font color='#BB00BB'>z</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>else</font>                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#009900'>/*!
+        Define std::less&lt;vector&lt;T,2&gt; &gt; so that you can use vector&lt;T,2&gt;s in the associative containers.
+    !*/</font>
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='less'></a>less</b><font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> binary_function<font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> ,dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> ,<font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#0000FF'>if</font>      <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> b.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> b.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>else</font>                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+    <b>}</b>;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_VECTOR_ABSTRACT_
+</font>
+
+</pre></body></html>

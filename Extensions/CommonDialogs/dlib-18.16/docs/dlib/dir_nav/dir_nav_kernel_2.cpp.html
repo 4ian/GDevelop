@@ -1,0 +1,251 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - dir_nav_kernel_2.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_DIR_NAV_KERNEL_2_CPp_
+<font color='#0000FF'>#define</font> DLIB_DIR_NAV_KERNEL_2_CPp_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../platform.h.html'>../platform.h</a>"
+
+<font color='#0000FF'>#ifdef</font> POSIX
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dir_nav_kernel_2.h.html'>dir_nav_kernel_2.h</a>"
+
+
+
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// file object implementation
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> file::
+    <b><a name='init'></a>init</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> name
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+
+
+        <font color='#0000FF'><u>char</u></font> buf[PATH_MAX];
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>realpath</font><font face='Lucida Console'>(</font>name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,buf<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// the file was not found
+</font>            <font color='#0000FF'>throw</font> <font color='#BB00BB'>file_not_found</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to find file </font>" <font color='#5555FF'>+</font> name<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        state.full_name <font color='#5555FF'>=</font> buf;
+
+
+        string::size_type pos <font color='#5555FF'>=</font> state.full_name.<font color='#BB00BB'>find_last_of</font><font face='Lucida Console'>(</font>directory::<font color='#BB00BB'>get_separator</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pos <font color='#5555FF'>=</font><font color='#5555FF'>=</font> string::npos<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// no valid full path has no separtor characters.  
+</font>            <font color='#0000FF'>throw</font> <font color='#BB00BB'>file_not_found</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to find file </font>" <font color='#5555FF'>+</font> name<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        state.name <font color='#5555FF'>=</font> state.full_name.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font>pos<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// now find the size of this file
+</font>        <font color='#0000FF'>struct</font> stat64 buffer;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>::<font color='#BB00BB'>stat64</font><font face='Lucida Console'>(</font>state.full_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>buffer<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+            <font color='#BB00BB'>S_ISDIR</font><font face='Lucida Console'>(</font>buffer.st_mode<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// there was an error during the call to stat64 or
+</font>            <font color='#009900'>// name is actually a directory
+</font>            <font color='#0000FF'>throw</font> <font color='#BB00BB'>file_not_found</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to find file </font>" <font color='#5555FF'>+</font> name<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            state.file_size <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint64<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buffer.st_size<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> file::
+    <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> file<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b> 
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state.full_name.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> rhs.state.full_name.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+        <font color='#009900'>// These files might have different names but actually represent the same
+</font>        <font color='#009900'>// file due to the presence of symbolic links.
+</font>        <font color='#0000FF'><u>char</u></font> buf[PATH_MAX];
+        string left, right;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>realpath</font><font face='Lucida Console'>(</font>state.full_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,buf<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;    
+        left <font color='#5555FF'>=</font> buf;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>realpath</font><font face='Lucida Console'>(</font>rhs.state.full_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,buf<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;    
+        right <font color='#5555FF'>=</font> buf;
+
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>left <font color='#5555FF'>=</font><font color='#5555FF'>=</font> right<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// directory object implementation
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> directory::
+    <b><a name='init'></a>init</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> name
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+        
+        <font color='#0000FF'><u>char</u></font> buf[PATH_MAX];
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>realpath</font><font face='Lucida Console'>(</font>name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,buf<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// the directory was not found
+</font>            <font color='#0000FF'>throw</font> <font color='#BB00BB'>dir_not_found</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to find directory </font>" <font color='#5555FF'>+</font> name<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        state.full_name <font color='#5555FF'>=</font> buf;
+  
+        
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> sep <font color='#5555FF'>=</font> <font color='#BB00BB'>get_separator</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_root_path</font><font face='Lucida Console'>(</font>state.full_name<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// ensure that thre is not a trialing separator
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state.full_name[state.full_name.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> sep<font face='Lucida Console'>)</font>
+                state.full_name.<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font>state.full_name.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// pick out the directory name
+</font>            string::size_type pos <font color='#5555FF'>=</font> state.full_name.<font color='#BB00BB'>find_last_of</font><font face='Lucida Console'>(</font>sep<font face='Lucida Console'>)</font>;
+            state.name <font color='#5555FF'>=</font> state.full_name.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font>pos<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// ensure that there is a trailing separator
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state.full_name[state.full_name.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> sep<font face='Lucida Console'>)</font>
+                state.full_name <font color='#5555FF'>+</font><font color='#5555FF'>=</font> sep;
+        <b>}</b>
+
+
+        <font color='#0000FF'>struct</font> stat64 buffer;
+        <font color='#009900'>// now check that this is actually a valid directory
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>::<font color='#BB00BB'>stat64</font><font face='Lucida Console'>(</font>state.full_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#5555FF'>&amp;</font>buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// the directory was not found
+</font>            <font color='#0000FF'>throw</font> <font color='#BB00BB'>dir_not_found</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to find directory </font>" <font color='#5555FF'>+</font> name<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>S_ISDIR</font><font face='Lucida Console'>(</font>buffer.st_mode<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// It is not a directory
+</font>            <font color='#0000FF'>throw</font> <font color='#BB00BB'>dir_not_found</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to find directory </font>" <font color='#5555FF'>+</font> name<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>char</u></font> directory::
+    <b><a name='get_separator'></a>get_separator</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'>return</font> '<font color='#FF0000'>/</font>';
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> directory::
+    <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> directory<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b> 
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state.full_name.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> rhs.state.full_name.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+        <font color='#009900'>// These directories might have different names but actually represent the same
+</font>        <font color='#009900'>// directory due to the presence of symbolic links.
+</font>        <font color='#0000FF'><u>char</u></font> buf[PATH_MAX];
+        string left, right;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>realpath</font><font face='Lucida Console'>(</font>state.full_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,buf<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;    
+        left <font color='#5555FF'>=</font> buf;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>realpath</font><font face='Lucida Console'>(</font>rhs.state.full_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,buf<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;    
+        right <font color='#5555FF'>=</font> buf;
+
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>left <font color='#5555FF'>=</font><font color='#5555FF'>=</font> right<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> directory directory::
+    <b><a name='get_parent'></a>get_parent</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        <font color='#009900'>// if *this is the root then just return *this
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_root</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            directory temp;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> sep <font color='#5555FF'>=</font> <font color='#BB00BB'>get_separator</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            string::size_type pos <font color='#5555FF'>=</font> state.full_name.<font color='#BB00BB'>find_last_of</font><font face='Lucida Console'>(</font>sep<font face='Lucida Console'>)</font>;
+            temp.state.full_name <font color='#5555FF'>=</font> state.full_name.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,pos<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>is_root_path</font><font face='Lucida Console'>(</font>temp.state.full_name<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp.state.full_name <font color='#5555FF'>+</font><font color='#5555FF'>=</font> sep;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                pos <font color='#5555FF'>=</font> temp.state.full_name.<font color='#BB00BB'>find_last_of</font><font face='Lucida Console'>(</font>sep<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pos <font color='#5555FF'>!</font><font color='#5555FF'>=</font> string::npos<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    temp.state.name <font color='#5555FF'>=</font> temp.state.full_name.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font>pos<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    temp.state.full_name <font color='#5555FF'>+</font><font color='#5555FF'>=</font> sep;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> directory::
+    <b><a name='is_root_path'></a>is_root_path</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> path
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> sep <font color='#5555FF'>=</font> <font color='#BB00BB'>get_separator</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>path.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> path[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> sep<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;   
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// POSIX
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_DIR_NAV_KERNEL_2_CPp_
+</font>
+
+</pre></body></html>

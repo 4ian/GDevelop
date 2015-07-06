@@ -10,6 +10,7 @@
 #include <GDCore/Utf8String.h>
 #include "GDCore/Events/Instruction.h"
 #include <memory>
+#include <functional>
 #if !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif
@@ -235,7 +236,7 @@ public:
     {
     public:
         enum AccessType {Reference, MutatorAndOrAccessor};
-        ExtraInformation() : accessType(Reference) {};
+        ExtraInformation() : accessType(Reference), hasCustomCodeGenerator(false) {};
         virtual ~ExtraInformation() {};
 
         /**
@@ -295,26 +296,33 @@ public:
             return *this;
         }
 
-        /** \brief Class used to redefine instruction code generation
-         */
-        class CustomCodeGenerator
+        ExtraInformation & SetCustomCodeGenerator(std::function<gd::String(Instruction & instruction,
+            gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)> codeGenerator)
         {
-        public:
-            virtual gd::String GenerateCode(Instruction & instruction, gd::EventsCodeGenerator & codeGenerator_, gd::EventsCodeGenerationContext & context) {return "";};
-        };
-
-        ExtraInformation & SetCustomCodeGenerator(std::shared_ptr<CustomCodeGenerator> codeGenerator)
-        {
-            optionalCustomCodeGenerator = codeGenerator;
+            hasCustomCodeGenerator = true;
+            customCodeGenerator = codeGenerator;
             return *this;
         }
+
+        ExtraInformation & RemoveCustomCodeGenerator()
+        {
+            hasCustomCodeGenerator = false;
+            std::function<gd::String(Instruction & instruction,
+            gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)> emptyFunction;
+            customCodeGenerator = emptyFunction;
+            return *this;
+        }
+
+        bool HasCustomCodeGenerator() const { return hasCustomCodeGenerator; }
 
         gd::String functionCallName;
         gd::String type;
         AccessType accessType;
         gd::String optionalAssociatedInstruction;
         gd::String optionalIncludeFile;
-        std::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
+        bool hasCustomCodeGenerator;
+        std::function<gd::String(Instruction & instruction,
+            gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)> customCodeGenerator;
     };
     ExtraInformation codeExtraInformation; ///< Information about how generate code for the instruction
 
@@ -366,5 +374,3 @@ private:
 
 #endif
 #endif // INSTRUCTIONMETADATA_H
-
-

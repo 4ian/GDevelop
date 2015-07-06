@@ -1,0 +1,358 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - svm_c_linear_dcd_trainer_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SVm_C_LINEAR_DCD_TRAINER_ABSTRACT_Hh_ 
+<font color='#0000FF'>#ifdef</font> DLIB_SVm_C_LINEAR_DCD_TRAINER_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='function_abstract.h.html'>function_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel_abstract.h.html'>kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib 
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='svm_c_linear_dcd_trainer'></a>svm_c_linear_dcd_trainer</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON K 
+                Is either linear_kernel or sparse_linear_kernel.  
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a tool for training the C formulation of a support
+                vector machine.  It is optimized for the case where linear kernels are
+                used.  
+
+
+                In particular, it is implemented using the algorithm described in the
+                following paper:
+                    A Dual Coordinate Descent Method for Large-scale Linear SVM
+                    by Cho-Jui Hsieh, Kai-Wei Chang, and Chih-Jen Lin
+
+                It solves the optimization problem of:
+                min_w: 0.5||w||^2 + C*sum_i (hinge loss for sample i)   
+                where w is the learned SVM parameter vector.
+
+                Note that this object is very similar to the svm_c_linear_trainer, however,
+                it interprets the C parameter slightly differently.  In particular, C for
+                the DCD trainer is not automatically divided by the number of samples like
+                it is with the svm_c_linear_trainer.  For example, a C value of 10 when
+                given to the svm_c_linear_trainer is equivalent to a C value of 10/N for
+                the svm_c_linear_dcd_trainer, where N is the number of training samples.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> K kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> trained_function_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> decision_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font>::sample_vector_type sample_vector_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> decision_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font>::scalar_vector_type scalar_vector_type;
+
+
+        <b><a name='svm_c_linear_dcd_trainer'></a>svm_c_linear_dcd_trainer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object is properly initialized and ready to be used to train a
+                  support vector machine.
+                - #get_c_class1() == 1
+                - #get_c_class2() == 1
+                - #get_epsilon() == 0.1
+                - #get_max_iterations() == 10000
+                - This object will not be verbose unless be_verbose() is called
+                - #forces_last_weight_to_1() == false
+                - #includes_bias() == true
+                - #shrinking_enabled() == true
+        !*/</font>
+
+        <font color='#0000FF'>explicit</font> <b><a name='svm_c_linear_dcd_trainer'></a>svm_c_linear_dcd_trainer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scalar_type<font color='#5555FF'>&amp;</font> C
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - C &gt; 0
+            ensures
+                - This object is properly initialized and ready to be used to train a
+                  support vector machine.
+                - #get_c_class1() == C
+                - #get_c_class2() == C
+                - #get_epsilon() == 0.1
+                - #get_max_iterations() == 10000
+                - This object will not be verbose unless be_verbose() is called
+                - #forces_last_weight_to_1() == false
+                - #includes_bias() == true
+                - #shrinking_enabled() == true
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='includes_bias'></a>includes_bias</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if this trainer will produce decision_functions with
+                  non-zero bias values.  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='include_bias'></a>include_bias</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>bool</u></font> should_have_bias
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #includes_bias() == should_have_bias
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='forces_last_weight_to_1'></a>forces_last_weight_to_1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if this trainer has the constraint that the last weight in
+                  the learned parameter vector must be 1.  This is the weight corresponding
+                  to the feature in the training vectors with the highest dimension.  
+                - Forcing the last weight to 1 also disables the bias and therefore the b
+                  field of the learned decision_function will be 0 when forces_last_weight_to_1() == true.
+                  This is true regardless of the setting of #include_bias().
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='force_last_weight_to_1'></a>force_last_weight_to_1</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>bool</u></font> should_last_weight_be_1
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #forces_last_weight_to_1() == should_last_weight_be_1
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='shrinking_enabled'></a>shrinking_enabled</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns true if the shrinking heuristic is enabled.  Typically this makes
+                  the algorithm run a lot faster so it should be enabled.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='enable_shrinking'></a>enable_shrinking</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>bool</u></font> enabled
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #shrinking_enabled() == enabled
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_verbose'></a>be_verbose</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object will print status messages to standard out so that a 
+                  user can observe the progress of the algorithm.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_quiet'></a>be_quiet</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object will not print anything to standard out
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_epsilon'></a>set_epsilon</b> <font face='Lucida Console'>(</font>
+            scalar_type eps_
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - eps &gt; 0
+            ensures
+                - #get_epsilon() == eps 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_epsilon'></a>get_epsilon</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the error epsilon that determines when training should stop.
+                  Smaller values may result in a more accurate solution but take longer to
+                  train.    
+        !*/</font>
+
+        <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> <b><a name='get_kernel'></a>get_kernel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a copy of the kernel function in use by this object.  Since the
+                  linear kernels don't have any parameters this function just returns
+                  kernel_type()
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_iterations'></a>get_max_iterations</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the maximum number of iterations the SVM optimizer is allowed to
+                  run before it is required to stop and return a result.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_iterations'></a>set_max_iterations</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #get_max_iterations() == max_iter
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_c'></a>set_c</b> <font face='Lucida Console'>(</font>
+            scalar_type C 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - C &gt; 0
+            ensures
+                - #get_c_class1() == C 
+                - #get_c_class2() == C 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_c_class1'></a>get_c_class1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the SVM regularization parameter for the +1 class.  It is the
+                  parameter that determines the trade off between trying to fit the +1
+                  training data exactly or allowing more errors but hopefully improving the
+                  generalization of the resulting classifier.  Larger values encourage
+                  exact fitting while smaller values of C may encourage better
+                  generalization. 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_c_class2'></a>get_c_class2</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the SVM regularization parameter for the -1 class.  It is the
+                  parameter that determines the trade off between trying to fit the -1
+                  training data exactly or allowing more errors but hopefully improving the
+                  generalization of the resulting classifier.  Larger values encourage
+                  exact fitting while smaller values of C may encourage better
+                  generalization. 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_c_class1'></a>set_c_class1</b> <font face='Lucida Console'>(</font>
+            scalar_type C
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - C &gt; 0
+            ensures
+                - #get_c_class1() == C
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_c_class2'></a>set_c_class2</b> <font face='Lucida Console'>(</font>
+            scalar_type C
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - C &gt; 0
+            ensures
+                - #get_c_class2() == C
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_learning_problem(x,y) == true
+                  (Note that it is ok for x.size() == 1)
+                - All elements of y must be equal to +1 or -1
+                - x == a matrix or something convertible to a matrix via mat().
+                  Also, x should contain sample_type objects.
+                - y == a matrix or something convertible to a matrix via mat().
+                  Also, y should contain scalar_type objects.
+            ensures
+                - Trains a C support vector classifier given the training samples in x and 
+                  labels in y.  
+                - returns a decision function F with the following properties:
+                    - F.alpha.size() == 1
+                    - F.basis_vectors.size() == 1
+                    - F.alpha(0) == 1
+                    - if (new_x is a sample predicted have +1 label) then
+                        - F(new_x) &gt;= 0
+                    - else
+                        - F(new_x) &lt; 0
+        !*/</font>
+
+        <font color='#009900'>// optimizer_state is used to record the internal state of the SVM optimizer.  It
+</font>        <font color='#009900'>// can be used with the following train() routine to warm-start the optimizer.
+</font>        <font color='#009900'>// Note, that optimizer_state objects are serializable but are otherwise completely
+</font>        <font color='#009900'>// opaque to the user.
+</font>        <font color='#0000FF'>class</font> optimizer_state;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y,
+            optimizer_state<font color='#5555FF'>&amp;</font> state 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_learning_problem(x,y) == true
+                  (Note that it is ok for x.size() == 1)
+                - All elements of y must be equal to +1 or -1
+                - state must be either a default initialized optimizer_state object or all the
+                  following conditions must be satisfied:
+                    - Let LAST denote the previous trainer used with the state object, then
+                      we must have: 
+                        - LAST.includes_bias() == includes_bias()
+                        - LAST.forces_last_weight_to_1() == forces_last_weight_to_1()
+                    - Let X denote the previous training samples used with state, then the
+                      following must be satisfied:
+                        - x.size() &gt;= X.size()
+                        - for all valid i:
+                            - x(i) == X(i)
+                              (i.e. the samples x and X have in common must be identical.
+                              That is, the only allowed difference between x and X is that
+                              x might have new training samples appended onto its end)
+                        - if (x contains dense vectors) then
+                            - max_index_plus_one(x) == max_index_plus_one(X)
+                        - else
+                            - max_index_plus_one(x) &gt;= max_index_plus_one(X)
+                - x == a matrix or something convertible to a matrix via mat().
+                  Also, x should contain sample_type objects.
+                - y == a matrix or something convertible to a matrix via mat().
+                  Also, y should contain scalar_type objects.
+            ensures
+                - Trains a C support vector classifier given the training samples in x and 
+                  labels in y.  
+                - The point of the state object is to allow you to warm start the SVM
+                  optimizer from the solution to a previous call to train().  Doing this
+                  might make the training run faster.  This is useful when you are trying
+                  different C values or have grown the training set and want to retrain.
+                - #state == the internal state of the optimizer at the solution to the SVM
+                  problem.  Therefore, passing #state to a new call to train() will start
+                  the optimizer from the current solution.
+                - returns a decision function F with the following properties:
+                    - F.alpha.size() == 1
+                    - F.basis_vectors.size() == 1
+                    - F.alpha(0) == 1
+                    - if (new_x is a sample predicted have +1 label) then
+                        - F(new_x) &gt;= 0
+                    - else
+                        - F(new_x) &lt; 0
+        !*/</font>
+    <b>}</b>; 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SVm_C_LINEAR_DCD_TRAINER_ABSTRACT_Hh_
+</font>
+
+</pre></body></html>

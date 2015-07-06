@@ -1,0 +1,169 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - filtering.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>filtering.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>matrix.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>rand.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.filtering</font>"<font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> filter_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='test_filter'></a>test_filter</b> <font face='Lucida Console'>(</font>
+        filter_type kf,
+        <font color='#0000FF'><u>int</u></font> size
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// This test has a point moving in a circle around the origin.  The point
+</font>        <font color='#009900'>// also gets a random bump in a random direction at each time step.
+</font>
+        running_stats<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> rs;
+
+        dlib::rand rnd;
+        <font color='#0000FF'><u>int</u></font> count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>z</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font><font color='#979000'>10</font>,<font color='#979000'>10</font><font face='Lucida Console'>)</font>, temp;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// move the point around in a circle
+</font>            p <font color='#5555FF'>+</font><font color='#5555FF'>=</font> z.<font color='#BB00BB'>cross</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>.<font color='#BB00BB'>normalize</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>0.5</font>;
+            <font color='#009900'>// randomly drop measurements
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0.7</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> count <font color='#5555FF'>&lt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// make a random bump
+</font>                dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> pp;
+                pp.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_gaussian</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>3</font>;
+                pp.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_gaussian</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>3</font>;
+
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+                kf.<font color='#BB00BB'>update</font><font face='Lucida Console'>(</font>p<font color='#5555FF'>+</font>pp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                kf.<font color='#BB00BB'>update</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>MISSED MEASUREMENT</font>";
+            <b>}</b>
+            <font color='#009900'>// figure out the next position
+</font>            temp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p<font color='#5555FF'>+</font>z.<font color='#BB00BB'>cross</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>.<font color='#BB00BB'>normalize</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> error <font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>temp <font color='#5555FF'>-</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>kf.<font color='#BB00BB'>get_predicted_next_state</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            rs.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>error<font face='Lucida Console'>)</font>;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>(</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> error <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>kf.<font color='#BB00BB'>get_predicted_next_state</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// test the serialization a few times.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                ostringstream sout;
+                <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>kf, sout<font face='Lucida Console'>)</font>;
+                istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                filter_type temp;
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>temp, sin<font face='Lucida Console'>)</font>;
+                kf <font color='#5555FF'>=</font> temp;
+            <b>}</b>
+        <b>}</b>
+
+
+        <font color='#0000FF'>return</font> rs.<font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_kalman_filter'></a>test_kalman_filter</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> R;
+        R <font color='#5555FF'>=</font> <font color='#979000'>0.3</font>, <font color='#979000'>0</font>,
+        <font color='#979000'>0</font>,  <font color='#979000'>0.3</font>;
+
+        <font color='#009900'>// the variables in the state are 
+</font>        <font color='#009900'>// x,y, x velocity, y velocity, x acceleration, and y acceleration
+</font>        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>6</font>,<font color='#979000'>6</font><font color='#5555FF'>&gt;</font> A;
+        A <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>,
+        <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>,
+        <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>,
+        <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>,
+        <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>,
+        <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>;
+
+        <font color='#009900'>// the measurements only tell us the positions
+</font>        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>6</font><font color='#5555FF'>&gt;</font> H;
+        H <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>,
+        <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>;
+
+
+        kalman_filter<font color='#5555FF'>&lt;</font><font color='#979000'>6</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> kf; 
+        kf.<font color='#BB00BB'>set_measurement_noise</font><font face='Lucida Console'>(</font>R<font face='Lucida Console'>)</font>;  
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> pn <font color='#5555FF'>=</font> <font color='#979000'>0.01</font><font color='#5555FF'>*</font>identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>6</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        kf.<font color='#BB00BB'>set_process_noise</font><font face='Lucida Console'>(</font>pn<font face='Lucida Console'>)</font>;
+        kf.<font color='#BB00BB'>set_observation_model</font><font face='Lucida Console'>(</font>H<font face='Lucida Console'>)</font>;
+        kf.<font color='#BB00BB'>set_transition_model</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>kf.<font color='#BB00BB'>get_observation_model</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> , H<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>kf.<font color='#BB00BB'>get_transition_model</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> , A<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>kf.<font color='#BB00BB'>get_measurement_noise</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> , R<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>kf.<font color='#BB00BB'>get_process_noise</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> , pn<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>kf.<font color='#BB00BB'>get_current_estimation_error_covariance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> , <font color='#BB00BB'>identity_matrix</font><font face='Lucida Console'>(</font>pn<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>double</u></font> kf_error <font color='#5555FF'>=</font> <font color='#BB00BB'>test_filter</font><font face='Lucida Console'>(</font>kf, <font color='#979000'>300</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>kf error: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> kf_error;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>kf_error <font color='#5555FF'>&lt;</font> <font color='#979000'>0.75</font>, kf_error<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_rls_filter'></a>test_rls_filter</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+
+        rls_filter <font color='#BB00BB'>rls</font><font face='Lucida Console'>(</font><font color='#979000'>10</font>, <font color='#979000'>0.99</font>, <font color='#979000'>0.1</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>rls.<font color='#BB00BB'>get_window_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>rls.<font color='#BB00BB'>get_forget_factor</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0.99</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>rls.<font color='#BB00BB'>get_c</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0.1</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>double</u></font> rls_error <font color='#5555FF'>=</font> <font color='#BB00BB'>test_filter</font><font face='Lucida Console'>(</font>rls, <font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>rls error: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rls_error;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>rls_error <font color='#5555FF'>&lt;</font> <font color='#979000'>0.75</font>, rls_error<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='filtering_tester'></a>filtering_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='filtering_tester'></a>filtering_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_filtering</font>",
+                    "<font color='#CC0000'>Runs tests on the filtering stuff (rls and kalman filters).</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>test_rls_filter</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_kalman_filter</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> a;
+
+<b>}</b>
+
+
+
+</pre></body></html>

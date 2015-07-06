@@ -1,0 +1,371 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - krr_trainer.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_KRR_TRAInER_Hh_
+<font color='#0000FF'>#define</font> DLIB_KRR_TRAInER_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='function.h.html'>function.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel.h.html'>kernel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='empirical_kernel_map.h.html'>empirical_kernel_map.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='linearly_independent_subset_finder.h.html'>linearly_independent_subset_finder.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../statistics.h.html'>../statistics.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='rr_trainer.h.html'>rr_trainer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='krr_trainer_abstract.h.html'>krr_trainer_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='krr_trainer'></a>krr_trainer</b>
+    <b>{</b>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> K kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> trained_function_type;
+
+        <b><a name='krr_trainer'></a>krr_trainer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            verbose<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+            max_basis_size<font face='Lucida Console'>(</font><font color='#979000'>400</font><font face='Lucida Console'>)</font>,
+            ekm_stale<font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_verbose'></a>be_verbose</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            trainer.<font color='#BB00BB'>be_verbose</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_quiet'></a>be_quiet</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            trainer.<font color='#BB00BB'>be_quiet</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='use_regression_loss_for_loo_cv'></a>use_regression_loss_for_loo_cv</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            trainer.<font color='#BB00BB'>use_regression_loss_for_loo_cv</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='use_classification_loss_for_loo_cv'></a>use_classification_loss_for_loo_cv</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            trainer.<font color='#BB00BB'>use_classification_loss_for_loo_cv</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='will_use_regression_loss_for_loo_cv'></a>will_use_regression_loss_for_loo_cv</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> trainer.<font color='#BB00BB'>will_use_regression_loss_for_loo_cv</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> kernel_type <b><a name='get_kernel'></a>get_kernel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> kern;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_kernel'></a>set_kernel</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            kern <font color='#5555FF'>=</font> k;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_basis'></a>set_basis</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> basis_samples
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>basis_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>basis_samples<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\tvoid krr_trainer::set_basis(basis_samples)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You have to give a non-empty set of basis_samples and it must be a vector</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t basis_samples.size():                       </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> basis_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_vector(mat(basis_samples)): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>basis_samples<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            basis <font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>basis_samples<font face='Lucida Console'>)</font>;
+            ekm_stale <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='basis_loaded'></a>basis_loaded</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>basis.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear_basis'></a>clear_basis</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            basis.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            ekm.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            ekm_stale <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_basis_size'></a>get_max_basis_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> max_basis_size;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_basis_size'></a>set_max_basis_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_basis_size_
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>max_basis_size_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t void krr_trainer::set_max_basis_size()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_basis_size_ must be greater than 0</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_basis_size_: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> max_basis_size_ 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this:            </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            max_basis_size <font color='#5555FF'>=</font> max_basis_size_;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_lambda'></a>set_lambda</b> <font face='Lucida Console'>(</font>
+            scalar_type lambda_ 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>lambda_ <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t void krr_trainer::set_lambda()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t lambda must be greater than or equal to 0</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t lambda_: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> lambda_
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            trainer.<font color='#BB00BB'>set_lambda</font><font face='Lucida Console'>(</font>lambda_<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_lambda'></a>get_lambda</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> trainer.<font color='#BB00BB'>get_lambda</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_search_lambdas'></a>set_search_lambdas</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lambdas
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>lambdas<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> lambdas.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>lambdas<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t void krr_trainer::set_search_lambdas()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t lambdas must be a non-empty vector of values</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_vector(lambdas): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>lambdas<font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t lambdas.size():     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> lambdas.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t min(lambdas):       </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>lambdas<font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            trainer.<font color='#BB00BB'>set_search_lambdas</font><font face='Lucida Console'>(</font>lambdas<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_search_lambdas'></a>get_search_lambdas</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> trainer.<font color='#BB00BB'>get_search_lambdas</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            std::vector<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font> temp;
+            scalar_type temp2;
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>do_train</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>y<font face='Lucida Console'>)</font>, <font color='#979000'>false</font>, temp, temp2<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y,
+            std::vector<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> loo_values
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            scalar_type temp;
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>do_train</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>y<font face='Lucida Console'>)</font>, <font color='#979000'>true</font>, loo_values, temp<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y,
+            std::vector<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> loo_values,
+            scalar_type<font color='#5555FF'>&amp;</font> lambda_used 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>do_train</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>y<font face='Lucida Console'>)</font>, <font color='#979000'>true</font>, loo_values, lambda_used<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='do_train'></a>do_train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> output_loo_values,
+            std::vector<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> loo_values,
+            scalar_type<font color='#5555FF'>&amp;</font> the_lambda
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_learning_problem</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\t decision_function krr_trainer::train(x,y)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_vector(x): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_vector(y): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>y<font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t x.size():     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t y.size():     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> y.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>get_lambda</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>will_use_regression_loss_for_loo_cv</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// make sure requires clause is not broken
+</font>                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_binary_classification_problem</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>,
+                    "<font color='#CC0000'>\t decision_function krr_trainer::train(x,y)</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                    <font face='Lucida Console'>)</font>;
+            <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+            <font color='#009900'>// The first thing we do is make sure we have an appropriate ekm ready for use below.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>basis_loaded</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ekm_stale<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    ekm.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>kern, basis<font face='Lucida Console'>)</font>;
+                    ekm_stale <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                linearly_independent_subset_finder<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>lisf</font><font face='Lucida Console'>(</font>kern, max_basis_size<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>fill_lisf</font><font face='Lucida Console'>(</font>lisf, x<font face='Lucida Console'>)</font>;
+                ekm.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>lisf<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>verbose<font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nNumber of basis vectors used: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> ekm.<font color='#BB00BB'>out_vector_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+            <b>}</b>
+
+            <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font> column_matrix_type;
+
+            running_stats<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font> rs;
+
+            <font color='#009900'>// Now we project all the x samples into kernel space using our EKM 
+</font>            matrix<font color='#5555FF'>&lt;</font>column_matrix_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type <font color='#5555FF'>&gt;</font> proj_x;
+            proj_x.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> proj_x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                scalar_type err;
+                <font color='#009900'>// Note that we also append a 1 to the end of the vectors because this is
+</font>                <font color='#009900'>// a convenient way of dealing with the bias term later on.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>verbose <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>proj_x</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> ekm.<font color='#BB00BB'>project</font><font face='Lucida Console'>(</font><font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#BB00BB'>proj_x</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> ekm.<font color='#BB00BB'>project</font><font face='Lucida Console'>(</font><font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>,err<font face='Lucida Console'>)</font>;
+                    rs.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>err<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>verbose<font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Mean EKM projection error:                  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rs.<font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+                std::cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Standard deviation of EKM projection error: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rs.<font color='#BB00BB'>stddev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+            <b>}</b>
+
+
+            decision_function<font color='#5555FF'>&lt;</font>linear_kernel<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> lin_df;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>output_loo_values<font face='Lucida Console'>)</font>
+                lin_df <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>proj_x,y, loo_values, the_lambda<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                lin_df <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>proj_x,y<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// convert the linear decision function into a kernelized one.
+</font>            decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> df;
+            df <font color='#5555FF'>=</font> ekm.<font color='#BB00BB'>convert_to_decision_function</font><font face='Lucida Console'>(</font>lin_df.<font color='#BB00BB'>basis_vectors</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            df.b <font color='#5555FF'>=</font> lin_df.b; 
+
+            <font color='#009900'>// If we used an automatically derived basis then there isn't any point in
+</font>            <font color='#009900'>// keeping the ekm around.  So free its memory.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>basis_loaded</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                ekm.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> df;
+        <b>}</b>
+
+
+        <font color='#009900'>/*!
+            CONVENTION
+                - if (ekm_stale) then
+                    - kern or basis have changed since the last time
+                      they were loaded into the ekm
+
+                - get_lambda() == trainer.get_lambda()
+                - get_kernel() == kern
+                - get_max_basis_size() == max_basis_size
+                - will_use_regression_loss_for_loo_cv() == trainer.will_use_regression_loss_for_loo_cv() 
+                - get_search_lambdas() == trainer.get_search_lambdas() 
+
+                - basis_loaded() == (basis.size() != 0)
+        !*/</font>
+
+        rr_trainer<font color='#5555FF'>&lt;</font>linear_kernel<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> trainer;
+
+        <font color='#0000FF'><u>bool</u></font> verbose;
+
+
+        kernel_type kern;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_basis_size;
+
+        matrix<font color='#5555FF'>&lt;</font>sample_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font> basis;
+        <font color='#0000FF'>mutable</font> empirical_kernel_map<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> ekm;
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>bool</u></font> ekm_stale; 
+
+    <b>}</b>; 
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_KRR_TRAInER_Hh_
+</font>
+
+
+</pre></body></html>

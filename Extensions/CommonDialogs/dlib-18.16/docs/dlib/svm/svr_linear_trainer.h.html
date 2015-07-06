@@ -1,0 +1,427 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - svr_linear_trainer.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SVR_LINEAR_TrAINER_Hh_
+<font color='#0000FF'>#define</font> DLIB_SVR_LINEAR_TrAINER_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svr_linear_trainer_abstract.h.html'>svr_linear_trainer_abstract.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../optimization.h.html'>../optimization.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='function.h.html'>function.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel.h.html'>kernel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sparse_vector.h.html'>sparse_vector.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> matrix_type, 
+        <font color='#0000FF'>typename</font> sample_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='oca_problem_linear_svr'></a>oca_problem_linear_svr</b> : <font color='#0000FF'>public</font> oca_problem<font color='#5555FF'>&lt;</font>matrix_type <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#009900'>/*
+            This class is used as part of the implementation of the svr_linear_trainer 
+            defined towards the end of this file.
+        */</font>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_type::type scalar_type;
+
+        <b><a name='oca_problem_linear_svr'></a>oca_problem_linear_svr</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scalar_type C_,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples_,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> targets_,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> be_verbose_,
+            <font color='#0000FF'>const</font> scalar_type eps_,
+            <font color='#0000FF'>const</font> scalar_type eps_insensitivity_,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+        <font face='Lucida Console'>)</font> :
+            samples<font face='Lucida Console'>(</font>samples_<font face='Lucida Console'>)</font>,
+            targets<font face='Lucida Console'>(</font>targets_<font face='Lucida Console'>)</font>,
+            C<font face='Lucida Console'>(</font>C_<font face='Lucida Console'>)</font>,
+            be_verbose<font face='Lucida Console'>(</font>be_verbose_<font face='Lucida Console'>)</font>,
+            eps<font face='Lucida Console'>(</font>eps_<font face='Lucida Console'>)</font>,
+            eps_insensitivity<font face='Lucida Console'>(</font>eps_insensitivity_<font face='Lucida Console'>)</font>,
+            max_iterations<font face='Lucida Console'>(</font>max_iter<font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> scalar_type <b><a name='get_c'></a>get_c</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            <font color='#0000FF'>return</font> C;
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_dimensions'></a>get_num_dimensions</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            <font color='#009900'>// plus one for the bias term
+</font>            <font color='#0000FF'>return</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='optimization_status'></a>optimization_status</b> <font face='Lucida Console'>(</font>
+            scalar_type current_objective_value,
+            scalar_type current_error_gap,
+            scalar_type current_risk_value,
+            scalar_type current_risk_gap,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_cutting_planes,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_iterations
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            current_risk_value <font color='#5555FF'>/</font><font color='#5555FF'>=</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            current_risk_gap <font color='#5555FF'>/</font><font color='#5555FF'>=</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>be_verbose<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>objective:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> current_objective_value <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>objective gap: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> current_error_gap <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>risk:          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> current_risk_value <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>risk gap:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> current_risk_gap <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>num planes:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_cutting_planes <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>iter:          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_iterations <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_iterations <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> max_iterations<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>current_risk_gap <font color='#5555FF'>&lt;</font> eps<font color='#5555FF'>*</font>eps_insensitivity<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='risk_has_lower_bound'></a>risk_has_lower_bound</b> <font face='Lucida Console'>(</font>
+            scalar_type<font color='#5555FF'>&amp;</font> lower_bound
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            lower_bound <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>; 
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='get_risk'></a>get_risk</b> <font face='Lucida Console'>(</font>
+            matrix_type<font color='#5555FF'>&amp;</font> w,
+            scalar_type<font color='#5555FF'>&amp;</font> risk,
+            matrix_type<font color='#5555FF'>&amp;</font> subgradient
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            subgradient.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>w.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            subgradient <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            risk <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#009900'>// loop over all the samples and compute the risk and its subgradient at the current solution point w
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> w_size_m1 <font color='#5555FF'>=</font> w.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                <font color='#0000FF'>const</font> scalar_type prediction <font color='#5555FF'>=</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>w,<font color='#979000'>0</font>,w_size_m1<font face='Lucida Console'>)</font>, samples[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font>w_size_m1<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>prediction <font color='#5555FF'>-</font> targets[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> eps_insensitivity<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>prediction <font color='#5555FF'>&lt;</font> targets[i]<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>subtract_from</font><font face='Lucida Console'>(</font>subgradient, samples[i]<font face='Lucida Console'>)</font>; 
+                        <font color='#BB00BB'>subgradient</font><font face='Lucida Console'>(</font>w_size_m1<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>add_to</font><font face='Lucida Console'>(</font>subgradient, samples[i]<font face='Lucida Console'>)</font>; 
+                        <font color='#BB00BB'>subgradient</font><font face='Lucida Console'>(</font>w_size_m1<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                    <b>}</b>
+
+                    risk <font color='#5555FF'>+</font><font color='#5555FF'>=</font> std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>prediction <font color='#5555FF'>-</font> targets[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> eps_insensitivity;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+    <font color='#009900'>// -----------------------------------------------------
+</font>    <font color='#009900'>// -----------------------------------------------------
+</font>
+
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples;
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> targets;
+        <font color='#0000FF'>const</font> scalar_type C;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> be_verbose;
+        <font color='#0000FF'>const</font> scalar_type eps;
+        <font color='#0000FF'>const</font> scalar_type eps_insensitivity;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iterations;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> matrix_type, 
+        <font color='#0000FF'>typename</font> sample_type,
+        <font color='#0000FF'>typename</font> scalar_type
+        <font color='#5555FF'>&gt;</font>
+    oca_problem_linear_svr<font color='#5555FF'>&lt;</font>matrix_type, sample_type<font color='#5555FF'>&gt;</font> <b><a name='make_oca_problem_linear_svr'></a>make_oca_problem_linear_svr</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> scalar_type C,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> targets,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> be_verbose,
+        <font color='#0000FF'>const</font> scalar_type eps,
+        <font color='#0000FF'>const</font> scalar_type eps_insensitivity,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iterations
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> oca_problem_linear_svr<font color='#5555FF'>&lt;</font>matrix_type, sample_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>
+            C, samples, targets, be_verbose, eps, eps_insensitivity, max_iterations<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='svr_linear_trainer'></a>svr_linear_trainer</b>
+    <b>{</b>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> K kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> trained_function_type;
+
+        <font color='#009900'>// You are getting a compiler error on this line because you supplied a non-linear kernel
+</font>        <font color='#009900'>// to the svr_linear_trainer object.  You have to use one of the linear kernels with this
+</font>        <font color='#009900'>// trainer.
+</font>        <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>K, linear_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                             is_same_type<font color='#5555FF'>&lt;</font>K, sparse_linear_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::value <font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <b><a name='svr_linear_trainer'></a>svr_linear_trainer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            C <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            eps <font color='#5555FF'>=</font> <font color='#979000'>0.01</font>;
+            max_iterations <font color='#5555FF'>=</font> <font color='#979000'>10000</font>;
+            learn_nonnegative_weights <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            last_weight_1 <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            eps_insensitivity <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>explicit</font> <b><a name='svr_linear_trainer'></a>svr_linear_trainer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scalar_type<font color='#5555FF'>&amp;</font> C_ 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>C_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t svr_linear_trainer::svr_linear_trainer()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t C_ must be greater than 0</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t C_:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C_ 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            C <font color='#5555FF'>=</font> C_;
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            eps <font color='#5555FF'>=</font> <font color='#979000'>0.01</font>;
+            max_iterations <font color='#5555FF'>=</font> <font color='#979000'>10000</font>;
+            learn_nonnegative_weights <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            last_weight_1 <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            eps_insensitivity <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_epsilon'></a>set_epsilon</b> <font face='Lucida Console'>(</font>
+            scalar_type eps_
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>eps_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t void svr_linear_trainer::set_epsilon()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps_ must be greater than 0</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps_: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> eps_ 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            eps <font color='#5555FF'>=</font> eps_;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_epsilon'></a>get_epsilon</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> eps; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_epsilon_insensitivity'></a>set_epsilon_insensitivity</b> <font face='Lucida Console'>(</font>
+            scalar_type eps_
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>eps_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\tvoid svr_linear_trainer::set_epsilon_insensitivity(eps_)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps_: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> eps_ 
+                <font face='Lucida Console'>)</font>;
+            eps_insensitivity <font color='#5555FF'>=</font> eps_;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_epsilon_insensitivity'></a>get_epsilon_insensitivity</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#0000FF'>return</font> eps_insensitivity;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_iterations'></a>get_max_iterations</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> max_iterations; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_iterations'></a>set_max_iterations</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            max_iterations <font color='#5555FF'>=</font> max_iter;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_verbose'></a>be_verbose</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_quiet'></a>be_quiet</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='forces_last_weight_to_1'></a>forces_last_weight_to_1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> last_weight_1;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='force_last_weight_to_1'></a>force_last_weight_to_1</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>bool</u></font> should_last_weight_be_1
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            last_weight_1 <font color='#5555FF'>=</font> should_last_weight_be_1;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_oca'></a>set_oca</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> oca<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            solver <font color='#5555FF'>=</font> item;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> oca <b><a name='get_oca'></a>get_oca</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> solver;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> kernel_type <b><a name='get_kernel'></a>get_kernel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>kernel_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='learns_nonnegative_weights'></a>learns_nonnegative_weights</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> learn_nonnegative_weights; <b>}</b>
+       
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_learns_nonnegative_weights'></a>set_learns_nonnegative_weights</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>bool</u></font> value
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            learn_nonnegative_weights <font color='#5555FF'>=</font> value;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_c'></a>set_c</b> <font face='Lucida Console'>(</font>
+            scalar_type C_ 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>C_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t void svr_linear_trainer::set_c()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t C_ must be greater than 0</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t C_:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C_ 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            C <font color='#5555FF'>=</font> C_;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_c'></a>get_c</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> C;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> targets
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_learning_problem</font><font face='Lucida Console'>(</font>samples, targets<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+                "<font color='#CC0000'>\t decision_function svr_linear_trainer::train(samples, targets)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t samples.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t targets.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> targets.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_learning_problem(samples,targets): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_learning_problem</font><font face='Lucida Console'>(</font>samples,targets<font face='Lucida Console'>)</font>
+                <font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> w_type;
+            w_type w;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_dims <font color='#5555FF'>=</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_nonnegative <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>learn_nonnegative_weights<font face='Lucida Console'>)</font>
+            <b>{</b>
+                num_nonnegative <font color='#5555FF'>=</font> num_dims;
+            <b>}</b>
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> force_weight_1_idx <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>last_weight_1<font face='Lucida Console'>)</font>
+            <b>{</b>
+                force_weight_1_idx <font color='#5555FF'>=</font> num_dims<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            <b>}</b>
+
+            <font color='#BB00BB'>solver</font><font face='Lucida Console'>(</font> make_oca_problem_linear_svr<font color='#5555FF'>&lt;</font>w_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>C, samples, targets, verbose, eps, eps_insensitivity, max_iterations<font face='Lucida Console'>)</font>, 
+                    w, 
+                    num_nonnegative,
+                    force_weight_1_idx<font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// put the solution into a decision function and then return it
+</font>            decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> df;
+            df.b <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>w</font><font face='Lucida Console'>(</font>w.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            df.basis_vectors.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// Copy the plane normal into the output basis vector.  The output vector might be a
+</font>            <font color='#009900'>// sparse vector container so we need to use this special kind of copy to handle that case.
+</font>            <font color='#009900'>// As an aside, the reason for using max_index_plus_one() and not just w.size()-1 is because
+</font>            <font color='#009900'>// doing it this way avoids an inane warning from gcc that can occur in some cases.
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> out_size <font color='#5555FF'>=</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>df.<font color='#BB00BB'>basis_vectors</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, matrix_cast<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>w, <font color='#979000'>0</font>, out_size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            df.alpha.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            df.<font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            <font color='#0000FF'>return</font> df;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        scalar_type C;
+        oca solver;
+        scalar_type eps;
+        <font color='#0000FF'><u>bool</u></font> verbose;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iterations;
+        <font color='#0000FF'><u>bool</u></font> learn_nonnegative_weights;
+        <font color='#0000FF'><u>bool</u></font> last_weight_1;
+        scalar_type eps_insensitivity;
+    <b>}</b>; 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SVR_LINEAR_TrAINER_Hh_
+</font>
+
+</pre></body></html>

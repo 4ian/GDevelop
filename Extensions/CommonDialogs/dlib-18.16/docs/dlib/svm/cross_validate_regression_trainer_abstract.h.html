@@ -1,0 +1,81 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - cross_validate_regression_trainer_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_CROSS_VALIDATE_REGRESSION_TRaINER_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_CROSS_VALIDATE_REGRESSION_TRaINER_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> reg_funct_type,
+        <font color='#0000FF'>typename</font> sample_type,
+        <font color='#0000FF'>typename</font> label_type
+        <font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font>
+    <b><a name='test_regression_function'></a>test_regression_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> reg_funct_type<font color='#5555FF'>&amp;</font> reg_funct,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x_test,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> y_test
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is_learning_problem(x_test, y_test)
+            - reg_funct_type == some kind of regression function object 
+              (e.g. a decision_function created by the svr_trainer )
+        ensures
+            - Tests reg_funct against the given samples in x_test and target values in 
+              y_test and returns a matrix M summarizing the results.  Specifically:
+                - M(0) == the mean squared error.  
+                  The MSE is given by: sum over i: pow(reg_funct(x_test[i]) - y_test[i], 2.0)
+                - M(1) == the R-squared value (i.e. the squared correlation between
+                  reg_funct(x_test[i]) and y_test[i]).  This is a number between 0
+                  and 1.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type,
+        <font color='#0000FF'>typename</font> sample_type,
+        <font color='#0000FF'>typename</font> label_type 
+        <font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font>
+    <b><a name='cross_validate_regression_trainer'></a>cross_validate_regression_trainer</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> y,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> folds
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is_learning_problem(x,y)
+            - 1 &lt; folds &lt;= x.size()
+            - trainer_type == some kind of regression trainer object (e.g. svr_trainer)
+        ensures
+            - Performs k-fold cross validation by using the given trainer to solve a 
+              regression problem for the given number of folds.  Each fold is tested using 
+              the output of the trainer.  A matrix M summarizing the results is returned.  
+              Specifically:
+                - M(0) == the mean squared error.  
+                  The MSE is given by: sum over i: pow(reg_funct(x[i]) - y[i], 2.0)
+                - M(1) == the R-squared value (i.e. the squared correlation between
+                  a predicted y value and its true value).  This is a number between 
+                  0 and 1.
+    !*/</font>
+
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CROSS_VALIDATE_REGRESSION_TRaINER_ABSTRACT_Hh_
+</font>
+
+
+
+</pre></body></html>

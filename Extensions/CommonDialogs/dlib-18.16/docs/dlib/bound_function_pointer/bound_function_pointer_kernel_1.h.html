@@ -1,0 +1,777 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bound_function_pointer_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_BOUND_FUNCTION_POINTER_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_BOUND_FUNCTION_POINTER_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../member_function_pointer.h.html'>../member_function_pointer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='bound_function_pointer_kernel_abstract.h.html'>bound_function_pointer_kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> bfp1_helpers
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='strip'></a>strip</b> <b>{</b> <font color='#0000FF'>typedef</font> T type; <b>}</b>;
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='strip'></a>strip</b><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>typedef</font> T type; <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>class</font> <b><a name='bound_function_helper_base_base'></a>bound_function_helper_base_base</b>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>virtual</font> ~<b><a name='bound_function_helper_base_base'></a>bound_function_helper_base_base</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b><b>}</b>
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='is_set'></a>is_set</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='clone'></a>clone</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> ptr<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> T4<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='bound_function_helper_base'></a>bound_function_helper_base</b> : <font color='#0000FF'>public</font> bound_function_helper_base_base
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='bound_function_helper_base'></a>bound_function_helper_base</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>:arg1<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, arg2<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, arg3<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, arg4<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            <font color='#0000FF'>typename</font> strip<font color='#5555FF'>&lt;</font>T1<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>*</font> arg1;
+            <font color='#0000FF'>typename</font> strip<font color='#5555FF'>&lt;</font>T2<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>*</font> arg2;
+            <font color='#0000FF'>typename</font> strip<font color='#5555FF'>&lt;</font>T3<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>*</font> arg3;
+            <font color='#0000FF'>typename</font> strip<font color='#5555FF'>&lt;</font>T4<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>*</font> arg4;
+
+
+            member_function_pointer<font color='#5555FF'>&lt;</font>T1,T2,T3,T4<font color='#5555FF'>&gt;</font> mfp;
+        <b>}</b>;
+
+    <font color='#009900'>// ----------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> T1 <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font>, <font color='#0000FF'>typename</font> T2 <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font>, <font color='#0000FF'>typename</font> T3 <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font>, <font color='#0000FF'>typename</font> T4 <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='bound_function_helper'></a>bound_function_helper</b> : <font color='#0000FF'>public</font> bound_function_helper_base<font color='#5555FF'>&lt;</font>T1,T2,T3,T4<font color='#5555FF'>&gt;</font>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>fp<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg1, <font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg2, <font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg3, <font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg4<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>typename</font> strip<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>*</font> fp;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> T4<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='bound_function_helper'></a>bound_function_helper</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,T1,T2,T3,T4<font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> bound_function_helper_base<font color='#5555FF'>&lt;</font>T1,T2,T3,T4<font color='#5555FF'>&gt;</font>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mfp<font face='Lucida Console'>)</font>    <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>mfp</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg1, <font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg2, <font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg3, <font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg4<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>fp<font face='Lucida Console'>)</font> <font color='#BB00BB'>fp</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg1, <font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg2, <font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg3, <font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg4<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>fp<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1, T2, T3, T4<font face='Lucida Console'>)</font>;
+        <b>}</b>;
+
+    <font color='#009900'>// ----------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='bound_function_helper'></a>bound_function_helper</b><font color='#5555FF'>&lt;</font>F,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> bound_function_helper_base<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>fp<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>typename</font> strip<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>*</font> fp;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='bound_function_helper'></a>bound_function_helper</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> bound_function_helper_base<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mfp<font face='Lucida Console'>)</font>    <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>mfp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>fp<font face='Lucida Console'>)</font> <font color='#BB00BB'>fp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>fp<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>;
+
+    <font color='#009900'>// ----------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> T1<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='bound_function_helper'></a>bound_function_helper</b><font color='#5555FF'>&lt;</font>F,T1,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> bound_function_helper_base<font color='#5555FF'>&lt;</font>T1,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>fp<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg1<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>typename</font> strip<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>*</font> fp;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='bound_function_helper'></a>bound_function_helper</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,T1,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> bound_function_helper_base<font color='#5555FF'>&lt;</font>T1,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mfp<font face='Lucida Console'>)</font>    <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>mfp</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg1<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>fp<font face='Lucida Console'>)</font> <font color='#BB00BB'>fp</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg1<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>fp<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1<font face='Lucida Console'>)</font>;
+        <b>}</b>;
+
+    <font color='#009900'>// ----------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='bound_function_helper'></a>bound_function_helper</b><font color='#5555FF'>&lt;</font>F,T1,T2,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> bound_function_helper_base<font color='#5555FF'>&lt;</font>T1,T2,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>fp<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg1, <font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg2<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>typename</font> strip<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>*</font> fp;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='bound_function_helper'></a>bound_function_helper</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,T1,T2,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> bound_function_helper_base<font color='#5555FF'>&lt;</font>T1,T2,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mfp<font face='Lucida Console'>)</font>    <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>mfp</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg1, <font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg2<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>fp<font face='Lucida Console'>)</font> <font color='#BB00BB'>fp</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg1, <font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg2<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>fp<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1, T2<font face='Lucida Console'>)</font>;
+        <b>}</b>;
+
+    <font color='#009900'>// ----------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> T3<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='bound_function_helper'></a>bound_function_helper</b><font color='#5555FF'>&lt;</font>F,T1,T2,T3,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> bound_function_helper_base<font color='#5555FF'>&lt;</font>T1,T2,T3,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>fp<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg1, <font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg2, <font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg3<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>typename</font> strip<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>*</font> fp;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> T3<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='bound_function_helper'></a>bound_function_helper</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,T1,T2,T3,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> bound_function_helper_base<font color='#5555FF'>&lt;</font>T1,T2,T3,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mfp<font face='Lucida Console'>)</font>    <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>mfp</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg1, <font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg2, <font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg3<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>fp<font face='Lucida Console'>)</font> <font color='#BB00BB'>fp</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg1, <font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg2, <font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg3<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>fp<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1, T2, T3<font face='Lucida Console'>)</font>;
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='bound_function_helper_T'></a>bound_function_helper_T</b> : <font color='#0000FF'>public</font> T
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='bound_function_helper_T'></a>bound_function_helper_T</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;<b>}</b>
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='is_set'></a>is_set</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fp <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mfp.<font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> mem_size<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'><u>void</u></font> <b><a name='safe_clone'></a>safe_clone</b><font face='Lucida Console'>(</font>stack_based_memory_block<font color='#5555FF'>&lt;</font>mem_size<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> buf<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// This is here just to validate the assumption that our block of memory we have made
+</font>                <font color='#009900'>// in bf_memory is the right size to store the data for this object.  If you
+</font>                <font color='#009900'>// get a compiler error on this line then email me :)
+</font>                <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>bound_function_helper_T<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> mem_size<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>clone</font><font face='Lucida Console'>(</font>buf.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='clone'></a>clone</b>   <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> ptr<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>  
+            <b>{</b> 
+                bound_function_helper_T<font color='#5555FF'>*</font> p <font color='#5555FF'>=</font> <font color='#0000FF'>new</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font> <font color='#BB00BB'>bound_function_helper_T</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+                p<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg1 <font color='#5555FF'>=</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg1;
+                p<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg2 <font color='#5555FF'>=</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg2;
+                p<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg3 <font color='#5555FF'>=</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg3;
+                p<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg4 <font color='#5555FF'>=</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arg4;
+                p<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fp <font color='#5555FF'>=</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fp;
+                p<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mfp <font color='#5555FF'>=</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mfp;
+            <b>}</b>
+        <b>}</b>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='bound_function_pointer'></a>bound_function_pointer</b>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> bfp1_helpers::bound_function_helper_T<font color='#5555FF'>&lt;</font>bfp1_helpers::bound_function_helper<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_null_type;
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#009900'>// These typedefs are here for backwards compatibility with previous versions of
+</font>        <font color='#009900'>// dlib.
+</font>        <font color='#0000FF'>typedef</font> bound_function_pointer kernel_1a;
+        <font color='#0000FF'>typedef</font> bound_function_pointer kernel_1a_c;
+
+
+        <b><a name='bound_function_pointer'></a>bound_function_pointer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>bf_null_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <b><a name='bound_function_pointer'></a>bound_function_pointer</b> <font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> bound_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <b>{</b> item.<font color='#BB00BB'>bf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>clone</font><font face='Lucida Console'>(</font>bf_memory.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        ~<b><a name='bound_function_pointer'></a>bound_function_pointer</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        bound_function_pointer<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bound_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>bound_function_pointer</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>; <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>bound_function_pointer</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_set'></a>is_set</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>bf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            bound_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make a temp copy of item
+</font>            bound_function_pointer <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// destory the stuff in item
+</font>            item.<font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// copy *this into item
+</font>            <font color='#BB00BB'>bf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>clone</font><font face='Lucida Console'>(</font>item.bf_memory.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// destory the stuff in this 
+</font>            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// copy temp into *this
+</font>            temp.<font color='#BB00BB'>bf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>clone</font><font face='Lucida Console'>(</font>bf_memory.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> ,
+                "<font color='#CC0000'>\tvoid bound_function_pointer::operator()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou must call set() before you can use this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>bf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>call</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'>struct</font> <b><a name='dummy'></a>dummy</b><b>{</b> <font color='#0000FF'><u>void</u></font> <b><a name='nonnull'></a>nonnull</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b><b>}</b>;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>dummy::<font color='#5555FF'>*</font>safe_bool<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>public</font>:
+        <b><a name='operator'></a>operator</b> <b><a name='safe_bool'></a>safe_bool</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> ? <font color='#5555FF'>&amp;</font>dummy::nonnull : <font color='#979000'>0</font>; <b>}</b>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>!</font><font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#009900'>// -------------------------------------------
+</font>    <font color='#009900'>//      set function object overloads
+</font>    <font color='#009900'>// -------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> function_object
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_function<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_pointer_type<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bfp1_helpers;
+            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> bound_function_helper_T<font color='#5555FF'>&lt;</font>bound_function_helper<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_helper_type;
+
+            bf_helper_type temp;
+            temp.fp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>function_object;
+
+            temp.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> A1 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> function_object,
+            A1<font color='#5555FF'>&amp;</font> arg1
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_function<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_pointer_type<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bfp1_helpers;
+            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> bound_function_helper_T<font color='#5555FF'>&lt;</font>bound_function_helper<font color='#5555FF'>&lt;</font>F,A1<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_helper_type;
+
+            bf_helper_type temp;
+            temp.arg1 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg1;
+            temp.fp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>function_object;
+
+            temp.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> function_object,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_function<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_pointer_type<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bfp1_helpers;
+            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> bound_function_helper_T<font color='#5555FF'>&lt;</font>bound_function_helper<font color='#5555FF'>&lt;</font>F,A1,A2<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_helper_type;
+
+            bf_helper_type temp;
+            temp.arg1 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg1;
+            temp.arg2 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg2;
+            temp.fp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>function_object;
+
+            temp.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> function_object,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2,
+            A3<font color='#5555FF'>&amp;</font> arg3
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_function<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_pointer_type<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bfp1_helpers;
+            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> bound_function_helper_T<font color='#5555FF'>&lt;</font>bound_function_helper<font color='#5555FF'>&lt;</font>F,A1,A2,A3<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_helper_type;
+
+            bf_helper_type temp;
+            temp.arg1 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg1;
+            temp.arg2 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg2;
+            temp.arg3 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg3;
+            temp.fp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>function_object;
+
+            temp.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3, <font color='#0000FF'>typename</font> A4<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> function_object,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2,
+            A3<font color='#5555FF'>&amp;</font> arg3,
+            A4<font color='#5555FF'>&amp;</font> arg4
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_function<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_pointer_type<font color='#5555FF'>&lt;</font>F<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bfp1_helpers;
+            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> bound_function_helper_T<font color='#5555FF'>&lt;</font>bound_function_helper<font color='#5555FF'>&lt;</font>F,A1,A2,A3,A4<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_helper_type;
+
+            bf_helper_type temp;
+            temp.arg1 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg1;
+            temp.arg2 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg2;
+            temp.arg3 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg3;
+            temp.arg4 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg4;
+            temp.fp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>function_object;
+
+            temp.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// -------------------------------------------
+</font>    <font color='#009900'>//      set mfp overloads
+</font>    <font color='#009900'>// -------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bfp1_helpers;
+            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> bound_function_helper_T<font color='#5555FF'>&lt;</font>bound_function_helper<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_helper_type;
+
+            bf_helper_type temp;
+            temp.mfp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object,funct<font face='Lucida Console'>)</font>;
+
+            temp.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#0000FF'>const</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bfp1_helpers;
+            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> bound_function_helper_T<font color='#5555FF'>&lt;</font>bound_function_helper<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_helper_type;
+
+            bf_helper_type temp;
+            temp.mfp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object,funct<font face='Lucida Console'>)</font>;
+
+            temp.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// -------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1<font face='Lucida Console'>)</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bfp1_helpers;
+            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> bound_function_helper_T<font color='#5555FF'>&lt;</font>bound_function_helper<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,T1<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_helper_type;
+
+            bf_helper_type temp;
+            temp.arg1 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg1;
+            temp.mfp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object,funct<font face='Lucida Console'>)</font>;
+
+            temp.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1<font face='Lucida Console'>)</font><font color='#0000FF'>const</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bfp1_helpers;
+            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> bound_function_helper_T<font color='#5555FF'>&lt;</font>bound_function_helper<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,T1<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_helper_type;
+
+            bf_helper_type temp;
+            temp.arg1 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg1;
+            temp.mfp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object,funct<font face='Lucida Console'>)</font>;
+
+            temp.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ----------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+        <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1, T2<font face='Lucida Console'>)</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bfp1_helpers;
+            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> bound_function_helper_T<font color='#5555FF'>&lt;</font>bound_function_helper<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,T1,T2<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_helper_type;
+
+            bf_helper_type temp;
+            temp.arg1 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg1;
+            temp.arg2 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg2;
+            temp.mfp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object,funct<font face='Lucida Console'>)</font>;
+
+            temp.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+        <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1, T2<font face='Lucida Console'>)</font><font color='#0000FF'>const</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bfp1_helpers;
+            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> bound_function_helper_T<font color='#5555FF'>&lt;</font>bound_function_helper<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,T1,T2<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_helper_type;
+
+            bf_helper_type temp;
+            temp.arg1 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg1;
+            temp.arg2 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg2;
+            temp.mfp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object,funct<font face='Lucida Console'>)</font>;
+
+            temp.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ----------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+        <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+        <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1, T2, T3<font face='Lucida Console'>)</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2,
+            A3<font color='#5555FF'>&amp;</font> arg3
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bfp1_helpers;
+            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> bound_function_helper_T<font color='#5555FF'>&lt;</font>bound_function_helper<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,T1,T2,T3<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_helper_type;
+
+            bf_helper_type temp;
+            temp.arg1 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg1;
+            temp.arg2 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg2;
+            temp.arg3 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg3;
+            temp.mfp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object,funct<font face='Lucida Console'>)</font>;
+
+            temp.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+        <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+        <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1, T2, T3<font face='Lucida Console'>)</font><font color='#0000FF'>const</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2,
+            A3<font color='#5555FF'>&amp;</font> arg3
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bfp1_helpers;
+            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> bound_function_helper_T<font color='#5555FF'>&lt;</font>bound_function_helper<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,T1,T2,T3<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_helper_type;
+
+            bf_helper_type temp;
+            temp.arg1 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg1;
+            temp.arg2 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg2;
+            temp.arg3 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg3;
+            temp.mfp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object,funct<font face='Lucida Console'>)</font>;
+
+            temp.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ----------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+        <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+        <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3,
+        <font color='#0000FF'>typename</font> T4, <font color='#0000FF'>typename</font> A4<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1, T2, T3, T4<font face='Lucida Console'>)</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2,
+            A3<font color='#5555FF'>&amp;</font> arg3,
+            A4<font color='#5555FF'>&amp;</font> arg4
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bfp1_helpers;
+            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> bound_function_helper_T<font color='#5555FF'>&lt;</font>bound_function_helper<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,T1,T2,T3,T4<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_helper_type;
+
+            bf_helper_type temp;
+            temp.arg1 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg1;
+            temp.arg2 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg2;
+            temp.arg3 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg3;
+            temp.arg4 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg4;
+            temp.mfp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object,funct<font face='Lucida Console'>)</font>;
+
+            temp.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+        <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+        <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3,
+        <font color='#0000FF'>typename</font> T4, <font color='#0000FF'>typename</font> A4<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1, T2, T3, T4<font face='Lucida Console'>)</font><font color='#0000FF'>const</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2,
+            A3<font color='#5555FF'>&amp;</font> arg3,
+            A4<font color='#5555FF'>&amp;</font> arg4
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bfp1_helpers;
+            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> bound_function_helper_T<font color='#5555FF'>&lt;</font>bound_function_helper<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,T1,T2,T3,T4<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_helper_type;
+
+            bf_helper_type temp;
+            temp.arg1 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg1;
+            temp.arg2 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg2;
+            temp.arg3 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg3;
+            temp.arg4 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg4;
+            temp.mfp.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object,funct<font face='Lucida Console'>)</font>;
+
+            temp.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// -------------------------------------------
+</font>    <font color='#009900'>//      set fp overloads
+</font>    <font color='#009900'>// -------------------------------------------
+</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bfp1_helpers;
+            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> bound_function_helper_T<font color='#5555FF'>&lt;</font>bound_function_helper<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_helper_type;
+
+            bf_helper_type temp;
+            temp.fp <font color='#5555FF'>=</font> funct;
+
+            temp.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1<font face='Lucida Console'>)</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bfp1_helpers;
+            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> bound_function_helper_T<font color='#5555FF'>&lt;</font>bound_function_helper<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,T1<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_helper_type;
+
+            bf_helper_type temp;
+            temp.arg1 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg1;
+            temp.fp <font color='#5555FF'>=</font> funct;
+
+            temp.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+        <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1, T2<font face='Lucida Console'>)</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bfp1_helpers;
+            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> bound_function_helper_T<font color='#5555FF'>&lt;</font>bound_function_helper<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,T1,T2<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_helper_type;
+
+            bf_helper_type temp;
+            temp.arg1 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg1;
+            temp.arg2 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg2;
+            temp.fp <font color='#5555FF'>=</font> funct;
+
+            temp.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+        <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+        <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1, T2, T3<font face='Lucida Console'>)</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2,
+            A3<font color='#5555FF'>&amp;</font> arg3
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bfp1_helpers;
+            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> bound_function_helper_T<font color='#5555FF'>&lt;</font>bound_function_helper<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,T1,T2,T3<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_helper_type;
+
+            bf_helper_type temp;
+            temp.arg1 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg1;
+            temp.arg2 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg2;
+            temp.arg3 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg3;
+            temp.fp <font color='#5555FF'>=</font> funct;
+
+            temp.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+        <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+        <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3,
+        <font color='#0000FF'>typename</font> T4, <font color='#0000FF'>typename</font> A4<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1, T2, T3, T4<font face='Lucida Console'>)</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2,
+            A3<font color='#5555FF'>&amp;</font> arg3,
+            A4<font color='#5555FF'>&amp;</font> arg4
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bfp1_helpers;
+            <font color='#BB00BB'>destroy_bf_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> bound_function_helper_T<font color='#5555FF'>&lt;</font>bound_function_helper<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,T1,T2,T3,T4<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bf_helper_type;
+
+            bf_helper_type temp;
+            temp.arg1 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg1;
+            temp.arg2 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg2;
+            temp.arg3 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg3;
+            temp.arg4 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>arg4;
+            temp.fp <font color='#5555FF'>=</font> funct;
+
+            temp.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>bf_memory<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// -------------------------------------------
+</font>
+    <font color='#0000FF'>private</font>:
+
+        stack_based_memory_block<font color='#5555FF'>&lt;</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>bf_null_type<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> bf_memory;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='destroy_bf_memory'></a>destroy_bf_memory</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// Honestly, this probably doesn't even do anything but I'm putting
+</font>            <font color='#009900'>// it here just for good measure.
+</font>            <font color='#BB00BB'>bf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>~<font color='#BB00BB'>bound_function_helper_base_base</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        bfp1_helpers::bound_function_helper_base_base<font color='#5555FF'>*</font>       <b><a name='bf'></a>bf</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>       
+        <b>{</b> <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>bfp1_helpers::bound_function_helper_base_base<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>bf_memory.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>const</font> bfp1_helpers::bound_function_helper_base_base<font color='#5555FF'>*</font> <b><a name='bf'></a>bf</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> bfp1_helpers::bound_function_helper_base_base<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>bf_memory.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        bound_function_pointer<font color='#5555FF'>&amp;</font> a,
+        bound_function_pointer<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BOUND_FUNCTION_POINTER_KERNEl_1_
+</font>
+
+</pre></body></html>

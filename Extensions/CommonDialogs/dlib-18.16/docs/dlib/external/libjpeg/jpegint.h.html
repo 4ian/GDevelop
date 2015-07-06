@@ -1,0 +1,395 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jpegint.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jpegint.h
+ *
+ * Copyright (C) 1991-1997, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file provides common declarations for the various JPEG modules.
+ * These declarations are considered internal to the JPEG library; most
+ * applications using the library shouldn't need to include this file.
+ */</font>
+
+
+<font color='#009900'>/* Declarations for both compression &amp; decompression */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>enum</font> <b>{</b>			<font color='#009900'>/* Operating modes for buffer controllers */</font>
+	JBUF_PASS_THRU,		<font color='#009900'>/* Plain stripwise operation */</font>
+	<font color='#009900'>/* Remaining modes require a full-image buffer to have been created */</font>
+	JBUF_SAVE_SOURCE,	<font color='#009900'>/* Run source subobject only, save output */</font>
+	JBUF_CRANK_DEST,	<font color='#009900'>/* Run dest subobject only, using saved data */</font>
+	JBUF_SAVE_AND_PASS	<font color='#009900'>/* Run both subobjects, save output */</font>
+<b>}</b> J_BUF_MODE;
+
+<font color='#009900'>/* Values of global_state field (jdapi.c has some dependencies on ordering!) */</font>
+<font color='#0000FF'>#define</font> CSTATE_START	<font color='#979000'>100</font>	<font color='#009900'>/* after create_compress */</font>
+<font color='#0000FF'>#define</font> CSTATE_SCANNING	<font color='#979000'>101</font>	<font color='#009900'>/* start_compress done, write_scanlines OK */</font>
+<font color='#0000FF'>#define</font> CSTATE_RAW_OK	<font color='#979000'>102</font>	<font color='#009900'>/* start_compress done, write_raw_data OK */</font>
+<font color='#0000FF'>#define</font> CSTATE_WRCOEFS	<font color='#979000'>103</font>	<font color='#009900'>/* jpeg_write_coefficients done */</font>
+<font color='#0000FF'>#define</font> DSTATE_START	<font color='#979000'>200</font>	<font color='#009900'>/* after create_decompress */</font>
+<font color='#0000FF'>#define</font> DSTATE_INHEADER	<font color='#979000'>201</font>	<font color='#009900'>/* reading header markers, no SOS yet */</font>
+<font color='#0000FF'>#define</font> DSTATE_READY	<font color='#979000'>202</font>	<font color='#009900'>/* found SOS, ready for start_decompress */</font>
+<font color='#0000FF'>#define</font> DSTATE_PRELOAD	<font color='#979000'>203</font>	<font color='#009900'>/* reading multiscan file in start_decompress*/</font>
+<font color='#0000FF'>#define</font> DSTATE_PRESCAN	<font color='#979000'>204</font>	<font color='#009900'>/* performing dummy pass for 2-pass quant */</font>
+<font color='#0000FF'>#define</font> DSTATE_SCANNING	<font color='#979000'>205</font>	<font color='#009900'>/* start_decompress done, read_scanlines OK */</font>
+<font color='#0000FF'>#define</font> DSTATE_RAW_OK	<font color='#979000'>206</font>	<font color='#009900'>/* start_decompress done, read_raw_data OK */</font>
+<font color='#0000FF'>#define</font> DSTATE_BUFIMAGE	<font color='#979000'>207</font>	<font color='#009900'>/* expecting jpeg_start_output */</font>
+<font color='#0000FF'>#define</font> DSTATE_BUFPOST	<font color='#979000'>208</font>	<font color='#009900'>/* looking for SOS/EOI in jpeg_finish_output */</font>
+<font color='#0000FF'>#define</font> DSTATE_RDCOEFS	<font color='#979000'>209</font>	<font color='#009900'>/* reading file in jpeg_read_coefficients */</font>
+<font color='#0000FF'>#define</font> DSTATE_STOPPING	<font color='#979000'>210</font>	<font color='#009900'>/* looking for EOI in jpeg_finish_decompress */</font>
+
+
+<font color='#009900'>/* Declarations for compression modules */</font>
+
+<font color='#009900'>/* Master control module */</font>
+<font color='#0000FF'>struct</font> <b><a name='jpeg_comp_master'></a>jpeg_comp_master</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, prepare_for_pass, <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, pass_startup, <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, finish_pass, <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* State variables made visible to other modules */</font>
+  <font color='#0000FF'><u>int</u></font> call_pass_startup;	<font color='#009900'>/* True if pass_startup must be called */</font>
+  <font color='#0000FF'><u>int</u></font> is_last_pass;		<font color='#009900'>/* True during last pass */</font>
+<b>}</b>;
+
+<font color='#009900'>/* Main buffer control (downsampled-data buffer) */</font>
+<font color='#0000FF'>struct</font> <b><a name='jpeg_c_main_controller'></a>jpeg_c_main_controller</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, start_pass, <font face='Lucida Console'>(</font>j_compress_ptr cinfo, J_BUF_MODE pass_mode<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, process_data, <font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+			       JSAMPARRAY input_buf, JDIMENSION <font color='#5555FF'>*</font>in_row_ctr,
+			       JDIMENSION in_rows_avail<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>;
+
+<font color='#009900'>/* Compression preprocessing (downsampling input buffer control) */</font>
+<font color='#0000FF'>struct</font> <b><a name='jpeg_c_prep_controller'></a>jpeg_c_prep_controller</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, start_pass, <font face='Lucida Console'>(</font>j_compress_ptr cinfo, J_BUF_MODE pass_mode<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, pre_process_data, <font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+				   JSAMPARRAY input_buf,
+				   JDIMENSION <font color='#5555FF'>*</font>in_row_ctr,
+				   JDIMENSION in_rows_avail,
+				   JSAMPIMAGE output_buf,
+				   JDIMENSION <font color='#5555FF'>*</font>out_row_group_ctr,
+				   JDIMENSION out_row_groups_avail<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>;
+
+<font color='#009900'>/* Coefficient buffer control */</font>
+<font color='#0000FF'>struct</font> <b><a name='jpeg_c_coef_controller'></a>jpeg_c_coef_controller</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, start_pass, <font face='Lucida Console'>(</font>j_compress_ptr cinfo, J_BUF_MODE pass_mode<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font>, compress_data, <font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+				   JSAMPIMAGE input_buf<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>;
+
+<font color='#009900'>/* Colorspace conversion */</font>
+<font color='#0000FF'>struct</font> <b><a name='jpeg_color_converter'></a>jpeg_color_converter</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, start_pass, <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, color_convert, <font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+				JSAMPARRAY input_buf, JSAMPIMAGE output_buf,
+				JDIMENSION output_row, <font color='#0000FF'><u>int</u></font> num_rows<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>;
+
+<font color='#009900'>/* Downsampling */</font>
+<font color='#0000FF'>struct</font> <b><a name='jpeg_downsampler'></a>jpeg_downsampler</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, start_pass, <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, downsample, <font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+			     JSAMPIMAGE input_buf, JDIMENSION in_row_index,
+			     JSAMPIMAGE output_buf,
+			     JDIMENSION out_row_group_index<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  <font color='#0000FF'><u>int</u></font> need_context_rows;	<font color='#009900'>/* TRUE if need rows above &amp; below */</font>
+<b>}</b>;
+
+<font color='#009900'>/* Forward DCT (also controls coefficient quantization) */</font>
+<font color='#0000FF'>struct</font> <b><a name='jpeg_forward_dct'></a>jpeg_forward_dct</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, start_pass, <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* perhaps this should be an array??? */</font>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, forward_DCT, <font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+			      jpeg_component_info <font color='#5555FF'>*</font> compptr,
+			      JSAMPARRAY sample_data, JBLOCKROW coef_blocks,
+			      JDIMENSION start_row, JDIMENSION start_col,
+			      JDIMENSION num_blocks<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>;
+
+<font color='#009900'>/* Entropy encoding */</font>
+<font color='#0000FF'>struct</font> <b><a name='jpeg_entropy_encoder'></a>jpeg_entropy_encoder</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, start_pass, <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> gather_statistics<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font>, encode_mcu, <font face='Lucida Console'>(</font>j_compress_ptr cinfo, JBLOCKROW <font color='#5555FF'>*</font>MCU_data<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, finish_pass, <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>;
+
+<font color='#009900'>/* Marker writing */</font>
+<font color='#0000FF'>struct</font> <b><a name='jpeg_marker_writer'></a>jpeg_marker_writer</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, write_file_header, <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, write_frame_header, <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, write_scan_header, <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, write_file_trailer, <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, write_tables_only, <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* These routines are exported to allow insertion of extra markers */</font>
+  <font color='#009900'>/* Probably only COM and APPn markers should be written this way */</font>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, write_marker_header, <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> marker,
+				      <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> datalen<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, write_marker_byte, <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>;
+
+
+<font color='#009900'>/* Declarations for decompression modules */</font>
+
+<font color='#009900'>/* Master control module */</font>
+<font color='#0000FF'>struct</font> <b><a name='jpeg_decomp_master'></a>jpeg_decomp_master</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, prepare_for_output_pass, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, finish_output_pass, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* State variables made visible to other modules */</font>
+  <font color='#0000FF'><u>int</u></font> is_dummy_pass;	<font color='#009900'>/* True during 1st pass for 2-pass quant */</font>
+<b>}</b>;
+
+<font color='#009900'>/* Input control module */</font>
+<font color='#0000FF'>struct</font> <b><a name='jpeg_input_controller'></a>jpeg_input_controller</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font>, consume_input, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, reset_input_controller, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, start_input_pass, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, finish_input_pass, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* State variables made visible to other modules */</font>
+  <font color='#0000FF'><u>int</u></font> has_multiple_scans;	<font color='#009900'>/* True if file has multiple scans */</font>
+  <font color='#0000FF'><u>int</u></font> eoi_reached;		<font color='#009900'>/* True when EOI has been consumed */</font>
+<b>}</b>;
+
+<font color='#009900'>/* Main buffer control (downsampled-data buffer) */</font>
+<font color='#0000FF'>struct</font> <b><a name='jpeg_d_main_controller'></a>jpeg_d_main_controller</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, start_pass, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, J_BUF_MODE pass_mode<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, process_data, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+			       JSAMPARRAY output_buf, JDIMENSION <font color='#5555FF'>*</font>out_row_ctr,
+			       JDIMENSION out_rows_avail<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>;
+
+<font color='#009900'>/* Coefficient buffer control */</font>
+<font color='#0000FF'>struct</font> <b><a name='jpeg_d_coef_controller'></a>jpeg_d_coef_controller</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, start_input_pass, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font>, consume_data, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, start_output_pass, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font>, decompress_data, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+				 JSAMPIMAGE output_buf<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Pointer to array of coefficient virtual arrays, or NULL if none */</font>
+  jvirt_barray_ptr <font color='#5555FF'>*</font>coef_arrays;
+<b>}</b>;
+
+<font color='#009900'>/* Decompression postprocessing (color quantization buffer control) */</font>
+<font color='#0000FF'>struct</font> <b><a name='jpeg_d_post_controller'></a>jpeg_d_post_controller</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, start_pass, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, J_BUF_MODE pass_mode<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, post_process_data, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+				    JSAMPIMAGE input_buf,
+				    JDIMENSION <font color='#5555FF'>*</font>in_row_group_ctr,
+				    JDIMENSION in_row_groups_avail,
+				    JSAMPARRAY output_buf,
+				    JDIMENSION <font color='#5555FF'>*</font>out_row_ctr,
+				    JDIMENSION out_rows_avail<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>;
+
+<font color='#009900'>/* Marker reading &amp; parsing */</font>
+<font color='#0000FF'>struct</font> <b><a name='jpeg_marker_reader'></a>jpeg_marker_reader</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, reset_marker_reader, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Read markers until SOS or EOI.
+   * Returns same codes as are defined for jpeg_consume_input:
+   * JPEG_SUSPENDED, JPEG_REACHED_SOS, or JPEG_REACHED_EOI.
+   */</font>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font>, read_markers, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Read a restart marker --- exported for use by entropy decoder only */</font>
+  jpeg_marker_parser_method read_restart_marker;
+
+  <font color='#009900'>/* State of marker reader --- nominally internal, but applications
+   * supplying COM or APPn handlers might like to know the state.
+   */</font>
+  <font color='#0000FF'><u>int</u></font> saw_SOI;		<font color='#009900'>/* found SOI? */</font>
+  <font color='#0000FF'><u>int</u></font> saw_SOF;		<font color='#009900'>/* found SOF? */</font>
+  <font color='#0000FF'><u>int</u></font> next_restart_num;		<font color='#009900'>/* next restart number expected (0-7) */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> discarded_bytes;	<font color='#009900'>/* # of bytes skipped looking for a marker */</font>
+<b>}</b>;
+
+<font color='#009900'>/* Entropy decoding */</font>
+<font color='#0000FF'>struct</font> <b><a name='jpeg_entropy_decoder'></a>jpeg_entropy_decoder</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, start_pass, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font>, decode_mcu, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+				JBLOCKROW <font color='#5555FF'>*</font>MCU_data<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* This is here to share code between baseline and progressive decoders; */</font>
+  <font color='#009900'>/* other modules probably should not use it */</font>
+  <font color='#0000FF'><u>int</u></font> insufficient_data;	<font color='#009900'>/* set TRUE after emitting warning */</font>
+<b>}</b>;
+
+<font color='#009900'>/* Inverse DCT (also performs dequantization) */</font>
+<font color='#0000FF'>typedef</font> <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, inverse_DCT_method_ptr,
+		<font face='Lucida Console'>(</font>j_decompress_ptr cinfo, jpeg_component_info <font color='#5555FF'>*</font> compptr,
+		 JCOEFPTR coef_block,
+		 JSAMPARRAY output_buf, JDIMENSION output_col<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>struct</font> <b><a name='jpeg_inverse_dct'></a>jpeg_inverse_dct</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, start_pass, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* It is useful to allow each component to have a separate IDCT method. */</font>
+  inverse_DCT_method_ptr inverse_DCT[MAX_COMPONENTS];
+<b>}</b>;
+
+<font color='#009900'>/* Upsampling (note that upsampler must also call color converter) */</font>
+<font color='#0000FF'>struct</font> <b><a name='jpeg_upsampler'></a>jpeg_upsampler</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, start_pass, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, upsample, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+			   JSAMPIMAGE input_buf,
+			   JDIMENSION <font color='#5555FF'>*</font>in_row_group_ctr,
+			   JDIMENSION in_row_groups_avail,
+			   JSAMPARRAY output_buf,
+			   JDIMENSION <font color='#5555FF'>*</font>out_row_ctr,
+			   JDIMENSION out_rows_avail<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  <font color='#0000FF'><u>int</u></font> need_context_rows;	<font color='#009900'>/* TRUE if need rows above &amp; below */</font>
+<b>}</b>;
+
+<font color='#009900'>/* Colorspace conversion */</font>
+<font color='#0000FF'>struct</font> <b><a name='jpeg_color_deconverter'></a>jpeg_color_deconverter</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, start_pass, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, color_convert, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+				JSAMPIMAGE input_buf, JDIMENSION input_row,
+				JSAMPARRAY output_buf, <font color='#0000FF'><u>int</u></font> num_rows<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>;
+
+<font color='#009900'>/* Color quantization or color precision reduction */</font>
+<font color='#0000FF'>struct</font> <b><a name='jpeg_color_quantizer'></a>jpeg_color_quantizer</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, start_pass, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, <font color='#0000FF'><u>int</u></font> is_pre_scan<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, color_quantize, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+				 JSAMPARRAY input_buf, JSAMPARRAY output_buf,
+				 <font color='#0000FF'><u>int</u></font> num_rows<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, finish_pass, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, new_color_map, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>;
+
+
+<font color='#009900'>/* Miscellaneous useful macros */</font>
+
+<font color='#0000FF'>#undef</font> MAX
+<font color='#0000FF'>#define</font> MAX<font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font>	<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font> ? <font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font> : <font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#undef</font> MIN
+<font color='#0000FF'>#define</font> MIN<font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font>	<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font> ? <font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font> : <font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+
+<font color='#009900'>/* We assume that right shift corresponds to signed division by 2 with
+ * rounding towards minus infinity.  This is correct for typical "arithmetic
+ * shift" instructions that shift in copies of the sign bit.  But some
+ * C compilers implement &gt;&gt; with an unsigned shift.  For these machines you
+ * must define RIGHT_SHIFT_IS_UNSIGNED.
+ * RIGHT_SHIFT provides a proper signed right shift of an long quantity.
+ * It is only applied with constant shift counts.  SHIFT_TEMPS must be
+ * included in the variables of any routine using RIGHT_SHIFT.
+ */</font>
+
+<font color='#0000FF'>#ifdef</font> RIGHT_SHIFT_IS_UNSIGNED
+<font color='#0000FF'>#define</font> SHIFT_TEMPS	<font color='#0000FF'><u>long</u></font> shift_temp;
+<font color='#0000FF'>#define</font> RIGHT_SHIFT<font face='Lucida Console'>(</font>x,shft<font face='Lucida Console'>)</font>  \
+	<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>shift_temp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font> ? \
+	 <font face='Lucida Console'>(</font>shift_temp <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font>shft<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>~<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#979000'>32</font><font color='#5555FF'>-</font><font face='Lucida Console'>(</font>shft<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> : \
+	 <font face='Lucida Console'>(</font>shift_temp <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font>shft<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#else</font>
+<font color='#0000FF'>#define</font> SHIFT_TEMPS
+<font color='#0000FF'>#define</font> RIGHT_SHIFT<font face='Lucida Console'>(</font>x,shft<font face='Lucida Console'>)</font>	<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font>shft<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#009900'>/* Short forms of external names for systems with brain-damaged linkers. */</font>
+
+<font color='#0000FF'>#ifdef</font> NEED_SHORT_EXTERNAL_NAMES
+<font color='#0000FF'>#define</font> jinit_compress_master	jICompress
+<font color='#0000FF'>#define</font> jinit_c_master_control	jICMaster
+<font color='#0000FF'>#define</font> jinit_c_main_controller	jICMainC
+<font color='#0000FF'>#define</font> jinit_c_prep_controller	jICPrepC
+<font color='#0000FF'>#define</font> jinit_c_coef_controller	jICCoefC
+<font color='#0000FF'>#define</font> jinit_color_converter	jICColor
+<font color='#0000FF'>#define</font> jinit_downsampler	jIDownsampler
+<font color='#0000FF'>#define</font> jinit_forward_dct	jIFDCT
+<font color='#0000FF'>#define</font> jinit_huff_encoder	jIHEncoder
+<font color='#0000FF'>#define</font> jinit_phuff_encoder	jIPHEncoder
+<font color='#0000FF'>#define</font> jinit_marker_writer	jIMWriter
+<font color='#0000FF'>#define</font> jinit_master_decompress	jIDMaster
+<font color='#0000FF'>#define</font> jinit_d_main_controller	jIDMainC
+<font color='#0000FF'>#define</font> jinit_d_coef_controller	jIDCoefC
+<font color='#0000FF'>#define</font> jinit_d_post_controller	jIDPostC
+<font color='#0000FF'>#define</font> jinit_input_controller	jIInCtlr
+<font color='#0000FF'>#define</font> jinit_marker_reader	jIMReader
+<font color='#0000FF'>#define</font> jinit_huff_decoder	jIHDecoder
+<font color='#0000FF'>#define</font> jinit_phuff_decoder	jIPHDecoder
+<font color='#0000FF'>#define</font> jinit_inverse_dct	jIIDCT
+<font color='#0000FF'>#define</font> jinit_upsampler		jIUpsampler
+<font color='#0000FF'>#define</font> jinit_color_deconverter	jIDColor
+<font color='#0000FF'>#define</font> jinit_1pass_quantizer	jI1Quant
+<font color='#0000FF'>#define</font> jinit_2pass_quantizer	jI2Quant
+<font color='#0000FF'>#define</font> jinit_merged_upsampler	jIMUpsampler
+<font color='#0000FF'>#define</font> jinit_memory_mgr	jIMemMgr
+<font color='#0000FF'>#define</font> jdiv_round_up		jDivRound
+<font color='#0000FF'>#define</font> jround_up		jRound
+<font color='#0000FF'>#define</font> jcopy_sample_rows	jCopySamples
+<font color='#0000FF'>#define</font> jcopy_block_row		jCopyBlocks
+<font color='#0000FF'>#define</font> jzero_far		jZeroFar
+<font color='#0000FF'>#define</font> jpeg_zigzag_order	jZIGTable
+<font color='#0000FF'>#define</font> jpeg_natural_order	jZAGTable
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* NEED_SHORT_EXTERNAL_NAMES */</font>
+
+
+<font color='#009900'>/* Compression module initialization routines */</font>
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_compress_master JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_c_master_control JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+					 <font color='#0000FF'><u>int</u></font> transcode_only<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_c_main_controller JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+					  <font color='#0000FF'><u>int</u></font> need_full_buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_c_prep_controller JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+					  <font color='#0000FF'><u>int</u></font> need_full_buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_c_coef_controller JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+					  <font color='#0000FF'><u>int</u></font> need_full_buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_color_converter JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_downsampler JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_forward_dct JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_huff_encoder JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_phuff_encoder JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_marker_writer JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#009900'>/* Decompression module initialization routines */</font>
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_master_decompress JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_d_main_controller JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+					  <font color='#0000FF'><u>int</u></font> need_full_buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_d_coef_controller JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+					  <font color='#0000FF'><u>int</u></font> need_full_buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_d_post_controller JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+					  <font color='#0000FF'><u>int</u></font> need_full_buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_input_controller JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_marker_reader JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_huff_decoder JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_phuff_decoder JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_inverse_dct JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_upsampler JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_color_deconverter JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_1pass_quantizer JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_2pass_quantizer JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_merged_upsampler JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#009900'>/* Memory manager initialization */</font>
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jinit_memory_mgr JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* Utility routines in jutils.c */</font>
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> jdiv_round_up JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> a, <font color='#0000FF'><u>long</u></font> b<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> jround_up JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> a, <font color='#0000FF'><u>long</u></font> b<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jcopy_sample_rows JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>JSAMPARRAY input_array, <font color='#0000FF'><u>int</u></font> source_row,
+				    JSAMPARRAY output_array, <font color='#0000FF'><u>int</u></font> dest_row,
+				    <font color='#0000FF'><u>int</u></font> num_rows, JDIMENSION num_cols<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jcopy_block_row JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>JBLOCKROW input_row, JBLOCKROW output_row,
+				  JDIMENSION num_blocks<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+EXTERN<font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jzero_far JPP<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font> target, <font color='#0000FF'><u>size_t</u></font> bytestozero<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#009900'>/* Constant tables in jutils.c */</font>
+<font color='#0000FF'>#if</font> <font color='#979000'>0</font>				<font color='#009900'>/* This table is not actually needed in v6a */</font>
+<font color='#0000FF'>extern</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> jpeg_zigzag_order[]; <font color='#009900'>/* natural coef order to zigzag order */</font>
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>extern</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> jpeg_natural_order[]; <font color='#009900'>/* zigzag coef order to natural order */</font>
+
+<font color='#009900'>/* Suppress undefined-structure complaints if necessary. */</font>
+
+<font color='#0000FF'>#ifdef</font> INCOMPLETE_TYPES_BROKEN
+<font color='#0000FF'>#ifndef</font> AM_MEMORY_MANAGER	<font color='#009900'>/* only jmemmgr.c defines these */</font>
+<font color='#0000FF'>struct</font> <b><a name='jvirt_sarray_control'></a>jvirt_sarray_control</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jvirt_barray_control'></a>jvirt_barray_control</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* INCOMPLETE_TYPES_BROKEN */</font>
+
+</pre></body></html>

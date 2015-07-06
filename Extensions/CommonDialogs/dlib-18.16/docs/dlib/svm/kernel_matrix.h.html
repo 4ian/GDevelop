@@ -1,0 +1,271 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - kernel_matrix.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SVm_KERNEL_MATRIX_
+<font color='#0000FF'>#define</font> DLIB_SVm_KERNEL_MATRIX_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel_matrix_abstract.h.html'>kernel_matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> T::type<font color='#5555FF'>&amp;</font> <b><a name='access'></a>access</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m, <font color='#0000FF'><u>long</u></font> i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// bind to anything that looks like an array and isn't a matrix
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'>typename</font> T::type<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&amp;</font> <b><a name='access'></a>access</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> m, <font color='#0000FF'><u>long</u></font> i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> m[i];
+        <b>}</b>
+
+        <font color='#009900'>// Only use this function if T isn't a std::pair because in that case the entire vector is
+</font>        <font color='#009900'>// probably itself a sparse sample.
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type, <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_pair<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font>::type <b><a name='access'></a>access</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m, <font color='#0000FF'><u>long</u></font> i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> m[i];
+        <b>}</b>
+
+        <font color='#009900'>// Only use this function if T isn't a std::pair because in that case the entire vector is
+</font>        <font color='#009900'>// probably a sparse sample.
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type, <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_pair<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font>::type <b><a name='access'></a>access</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> std_vector_c<font color='#5555FF'>&lt;</font>T,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m, <font color='#0000FF'><u>long</u></font> i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> m[i];
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> kernel_type::sample_type<font color='#5555FF'>&amp;</font> <b><a name='access'></a>access</b> <font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> kernel_type::sample_type<font color='#5555FF'>&amp;</font> samp, 
+            <font color='#0000FF'><u>long</u></font> 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> samp;
+        <b>}</b>
+
+        <font color='#009900'>// --------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_same_type<font color='#5555FF'>&lt;</font>T,<font color='#0000FF'>typename</font> kernel_type::sample_type<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::type 
+        <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> m<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> m.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> kernel_type::sample_type<font color='#5555FF'>&amp;</font>  
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#009900'>// --------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='assert_is_vector'></a>assert_is_vector</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#009900'>// This funny #ifdef thing is here because gcc sometimes gives a warning 
+</font>        <font color='#009900'>// about v being unused otherwise.
+</font><font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+        <font color='#0000FF'><u>void</u></font> <b><a name='assert_is_vector'></a>assert_is_vector</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> v<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='assert_is_vector'></a>assert_is_vector</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>v<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+                "<font color='#CC0000'>\tconst matrix_exp kernel_matrix()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You have to supply this function with row or column vectors</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t v.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> v.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t v.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> v.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> K, <font color='#0000FF'>typename</font> vect_type1, <font color='#0000FF'>typename</font> vect_type2<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='op_kern_mat'></a>op_kern_mat</b>  
+    <b>{</b>
+        <b><a name='op_kern_mat'></a>op_kern_mat</b><font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> K<font color='#5555FF'>&amp;</font> kern_, 
+            <font color='#0000FF'>const</font> vect_type1<font color='#5555FF'>&amp;</font> vect1_,
+            <font color='#0000FF'>const</font> vect_type2<font color='#5555FF'>&amp;</font> vect2_
+        <font face='Lucida Console'>)</font> : 
+            kern<font face='Lucida Console'>(</font>kern_<font face='Lucida Console'>)</font>, 
+            vect1<font face='Lucida Console'>(</font>vect1_<font face='Lucida Console'>)</font>,
+            vect2<font face='Lucida Console'>(</font>vect2_<font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#009900'>// make sure the requires clauses get checked eventually
+</font>            impl::<font color='#BB00BB'>assert_is_vector</font><font face='Lucida Console'>(</font>vect1<font face='Lucida Console'>)</font>;
+            impl::<font color='#BB00BB'>assert_is_vector</font><font face='Lucida Console'>(</font>vect2<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> K<font color='#5555FF'>&amp;</font> kern;
+        <font color='#0000FF'>const</font> vect_type1<font color='#5555FF'>&amp;</font> vect1;
+        <font color='#0000FF'>const</font> vect_type2<font color='#5555FF'>&amp;</font> vect2;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::scalar_type type;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> cost <font color='#5555FF'>=</font> <font color='#979000'>100</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>vect_type1,<font color='#0000FF'>typename</font> K::sample_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> ? <font color='#979000'>1</font> : <font color='#979000'>0</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>vect_type2,<font color='#0000FF'>typename</font> K::sample_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> ? <font color='#979000'>1</font> : <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>const</font> type const_ret_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> row_major_layout layout_type;
+
+        const_ret_type <b><a name='apply'></a>apply</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r, <font color='#0000FF'><u>long</u></font> c <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>kern</font><font face='Lucida Console'>(</font>impl::access<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>vect1,r<font face='Lucida Console'>)</font>, impl::access<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>vect2,c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> impl::size<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>vect1<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> impl::size<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>vect2<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='aliases'></a>aliases</b>               <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>alias_helper</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='destructively_aliases'></a>destructively_aliases</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>alias_helper</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='alias_helper'></a>alias_helper</b>  <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>false</font>; <b>}</b>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::sample_type samp_type;
+
+        <font color='#009900'>// Say we destructively alias if one of the vect* objects is actually item.
+</font>        <font color='#0000FF'><u>bool</u></font> <b><a name='alias_helper'></a>alias_helper</b>                   <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> samp_type<font color='#5555FF'>&amp;</font> item <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>are_same</font><font face='Lucida Console'>(</font>item, vect1<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font color='#BB00BB'>are_same</font><font face='Lucida Console'>(</font>item, vect2<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='are_same'></a>are_same</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> samp_type<font color='#5555FF'>&amp;</font> , <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font>         <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>false</font>; <b>}</b>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='are_same'></a>are_same</b>                       <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> samp_type<font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> samp_type<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>; 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K,
+        <font color='#0000FF'>typename</font> V1,
+        <font color='#0000FF'>typename</font> V2 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_op<font color='#5555FF'>&lt;</font>op_kern_mat<font color='#5555FF'>&lt;</font>K,V1,V2<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='kernel_matrix'></a>kernel_matrix</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> K<font color='#5555FF'>&amp;</font> kern,
+        <font color='#0000FF'>const</font> V1<font color='#5555FF'>&amp;</font> v1,
+        <font color='#0000FF'>const</font> V2<font color='#5555FF'>&amp;</font> v2
+        <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> op_kern_mat<font color='#5555FF'>&lt;</font>K,V1,V2<font color='#5555FF'>&gt;</font> op;
+        <font color='#0000FF'>return</font> matrix_op<font color='#5555FF'>&lt;</font>op<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>op</font><font face='Lucida Console'>(</font>kern,v1,v2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>/*
+        It is possible to implement the kernel_matrix() operator with just one operator
+        class but treating the version that takes only a single vector separately
+        leads to more efficient output by gcc in certain instances.  
+    */</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> K, <font color='#0000FF'>typename</font> vect_type1<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='op_kern_mat_single'></a>op_kern_mat_single</b>  
+    <b>{</b>
+        <b><a name='op_kern_mat_single'></a>op_kern_mat_single</b><font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> K<font color='#5555FF'>&amp;</font> kern_, 
+            <font color='#0000FF'>const</font> vect_type1<font color='#5555FF'>&amp;</font> vect1_
+        <font face='Lucida Console'>)</font> : 
+            kern<font face='Lucida Console'>(</font>kern_<font face='Lucida Console'>)</font>, 
+            vect1<font face='Lucida Console'>(</font>vect1_<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure the requires clauses get checked eventually
+</font>            impl::<font color='#BB00BB'>assert_is_vector</font><font face='Lucida Console'>(</font>vect1<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> K<font color='#5555FF'>&amp;</font> kern;
+        <font color='#0000FF'>const</font> vect_type1<font color='#5555FF'>&amp;</font> vect1;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::scalar_type type;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> cost <font color='#5555FF'>=</font> <font color='#979000'>100</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>vect_type1,<font color='#0000FF'>typename</font> K::sample_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> ? <font color='#979000'>1</font> : <font color='#979000'>0</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>vect_type1,<font color='#0000FF'>typename</font> K::sample_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> ? <font color='#979000'>1</font> : <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>const</font> type const_ret_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> row_major_layout layout_type;
+
+        const_ret_type <b><a name='apply'></a>apply</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r, <font color='#0000FF'><u>long</u></font> c <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>kern</font><font face='Lucida Console'>(</font>impl::access<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>vect1,r<font face='Lucida Console'>)</font>, impl::access<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>vect1,c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> impl::size<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>vect1<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> impl::size<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>vect1<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='aliases'></a>aliases</b>               <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>alias_helper</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='destructively_aliases'></a>destructively_aliases</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>alias_helper</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='alias_helper'></a>alias_helper</b>  <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>false</font>; <b>}</b>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::sample_type samp_type;
+
+        <font color='#009900'>// Say we destructively alias if vect1 is actually item.
+</font>        <font color='#0000FF'><u>bool</u></font> <b><a name='alias_helper'></a>alias_helper</b>                   <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> samp_type<font color='#5555FF'>&amp;</font> item <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>are_same</font><font face='Lucida Console'>(</font>item, vect1<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='are_same'></a>are_same</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> samp_type<font color='#5555FF'>&amp;</font> , <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font>         <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>false</font>; <b>}</b>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='are_same'></a>are_same</b>                       <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> samp_type<font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> samp_type<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>; 
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K,
+        <font color='#0000FF'>typename</font> V
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_op<font color='#5555FF'>&lt;</font>op_kern_mat_single<font color='#5555FF'>&lt;</font>K,V<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='kernel_matrix'></a>kernel_matrix</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> K<font color='#5555FF'>&amp;</font> kern,
+        <font color='#0000FF'>const</font> V<font color='#5555FF'>&amp;</font> v
+        <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> op_kern_mat_single<font color='#5555FF'>&lt;</font>K,V<font color='#5555FF'>&gt;</font> op;
+        <font color='#0000FF'>return</font> matrix_op<font color='#5555FF'>&lt;</font>op<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>op</font><font face='Lucida Console'>(</font>kern,v<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> matrix_dest_type,
+        <font color='#0000FF'>typename</font> K,
+        <font color='#0000FF'>typename</font> V
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='matrix_assign'></a>matrix_assign</b> <font face='Lucida Console'>(</font>
+        matrix_dest_type<font color='#5555FF'>&amp;</font> dest,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>matrix_op<font color='#5555FF'>&lt;</font>op_kern_mat_single<font color='#5555FF'>&lt;</font>K,V<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> src
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        Overload matrix assignment so that when a kernel_matrix expression
+        gets assigned it only evaluates half the kernel matrix (since it is symmetric)
+    !*/</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> src.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> r; c <font color='#5555FF'>&lt;</font> src.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>dest</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>dest</font><font face='Lucida Console'>(</font>c,r<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>src</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SVm_KERNEL_MATRIX_
+</font>
+
+</pre></body></html>

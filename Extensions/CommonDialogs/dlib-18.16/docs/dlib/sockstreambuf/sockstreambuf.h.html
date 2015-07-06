@@ -1,0 +1,175 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sockstreambuf.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SOCKStREAMBUF_Hh_
+<font color='#0000FF'>#define</font> DLIB_SOCKStREAMBUF_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iosfwd<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>streambuf<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sockets.h.html'>../sockets.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sockstreambuf_abstract.h.html'>sockstreambuf_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sockstreambuf_unbuffered.h.html'>sockstreambuf_unbuffered.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+    <font color='#0000FF'>class</font> <b><a name='sockstreambuf'></a>sockstreambuf</b> : <font color='#0000FF'>public</font> std::streambuf
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - con == a connection
+                - in_buffer == an array of in_buffer_size bytes
+                - out_buffer == an array of out_buffer_size bytes
+
+            CONVENTION
+                - in_buffer == the input buffer used by this streambuf
+                - out_buffer == the output buffer used by this streambuf
+                - max_putback == the maximum number of chars to have in the put back buffer.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#009900'>// These typedefs are here for backwards compatibility with previous versions of
+</font>        <font color='#009900'>// dlib.
+</font>        <font color='#0000FF'>typedef</font> sockstreambuf_unbuffered kernel_1a;
+        <font color='#0000FF'>typedef</font> sockstreambuf kernel_2a;
+
+        <b><a name='sockstreambuf'></a>sockstreambuf</b> <font face='Lucida Console'>(</font>
+            connection<font color='#5555FF'>*</font> con_
+        <font face='Lucida Console'>)</font> :
+            con<font face='Lucida Console'>(</font><font color='#5555FF'>*</font>con_<font face='Lucida Console'>)</font>,
+            out_buffer<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            in_buffer<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            autoflush<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>init</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <b><a name='sockstreambuf'></a>sockstreambuf</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scoped_ptr<font color='#5555FF'>&lt;</font>connection<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> con_
+        <font face='Lucida Console'>)</font> :
+            con<font face='Lucida Console'>(</font><font color='#5555FF'>*</font>con_<font face='Lucida Console'>)</font>,
+            out_buffer<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            in_buffer<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            autoflush<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>init</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='sockstreambuf'></a>sockstreambuf</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>sync</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>delete</font> [] out_buffer;
+            <font color='#0000FF'>delete</font> [] in_buffer;
+        <b>}</b>
+
+        connection<font color='#5555FF'>*</font> <b><a name='get_connection'></a>get_connection</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>&amp;</font>con; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='flush_output_on_read'></a>flush_output_on_read</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            autoflush <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='flushes_output_on_read'></a>flushes_output_on_read</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> autoflush;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='do_not_flush_output_on_read'></a>do_not_flush_output_on_read</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            autoflush <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>protected</font>:
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='init'></a>init</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                out_buffer <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#0000FF'><u>char</u></font>[out_buffer_size];
+                in_buffer <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#0000FF'><u>char</u></font>[in_buffer_size];
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>out_buffer<font face='Lucida Console'>)</font> <font color='#0000FF'>delete</font> [] out_buffer;
+                <font color='#0000FF'>throw</font>;
+            <b>}</b>
+            <font color='#BB00BB'>setp</font><font face='Lucida Console'>(</font>out_buffer, out_buffer <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>out_buffer_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>setg</font><font face='Lucida Console'>(</font>in_buffer<font color='#5555FF'>+</font>max_putback, 
+                 in_buffer<font color='#5555FF'>+</font>max_putback, 
+                 in_buffer<font color='#5555FF'>+</font>max_putback<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='flush_out_buffer'></a>flush_out_buffer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> num <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>pptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#BB00BB'>pbase</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>con.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font>out_buffer,num<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> num<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// the write was not successful so return EOF 
+</font>                <font color='#0000FF'>return</font> EOF;
+            <b>}</b> 
+            <font color='#BB00BB'>pbump</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>num<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> num;
+        <b>}</b>
+
+        <font color='#009900'>// output functions
+</font>        int_type <b><a name='overflow'></a>overflow</b> <font face='Lucida Console'>(</font>
+            int_type c
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='sync'></a>sync</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>flush_out_buffer</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// an error occurred
+</font>                <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            <b>}</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        std::streamsize <b><a name='xsputn'></a>xsputn</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> s,
+            std::streamsize num
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// input functions
+</font>        int_type <b><a name='underflow'></a>underflow</b><font face='Lucida Console'>(</font> 
+        <font face='Lucida Console'>)</font>;
+
+        std::streamsize <b><a name='xsgetn'></a>xsgetn</b> <font face='Lucida Console'>(</font>
+            char_type<font color='#5555FF'>*</font> s, 
+            std::streamsize n
+        <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// member data
+</font>        connection<font color='#5555FF'>&amp;</font>  con;
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> std::streamsize max_putback <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> std::streamsize out_buffer_size <font color='#5555FF'>=</font> <font color='#979000'>10000</font>;
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> std::streamsize in_buffer_size <font color='#5555FF'>=</font> <font color='#979000'>10000</font>;
+        <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> out_buffer;
+        <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> in_buffer;
+        <font color='#0000FF'><u>bool</u></font> autoflush;
+    
+    <b>}</b>;
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sockstreambuf.cpp.html'>sockstreambuf.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SOCKStREAMBUF_Hh_
+</font>
+
+</pre></body></html>

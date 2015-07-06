@@ -1,0 +1,188 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - auto_mutex_extension_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_AUTO_MUTEX_EXTENSIOn_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_AUTO_MUTEX_EXTENSIOn_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel_abstract.h.html'>threads_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='rmutex_extension_abstract.h.html'>rmutex_extension_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='read_write_mutex_extension_abstract.h.html'>read_write_mutex_extension_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='auto_mutex'></a>auto_mutex</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                The mutex given in the constructor is locked and associated with this 
+                object.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a mechanism for automatically locking and unlocking
+                a mutex object.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>explicit</font> <b><a name='auto_mutex'></a>auto_mutex</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> mutex<font color='#5555FF'>&amp;</font> m
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is properly initialized
+                - m will be locked
+        !*/</font>
+
+        <font color='#0000FF'>explicit</font> <b><a name='auto_mutex'></a>auto_mutex</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rmutex<font color='#5555FF'>&amp;</font> m
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is properly initialized
+                - m will be locked
+        !*/</font>
+
+        <font color='#0000FF'>explicit</font> <b><a name='auto_mutex'></a>auto_mutex</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> read_write_mutex<font color='#5555FF'>&amp;</font> m
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is properly initialized
+                - m will be locked via m.lock() (i.e. a write lock will be obtained)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='unlock'></a>unlock</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (unlock() has not already been called) then
+                    - The mutex associated with *this has been unlocked.  This is useful if
+                      you want to unlock a mutex before the auto_mutex destructor executes.
+        !*/</font>
+
+        ~<b><a name='auto_mutex'></a>auto_mutex</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources allocated by *this have been freed
+                - calls unlock()
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='auto_mutex'></a>auto_mutex</b><font face='Lucida Console'>(</font>auto_mutex<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        auto_mutex<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>auto_mutex<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='auto_mutex_readonly'></a>auto_mutex_readonly</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                The mutex given in the constructor is locked using a read-only lock and
+                associated with this object.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a mechanism for automatically locking and unlocking
+                a read_write_mutex object.  In particular, a readonly lock is used.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>explicit</font> <b><a name='auto_mutex_readonly'></a>auto_mutex_readonly</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> read_write_mutex<font color='#5555FF'>&amp;</font> m
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is properly initialized
+                - a readonly lock will be obtained on m using m.lock_readonly()
+                - #has_read_lock() == true
+        !*/</font>
+
+        ~<b><a name='auto_mutex_readonly'></a>auto_mutex_readonly</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources allocated by *this have been freed
+                - the mutex associated with *this has been unlocked
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='has_read_lock'></a>has_read_lock</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if this object has called read_write_mutex::lock_readonly()
+                  on its associated mutex and has yet to release that lock.
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='has_write_lock'></a>has_write_lock</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns true if this object has called read_write_mutex::lock() on its
+                  associated mutex and has yet to release that lock.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='lock_readonly'></a>lock_readonly</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This function converts the lock on the associated mutex into a readonly lock.
+                  Specifically:
+                  if (!has_read_lock()) then
+                    - if (has_write_lock()) then
+                        - unlocks the associated mutex and then relocks it by calling
+                          read_write_mutex::lock_readonly()
+                    - else
+                        - locks the associated mutex by calling read_write_mutex::lock_readonly()
+                - #has_read_lock() == true
+                - Note that the lock switch is not atomic.  This means that whatever
+                  resource is protected by the mutex might have been modified during the
+                  call to lock_readonly().
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='lock_write'></a>lock_write</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This function converts the lock on the associated mutex into a write lock.
+                  Specifically:
+                  if (!has_write_lock()) then
+                    - if (has_read_lock()) then
+                        - unlocks the associated mutex and then relocks it by calling
+                          read_write_mutex::lock()
+                    - else
+                        - locks the associated mutex by calling read_write_mutex::lock()
+                - #has_write_lock() == true
+                - Note that the lock switch is not atomic.  This means that whatever
+                  resource is protected by the mutex might have been modified during the
+                  call to lock_write().
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='unlock'></a>unlock</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (has_read_lock() || has_write_lock()) then
+                    - unlocks the associated mutex.  This is useful if you want to unlock a
+                      mutex before the auto_mutex_readonly destructor executes.
+                - #has_read_lock() == false
+                - #has_write_lock() == false
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='auto_mutex_readonly'></a>auto_mutex_readonly</b><font face='Lucida Console'>(</font>auto_mutex_readonly<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        auto_mutex_readonly<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>auto_mutex_readonly<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_AUTO_MUTEX_EXTENSIOn_ABSTRACT_
+</font>
+
+</pre></body></html>

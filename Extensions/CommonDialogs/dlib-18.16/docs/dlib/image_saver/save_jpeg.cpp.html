@@ -1,0 +1,177 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - save_jpeg.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2014  Davis E. King (davis@dlib.net), Nils Labugt
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_JPEG_SAVER_CPp_
+<font color='#0000FF'>#define</font> DLIB_JPEG_SAVER_CPp_
+
+<font color='#009900'>// only do anything with this file if DLIB_JPEG_SUPPORT is defined
+</font><font color='#0000FF'>#ifdef</font> DLIB_JPEG_SUPPORT
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array2d.h.html'>../array2d.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='save_jpeg.h.html'>save_jpeg.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>stdio.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#ifdef</font> DLIB_JPEG_STATIC
+#   include "<font color='#CC0000'>../external/libjpeg/jpeglib.h</font>"
+<font color='#0000FF'>#else</font>
+#   include <font color='#5555FF'>&lt;</font>jpeglib.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>setjmp.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='image_saver.h.html'>image_saver.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='jpeg_saver_error_mgr'></a>jpeg_saver_error_mgr</b> 
+    <b>{</b>
+        jpeg_error_mgr pub;    <font color='#009900'>/* "public" fields */</font>
+        jmp_buf setjmp_buffer;  <font color='#009900'>/* for return to caller */</font>
+    <b>}</b>;
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='jpeg_saver_error_exit'></a>jpeg_saver_error_exit</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>/* cinfo-&gt;err really points to a jpeg_saver_error_mgr struct, so coerce pointer */</font>
+        jpeg_saver_error_mgr<font color='#5555FF'>*</font> myerr <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>jpeg_saver_error_mgr<font color='#5555FF'>*</font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err;
+
+        <font color='#009900'>/* Return control to the setjmp point */</font>
+        <font color='#BB00BB'>longjmp</font><font face='Lucida Console'>(</font>myerr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>setjmp_buffer, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='save_jpeg'></a>save_jpeg</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> array2d<font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename,
+        <font color='#0000FF'><u>int</u></font> quality
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>img.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t save_jpeg()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You can't save an empty image as a JPEG.</font>"
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> quality <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> quality <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>100</font>,
+            "<font color='#CC0000'>\t save_jpeg()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid quality value.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t quality: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> quality
+            <font face='Lucida Console'>)</font>;
+
+        FILE<font color='#5555FF'>*</font> outfile <font color='#5555FF'>=</font> <font color='#BB00BB'>fopen</font><font face='Lucida Console'>(</font>filename.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, "<font color='#CC0000'>wb</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>outfile<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_save_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Can't open file </font>" <font color='#5555FF'>+</font> filename <font color='#5555FF'>+</font> "<font color='#CC0000'> for writing.</font>"<font face='Lucida Console'>)</font>;
+
+        jpeg_compress_struct cinfo;
+
+        jpeg_saver_error_mgr jerr;
+        cinfo.err <font color='#5555FF'>=</font> <font color='#BB00BB'>jpeg_std_error</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>jerr.pub<font face='Lucida Console'>)</font>;
+        jerr.pub.error_exit <font color='#5555FF'>=</font> jpeg_saver_error_exit;
+        <font color='#009900'>/* Establish the setjmp return context for my_error_exit to use. */</font>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>setjmp</font><font face='Lucida Console'>(</font>jerr.setjmp_buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#009900'>/* If we get here, the JPEG code has signaled an error.
+             * We need to clean up the JPEG object, close the input file, and return.
+             */</font>
+            <font color='#BB00BB'>jpeg_destroy_compress</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>fclose</font><font face='Lucida Console'>(</font>outfile<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_save_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>save_jpeg: error while writing </font>" <font color='#5555FF'>+</font> filename<font face='Lucida Console'>)</font>;
+        <b>}</b>
+         
+        <font color='#BB00BB'>jpeg_create_compress</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>jpeg_stdio_dest</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo, outfile<font face='Lucida Console'>)</font>;
+         
+        cinfo.image_width      <font color='#5555FF'>=</font> img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        cinfo.image_height     <font color='#5555FF'>=</font> img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        cinfo.input_components <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        cinfo.in_color_space   <font color='#5555FF'>=</font> JCS_RGB;
+        <font color='#BB00BB'>jpeg_set_defaults</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>jpeg_set_quality</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo, quality, <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>jpeg_start_compress</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo, <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+         
+        <font color='#009900'>// now write out the rows one at a time
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>cinfo.next_scanline <font color='#5555FF'>&lt;</font> cinfo.image_height<font face='Lucida Console'>)</font> <b>{</b>
+            JSAMPROW row_pointer <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPROW<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font>img[cinfo.next_scanline][<font color='#979000'>0</font>];
+            <font color='#BB00BB'>jpeg_write_scanlines</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo, <font color='#5555FF'>&amp;</font>row_pointer, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#BB00BB'>jpeg_finish_compress</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>jpeg_destroy_compress</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>fclose</font><font face='Lucida Console'>(</font> outfile <font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='save_jpeg'></a>save_jpeg</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename,
+        <font color='#0000FF'><u>int</u></font> quality
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>img.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t save_jpeg()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You can't save an empty image as a JPEG.</font>"
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> quality <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> quality <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>100</font>,
+            "<font color='#CC0000'>\t save_jpeg()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid quality value.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t quality: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> quality
+            <font face='Lucida Console'>)</font>;
+
+
+        FILE<font color='#5555FF'>*</font> outfile <font color='#5555FF'>=</font> <font color='#BB00BB'>fopen</font><font face='Lucida Console'>(</font>filename.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, "<font color='#CC0000'>wb</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>outfile<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_save_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Can't open file </font>" <font color='#5555FF'>+</font> filename <font color='#5555FF'>+</font> "<font color='#CC0000'> for writing.</font>"<font face='Lucida Console'>)</font>;
+
+        jpeg_compress_struct cinfo;
+
+        jpeg_saver_error_mgr jerr;
+        cinfo.err <font color='#5555FF'>=</font> <font color='#BB00BB'>jpeg_std_error</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>jerr.pub<font face='Lucida Console'>)</font>;
+        jerr.pub.error_exit <font color='#5555FF'>=</font> jpeg_saver_error_exit;
+        <font color='#009900'>/* Establish the setjmp return context for my_error_exit to use. */</font>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>setjmp</font><font face='Lucida Console'>(</font>jerr.setjmp_buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#009900'>/* If we get here, the JPEG code has signaled an error.
+             * We need to clean up the JPEG object, close the input file, and return.
+             */</font>
+            <font color='#BB00BB'>jpeg_destroy_compress</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>fclose</font><font face='Lucida Console'>(</font>outfile<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_save_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>save_jpeg: error while writing </font>" <font color='#5555FF'>+</font> filename<font face='Lucida Console'>)</font>;
+        <b>}</b>
+         
+        <font color='#BB00BB'>jpeg_create_compress</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>jpeg_stdio_dest</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo, outfile<font face='Lucida Console'>)</font>;
+         
+        cinfo.image_width      <font color='#5555FF'>=</font> img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        cinfo.image_height     <font color='#5555FF'>=</font> img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        cinfo.input_components <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        cinfo.in_color_space   <font color='#5555FF'>=</font> JCS_GRAYSCALE;
+        <font color='#BB00BB'>jpeg_set_defaults</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>jpeg_set_quality</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo, quality, <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>jpeg_start_compress</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo, <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+         
+        <font color='#009900'>// now write out the rows one at a time
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>cinfo.next_scanline <font color='#5555FF'>&lt;</font> cinfo.image_height<font face='Lucida Console'>)</font> <b>{</b>
+            JSAMPROW row_pointer <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPROW<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font>img[cinfo.next_scanline][<font color='#979000'>0</font>];
+            <font color='#BB00BB'>jpeg_write_scanlines</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo, <font color='#5555FF'>&amp;</font>row_pointer, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#BB00BB'>jpeg_finish_compress</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>jpeg_destroy_compress</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>fclose</font><font face='Lucida Console'>(</font> outfile <font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_JPEG_SUPPORT
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_JPEG_SAVER_CPp_
+</font>
+
+
+
+</pre></body></html>

@@ -1,0 +1,268 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - one_vs_all_decision_function.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_ONE_VS_ALL_DECISION_FUnCTION_Hh_
+<font color='#0000FF'>#define</font> DLIB_ONE_VS_ALL_DECISION_FUnCTION_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='one_vs_all_decision_function_abstract.h.html'>one_vs_all_decision_function_abstract.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../type_safe_union.h.html'>../type_safe_union.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>map<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../any.h.html'>../any.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='null_df.h.html'>null_df.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> one_vs_all_trainer,
+        <font color='#0000FF'>typename</font> DF1 <font color='#5555FF'>=</font> null_df, <font color='#0000FF'>typename</font> DF2 <font color='#5555FF'>=</font> null_df, <font color='#0000FF'>typename</font> DF3 <font color='#5555FF'>=</font> null_df,
+        <font color='#0000FF'>typename</font> DF4 <font color='#5555FF'>=</font> null_df, <font color='#0000FF'>typename</font> DF5 <font color='#5555FF'>=</font> null_df, <font color='#0000FF'>typename</font> DF6 <font color='#5555FF'>=</font> null_df,
+        <font color='#0000FF'>typename</font> DF7 <font color='#5555FF'>=</font> null_df, <font color='#0000FF'>typename</font> DF8 <font color='#5555FF'>=</font> null_df, <font color='#0000FF'>typename</font> DF9 <font color='#5555FF'>=</font> null_df,
+        <font color='#0000FF'>typename</font> DF10 <font color='#5555FF'>=</font> null_df
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='one_vs_all_decision_function'></a>one_vs_all_decision_function</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> one_vs_all_trainer::label_type result_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> one_vs_all_trainer::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> one_vs_all_trainer::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> one_vs_all_trainer::mem_manager_type mem_manager_type;
+
+        <font color='#0000FF'>typedef</font> std::map<font color='#5555FF'>&lt;</font>result_type, any_decision_function<font color='#5555FF'>&lt;</font>sample_type, scalar_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> binary_function_table;
+
+        <b><a name='one_vs_all_decision_function'></a>one_vs_all_decision_function</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> :num_classes<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>explicit</font> <b><a name='one_vs_all_decision_function'></a>one_vs_all_decision_function</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> binary_function_table<font color='#5555FF'>&amp;</font> dfs_
+        <font face='Lucida Console'>)</font> : dfs<font face='Lucida Console'>(</font>dfs_<font face='Lucida Console'>)</font>
+        <b>{</b>
+            num_classes <font color='#5555FF'>=</font> dfs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> binary_function_table<font color='#5555FF'>&amp;</font> <b><a name='get_binary_decision_functions'></a>get_binary_decision_functions</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> dfs;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>result_type<font color='#5555FF'>&gt;</font> <b><a name='get_labels'></a>get_labels</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            std::vector<font color='#5555FF'>&lt;</font>result_type<font color='#5555FF'>&gt;</font> temp;
+            temp.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>dfs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> binary_function_table::const_iterator i <font color='#5555FF'>=</font> dfs.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> dfs.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> df1, <font color='#0000FF'>typename</font> df2, <font color='#0000FF'>typename</font> df3, <font color='#0000FF'>typename</font> df4, <font color='#0000FF'>typename</font> df5,
+            <font color='#0000FF'>typename</font> df6, <font color='#0000FF'>typename</font> df7, <font color='#0000FF'>typename</font> df8, <font color='#0000FF'>typename</font> df9, <font color='#0000FF'>typename</font> df10
+            <font color='#5555FF'>&gt;</font>
+        <b><a name='one_vs_all_decision_function'></a>one_vs_all_decision_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> one_vs_all_decision_function<font color='#5555FF'>&lt;</font>one_vs_all_trainer, 
+                                               df1, df2, df3, df4, df5,
+                                               df6, df7, df8, df9, df10<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> : dfs<font face='Lucida Console'>(</font>item.get_binary_decision_functions<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, num_classes<font face='Lucida Console'>(</font>item.number_of_classes<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_classes'></a>number_of_classes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> num_classes;
+        <b>}</b>
+
+        std::pair<font color='#5555FF'>&lt;</font>result_type, scalar_type<font color='#5555FF'>&gt;</font> <b><a name='predict'></a>predict</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> sample
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>number_of_classes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>, 
+                "<font color='#CC0000'>\t pair&lt;result_type,scalar_type&gt; one_vs_all_decision_function::predict()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You can't make predictions with an empty decision function.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            result_type best_label <font color='#5555FF'>=</font> <font color='#BB00BB'>result_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            scalar_type best_score <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// run all the classifiers over the sample and find the best one
+</font>            <font color='#0000FF'>for</font><font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> binary_function_table::const_iterator i <font color='#5555FF'>=</font> dfs.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> dfs.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> scalar_type score <font color='#5555FF'>=</font> i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>second</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>score <font color='#5555FF'>&gt;</font> best_score<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    best_score <font color='#5555FF'>=</font> score;
+                    best_label <font color='#5555FF'>=</font> i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>best_label, best_score<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        result_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> sample
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>number_of_classes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>, 
+                "<font color='#CC0000'>\t result_type one_vs_all_decision_function::operator()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You can't make predictions with an empty decision function.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>predict</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font>.first;
+        <b>}</b>
+
+
+
+    <font color='#0000FF'>private</font>:
+        binary_function_table dfs;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_classes;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> DF1, <font color='#0000FF'>typename</font> DF2, <font color='#0000FF'>typename</font> DF3,
+        <font color='#0000FF'>typename</font> DF4, <font color='#0000FF'>typename</font> DF5, <font color='#0000FF'>typename</font> DF6,
+        <font color='#0000FF'>typename</font> DF7, <font color='#0000FF'>typename</font> DF8, <font color='#0000FF'>typename</font> DF9,
+        <font color='#0000FF'>typename</font> DF10 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> one_vs_all_decision_function<font color='#5555FF'>&lt;</font>T,DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            type_safe_union<font color='#5555FF'>&lt;</font>DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10<font color='#5555FF'>&gt;</font> temp;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::label_type result_type;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::sample_type sample_type;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::scalar_type scalar_type;
+            <font color='#0000FF'>typedef</font> std::map<font color='#5555FF'>&lt;</font>result_type, any_decision_function<font color='#5555FF'>&lt;</font>sample_type, scalar_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> binary_function_table;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> version <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>version, out<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size <font color='#5555FF'>=</font> item.<font color='#BB00BB'>get_binary_decision_functions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>size, out<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font><font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> binary_function_table::const_iterator i <font color='#5555FF'>=</font> item.<font color='#BB00BB'>get_binary_decision_functions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+                i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> item.<font color='#BB00BB'>get_binary_decision_functions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first, out<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font>      <font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#0000FF'>template</font> contains<font color='#5555FF'>&lt;</font>DF1<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> temp.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>DF1<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> any_cast<font color='#5555FF'>&lt;</font>DF1<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#0000FF'>template</font> contains<font color='#5555FF'>&lt;</font>DF2<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> temp.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>DF2<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> any_cast<font color='#5555FF'>&lt;</font>DF2<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#0000FF'>template</font> contains<font color='#5555FF'>&lt;</font>DF3<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> temp.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>DF3<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> any_cast<font color='#5555FF'>&lt;</font>DF3<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#0000FF'>template</font> contains<font color='#5555FF'>&lt;</font>DF4<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> temp.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>DF4<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> any_cast<font color='#5555FF'>&lt;</font>DF4<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#0000FF'>template</font> contains<font color='#5555FF'>&lt;</font>DF5<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> temp.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>DF5<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> any_cast<font color='#5555FF'>&lt;</font>DF5<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#0000FF'>template</font> contains<font color='#5555FF'>&lt;</font>DF6<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> temp.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>DF6<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> any_cast<font color='#5555FF'>&lt;</font>DF6<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#0000FF'>template</font> contains<font color='#5555FF'>&lt;</font>DF7<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> temp.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>DF7<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> any_cast<font color='#5555FF'>&lt;</font>DF7<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#0000FF'>template</font> contains<font color='#5555FF'>&lt;</font>DF8<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> temp.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>DF8<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> any_cast<font color='#5555FF'>&lt;</font>DF8<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#0000FF'>template</font> contains<font color='#5555FF'>&lt;</font>DF9<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> temp.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>DF9<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> any_cast<font color='#5555FF'>&lt;</font>DF9<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#0000FF'>template</font> contains<font color='#5555FF'>&lt;</font>DF10<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> temp.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>DF10<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> any_cast<font color='#5555FF'>&lt;</font>DF10<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Can't serialize one_vs_all_decision_function.  Not all decision functions defined.</font>"<font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>temp,out<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing an object of type one_vs_all_decision_function</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl_ova
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> sample_type, <font color='#0000FF'>typename</font> scalar_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='copy_to_df_helper'></a>copy_to_df_helper</b>
+        <b>{</b>
+            <b><a name='copy_to_df_helper'></a>copy_to_df_helper</b><font face='Lucida Console'>(</font>any_decision_function<font color='#5555FF'>&lt;</font>sample_type, scalar_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> target_<font face='Lucida Console'>)</font> : target<font face='Lucida Console'>(</font>target_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            any_decision_function<font color='#5555FF'>&lt;</font>sample_type, scalar_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> target;
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                target <font color='#5555FF'>=</font> item;
+            <b>}</b>
+        <b>}</b>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> DF1, <font color='#0000FF'>typename</font> DF2, <font color='#0000FF'>typename</font> DF3,
+        <font color='#0000FF'>typename</font> DF4, <font color='#0000FF'>typename</font> DF5, <font color='#0000FF'>typename</font> DF6,
+        <font color='#0000FF'>typename</font> DF7, <font color='#0000FF'>typename</font> DF8, <font color='#0000FF'>typename</font> DF9,
+        <font color='#0000FF'>typename</font> DF10 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>
+        one_vs_all_decision_function<font color='#5555FF'>&lt;</font>T,DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            type_safe_union<font color='#5555FF'>&lt;</font>DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10<font color='#5555FF'>&gt;</font> temp;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::label_type result_type;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::sample_type sample_type;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::scalar_type scalar_type;
+            <font color='#0000FF'>typedef</font> impl_ova::copy_to_df_helper<font color='#5555FF'>&lt;</font>sample_type, scalar_type<font color='#5555FF'>&gt;</font> copy_to;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> version;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>version, in<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>version <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Can't deserialize one_vs_all_decision_function.  Wrong version.</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>size, in<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>typedef</font> std::map<font color='#5555FF'>&lt;</font>result_type, any_decision_function<font color='#5555FF'>&lt;</font>sample_type, scalar_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> binary_function_table;
+            binary_function_table dfs;
+
+            result_type l;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>l, in<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>temp, in<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp.<font color='#0000FF'>template</font> contains<font color='#5555FF'>&lt;</font>null_df<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>A sub decision function of unknown type was encountered.</font>"<font face='Lucida Console'>)</font>;
+
+                temp.<font color='#BB00BB'>apply_to_contents</font><font face='Lucida Console'>(</font><font color='#BB00BB'>copy_to</font><font face='Lucida Console'>(</font>dfs[l]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            item <font color='#5555FF'>=</font> one_vs_all_decision_function<font color='#5555FF'>&lt;</font>T,DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>dfs<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing an object of type one_vs_all_decision_function</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ONE_VS_ALL_DECISION_FUnCTION_Hh_
+</font>
+
+
+
+</pre></body></html>

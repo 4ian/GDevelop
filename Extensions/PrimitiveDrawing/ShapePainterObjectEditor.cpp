@@ -5,7 +5,7 @@ Copyright (c) 2008-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #include "ShapePainterObjectEditor.h"
 
@@ -55,7 +55,7 @@ object(object_)
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 
-	Create(parent, wxID_ANY, _("Edition of the Shape Painter object"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Edit the Shape Painter object"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);

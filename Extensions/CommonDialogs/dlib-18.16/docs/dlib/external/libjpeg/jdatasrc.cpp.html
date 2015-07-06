@@ -1,0 +1,215 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jdatasrc.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jdatasrc.c
+ *
+ * Copyright (C) 1994-1996, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains decompression data source routines for the case of
+ * reading JPEG data from a file (or any stdio stream).  While these routines
+ * are sufficient for most applications, some will want to use a different
+ * source manager.
+ * IMPORTANT: we assume that fread() will correctly transcribe an array of
+ * JOCTETs from 8-bit-wide elements on external storage.  If char is wider
+ * than 8 bits on your machine, you may need to do some tweaking.
+ */</font>
+
+<font color='#009900'>/* this is not a core library module, so it doesn't define JPEG_INTERNALS */</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jerror.h.html'>jerror.h</a>"
+
+
+<font color='#009900'>/* Expanded data source object for stdio input */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#0000FF'>struct</font> jpeg_source_mgr pub;	<font color='#009900'>/* public fields */</font>
+
+  FILE <font color='#5555FF'>*</font> infile;		<font color='#009900'>/* source stream */</font>
+  JOCTET <font color='#5555FF'>*</font> buffer;		<font color='#009900'>/* start of buffer */</font>
+  <font color='#0000FF'><u>int</u></font> start_of_file;	<font color='#009900'>/* have we gotten any data yet? */</font>
+<b>}</b> my_source_mgr;
+
+<font color='#0000FF'>typedef</font> my_source_mgr <font color='#5555FF'>*</font> my_src_ptr;
+
+<font color='#0000FF'>#define</font> INPUT_BUF_SIZE  <font color='#979000'>4096</font>	<font color='#009900'>/* choose an efficiently fread'able size */</font>
+
+
+<font color='#009900'>/*
+ * Initialize source --- called by jpeg_read_header
+ * before any data is actually read.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='init_source'></a>init_source</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_src_ptr src <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_src_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>src;
+
+  <font color='#009900'>/* We reset the empty-input-file flag for each image,
+   * but we don't clear the input buffer.
+   * This is correct behavior for reading a series of images from one source.
+   */</font>
+  src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>start_of_file <font color='#5555FF'>=</font> TRUE;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Fill the input buffer --- called whenever buffer is emptied.
+ *
+ * In typical applications, this should read fresh data into the buffer
+ * (ignoring the current state of next_input_byte &amp; bytes_in_buffer),
+ * reset the pointer &amp; count to the start of the buffer, and return TRUE
+ * indicating that the buffer has been reloaded.  It is not necessary to
+ * fill the buffer entirely, only to obtain at least one more byte.
+ *
+ * There is no such thing as an EOF return.  If the end of the file has been
+ * reached, the routine has a choice of ERREXIT() or inserting fake data into
+ * the buffer.  In most cases, generating a warning message and inserting a
+ * fake EOI marker is the best course of action --- this will allow the
+ * decompressor to output however much of the image is there.  However,
+ * the resulting error message is misleading if the real problem is an empty
+ * input file, so we handle that case specially.
+ *
+ * In applications that need to be able to suspend compression due to input
+ * not being available yet, a FALSE return indicates that no more data can be
+ * obtained right now, but more may be forthcoming later.  In this situation,
+ * the decompressor will return to its caller (with an indication of the
+ * number of scanlines it has read, if any).  The application should resume
+ * decompression after it has loaded more data into the input buffer.  Note
+ * that there are substantial restrictions on the use of suspension --- see
+ * the documentation.
+ *
+ * When suspending, the decompressor will back up to a convenient restart point
+ * (typically the start of the current MCU). next_input_byte &amp; bytes_in_buffer
+ * indicate where the restart point will be if the current call returns FALSE.
+ * Data beyond this point must be rescanned after resumption, so move it to
+ * the front of the buffer rather than discarding it.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='fill_input_buffer'></a>fill_input_buffer</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_src_ptr src <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_src_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>src;
+  <font color='#0000FF'><u>size_t</u></font> nbytes;
+
+  nbytes <font color='#5555FF'>=</font> <font color='#BB00BB'>JFREAD</font><font face='Lucida Console'>(</font>src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>infile, src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer, INPUT_BUF_SIZE<font face='Lucida Console'>)</font>;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nbytes <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>start_of_file<font face='Lucida Console'>)</font>	<font color='#009900'>/* Treat empty input file as fatal error */</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_INPUT_EMPTY<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>WARNMS</font><font face='Lucida Console'>(</font>cinfo, JWRN_JPEG_EOF<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Insert a fake EOI marker */</font>
+    src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JOCTET<font face='Lucida Console'>)</font> <font color='#979000'>0xFF</font>;
+    src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JOCTET<font face='Lucida Console'>)</font> JPEG_EOI;
+    nbytes <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+  <b>}</b>
+
+  src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.next_input_byte <font color='#5555FF'>=</font> src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer;
+  src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.bytes_in_buffer <font color='#5555FF'>=</font> nbytes;
+  src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>start_of_file <font color='#5555FF'>=</font> FALSE;
+
+  <font color='#0000FF'>return</font> TRUE;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Skip data --- used to skip over a potentially large amount of
+ * uninteresting data (such as an APPn marker).
+ *
+ * Writers of suspendable-input applications must note that skip_input_data
+ * is not granted the right to give a suspension return.  If the skip extends
+ * beyond the data currently in the buffer, the buffer can be marked empty so
+ * that the next read will cause a fill_input_buffer call that can suspend.
+ * Arranging for additional bytes to be discarded before reloading the input
+ * buffer is the application writer's problem.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='skip_input_data'></a>skip_input_data</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, <font color='#0000FF'><u>long</u></font> num_bytes<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_src_ptr src <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_src_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>src;
+
+  <font color='#009900'>/* Just a dumb implementation for now.  Could use fseek() except
+   * it doesn't work on pipes.  Not clear that being smart is worth
+   * any trouble anyway --- large skips are infrequent.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_bytes <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>num_bytes <font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.bytes_in_buffer<font face='Lucida Console'>)</font> <b>{</b>
+      num_bytes <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.bytes_in_buffer;
+      <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>fill_input_buffer</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+      <font color='#009900'>/* note we assume that fill_input_buffer will never return FALSE,
+       * so suspension need not be handled.
+       */</font>
+    <b>}</b>
+    src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.next_input_byte <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> num_bytes;
+    src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.bytes_in_buffer <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> num_bytes;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * An additional method that can be provided by data source modules is the
+ * resync_to_restart method for error recovery in the presence of RST markers.
+ * For the moment, this source module just uses the default resync method
+ * provided by the JPEG library.  That method assumes that no backtracking
+ * is possible.
+ */</font>
+
+
+<font color='#009900'>/*
+ * Terminate source --- called by jpeg_finish_decompress
+ * after all data has been read.  Often a no-op.
+ *
+ * NB: *not* called by jpeg_abort or jpeg_destroy; surrounding
+ * application must deal with any cleanup that should happen even
+ * for error exit.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='term_source'></a>term_source</b> <font face='Lucida Console'>(</font>j_decompress_ptr <font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#009900'>/* no work necessary here */</font>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Prepare for input from a stdio stream.
+ * The caller must have already opened the stream, and is responsible
+ * for closing it after finishing decompression.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_stdio_src'></a>jpeg_stdio_src</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, FILE <font color='#5555FF'>*</font> infile<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_src_ptr src;
+
+  <font color='#009900'>/* The source object and input buffer are made permanent so that a series
+   * of JPEG images can be read from the same file by calling jpeg_stdio_src
+   * only before the first one.  (If we discarded the buffer at the end of
+   * one image, we'd likely lose the start of the next one.)
+   * This makes it unsafe to use this manager and a different source
+   * manager serially with the same JPEG object.  Caveat programmer.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>src <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>	<font color='#009900'>/* first time for this JPEG object? */</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>src <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> jpeg_source_mgr <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_PERMANENT,
+				  <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>my_source_mgr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    src <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_src_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>src;
+    src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JOCTET <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_PERMANENT,
+				  INPUT_BUF_SIZE <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JOCTET<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b>}</b>
+
+  src <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_src_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>src;
+  src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.init_source <font color='#5555FF'>=</font> init_source;
+  src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.fill_input_buffer <font color='#5555FF'>=</font> fill_input_buffer;
+  src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.skip_input_data <font color='#5555FF'>=</font> skip_input_data;
+  src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.resync_to_restart <font color='#5555FF'>=</font> jpeg_resync_to_restart; <font color='#009900'>/* use default method */</font>
+  src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.term_source <font color='#5555FF'>=</font> term_source;
+  src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>infile <font color='#5555FF'>=</font> infile;
+  src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.bytes_in_buffer <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#009900'>/* forces fill_input_buffer on first read */</font>
+  src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.next_input_byte <font color='#5555FF'>=</font> NULL; <font color='#009900'>/* until buffer loaded */</font>
+<b>}</b>
+
+</pre></body></html>

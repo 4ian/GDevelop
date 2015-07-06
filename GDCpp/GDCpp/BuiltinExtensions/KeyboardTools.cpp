@@ -15,6 +15,11 @@ bool GD_API IsKeyPressed(RuntimeScene & scene, gd::String key)
     return scene.GetInputManager().IsKeyPressed(key);
 }
 
+bool GD_API WasKeyReleased(RuntimeScene & scene, gd::String key)
+{
+    return scene.GetInputManager().WasKeyReleased(key);
+}
+
 bool GD_API AnyKeyIsPressed(RuntimeScene & scene)
 {
     return scene.GetInputManager().AnyKeyIsPressed();

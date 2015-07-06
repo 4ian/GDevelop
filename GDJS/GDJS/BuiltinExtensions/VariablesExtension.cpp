@@ -47,152 +47,123 @@ VariablesExtension::VariablesExtension()
     GetAllActions()["VariableRemoveChild"].SetFunctionName("gdjs.evtTools.common.variableRemoveChild");
     GetAllActions()["GlobalVariableRemoveChild"].SetFunctionName("gdjs.evtTools.common.variableRemoveChild");
 
-    {
-        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
-        {
-            virtual gd::String GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+    GetAllActions()["ModVarScene"].codeExtraInformation
+        .SetCustomCodeGenerator([](gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) {
+            gd::String expressionCode;
             {
-                gd::String expressionCode;
-                {
-                    gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
-                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
-                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty())
-                        expressionCode = "0";
-                }
-                gd::String varGetter;
-                {
-                    VariableCodeGenerationCallbacks callbacks(varGetter, codeGenerator, context, VariableCodeGenerationCallbacks::LAYOUT_VARIABLE);
-                    gd::VariableParser parser(instruction.GetParameters()[0].GetPlainString());
-                    if ( !parser.Parse(callbacks) )
-                        varGetter = "runtimeScene.getVariables().get(\"\")";
-                }
-
-                gd::String op = instruction.GetParameters()[1].GetPlainString();
-                if ( op == "=" )
-                    return varGetter+".setNumber("+expressionCode+");\n";
-                else if ( op == "+" )
-                    return varGetter+".add("+expressionCode+");\n";
-                else if ( op == "-" )
-                    return varGetter+".sub("+expressionCode+");\n";
-                else if ( op == "*" )
-                    return varGetter+".mul("+expressionCode+");\n";
-                else if ( op == "/" )
-                    return varGetter+".div("+expressionCode+");\n";
-
-                return "";
-            };
-        };
-
-        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
-        GetAllActions()["ModVarScene"].codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
-    }
-    {
-        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
-        {
-            virtual gd::String GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+                gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
+                gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty())
+                    expressionCode = "0";
+            }
+            gd::String varGetter;
             {
-                gd::String expressionCode;
-                {
-                    gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
-                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
-                    if (!parser.ParseStringExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty())
-                        expressionCode = "\"\"";
-                }
+                VariableCodeGenerationCallbacks callbacks(varGetter, codeGenerator, context, VariableCodeGenerationCallbacks::LAYOUT_VARIABLE);
+                gd::VariableParser parser(instruction.GetParameters()[0].GetPlainString());
+                if ( !parser.Parse(callbacks) )
+                    varGetter = "runtimeScene.getVariables().get(\"\")";
+            }
 
-                gd::String varGetter;
-                {
-                    VariableCodeGenerationCallbacks callbacks(varGetter, codeGenerator, context, VariableCodeGenerationCallbacks::LAYOUT_VARIABLE);
-                    gd::VariableParser parser(instruction.GetParameters()[0].GetPlainString());
-                    if ( !parser.Parse(callbacks) )
-                        varGetter = "runtimeScene.getVariables().get(\"\")";
-                }
+            gd::String op = instruction.GetParameters()[1].GetPlainString();
+            if ( op == "=" )
+                return varGetter+".setNumber("+expressionCode+");\n";
+            else if ( op == "+" )
+                return varGetter+".add("+expressionCode+");\n";
+            else if ( op == "-" )
+                return varGetter+".sub("+expressionCode+");\n";
+            else if ( op == "*" )
+                return varGetter+".mul("+expressionCode+");\n";
+            else if ( op == "/" )
+                return varGetter+".div("+expressionCode+");\n";
 
-                gd::String op = instruction.GetParameters()[1].GetPlainString();
-                if ( op == "=" )
-                    return varGetter+".setString("+expressionCode+");\n";
-                else if ( op == "+" )
-                    return varGetter+".concatenate("+expressionCode+");\n";
+            return gd::String("");
+        });
 
-                return "";
-            };
-        };
-
-        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
-        GetAllActions()["ModVarSceneTxt"].codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
-    }
-    {
-        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
-        {
-            virtual gd::String GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+    GetAllActions()["ModVarSceneTxt"].codeExtraInformation
+        .SetCustomCodeGenerator([](gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) {
+            gd::String expressionCode;
             {
-                gd::String expressionCode;
-                {
-                    gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
-                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
-                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty())
-                        expressionCode = "0";
-                }
-                gd::String varGetter;
-                {
-                    VariableCodeGenerationCallbacks callbacks(varGetter, codeGenerator, context, VariableCodeGenerationCallbacks::PROJECT_VARIABLE);
-                    gd::VariableParser parser(instruction.GetParameters()[0].GetPlainString());
-                    if ( !parser.Parse(callbacks) )
-                        varGetter = "runtimeScene.getVariables().get(\"\")";
-                }
+                gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
+                gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                if (!parser.ParseStringExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty())
+                    expressionCode = "\"\"";
+            }
 
-                gd::String op = instruction.GetParameters()[1].GetPlainString();
-                if ( op == "=" )
-                    return varGetter+".setNumber("+expressionCode+");\n";
-                else if ( op == "+" )
-                    return varGetter+".add("+expressionCode+");\n";
-                else if ( op == "-" )
-                    return varGetter+".sub("+expressionCode+");\n";
-                else if ( op == "*" )
-                    return varGetter+".mul("+expressionCode+");\n";
-                else if ( op == "/" )
-                    return varGetter+".div("+expressionCode+");\n";
-
-                return "";
-            };
-        };
-
-        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
-        GetAllActions()["ModVarGlobal"].codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
-    }
-    {
-        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
-        {
-            virtual gd::String GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            gd::String varGetter;
             {
-                gd::String expressionCode;
-                {
-                    gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
-                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
-                    if (!parser.ParseStringExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty())
-                        expressionCode = "\"\"";
-                }
+                VariableCodeGenerationCallbacks callbacks(varGetter, codeGenerator, context, VariableCodeGenerationCallbacks::LAYOUT_VARIABLE);
+                gd::VariableParser parser(instruction.GetParameters()[0].GetPlainString());
+                if ( !parser.Parse(callbacks) )
+                    varGetter = "runtimeScene.getVariables().get(\"\")";
+            }
 
-                gd::String varGetter;
-                {
-                    VariableCodeGenerationCallbacks callbacks(varGetter, codeGenerator, context, VariableCodeGenerationCallbacks::PROJECT_VARIABLE);
-                    gd::VariableParser parser(instruction.GetParameters()[0].GetPlainString());
-                    if ( !parser.Parse(callbacks) )
-                        varGetter = "runtimeScene.getVariables().get(\"\")";
-                }
+            gd::String op = instruction.GetParameters()[1].GetPlainString();
+            if ( op == "=" )
+                return varGetter+".setString("+expressionCode+");\n";
+            else if ( op == "+" )
+                return varGetter+".concatenate("+expressionCode+");\n";
 
-                gd::String op = instruction.GetParameters()[1].GetPlainString();
-                if ( op == "=" )
-                    return varGetter+".setString("+expressionCode+");\n";
-                else if ( op == "+" )
-                    return varGetter+".concatenate("+expressionCode+");\n";
+            return gd::String("");
+        });
 
-                return "";
-            };
-        };
+    GetAllActions()["ModVarGlobal"].codeExtraInformation
+        .SetCustomCodeGenerator([](gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) {
+            gd::String expressionCode;
+            {
+                gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
+                gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty())
+                    expressionCode = "0";
+            }
+            gd::String varGetter;
+            {
+                VariableCodeGenerationCallbacks callbacks(varGetter, codeGenerator, context, VariableCodeGenerationCallbacks::PROJECT_VARIABLE);
+                gd::VariableParser parser(instruction.GetParameters()[0].GetPlainString());
+                if ( !parser.Parse(callbacks) )
+                    varGetter = "runtimeScene.getVariables().get(\"\")";
+            }
 
-        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
-        GetAllActions()["ModVarGlobalTxt"].codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
-    }
+            gd::String op = instruction.GetParameters()[1].GetPlainString();
+            if ( op == "=" )
+                return varGetter+".setNumber("+expressionCode+");\n";
+            else if ( op == "+" )
+                return varGetter+".add("+expressionCode+");\n";
+            else if ( op == "-" )
+                return varGetter+".sub("+expressionCode+");\n";
+            else if ( op == "*" )
+                return varGetter+".mul("+expressionCode+");\n";
+            else if ( op == "/" )
+                return varGetter+".div("+expressionCode+");\n";
+
+            return gd::String("");
+        });
+
+    GetAllActions()["ModVarGlobalTxt"].codeExtraInformation
+        .SetCustomCodeGenerator([](gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) {
+            gd::String expressionCode;
+            {
+                gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
+                gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                if (!parser.ParseStringExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty())
+                    expressionCode = "\"\"";
+            }
+
+            gd::String varGetter;
+            {
+                VariableCodeGenerationCallbacks callbacks(varGetter, codeGenerator, context, VariableCodeGenerationCallbacks::PROJECT_VARIABLE);
+                gd::VariableParser parser(instruction.GetParameters()[0].GetPlainString());
+                if ( !parser.Parse(callbacks) )
+                    varGetter = "runtimeScene.getVariables().get(\"\")";
+            }
+
+            gd::String op = instruction.GetParameters()[1].GetPlainString();
+            if ( op == "=" )
+                return varGetter+".setString("+expressionCode+");\n";
+            else if ( op == "+" )
+                return varGetter+".concatenate("+expressionCode+");\n";
+
+            return gd::String("");
+        });
 }
 
 }

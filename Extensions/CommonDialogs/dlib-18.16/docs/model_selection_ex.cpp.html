@@ -1,0 +1,268 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - model_selection_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example that shows some reasonable ways you can perform
+    model selection with the dlib C++ Library.  
+
+    It will create a simple set of data and then show you how to use 
+    the cross validation and optimization routines to determine good model 
+    parameters for the purpose of training an svm to classify the sample data.
+
+    The data used in this example will be 2 dimensional data and will
+    come from a distribution where points with a distance less than 10
+    from the origin are labeled +1 and all other points are labeled
+    as -1.
+        
+
+    As an side, you should probably read the <a href="svm_ex.cpp.html">svm_ex.cpp</a> and <a href="matrix_ex.cpp.html">matrix_ex.cpp</a> example 
+    programs before you read this one.
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// The svm functions use column vectors to contain a lot of the data on which they 
+</font><font color='#009900'>// operate. So the first thing we do here is declare a convenient typedef.  
+</font>
+<font color='#009900'>// This typedef declares a matrix with 2 rows and 1 column.  It will be the
+</font><font color='#009900'>// object that contains each of our 2 dimensional samples.   
+</font><font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, <font color='#979000'>2</font>, <font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample_type;
+
+<font color='#009900'>// This is a typedef for the type of kernel we are going to use in this example.
+</font><font color='#009900'>// In this case I have selected the radial basis kernel that can operate on our
+</font><font color='#009900'>// 2D sample_type objects
+</font><font color='#0000FF'>typedef</font> radial_basis_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> kernel_type;
+
+
+
+
+<font color='#0000FF'>class</font> <b><a name='cross_validation_objective'></a>cross_validation_objective</b>
+<b>{</b>
+    <font color='#009900'>/*!
+        WHAT THIS OBJECT REPRESENTS
+            This object is a simple function object that takes a set of model
+            parameters and returns a number indicating how "good" they are.  It
+            does this by performing 10 fold cross validation on our dataset
+            and reporting the accuracy.
+
+            See below in main() for how this object gets used. 
+    !*/</font>
+<font color='#0000FF'>public</font>:
+
+    <b><a name='cross_validation_objective'></a>cross_validation_objective</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples_,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels_
+    <font face='Lucida Console'>)</font> : samples<font face='Lucida Console'>(</font>samples_<font face='Lucida Console'>)</font>, labels<font face='Lucida Console'>(</font>labels_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+    <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> params
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// Pull out the two SVM model parameters.  Note that, in this case,
+</font>        <font color='#009900'>// I have setup the parameter search to operate in log scale so we have
+</font>        <font color='#009900'>// to remember to call exp() to put the parameters back into a normal scale.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> gamma <font color='#5555FF'>=</font> <font color='#BB00BB'>exp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>params</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> nu    <font color='#5555FF'>=</font> <font color='#BB00BB'>exp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>params</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Make an SVM trainer and tell it what the parameters are supposed to be.
+</font>        svm_nu_trainer<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> trainer;
+        trainer.<font color='#BB00BB'>set_kernel</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_type</font><font face='Lucida Console'>(</font>gamma<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        trainer.<font color='#BB00BB'>set_nu</font><font face='Lucida Console'>(</font>nu<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Finally, perform 10-fold cross validation and then print and return the results.
+</font>        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> result <font color='#5555FF'>=</font> <font color='#BB00BB'>cross_validate_trainer</font><font face='Lucida Console'>(</font>trainer, samples, labels, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>gamma: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>setw</font><font face='Lucida Console'>(</font><font color='#979000'>11</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> gamma <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  nu: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>setw</font><font face='Lucida Console'>(</font><font color='#979000'>11</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> nu <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>  "<font color='#CC0000'>  cross validation accuracy: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> result;
+
+        <font color='#009900'>// Here I'm returning the harmonic mean between the accuracies of each class.
+</font>        <font color='#009900'>// However, you could do something else.  For example, you might care a lot more
+</font>        <font color='#009900'>// about correctly predicting the +1 class, so you could penalize results that
+</font>        <font color='#009900'>// didn't obtain a high accuracy on that class.  You might do this by using 
+</font>        <font color='#009900'>// something like a weighted version of the F1-score (see http://en.wikipedia.org/wiki/F1_score).     
+</font>        <font color='#0000FF'>return</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#BB00BB'>prod</font><font face='Lucida Console'>(</font>result<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>result<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples;
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels;
+
+<b>}</b>;
+
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+
+        <font color='#009900'>// Now we make objects to contain our samples and their respective labels.
+</font>        std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samples;
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> labels;
+
+        <font color='#009900'>// Now let's put some data into our samples and labels objects.  We do this
+</font>        <font color='#009900'>// by looping over a bunch of points and labeling them according to their
+</font>        <font color='#009900'>// distance from the origin.
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> r <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>20</font>; r <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>20</font>; r <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>0.8</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> c <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>20</font>; c <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>20</font>; c <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>0.8</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                sample_type samp;
+                <font color='#BB00BB'>samp</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> r;
+                <font color='#BB00BB'>samp</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> c;
+                samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>samp<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// if this point is less than 10 from the origin
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>r<font color='#5555FF'>*</font>r <font color='#5555FF'>+</font> c<font color='#5555FF'>*</font>c<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>
+                    labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <b>}</b>
+        <b>}</b>
+
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Generated </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> points</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+        <font color='#009900'>// Here we normalize all the samples by subtracting their mean and dividing by their standard deviation.
+</font>        <font color='#009900'>// This is generally a good idea since it often heads off numerical stability problems and also 
+</font>        <font color='#009900'>// prevents one large feature from smothering others.  Doing this doesn't matter much in this example
+</font>        <font color='#009900'>// so I'm just doing this here so you can see an easy way to accomplish this with 
+</font>        <font color='#009900'>// the library.  
+</font>        vector_normalizer<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> normalizer;
+        <font color='#009900'>// let the normalizer learn the mean and standard deviation of the samples
+</font>        normalizer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// now normalize each sample
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            samples[i] <font color='#5555FF'>=</font> <font color='#BB00BB'>normalizer</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font>; 
+
+
+        <font color='#009900'>// Now that we have some data we want to train on it.  However, there are two parameters to the 
+</font>        <font color='#009900'>// training.  These are the nu and gamma parameters.  Our choice for these parameters will 
+</font>        <font color='#009900'>// influence how good the resulting decision function is.  To test how good a particular choice 
+</font>        <font color='#009900'>// of these parameters is we can use the cross_validate_trainer() function to perform n-fold cross
+</font>        <font color='#009900'>// validation on our training data.  However, there is a problem with the way we have sampled 
+</font>        <font color='#009900'>// our distribution above.  The problem is that there is a definite ordering to the samples.  
+</font>        <font color='#009900'>// That is, the first half of the samples look like they are from a different distribution 
+</font>        <font color='#009900'>// than the second half.  This would screw up the cross validation process but we can 
+</font>        <font color='#009900'>// fix it by randomizing the order of the samples with the following function call.
+</font>        <font color='#BB00BB'>randomize_samples</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// The nu parameter has a maximum value that is dependent on the ratio of the +1 to -1 
+</font>        <font color='#009900'>// labels in the training data.  This function finds that value.  The 0.999 is here because
+</font>        <font color='#009900'>// the maximum allowable nu is strictly less than the value returned by maximum_nu().  So
+</font>        <font color='#009900'>// rather than dealing with that below we can just back away from it a little bit here and then
+</font>        <font color='#009900'>// not worry about it.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> max_nu <font color='#5555FF'>=</font> <font color='#979000'>0.999</font><font color='#5555FF'>*</font><font color='#BB00BB'>maximum_nu</font><font face='Lucida Console'>(</font>labels<font face='Lucida Console'>)</font>;
+
+
+
+        <font color='#009900'>// The first kind of model selection we will do is a simple grid search.  That is, below we just
+</font>        <font color='#009900'>// generate a fixed grid of points (each point represents one possible setting of the model parameters)
+</font>        <font color='#009900'>// and test each via cross validation.
+</font>
+        <font color='#009900'>// This code generates a 4x4 grid of logarithmically spaced points.  The result is a matrix
+</font>        <font color='#009900'>// with 2 rows and 16 columns where each column represents one of our points. 
+</font>        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> params <font color='#5555FF'>=</font> <font color='#BB00BB'>cartesian_product</font><font face='Lucida Console'>(</font><font color='#BB00BB'>logspace</font><font face='Lucida Console'>(</font><font color='#BB00BB'>log10</font><font face='Lucida Console'>(</font><font color='#979000'>5.0</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>log10</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>, <font color='#979000'>4</font><font face='Lucida Console'>)</font>,  <font color='#009900'>// gamma parameter
+</font>                                                  <font color='#BB00BB'>logspace</font><font face='Lucida Console'>(</font><font color='#BB00BB'>log10</font><font face='Lucida Console'>(</font>max_nu<font face='Lucida Console'>)</font>, <font color='#BB00BB'>log10</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>, <font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#009900'>// nu parameter
+</font>                                                  <font face='Lucida Console'>)</font>;
+        <font color='#009900'>// As an aside, if you wanted to do a grid search over points of dimensionality more than two
+</font>        <font color='#009900'>// you would just nest calls to cartesian_product().  You can also use linspace() to generate 
+</font>        <font color='#009900'>// linearly spaced points if that is more appropriate for the parameters you are working with.   
+</font>
+
+        <font color='#009900'>// Next we loop over all the points we generated and check how good each is.
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Doing a grid search</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>best_result</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        best_result <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>double</u></font> best_gamma <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>, best_nu;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> col <font color='#5555FF'>=</font> <font color='#979000'>0</font>; col <font color='#5555FF'>&lt;</font> params.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>col<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// pull out the current set of model parameters
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> gamma <font color='#5555FF'>=</font> <font color='#BB00BB'>params</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, col<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> nu    <font color='#5555FF'>=</font> <font color='#BB00BB'>params</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, col<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// setup a training object using our current parameters
+</font>            svm_nu_trainer<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> trainer;
+            trainer.<font color='#BB00BB'>set_kernel</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_type</font><font face='Lucida Console'>(</font>gamma<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            trainer.<font color='#BB00BB'>set_nu</font><font face='Lucida Console'>(</font>nu<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Finally, do 10 fold cross validation and then check if the results are the best we have seen so far.
+</font>            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> result <font color='#5555FF'>=</font> <font color='#BB00BB'>cross_validate_trainer</font><font face='Lucida Console'>(</font>trainer, samples, labels, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>gamma: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>setw</font><font face='Lucida Console'>(</font><font color='#979000'>11</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> gamma <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  nu: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>setw</font><font face='Lucida Console'>(</font><font color='#979000'>11</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> nu <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>  "<font color='#CC0000'>  cross validation accuracy: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> result;
+
+            <font color='#009900'>// save the best results
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>result<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>best_result<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                best_result <font color='#5555FF'>=</font> result;
+                best_gamma <font color='#5555FF'>=</font> gamma;
+                best_nu <font color='#5555FF'>=</font> nu;
+            <b>}</b>
+        <b>}</b>
+
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n best result of grid search: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>best_result<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> best gamma: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> best_gamma <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   best nu: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> best_nu <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+
+        <font color='#009900'>// Grid search is a very simple brute force method.  Below we try out the BOBYQA algorithm.
+</font>        <font color='#009900'>// It is a routine that performs optimization of a function in the absence of derivatives.  
+</font>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\n Try the BOBYQA algorithm</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        <font color='#009900'>// We need to supply a starting point for the optimization.  Here we are using the best
+</font>        <font color='#009900'>// result of the grid search.  Generally, you want to try and give a reasonable starting
+</font>        <font color='#009900'>// point due to the possibility of the optimization getting stuck in a local maxima.  
+</font>        params.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        params <font color='#5555FF'>=</font> best_gamma, <font color='#009900'>// initial gamma
+</font>                 best_nu;    <font color='#009900'>// initial nu
+</font>
+        <font color='#009900'>// We also need to supply lower and upper bounds for the search.  
+</font>        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>lower_bound</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>upper_bound</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        lower_bound <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font>,   <font color='#009900'>// smallest allowed gamma
+</font>                      <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font>;   <font color='#009900'>// smallest allowed nu
+</font>        upper_bound <font color='#5555FF'>=</font> <font color='#979000'>100</font>,    <font color='#009900'>// largest allowed gamma
+</font>                      max_nu; <font color='#009900'>// largest allowed nu
+</font>
+
+        <font color='#009900'>// For the gamma and nu SVM parameters it is generally a good idea to search
+</font>        <font color='#009900'>// in log space.  So I'm just converting them into log space here before
+</font>        <font color='#009900'>// we start the optimization.
+</font>        params <font color='#5555FF'>=</font> <font color='#BB00BB'>log</font><font face='Lucida Console'>(</font>params<font face='Lucida Console'>)</font>;
+        lower_bound <font color='#5555FF'>=</font> <font color='#BB00BB'>log</font><font face='Lucida Console'>(</font>lower_bound<font face='Lucida Console'>)</font>;
+        upper_bound <font color='#5555FF'>=</font> <font color='#BB00BB'>log</font><font face='Lucida Console'>(</font>upper_bound<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Finally, ask BOBYQA to look for the best set of parameters.  Note that we are using the
+</font>        <font color='#009900'>// cross validation function object defined at the top of the file.
+</font>        <font color='#0000FF'><u>double</u></font> best_score <font color='#5555FF'>=</font> <font color='#BB00BB'>find_max_bobyqa</font><font face='Lucida Console'>(</font>
+            <font color='#BB00BB'>cross_validation_objective</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>, <font color='#009900'>// Function to maximize
+</font>            params,                                      <font color='#009900'>// starting point
+</font>            params.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>,                         <font color='#009900'>// See BOBYQA docs, generally size*2+1 is a good setting for this
+</font>            lower_bound,                                 <font color='#009900'>// lower bound 
+</font>            upper_bound,                                 <font color='#009900'>// upper bound
+</font>            <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>upper_bound<font color='#5555FF'>-</font>lower_bound<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>10</font>,             <font color='#009900'>// search radius
+</font>            <font color='#979000'>0.01</font>,                                        <font color='#009900'>// desired accuracy
+</font>            <font color='#979000'>100</font>                                          <font color='#009900'>// max number of allowable calls to cross_validation_objective()
+</font>            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Don't forget to convert back from log scale to normal scale
+</font>        params <font color='#5555FF'>=</font> <font color='#BB00BB'>exp</font><font face='Lucida Console'>(</font>params<font face='Lucida Console'>)</font>;
+
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> best result of BOBYQA: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> best_score <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> best gamma: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>params</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   best nu: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>params</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        <font color='#009900'>// Also note that the find_max_bobyqa() function only works for optimization problems
+</font>        <font color='#009900'>// with 2 variables or more.  If you only have a single variable then you should use
+</font>        <font color='#009900'>// the find_max_single_variable() function.
+</font>
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+
+</pre></body></html>

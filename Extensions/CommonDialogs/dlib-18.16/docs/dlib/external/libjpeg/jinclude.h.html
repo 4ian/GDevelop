@@ -1,0 +1,94 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jinclude.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jinclude.h
+ *
+ * Copyright (C) 1991-1994, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file exists to provide a single place to fix any problems with
+ * including the wrong system include files.  (Common problems are taken
+ * care of by the standard jconfig symbols, but on really weird systems
+ * you may have to edit this file.)
+ *
+ * NOTE: this file is NOT intended to be included by applications using the
+ * JPEG library.  Most applications need only include jpeglib.h.
+ */</font>
+
+
+<font color='#009900'>/* Include auto-config file to find out which system include files we need. */</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jconfig.h.html'>jconfig.h</a>"		<font color='#009900'>/* auto configuration options */</font>
+<font color='#0000FF'>#define</font> JCONFIG_INCLUDED	<font color='#009900'>/* so that jpeglib.h doesn't do it again */</font>
+
+<font color='#009900'>/*
+ * We need the NULL macro and size_t typedef.
+ * On an ANSI-conforming system it is sufficient to include &lt;stddef.h&gt;.
+ * Otherwise, we get them from &lt;stdlib.h&gt; or &lt;stdio.h&gt;; we may have to
+ * pull in &lt;sys/types.h&gt; as well.
+ * Note that the core JPEG library does not require &lt;stdio.h&gt;;
+ * only the default error handler and data source/destination modules do.
+ * But we must pull it in because of the references to FILE in jpeglib.h.
+ * You can remove those references if you want to compile without &lt;stdio.h&gt;.
+ */</font>
+
+<font color='#0000FF'>#ifdef</font> HAVE_STDDEF_H
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>stddef.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> HAVE_STDLIB_H
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>stdlib.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> NEED_SYS_TYPES_H
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sys<font color='#5555FF'>/</font>types.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>stdio.h<font color='#5555FF'>&gt;</font>
+
+<font color='#009900'>/*
+ * We need memory copying and zeroing functions, plus strncpy().
+ * ANSI and System V implementations declare these in &lt;string.h&gt;.
+ * BSD doesn't have the mem() functions, but it does have bcopy()/bzero().
+ * Some systems may declare memset and memcpy in &lt;memory.h&gt;.
+ *
+ * NOTE: we assume the size parameters to these functions are of type size_t.
+ * Change the casts in these macros if not!
+ */</font>
+
+<font color='#0000FF'>#ifdef</font> NEED_BSD_STRINGS
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>strings.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#define</font> MEMZERO<font face='Lucida Console'>(</font>target,size<font face='Lucida Console'>)</font>	bzero<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>target<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> MEMCOPY<font face='Lucida Console'>(</font>dest,src,size<font face='Lucida Console'>)</font>	bcopy<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>#else</font> <font color='#009900'>/* not BSD, assume ANSI/SysV string lib */</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#define</font> MEMZERO<font face='Lucida Console'>(</font>target,size<font face='Lucida Console'>)</font>	memset<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>target<font face='Lucida Console'>)</font>, <font color='#979000'>0</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> MEMCOPY<font face='Lucida Console'>(</font>dest,src,size<font face='Lucida Console'>)</font>	memcpy<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/*
+ * In ANSI C, and indeed any rational implementation, size_t is also the
+ * type returned by sizeof().  However, it seems there are some irrational
+ * implementations out there, in which sizeof() returns an int even though
+ * size_t is defined as long or unsigned long.  To ensure consistent results
+ * we always use this SIZEOF() macro in place of using sizeof() directly.
+ */</font>
+
+<font color='#0000FF'>#define</font> SIZEOF<font face='Lucida Console'>(</font>object<font face='Lucida Console'>)</font>	<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>object<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>/*
+ * The modules that use fread() and fwrite() always invoke them through
+ * these macros.  On some systems you may need to twiddle the argument casts.
+ * CAUTION: argument order is different from underlying functions!
+ */</font>
+
+<font color='#0000FF'>#define</font> JFREAD<font face='Lucida Console'>(</font>file,buf,sizeofbuf<font face='Lucida Console'>)</font>  \
+  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>fread</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font color='#979000'>1</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>sizeofbuf<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font>file<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> JFWRITE<font face='Lucida Console'>(</font>file,buf,sizeofbuf<font face='Lucida Console'>)</font>  \
+  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>fwrite</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font color='#979000'>1</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>sizeofbuf<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font>file<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+</pre></body></html>

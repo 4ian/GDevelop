@@ -1,0 +1,305 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - object_detector_advanced_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the process for defining custom
+    bag-of-visual-word style feature extractors for use with the
+    structural_object_detection_trainer.
+
+    NOTICE: This example assumes you are familiar with the contents of the
+    <a href="object_detector_ex.cpp.html">object_detector_ex.cpp</a> example program.  Also, if the objects you want to
+    detect are somewhat rigid in appearance (e.g.  faces, pedestrians, etc.)
+    then you should try the methods shown in the <a href="fhog_object_detector_ex.cpp.html">fhog_object_detector_ex.cpp</a>
+    example program before trying to use the bag-of-visual-word tools shown in
+    this example.  
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm_threaded.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>gui_widgets.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>array.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>array2d.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_keypoint.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_processing.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+    <font color='#0000FF'>typename</font> image_array_type
+    <font color='#5555FF'>&gt;</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='make_simple_test_data'></a>make_simple_test_data</b> <font face='Lucida Console'>(</font>
+    image_array_type<font color='#5555FF'>&amp;</font> images,
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> object_locations
+<font face='Lucida Console'>)</font>
+<font color='#009900'>/*!
+    ensures
+        - #images.size() == 3
+        - #object_locations.size() == 3
+        - Creates some simple images to test the object detection routines.  In particular, 
+          this function creates images with white 70x70 squares in them.  It also stores 
+          the locations of these squares in object_locations.  
+        - for all valid i:
+            - object_locations[i] == A list of all the white rectangles present in images[i].
+!*/</font>
+<b>{</b>
+    images.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    object_locations.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    images.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    images[<font color='#979000'>0</font>].<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>400</font>,<font color='#979000'>400</font><font face='Lucida Console'>)</font>;
+    images[<font color='#979000'>1</font>].<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>400</font>,<font color='#979000'>400</font><font face='Lucida Console'>)</font>;
+    images[<font color='#979000'>2</font>].<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>400</font>,<font color='#979000'>400</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// set all the pixel values to black
+</font>    <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>images[<font color='#979000'>0</font>], <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>images[<font color='#979000'>1</font>], <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>images[<font color='#979000'>2</font>], <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Now make some squares and draw them onto our black images. All the
+</font>    <font color='#009900'>// squares will be 70 pixels wide and tall.
+</font>
+    std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> temp;
+    temp.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>100</font>,<font color='#979000'>100</font><font face='Lucida Console'>)</font>, <font color='#979000'>70</font>,<font color='#979000'>70</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+    <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>images[<font color='#979000'>0</font>],temp.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font>; <font color='#009900'>// Paint the square white
+</font>    temp.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>200</font>,<font color='#979000'>300</font><font face='Lucida Console'>)</font>, <font color='#979000'>70</font>,<font color='#979000'>70</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>images[<font color='#979000'>0</font>],temp.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font>; <font color='#009900'>// Paint the square white
+</font>    object_locations.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+    temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    temp.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>140</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font>, <font color='#979000'>70</font>,<font color='#979000'>70</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>images[<font color='#979000'>1</font>],temp.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font>; <font color='#009900'>// Paint the square white
+</font>    temp.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>303</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font>, <font color='#979000'>70</font>,<font color='#979000'>70</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>images[<font color='#979000'>1</font>],temp.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font>; <font color='#009900'>// Paint the square white
+</font>    object_locations.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+    temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    temp.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>123</font>,<font color='#979000'>121</font><font face='Lucida Console'>)</font>, <font color='#979000'>70</font>,<font color='#979000'>70</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>images[<font color='#979000'>2</font>],temp.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font>; <font color='#009900'>// Paint the square white
+</font>    object_locations.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>class</font> <b><a name='very_simple_feature_extractor'></a>very_simple_feature_extractor</b> : noncopyable
+<b>{</b>
+    <font color='#009900'>/*!
+        WHAT THIS OBJECT REPRESENTS
+            This object is a feature extractor which goes to every pixel in an image and
+            produces a 32 dimensional feature vector.  This vector is an indicator vector
+            which records the pattern of pixel values in a 4-connected region.  So it should
+            be able to distinguish basic things like whether or not a location falls on the
+            corner of a white box, on an edge, in the middle, etc.
+
+
+            Note that this object also implements the interface defined in dlib/image_keypoint/hashed_feature_image_abstract.h.
+            This means all the member functions in this object are supposed to behave as 
+            described in the hashed_feature_image specification.  So when you define your own
+            feature extractor objects you should probably refer yourself to that documentation
+            in addition to reading this example program.
+    !*/</font>
+
+
+<font color='#0000FF'>public</font>:
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='load'></a>load</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        feat_image.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>feat_image,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>1</font>; r<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font> img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>1</font>; c<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font> img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> f <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>img[r][c]<font face='Lucida Console'>)</font>   f <font color='#5555FF'>|</font><font color='#5555FF'>=</font> <font color='#979000'>0x1</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font> f <font color='#5555FF'>|</font><font color='#5555FF'>=</font> <font color='#979000'>0x2</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>img[r][c<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font> f <font color='#5555FF'>|</font><font color='#5555FF'>=</font> <font color='#979000'>0x4</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c]<font face='Lucida Console'>)</font> f <font color='#5555FF'>|</font><font color='#5555FF'>=</font> <font color='#979000'>0x8</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c]<font face='Lucida Console'>)</font> f <font color='#5555FF'>|</font><font color='#5555FF'>=</font> <font color='#979000'>0x10</font>;
+
+                <font color='#009900'>// Store the code value for the pattern of pixel values in the 4-connected
+</font>                <font color='#009900'>// neighborhood around this row and column.
+</font>                feat_image[r][c] <font color='#5555FF'>=</font> f;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> feat_image.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> feat_image.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> feat_image.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_dimensions'></a>get_num_dimensions</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// Return the dimensionality of the vectors produced by operator()
+</font>        <font color='#0000FF'>return</font> <font color='#979000'>32</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> descriptor_type;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> descriptor_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>long</u></font> row,
+        <font color='#0000FF'><u>long</u></font> col
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt;= row &lt; nr()
+            - 0 &lt;= col &lt; nc()
+        ensures
+            - returns a sparse vector which describes the image at the given row and column.  
+              In particular, this is a vector that is 0 everywhere except for one element. 
+    !*/</font>
+    <b>{</b>
+        feat.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> only_nonzero_element_index <font color='#5555FF'>=</font> feat_image[row][col];
+        feat.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>only_nonzero_element_index,<font color='#979000'>1.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> feat;
+    <b>}</b>
+
+    <font color='#009900'>// This block of functions is meant to provide a way to map between the row/col space taken by
+</font>    <font color='#009900'>// this object's operator() function and the images supplied to load().  In this example it's trivial.  
+</font>    <font color='#009900'>// However, in general, you might create feature extractors which don't perform extraction at every 
+</font>    <font color='#009900'>// possible image location (e.g. the hog_image) and thus result in some more complex mapping.  
+</font>    <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> rectangle <b><a name='get_block_rect'></a>get_block_rect</b>       <font face='Lucida Console'>(</font> <font color='#0000FF'><u>long</u></font> row, <font color='#0000FF'><u>long</u></font> col<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font>col,row,<font color='#979000'>3</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> point <b><a name='image_to_feat_space'></a>image_to_feat_space</b>      <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> p; <b>}</b> 
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> rectangle <b><a name='image_to_feat_space'></a>image_to_feat_space</b>  <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> rect; <b>}</b> 
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> point <b><a name='feat_to_image_space'></a>feat_to_image_space</b>      <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> p; <b>}</b> 
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> rectangle <b><a name='feat_to_image_space'></a>feat_to_image_space</b>  <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> rect; <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b>   <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> very_simple_feature_extractor<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font>  <b>{</b> <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.feat_image, out<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font> very_simple_feature_extractor<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.feat_image, in<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='copy_configuration'></a>copy_configuration</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> very_simple_feature_extractor<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+<font color='#0000FF'>private</font>:
+    array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> feat_image;
+
+    <font color='#009900'>// This variable doesn't logically contribute to the state of this object.  It is here
+</font>    <font color='#009900'>// only to avoid returning a descriptor_type object by value inside the operator() method.
+</font>    <font color='#0000FF'>mutable</font> descriptor_type feat;
+<b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>  
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// Get some data 
+</font>        dlib::array<font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> images;
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> object_locations;
+        <font color='#BB00BB'>make_simple_test_data</font><font face='Lucida Console'>(</font>images, object_locations<font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>typedef</font> scan_image_pyramid<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>5</font><font color='#5555FF'>&gt;</font>, very_simple_feature_extractor<font color='#5555FF'>&gt;</font> image_scanner_type;
+        image_scanner_type scanner;
+        <font color='#009900'>// Instead of using setup_grid_detection_templates() like in <a href="object_detector_ex.cpp.html">object_detector_ex.cpp</a>, let's manually
+</font>        <font color='#009900'>// setup the sliding window box.  We use a window with the same shape as the white boxes we
+</font>        <font color='#009900'>// are trying to detect.
+</font>        <font color='#0000FF'>const</font> rectangle object_box <font color='#5555FF'>=</font> <font color='#BB00BB'>compute_box_dimensions</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,    <font color='#009900'>// width/height ratio
+</font>                                                            <font color='#979000'>70</font><font color='#5555FF'>*</font><font color='#979000'>70</font> <font color='#009900'>// box area
+</font>                                                            <font face='Lucida Console'>)</font>;
+        scanner.<font color='#BB00BB'>add_detection_template</font><font face='Lucida Console'>(</font>object_box, <font color='#BB00BB'>create_grid_detection_template</font><font face='Lucida Console'>(</font>object_box,<font color='#979000'>2</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Since our sliding window is already the right size to detect our objects we don't need
+</font>        <font color='#009900'>// to use an image pyramid.  So setting this to 1 turns off the image pyramid.  
+</font>        scanner.<font color='#BB00BB'>set_max_pyramid_levels</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        
+        <font color='#009900'>// While the very_simple_feature_extractor doesn't have any parameters, when you go solve
+</font>        <font color='#009900'>// real problems you might define a feature extractor which has some non-trivial parameters 
+</font>        <font color='#009900'>// that need to be setup before it can be used.  So you need to be able to pass these parameters 
+</font>        <font color='#009900'>// to the scanner object somehow.  You can do this using the copy_configuration() function as
+</font>        <font color='#009900'>// shown below.
+</font>        very_simple_feature_extractor fe;
+        <font color='#009900'>/*
+            setup the parameters in the fe object.
+            ...
+        */</font>
+        <font color='#009900'>// The scanner will use very_simple_feature_extractor::copy_configuration() to copy the state 
+</font>        <font color='#009900'>// of fe into its internal feature extractor.
+</font>        scanner.<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>fe<font face='Lucida Console'>)</font>;
+
+
+
+
+        <font color='#009900'>// Now that we have defined the kind of sliding window classifier system we want and stored 
+</font>        <font color='#009900'>// the details into the scanner object we are ready to use the structural_object_detection_trainer
+</font>        <font color='#009900'>// to learn the weight vector and threshold needed to produce a complete object detector.
+</font>        structural_object_detection_trainer<font color='#5555FF'>&lt;</font>image_scanner_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>trainer</font><font face='Lucida Console'>(</font>scanner<font face='Lucida Console'>)</font>;
+        trainer.<font color='#BB00BB'>set_num_threads</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>; <font color='#009900'>// Set this to the number of processing cores on your machine. 
+</font>
+
+        <font color='#009900'>// The trainer will try and find the detector which minimizes the number of detection mistakes.
+</font>        <font color='#009900'>// This function controls how it decides if a detection output is a mistake or not.  The bigger
+</font>        <font color='#009900'>// the input to this function the more strict it is in deciding if the detector is correctly
+</font>        <font color='#009900'>// hitting the targets.  Try reducing the value to 0.001 and observing the results.  You should
+</font>        <font color='#009900'>// see that the detections aren't exactly on top of the white squares anymore.  See the documentation
+</font>        <font color='#009900'>// for the structural_object_detection_trainer and structural_svm_object_detection_problem objects
+</font>        <font color='#009900'>// for a more detailed discussion of this parameter.  
+</font>        trainer.<font color='#BB00BB'>set_match_eps</font><font face='Lucida Console'>(</font><font color='#979000'>0.95</font><font face='Lucida Console'>)</font>;
+
+
+        object_detector<font color='#5555FF'>&lt;</font>image_scanner_type<font color='#5555FF'>&gt;</font> detector <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>images, object_locations<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// We can easily test the new detector against our training data.  This print
+</font>        <font color='#009900'>// statement will indicate that it has perfect precision and recall on this simple
+</font>        <font color='#009900'>// task.  It will also print the average precision (AP).
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Test detector (precision,recall,AP): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test_object_detection_function</font><font face='Lucida Console'>(</font>detector, images, object_locations<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        <font color='#009900'>// The cross validation should also indicate perfect precision and recall.
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>3-fold cross validation (precision,recall,AP): </font>"
+             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>cross_validate_object_detection_trainer</font><font face='Lucida Console'>(</font>trainer, images, object_locations, <font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+        <font color='#009900'>/*
+            It is also worth pointing out that you don't have to use dlib::array2d objects to 
+            represent your images.  In fact, you can use any object, even something like a struct
+            of many images and other things as the "image".  The only requirements on an image
+            are that it should be possible to pass it to scanner.load().  So if you can say 
+            scanner.load(images[0]), for example, then you are good to go.  See the documentation 
+            for scan_image_pyramid::load() for more details.
+        */</font>
+
+
+        <font color='#009900'>// Let's display the output of the detector along with our training images.
+</font>        image_window win;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// Run the detector on images[i] 
+</font>            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> rects <font color='#5555FF'>=</font> <font color='#BB00BB'>detector</font><font face='Lucida Console'>(</font>images[i]<font face='Lucida Console'>)</font>;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Number of detections: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+            <font color='#009900'>// Put the image and detections into the window.
+</font>            win.<font color='#BB00BB'>clear_overlay</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            win.<font color='#BB00BB'>set_image</font><font face='Lucida Console'>(</font>images[i]<font face='Lucida Console'>)</font>;
+            win.<font color='#BB00BB'>add_overlay</font><font face='Lucida Console'>(</font>rects, <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Hit enter to see the next image.</font>";
+            cin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nexception thrown!</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+
+</pre></body></html>

@@ -1,0 +1,74 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - serialize_pickle.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SERIALIZE_PiCKLE_Hh_
+<font color='#0000FF'>#define</font> DLIB_SERIALIZE_PiCKLE_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>serialize.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>boost<font color='#5555FF'>/</font>python.hpp<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>vectorstream.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='serialize_pickle'></a>serialize_pickle</b> : boost::python::pickle_suite
+<b>{</b>
+    <font color='#0000FF'>static</font> boost::python::tuple <b><a name='getstate'></a>getstate</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> buf;
+        buf.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font><font color='#979000'>5000</font><font face='Lucida Console'>)</font>;
+        vectorstream <font color='#BB00BB'>sout</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item, sout<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> boost::python::<font color='#BB00BB'>make_tuple</font><font face='Lucida Console'>(</font>boost::python::handle<font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>
+                <font color='#BB00BB'>PyBytes_FromStringAndSize</font><font face='Lucida Console'>(</font>buf.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>?<font color='#5555FF'>&amp;</font>buf[<font color='#979000'>0</font>]:<font color='#979000'>0</font>, buf.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>static</font> <font color='#0000FF'><u>void</u></font> <b><a name='setstate'></a>setstate</b><font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> item, 
+        boost::python::tuple state
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> boost::python;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>len</font><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>PyErr_SetObject</font><font face='Lucida Console'>(</font>PyExc_ValueError,
+                <font face='Lucida Console'>(</font>"<font color='#CC0000'>expected 1-item tuple in call to __setstate__; got %s</font>"
+                 <font color='#5555FF'>%</font> state<font face='Lucida Console'>)</font>.<font color='#BB00BB'>ptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>throw_error_already_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// We used to serialize by converting to a str but the boost.python routines for
+</font>        <font color='#009900'>// doing this don't work in Python 3.  You end up getting an error about invalid
+</font>        <font color='#009900'>// UTF-8 encodings.  So instead we access the python C interface directly and use
+</font>        <font color='#009900'>// bytes objects.  However, we keep the deserialization code that worked with str
+</font>        <font color='#009900'>// for backwards compatibility with previously pickled files.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>extract<font color='#5555FF'>&lt;</font>str<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>state[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>.<font color='#BB00BB'>check</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            str data <font color='#5555FF'>=</font> extract<font color='#5555FF'>&lt;</font>str<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>state[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+            std::string <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>extract<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>, <font color='#BB00BB'>len</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            std::istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item, sin<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font><font face='Lucida Console'>(</font><font color='#BB00BB'>PyBytes_Check</font><font face='Lucida Console'>(</font><font color='#BB00BB'>object</font><font face='Lucida Console'>(</font>state[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>.<font color='#BB00BB'>ptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            object obj <font color='#5555FF'>=</font> state[<font color='#979000'>0</font>];
+            <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> data <font color='#5555FF'>=</font> <font color='#BB00BB'>PyBytes_AsString</font><font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>ptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> <font color='#BB00BB'>PyBytes_Size</font><font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>ptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            std::istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>string</font><font face='Lucida Console'>(</font>data, num<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item, sin<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to unpickle, error in input file.</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+<b>}</b>;
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SERIALIZE_PiCKLE_Hh_
+</font>
+
+</pre></body></html>

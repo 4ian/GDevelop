@@ -1,0 +1,339 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - array_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_ARRAY_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_ARRAY_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/enumerable.h.html'>../interfaces/enumerable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager <font color='#5555FF'>=</font> default_memory_manager 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='array'></a>array</b> : <font color='#0000FF'>public</font> enumerable<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T
+                T must have a default constructor.
+
+            REQUIREMENTS ON mem_manager
+                must be an implementation of memory_manager/memory_manager_kernel_abstract.h or
+                must be an implementation of memory_manager_global/memory_manager_global_kernel_abstract.h or
+                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+                mem_manager::type can be set to anything.
+
+            POINTERS AND REFERENCES TO INTERNAL DATA
+                front(), back(), swap(), max_size(), set_size(), and operator[] 
+                functions do not invalidate pointers or references to internal data.
+                All other functions have no such guarantee.
+
+            INITIAL VALUE
+                size() == 0    
+                max_size() == 0
+
+            ENUMERATION ORDER
+                The enumerator will iterate over the elements of the array in the
+                order (*this)[0], (*this)[1], (*this)[2], ...
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents an ordered 1-dimensional array of items, 
+                each item is associated with an integer value.  The items are 
+                numbered from 0 though size() - 1 and the operator[] functions 
+                run in constant time.  
+
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
+        !*/</font>
+        
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'>typedef</font> T type;
+            <font color='#0000FF'>typedef</font> T value_type;
+            <font color='#0000FF'>typedef</font> mem_manager mem_manager_type;
+
+            <b><a name='array'></a>array</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures 
+                    - #*this is properly initialized
+                throws
+                    - std::bad_alloc or any exception thrown by T's constructor
+            !*/</font>
+
+            <font color='#0000FF'>explicit</font> <b><a name='array'></a>array</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_size
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures 
+                    - #*this is properly initialized
+                    - #size() == new_size
+                    - #max_size() == new_size
+                    - All elements of the array will have initial values for their type.
+                throws
+                    - std::bad_alloc or any exception thrown by T's constructor
+            !*/</font>
+
+            ~<b><a name='array'></a>array</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>; 
+            <font color='#009900'>/*!
+                ensures
+                    - all memory associated with *this has been released
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - #*this has its initial value
+                throws
+                    - std::bad_alloc or any exception thrown by T's constructor
+                        if this exception is thrown then the array object is unusable 
+                        until clear() is called and succeeds
+            !*/</font>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                requires
+                    - pos &lt; size()
+                ensures
+                    - returns a const reference to the element at position pos
+            !*/</font>
+            
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - pos &lt; size()
+                ensures
+                    - returns a non-const reference to the element at position pos
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - size &lt;= max_size()
+                ensures
+                    - #size() == size
+                    - any element with index between 0 and size - 1 which was in the 
+                      array before the call to set_size() retains its value and index.
+                      All other elements have undetermined (but valid for their type) 
+                      values.  (e.g. this object might buffer old T objects and reuse 
+                      them without reinitializing them between calls to set_size())
+                    - #at_start() == true
+                throws
+                    - std::bad_alloc or any exception thrown by T's constructor
+                        may throw this exception if there is not enough memory and 
+                        if it does throw then the call to set_size() has no effect    
+            !*/</font>
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='max_size'></a>max_size</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - returns the maximum size of *this
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_max_size'></a>set_max_size</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - #max_size() == max
+                    - #size() == 0
+                    - #at_start() == true
+                throws
+                    - std::bad_alloc or any exception thrown by T's constructor
+                        may throw this exception if there is not enough 
+                        memory and if it does throw then max_size() == 0    
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+                array<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - swaps *this and item
+            !*/</font> 
+            
+            <font color='#0000FF'><u>void</u></font> <b><a name='sort'></a>sort</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - T must be a type with that is comparable via operator&lt;
+                ensures
+                    - for all elements in #*this the ith element is &lt;= the i+1 element
+                    - #at_start() == true
+                throws
+                    - std::bad_alloc or any exception thrown by T's constructor
+                        data may be lost if sort() throws
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='resize'></a>resize</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_size
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - #size() == new_size
+                    - #max_size() == max(new_size,max_size())
+                    - for all i &lt; size() &amp;&amp; i &lt; new_size:
+                        - #(*this)[i] == (*this)[i]
+                          (i.e. All the original elements of *this which were at index
+                          values less than new_size are unmodified.)
+                    - for all valid i &gt;= size():
+                        - #(*this)[i] has an undefined value
+                          (i.e. any new elements of the array have an undefined value)
+                throws
+                    - std::bad_alloc or any exception thrown by T's constructor.
+                       If an exception is thrown then it has no effect on *this.
+            !*/</font>
+
+            
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='back'></a>back</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                requires
+                    - size() != 0
+                ensures
+                    - returns a const reference to (*this)[size()-1]
+            !*/</font>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='back'></a>back</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - size() != 0
+                ensures
+                    - returns a non-const reference to (*this)[size()-1]
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='pop_back'></a>pop_back</b> <font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - size() != 0
+                ensures
+                    - #size() == size() - 1
+                    - swaps (*this)[size()-1] into item
+                    - All elements with an index less than size()-1 are 
+                      unmodified by this operation.
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='pop_back'></a>pop_back</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - size() != 0
+                ensures
+                    - #size() == size() - 1
+                    - All elements with an index less than size()-1 are 
+                      unmodified by this operation.
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='push_back'></a>push_back</b> <font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - #size() == size()+1
+                    - swaps item into (*this)[#size()-1] 
+                    - #back() == item
+                    - #item has some undefined value (whatever happens to 
+                      get swapped out of the array)
+                throws
+                    - std::bad_alloc or any exception thrown by T's constructor.
+                       If an exception is thrown then it has no effect on *this.
+            !*/</font>
+
+            <font color='#0000FF'>typedef</font> T<font color='#5555FF'>*</font> iterator;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>const</font> T<font color='#5555FF'>*</font> const_iterator;
+
+            iterator <b><a name='begin'></a>begin</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - returns an iterator that points to the first element in this array or
+                      end() if the array is empty.
+            !*/</font>
+
+            const_iterator <b><a name='begin'></a>begin</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - returns a const iterator that points to the first element in this
+                      array or end() if the array is empty.
+            !*/</font>
+
+            iterator <b><a name='end'></a>end</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - returns an iterator that points to one past the end of the array.
+            !*/</font>
+
+            const_iterator <b><a name='end'></a>end</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - returns a const iterator that points to one past the end of the
+                      array.
+            !*/</font>
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='array'></a>array</b><font face='Lucida Console'>(</font>array<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>            array<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>array<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator        
+</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        array<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        array<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> array<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        array<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ARRAY_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,145 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - memory_manager_stateless_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_MEMORY_MANAGER_STATELESs_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_MEMORY_MANAGER_STATELESs_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='memory_manager_stateless'></a>memory_manager_stateless</b>
+    <b>{</b>
+        <font color='#009900'>/*!      
+            REQUIREMENTS ON T
+                T must have a default constructor.      
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents some kind of stateless memory manager or memory pool.  
+                Stateless means that all instances (instances of the same kernel implementation that is) 
+                of this object are identical and can be used interchangeably.  Note that 
+                implementations are allowed to have some shared global state such as a 
+                global memory pool.
+
+            THREAD SAFETY
+                This object is thread safe.  You may access it from any thread at any time
+                without synchronizing access.
+        !*/</font>
+        
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'>typedef</font> T type;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> is_stateless <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'>struct</font> <b><a name='rebind'></a>rebind</b> <b>{</b>
+                <font color='#0000FF'>typedef</font> memory_manager_stateless<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font> other;
+            <b>}</b>;
+
+            <b><a name='memory_manager_stateless'></a>memory_manager_stateless</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures 
+                    - #*this is properly initialized
+                throws
+                    - std::bad_alloc
+            !*/</font>
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='memory_manager_stateless'></a>memory_manager_stateless</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>; 
+            <font color='#009900'>/*!
+                ensures
+                    - frees any resources used by *this but has no effect on any shared global
+                      resources used by the implementation.
+            !*/</font>
+
+            T<font color='#5555FF'>*</font> <b><a name='allocate'></a>allocate</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - allocates a new object of type T and returns a pointer to it.
+                throws
+                    - std::bad_alloc or any exception thrown by T's constructor.
+                        If this exception is thrown then the call to allocate() 
+                        has no effect on #*this.
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='deallocate'></a>deallocate</b> <font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>*</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - item == is a pointer to memory that was obtained from a call to
+                      allocate(). (i.e. The pointer you are deallocating must have
+                      come from the same implementation of memory_manager_stateless
+                      that is trying to deallocate it.)
+                    - the memory pointed to by item hasn't already been deallocated.
+                ensures
+                    - deallocates the object pointed to by item
+            !*/</font>
+
+            T<font color='#5555FF'>*</font> <b><a name='allocate_array'></a>allocate_array</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - allocates a new array of size objects of type T and returns a 
+                      pointer to it.
+                throws
+                    - std::bad_alloc or any exception thrown by T's constructor.
+                        If this exception is thrown then the call to allocate() 
+                        has no effect on #*this.
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='deallocate_array'></a>deallocate_array</b> <font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>*</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - item == is a pointer to memory that was obtained from a call to
+                      allocate_array(). (i.e. The pointer you are deallocating must have
+                      come from the same implementation of memory_manager_stateless
+                      that is trying to deallocate it.)
+                    - the memory pointed to by item hasn't already been deallocated.
+                ensures
+                    - deallocates the array pointed to by item
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+                memory_manager_stateless<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - this function has no effect on *this or item.  It is just provided 
+                      to make this object's interface more compatable with the other 
+                      memory managers.
+            !*/</font> 
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='memory_manager_stateless'></a>memory_manager_stateless</b><font face='Lucida Console'>(</font>memory_manager_stateless<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>            memory_manager_stateless<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>memory_manager_stateless<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        memory_manager_stateless<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        memory_manager_stateless<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MEMORY_MANAGER_STATELESs_ABSTRACT_
+</font>
+
+
+</pre></body></html>

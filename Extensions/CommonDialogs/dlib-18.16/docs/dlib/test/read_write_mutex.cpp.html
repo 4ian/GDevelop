@@ -1,0 +1,211 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - read_write_mutex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>misc_api.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>threads.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.read_write_mutex</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>class</font> <b><a name='read_write_mutex_tester'></a>read_write_mutex_tester</b> : <font color='#0000FF'>public</font> tester, multithreaded_object
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='read_write_mutex_tester'></a>read_write_mutex_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_read_write_mutex</font>",
+                    "<font color='#CC0000'>Runs tests on the read_write_mutex component.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>read_write_mutex_tester::thread_write<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>read_write_mutex_tester::thread_write<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>read_write_mutex_tester::thread_write<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>read_write_mutex_tester::thread_readonly<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>read_write_mutex_tester::thread_readonly<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>read_write_mutex_tester::thread_readonly<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>read_write_mutex_tester::thread_readonly2<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>read_write_mutex_tester::thread_readonly2<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>read_write_mutex_tester::thread_readonly2<font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+
+        read_write_mutex m;
+
+        dlib::mutex mut;
+        <font color='#0000FF'><u>int</u></font> num_write;
+        <font color='#0000FF'><u>int</u></font> num_read;
+        <font color='#0000FF'><u>int</u></font> max_read;
+
+        <font color='#0000FF'><u>bool</u></font> failure;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread_write'></a>thread_write</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// do this so that the readonly threads can get into their loops first.  This way
+</font>            <font color='#009900'>// we can see if the mutex lets many readers into their area
+</font>            dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>250</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>6</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+
+                mut.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>num_write;
+                mut.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// only one write thread should ever be active at once
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_write <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    failure <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>1</font>";
+                <b>}</b>
+
+                dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>300</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// only one write thread should ever be active at once
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_write <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    failure <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>2</font>";
+                <b>}</b>
+
+                mut.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#5555FF'>-</font><font color='#5555FF'>-</font>num_write;
+                mut.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>exit thread_write()</font>";
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='do_readonly_stuff'></a>do_readonly_stuff</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            mut.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>num_read;
+            max_read <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>num_read, max_read<font face='Lucida Console'>)</font>;
+            mut.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_write <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                failure <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>3</font>";
+            <b>}</b>
+
+            dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>300</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_write <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                failure <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>4</font>";
+            <b>}</b>
+
+            mut.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            max_read <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>num_read, max_read<font face='Lucida Console'>)</font>;
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>num_read;
+            mut.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread_readonly'></a>thread_readonly</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>6</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                auto_mutex_readonly <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>lock.<font color='#BB00BB'>has_read_lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>lock.<font color='#BB00BB'>has_write_lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>do_readonly_stuff</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                lock.<font color='#BB00BB'>lock_readonly</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>lock.<font color='#BB00BB'>has_read_lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>lock.<font color='#BB00BB'>has_write_lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                lock.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>lock.<font color='#BB00BB'>has_read_lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>lock.<font color='#BB00BB'>has_write_lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                lock.<font color='#BB00BB'>lock_readonly</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>lock.<font color='#BB00BB'>has_read_lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>lock.<font color='#BB00BB'>has_write_lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                lock.<font color='#BB00BB'>lock_write</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>lock.<font color='#BB00BB'>has_read_lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>lock.<font color='#BB00BB'>has_write_lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                lock.<font color='#BB00BB'>lock_write</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>lock.<font color='#BB00BB'>has_read_lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>lock.<font color='#BB00BB'>has_write_lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>exit thread_readonly()</font>";
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread_readonly2'></a>thread_readonly2</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>6</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                m.<font color='#BB00BB'>lock_readonly</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                auto_unlock_readonly <font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>do_readonly_stuff</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>exit thread_readonly2()</font>";
+        <b>}</b>
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            num_write <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            num_read <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            max_read <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            failure <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+            <font color='#009900'>// doing this big block of weird stuff should have no effect.  
+</font>            <b>{</b>
+                m.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                m.<font color='#BB00BB'>lock_readonly</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                m.<font color='#BB00BB'>lock_readonly</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                m.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                m.<font color='#BB00BB'>unlock_readonly</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                m.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                m.<font color='#BB00BB'>unlock_readonly</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                m.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                m.<font color='#BB00BB'>unlock_readonly</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                m.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                m.<font color='#BB00BB'>unlock_readonly</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                m.<font color='#BB00BB'>unlock_readonly</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                m.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+            <font color='#009900'>// start up our testing threads
+</font>            <font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// wait for the threads to finish
+</font>            <font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>failure <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>max_read <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font>, "<font color='#CC0000'>max_read: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> max_read<font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+
+    <b>}</b> a;
+
+
+<b>}</b>
+
+
+
+
+</pre></body></html>

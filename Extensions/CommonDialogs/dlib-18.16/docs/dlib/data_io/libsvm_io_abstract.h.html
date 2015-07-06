@@ -1,0 +1,128 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - libsvm_io_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_LIBSVM_iO_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_LIBSVM_iO_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>utility<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>struct</font> <b><a name='sample_data_io_error'></a>sample_data_io_error</b> : <font color='#0000FF'>public</font> error
+    <b>{</b>
+        <font color='#009900'>/*!
+            This is the exception class used by the file IO functions defined below.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sample_type, 
+        <font color='#0000FF'>typename</font> label_type, 
+        <font color='#0000FF'>typename</font> alloc1, 
+        <font color='#0000FF'>typename</font> alloc2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='load_libsvm_formatted_data'></a>load_libsvm_formatted_data</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name,
+        std::vector<font color='#5555FF'>&lt;</font>sample_type, alloc1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        std::vector<font color='#5555FF'>&lt;</font>label_type, alloc2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - sample_type must be an STL container
+            - sample_type::value_type == std::pair&lt;T,U&gt; where T is some kind of 
+              unsigned integral type
+        ensures
+            - attempts to read a file of the given name that should contain libsvm
+              formatted data.  We turn the data into sparse vectors and store it
+              in samples
+            - #labels.size() == #samples.size()
+            - for all valid i: #labels[i] is the label for #samples[i]
+        throws
+            - sample_data_io_error
+                This exception is thrown if there is any problem loading data from file
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sample_type,
+        <font color='#0000FF'>typename</font> label_type,
+        <font color='#0000FF'>typename</font> alloc1,
+        <font color='#0000FF'>typename</font> alloc2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='save_libsvm_formatted_data'></a>save_libsvm_formatted_data</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type, alloc1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type, alloc2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - sample_type must be an STL container
+            - sample_type::value_type == std::pair&lt;T,U&gt; where T is some kind of 
+              unsigned integral type
+            - samples.size() == labels.size()
+        ensures
+            - saves the data to the given file in libsvm format
+        throws
+            - sample_data_io_error
+                This exception is thrown if there is any problem saving data to file
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sample_type, 
+        <font color='#0000FF'>typename</font> label_type, 
+        <font color='#0000FF'>typename</font> alloc1, 
+        <font color='#0000FF'>typename</font> alloc2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='save_libsvm_formatted_data'></a>save_libsvm_formatted_data</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type, alloc1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type, alloc2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - sample_type == a dense matrix (i.e. dlib::matrix)
+            - for all valid i: is_vector(samples[i]) == true
+            - samples.size() == labels.size()
+        ensures
+            - saves the data to the given file in libsvm format
+        throws
+            - sample_data_io_error
+                This exception is thrown if there is any problem saving data to file
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> sample_type, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='fix_nonzero_indexing'></a>fix_nonzero_indexing</b> <font face='Lucida Console'>(</font>
+        std::vector<font color='#5555FF'>&lt;</font>sample_type,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - samples must only contain valid sparse vectors.  The definition of
+              a sparse vector can be found at the top of dlib/svm/sparse_vector_abstract.h
+        ensures
+            - Adjusts the sparse vectors in samples so that they are zero-indexed.  
+              Or in other words, assume the smallest used index value in any of the sparse 
+              vectors is N.  Then this function subtracts N from all the index values in 
+              samples.  This is useful, for example, if you load a libsvm formatted datafile 
+              with features indexed from 1 rather than 0 and you would like to fix this.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LIBSVM_iO_ABSTRACT_Hh_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,179 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jdct.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jdct.h
+ *
+ * Copyright (C) 1994-1996, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This include file contains common declarations for the forward and
+ * inverse DCT modules.  These declarations are private to the DCT managers
+ * (jcdctmgr.c, jddctmgr.c) and the individual DCT algorithms.
+ * The individual DCT algorithms are kept in separate files to ease 
+ * machine-dependent tuning (e.g., assembly coding).
+ */</font>
+
+
+<font color='#009900'>/*
+ * A forward DCT routine is given a pointer to a work area of type DCTELEM[];
+ * the DCT is to be performed in-place in that buffer.  Type DCTELEM is int
+ * for 8-bit samples, long for 12-bit samples.  (NOTE: Floating-point DCT
+ * implementations use an array of type FAST_FLOAT, instead.)
+ * The DCT inputs are expected to be signed (range +-CENTERJSAMPLE).
+ * The DCT outputs are returned scaled up by a factor of 8; they therefore
+ * have a range of +-8K for 8-bit data, +-128K for 12-bit data.  This
+ * convention improves accuracy in integer implementations and saves some
+ * work in floating-point ones.
+ * Quantization of the output coefficients is done by jcdctmgr.c.
+ */</font>
+
+<font color='#0000FF'>#if</font> BITS_IN_JSAMPLE <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>int</u></font> DCTELEM;		<font color='#009900'>/* 16 or 32 bits is fine */</font>
+<font color='#0000FF'>#else</font>
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>long</u></font> DCTELEM;		<font color='#009900'>/* must have 32 bits */</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>typedef</font> <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, forward_DCT_method_ptr, <font face='Lucida Console'>(</font>DCTELEM <font color='#5555FF'>*</font> data<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>typedef</font> <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, float_DCT_method_ptr, <font face='Lucida Console'>(</font>FAST_FLOAT <font color='#5555FF'>*</font> data<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+<font color='#009900'>/*
+ * An inverse DCT routine is given a pointer to the input JBLOCK and a pointer
+ * to an output sample array.  The routine must dequantize the input data as
+ * well as perform the IDCT; for dequantization, it uses the multiplier table
+ * pointed to by compptr-&gt;dct_table.  The output data is to be placed into the
+ * sample array starting at a specified column.  (Any row offset needed will
+ * be applied to the array pointer before it is passed to the IDCT code.)
+ * Note that the number of samples emitted by the IDCT routine is
+ * DCT_scaled_size * DCT_scaled_size.
+ */</font>
+
+<font color='#009900'>/* typedef inverse_DCT_method_ptr is declared in jpegint.h */</font>
+
+<font color='#009900'>/*
+ * Each IDCT routine has its own ideas about the best dct_table element type.
+ */</font>
+
+<font color='#0000FF'>typedef</font> MULTIPLIER ISLOW_MULT_TYPE; <font color='#009900'>/* short or int, whichever is faster */</font>
+<font color='#0000FF'>#if</font> BITS_IN_JSAMPLE <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>
+<font color='#0000FF'>typedef</font> MULTIPLIER IFAST_MULT_TYPE; <font color='#009900'>/* 16 bits is OK, use short if faster */</font>
+<font color='#0000FF'>#define</font> IFAST_SCALE_BITS  <font color='#979000'>2</font>	<font color='#009900'>/* fractional bits in scale factors */</font>
+<font color='#0000FF'>#else</font>
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>long</u></font> IFAST_MULT_TYPE;	<font color='#009900'>/* need 32 bits for scaled quantizers */</font>
+<font color='#0000FF'>#define</font> IFAST_SCALE_BITS  <font color='#979000'>13</font>	<font color='#009900'>/* fractional bits in scale factors */</font>
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>typedef</font> FAST_FLOAT FLOAT_MULT_TYPE; <font color='#009900'>/* preferred floating type */</font>
+
+
+<font color='#009900'>/*
+ * Each IDCT routine is responsible for range-limiting its results and
+ * converting them to unsigned form (0..MAXJSAMPLE).  The raw outputs could
+ * be quite far out of range if the input data is corrupt, so a bulletproof
+ * range-limiting step is required.  We use a mask-and-table-lookup method
+ * to do the combined operations quickly.  See the comments with
+ * prepare_range_limit_table (in jdmaster.c) for more info.
+ */</font>
+
+<font color='#0000FF'>#define</font> IDCT_range_limit<font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sample_range_limit <font color='#5555FF'>+</font> CENTERJSAMPLE<font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>#define</font> RANGE_MASK  <font face='Lucida Console'>(</font>MAXJSAMPLE <font color='#5555FF'>*</font> <font color='#979000'>4</font> <font color='#5555FF'>+</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#009900'>/* 2 bits wider than legal samples */</font>
+
+
+<font color='#009900'>/* Short forms of external names for systems with brain-damaged linkers. */</font>
+
+<font color='#0000FF'>#ifdef</font> NEED_SHORT_EXTERNAL_NAMES
+<font color='#0000FF'>#define</font> jpeg_fdct_islow		jFDislow
+<font color='#0000FF'>#define</font> jpeg_fdct_ifast		jFDifast
+<font color='#0000FF'>#define</font> jpeg_fdct_float		jFDfloat
+<font color='#0000FF'>#define</font> jpeg_idct_islow		jRDislow
+<font color='#0000FF'>#define</font> jpeg_idct_ifast		jRDifast
+<font color='#0000FF'>#define</font> jpeg_idct_float		jRDfloat
+<font color='#0000FF'>#define</font> jpeg_idct_4x4		jRD4x4
+<font color='#0000FF'>#define</font> jpeg_idct_2x2		jRD2x2
+<font color='#0000FF'>#define</font> jpeg_idct_1x1		jRD1x1
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* NEED_SHORT_EXTERNAL_NAMES */</font>
+
+<font color='#009900'>/* Extern declarations for the forward and inverse DCT routines. */</font>
+
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_fdct_islow <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>DCTELEM <font color='#5555FF'>*</font> data<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_fdct_ifast <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>DCTELEM <font color='#5555FF'>*</font> data<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_fdct_float <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>FAST_FLOAT <font color='#5555FF'>*</font> data<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_idct_islow
+    <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo, jpeg_component_info <font color='#5555FF'>*</font> compptr,
+	 JCOEFPTR coef_block, JSAMPARRAY output_buf, JDIMENSION output_col<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_idct_ifast
+    <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo, jpeg_component_info <font color='#5555FF'>*</font> compptr,
+	 JCOEFPTR coef_block, JSAMPARRAY output_buf, JDIMENSION output_col<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_idct_float
+    <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo, jpeg_component_info <font color='#5555FF'>*</font> compptr,
+	 JCOEFPTR coef_block, JSAMPARRAY output_buf, JDIMENSION output_col<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_idct_4x4
+    <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo, jpeg_component_info <font color='#5555FF'>*</font> compptr,
+	 JCOEFPTR coef_block, JSAMPARRAY output_buf, JDIMENSION output_col<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_idct_2x2
+    <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo, jpeg_component_info <font color='#5555FF'>*</font> compptr,
+	 JCOEFPTR coef_block, JSAMPARRAY output_buf, JDIMENSION output_col<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_idct_1x1
+    <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo, jpeg_component_info <font color='#5555FF'>*</font> compptr,
+	 JCOEFPTR coef_block, JSAMPARRAY output_buf, JDIMENSION output_col<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+<font color='#009900'>/*
+ * Macros for handling fixed-point arithmetic; these are used by many
+ * but not all of the DCT/IDCT modules.
+ *
+ * All values are expected to be of type long.
+ * Fractional constants are scaled left by CONST_BITS bits.
+ * CONST_BITS is defined within each module using these macros,
+ * and may differ from one module to the next.
+ */</font>
+
+<font color='#0000FF'>#define</font> ONE	<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> CONST_SCALE <font face='Lucida Console'>(</font>ONE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> CONST_BITS<font face='Lucida Console'>)</font>
+
+<font color='#009900'>/* Convert a positive real constant to an integer scaled by CONST_SCALE.
+ * Caution: some C compilers fail to reduce "FIX(constant)" at compile time,
+ * thus causing a lot of useless floating-point operations at run time.
+ */</font>
+
+<font color='#0000FF'>#define</font> FIX<font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>	<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> CONST_SCALE <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>/* Descale and correctly round an long value that's scaled by N bits.
+ * We assume RIGHT_SHIFT rounds towards minus infinity, so adding
+ * the fudge factor is correct for either sign of X.
+ */</font>
+
+<font color='#0000FF'>#define</font> DESCALE<font face='Lucida Console'>(</font>x,n<font face='Lucida Console'>)</font>  RIGHT_SHIFT<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>ONE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, n<font face='Lucida Console'>)</font>
+
+<font color='#009900'>/* Multiply an long variable by an long constant to yield an long result.
+ * This macro is used only when the two inputs will actually be no more than
+ * 16 bits wide, so that a 16x16-&gt;32 bit multiply can be used instead of a
+ * full 32x32 multiply.  This provides a useful speedup on many machines.
+ * Unfortunately there is no way to specify a 16x16-&gt;32 multiply portably
+ * in C, but some C compilers will do the right thing if you provide the
+ * correct combination of casts.
+ */</font>
+
+<font color='#0000FF'>#ifdef</font> SHORTxSHORT_32		<font color='#009900'>/* may work if 'int' is 32 bits */</font>
+<font color='#0000FF'>#define</font> MULTIPLY16C16<font face='Lucida Console'>(</font>var,<font color='#0000FF'>const</font><font face='Lucida Console'>)</font>  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>short</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>var<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>short</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> SHORTxLCONST_32		<font color='#009900'>/* known to work with Microsoft C 6.0 */</font>
+<font color='#0000FF'>#define</font> MULTIPLY16C16<font face='Lucida Console'>(</font>var,<font color='#0000FF'>const</font><font face='Lucida Console'>)</font>  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>short</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>var<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifndef</font> MULTIPLY16C16		<font color='#009900'>/* default definition */</font>
+<font color='#0000FF'>#define</font> MULTIPLY16C16<font face='Lucida Console'>(</font>var,<font color='#0000FF'>const</font><font face='Lucida Console'>)</font>  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>var<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* Same except both inputs are variables. */</font>
+
+<font color='#0000FF'>#ifdef</font> SHORTxSHORT_32		<font color='#009900'>/* may work if 'int' is 32 bits */</font>
+<font color='#0000FF'>#define</font> MULTIPLY16V16<font face='Lucida Console'>(</font>var1,var2<font face='Lucida Console'>)</font>  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>short</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>var1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>short</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>var2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifndef</font> MULTIPLY16V16		<font color='#009900'>/* default definition */</font>
+<font color='#0000FF'>#define</font> MULTIPLY16V16<font face='Lucida Console'>(</font>var1,var2<font face='Lucida Console'>)</font>  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>var1<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>var2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+</pre></body></html>

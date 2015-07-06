@@ -1,0 +1,68 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - create_iris_datafile.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>compress_stream.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>base64.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> 
+<b>{</b>
+    <font color='#009900'>// This function returns the contents of the file 'iris.scale'
+</font>    <font color='#0000FF'>const</font> std::string <b><a name='get_decoded_string'></a>get_decoded_string</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::base64::kernel_1a base64_coder;
+        dlib::compress_stream::kernel_1ea compressor;
+        std::ostringstream sout;
+        std::istringstream sin;
+
+        <font color='#009900'>// The base64 encoded data from the file 'iris.scale' we want to decode and return.
+</font>        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>MU66cCmT9lCXWJXwhdfOGELwlyExClbHEF1s9XoqxNDV7o8AdVVHws/C9oIKO5EShH1lI/QFTWk3</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>8EUdVpSw/NpZCUa7O9nq5uO6SE0gfRAyryH+pfIVL9jPiQi8rBdagDf4kUd4eggz9glwYnKEE+US</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>K4GUBnW33YDf/jMF2GIBLNvz69yGJj8RC5rOUeJxR4mlHrDmnEfgRSdFIfXk4OQ4V/XbOsE1bnhG</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>fmACcu7nYv6M/043Z6o8oaBeoJ2XK/9UqOWGFOwfVpQ46fz1a0oTlOzyDbbzMiniLr8z5P/VYwYd</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>iAE70MwxHXs6Ga3zMmD/h1WxB/uRRph39B1lPN1UXC7U6SIatmtGWY+JYpwBk6raAnR3sblTFBNs</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>UdPW+1a7AxinR0NZO6YEiCFy8lbpfPRZNAr5ENqPbD2DZtkHk3L8ARxSoFBgqPa8aO3fFow7rVxF</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>xIJ2TxcHS84+BtH7KvtWfH7kUPOZLQ+Ohqghn9I57IeMl7E3aoTRTiVv3P2twAbP5Y+ZaAUoU7CK</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>c9FptjKgMClUkuWxA7tGUEp069PqGT8NbI+yxorh/iVhkVhuGAzgjjXYS/D26OGj4bzF6mtRbnms</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Y2OYlF7QqhawZaHLtmZ6xLhR2F8p/0nrbpAz2brQLNKgQAMvU9rTZ0XYpuJNbRSsARkRDorPopDO</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>kKNUORfkh2zfIytVToQ9tZ9W2LkfGZdWjJu/wEKjPDAU55q3bCfKOUk12tjq0sq/7qjUWJRcLSCu</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>bqo8EzaKJj3cTXVgXXLHP6WEOPZ9vShuxQUu1JWkh8YEinjwFSyA6UnAKqPtN/HsBgv8YbnfnY/q</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>e5JvUYWbs3Lk9enlhcI0vEVTV5f0GMjdkW87l3cWgmXJqiljJDREWEdKZJQ0rGBU/gW5kO3SAS1W</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>OETVJG2kJD8Ib7hT15Mu2lOVNQYFri6O3yWtp5/NLHsYXoDKIYrxoJtM9+GkprVwRuhDcwxE+eQa</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>pp5nC8qj38ameQHaJR2hJCuW2nvr4Wwm0ploF00ZP9cS9YznCO52cueUQX0+zil7bU++jghqSGP5</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>+JyRzWUWWbDhnCyanej2Y3sqfZ3o2kuUjaAgZFz5pLqK64uACjztp4bQFsaMRdc+OCV2uItqoaRg</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>a6u7/VrvS+ZigwcGWDjXSKev334f8ZqQQIR5hljdeseGuw7/5XySzUrgc8lCOvMa0pKNn9Nl8W/W</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>vbKz1VwA</font>";
+
+        <font color='#009900'>// Put the data into the istream sin
+</font>        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Decode the base64 text into its compressed binary form
+</font>        base64_coder.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+        sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Decompress the data into its original form
+</font>        compressor.<font color='#BB00BB'>decompress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Return the decoded and decompressed data
+</font>        <font color='#0000FF'>return</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'><u>void</u></font> <b><a name='create_iris_datafile'></a>create_iris_datafile</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::ofstream <font color='#BB00BB'>fout</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>iris.scale</font>"<font face='Lucida Console'>)</font>;
+        fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_decoded_string</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>
+
+
+</pre></body></html>

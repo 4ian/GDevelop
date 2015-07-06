@@ -1,0 +1,189 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - border_enumerator.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_BORDER_EnUMERATOR_H_
+<font color='#0000FF'>#define</font> DLIB_BORDER_EnUMERATOR_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='border_enumerator_abstract.h.html'>border_enumerator_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='rectangle.h.html'>rectangle.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='border_enumerator'></a>border_enumerator</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='border_enumerator'></a>border_enumerator</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <b><a name='border_enumerator'></a>border_enumerator</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> border_size
+        <font face='Lucida Console'>)</font> : 
+            rect<font face='Lucida Console'>(</font>rect_<font face='Lucida Console'>)</font>,
+            inner_rect<font face='Lucida Console'>(</font>shrink_rect<font face='Lucida Console'>(</font>rect_, border_size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <b><a name='border_enumerator'></a>border_enumerator</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect_,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> non_border_region
+        <font face='Lucida Console'>)</font> : 
+            rect<font face='Lucida Console'>(</font>rect_<font face='Lucida Console'>)</font>,
+            inner_rect<font face='Lucida Console'>(</font>non_border_region.intersect<font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#009900'>// make the four rectangles that surround inner_rect and intersect them
+</font>            <font color='#009900'>// with rect.
+</font>            bleft   <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                               std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                               inner_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>,
+                                               std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            bright  <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>inner_rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font>,
+                                               std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                               std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                               std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            btop    <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>inner_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                               std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                               inner_rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                               inner_rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            bbottom <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>inner_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                               inner_rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font>,
+                                               inner_rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                               std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            p <font color='#5555FF'>=</font> bleft.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            mode <font color='#5555FF'>=</font> atleft;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='at_start'></a>at_start</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            point temp <font color='#5555FF'>=</font> bleft.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            temp.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font><font color='#979000'>1</font>;
+            <font color='#0000FF'>return</font> temp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='current_element_valid'></a>current_element_valid</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> rect.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='move_next'></a>move_next</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>mode <font color='#5555FF'>=</font><font color='#5555FF'>=</font> atleft<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>advance_point</font><font face='Lucida Console'>(</font>bleft, p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                    
+                mode <font color='#5555FF'>=</font> attop;
+                p <font color='#5555FF'>=</font> btop.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>mode <font color='#5555FF'>=</font><font color='#5555FF'>=</font> attop<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>advance_point</font><font face='Lucida Console'>(</font>btop, p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                    
+                mode <font color='#5555FF'>=</font> atright;
+                p <font color='#5555FF'>=</font> bright.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>mode <font color='#5555FF'>=</font><font color='#5555FF'>=</font> atright<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>advance_point</font><font face='Lucida Console'>(</font>bright, p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                    
+                mode <font color='#5555FF'>=</font> atbottom;
+                p <font color='#5555FF'>=</font> bbottom.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>advance_point</font><font face='Lucida Console'>(</font>bbottom, p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            <font color='#009900'>// put p outside rect since there are no more points to enumerate
+</font>            p <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                    
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> rect.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> inner_rect.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>current_element_valid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\t point border_enumerator::element()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t This function can't be called unless the element is valid.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> p;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='advance_point'></a>advance_point</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> r,
+            point<font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> r.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> r.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> r.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        point p;
+        rectangle rect;
+        rectangle inner_rect;  <font color='#009900'>// the non-border regions of rect
+</font>
+        <font color='#0000FF'>enum</font> <b><a name='emode'></a>emode</b>
+        <b>{</b>
+            atleft,
+            atright,
+            atbottom,
+            attop
+        <b>}</b>;
+
+        emode mode;
+
+        rectangle btop, bleft, bright, bbottom;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BORDER_EnUMERATOR_H_
+</font>
+
+</pre></body></html>

@@ -342,9 +342,9 @@ set_dir(
     try
     {
         directory d( dir );
-        queue<directory>::kernel_1a_c qod;
-        queue<file>::kernel_1a_c qof;
-        queue<std::string>::sort_1a_c qos;
+        dlib::queue<directory>::kernel_1a_c qod;
+        dlib::queue<file>::kernel_1a_c qof;
+        dlib::queue<std::string>::sort_1a_c qos;
         d.get_dirs( qod );
         d.get_files( qof );
 
@@ -388,9 +388,9 @@ on_root_click(
     if ( cur_dir != -1 )
         sob[cur_dir]->set_unchecked();
 
-    queue<directory>::kernel_1a_c qod, qod2;
-    queue<file>::kernel_1a_c qof;
-    queue<std::string>::sort_1a_c qos;
+    dlib::queue<directory>::kernel_1a_c qod, qod2;
+    dlib::queue<file>::kernel_1a_c qof;
+    dlib::queue<std::string>::sort_1a_c qos;
     get_filesystem_roots( qod );
     path.clear();
     cur_dir = -1;

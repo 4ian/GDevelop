@@ -1,0 +1,180 @@
+# This is a CMake file that sets up the add_python_module() macro.  This macro
+# lets you easily make python modules that use dlib.  
+#
+# The macro takes the module name as its first argument and then a list of
+# source files to compile into the module.  See ../tools/python/CMakeLists.txt
+# for an example.
+#
+# It also sets up a macro called install_${module_name}_to() where
+# ${module_name} is whatever you named your module.  This install_*_to() macro
+# takes a folder name and creates an install target that will copy the compiled
+# python module to that folder when you run "make install".  Note that the path
+# given to install_*_to() is relative to your CMakeLists.txt file.
+#
+
+
+option(PYTHON3 "Build a Python3 compatible library rather than Python2." OFF)
+
+# Avoid cmake warnings about changes in behavior of some Mac OS X path 
+# variable we don't care about.
+if (POLICY CMP0042)
+    cmake_policy(SET CMP0042 NEW)
+endif()
+
+
+# Sometimes a computer will have multiple python verions installed.  So in this
+# block of code we find the one in the user's path and add its home folder into
+# cmake's search path.  That way it will use that version of python first. 
+find_program(PYTHON_EXECUTABLE python)
+# Resolve symbolic links, hopefully this will give us a path in the proper
+# python home directory.
+get_filename_component(PYTHON_EXECUTABLE ${PYTHON_EXECUTABLE} REALPATH)
+# Pick out the parent directories
+get_filename_component(PYTHON_PATH ${PYTHON_EXECUTABLE} PATH)
+get_filename_component(PYTHON_PATH ${PYTHON_PATH} PATH)
+set(CMAKE_PREFIX_PATH ${PYTHON_PATH})
+
+
+
+#SET(Boost_USE_STATIC_LIBS OFF)
+#SET(Boost_USE_MULTITHREADED ON)
+#SET(Boost_USE_STATIC_RUNTIME OFF)
+set(Boost_NO_BOOST_CMAKE ON)
+
+if (NOT WIN32)
+    set(BOOST_LIBRARYDIR ${BOOST_LIBRARYDIR} $ENV{BOOST_LIBRARYDIR}  
+            /usr/lib/x86_64-linux-gnu/)
+endif()
+if (PYTHON3)
+    # on Some systems the boost python3 module is called python-py34 so check for that one.
+    FIND_PACKAGE(Boost 1.41.0  COMPONENTS python-py34 )
+    if (NOT Boost_FOUND)
+        # But if you don't find it then try looking for a module called python.
+        FIND_PACKAGE(Boost 1.41.0 COMPONENTS python REQUIRED)
+    endif()
+    FIND_PACKAGE(PythonLibs 3.4 REQUIRED)
+else()
+    FIND_PACKAGE(Boost 1.41.0 COMPONENTS python REQUIRED)
+    FIND_PACKAGE(PythonLibs 2.6 REQUIRED)
+endif()
+if (NOT Boost_FOUND)
+    if (WIN32)
+        message(" Set the BOOST_ROOT and BOOST_LIBRARYDIR environment variables before running cmake. ")
+        message(" E.g.  Something like this: ")
+        message("    set BOOST_ROOT=C:\\local\\boost_1_57_0 " )
+        message("    set BOOST_LIBRARYDIR=C:\\local\\boost_1_57_0\\stage\\lib")
+        message("")
+        message(" You will also likely need to compile boost yourself rather than using one of the precompiled ")
+        message(" windows binaries.  Do this by going to the folder tools\\build\\ within boost and running ")
+        message(" bootstrap.bat.  Then run the command: ")
+        message("    b2 install")
+        message(" And then add the output bin folder to your PATH.  Usually this is the C:\\boost-build-engine\\bin")
+        message(" folder. Finally, go to the boost root and run a command like this:")
+        message("    b2 --with-python address-model=64 toolset=msvc --build-type=complete")
+        message(" And set the BOOST_LIBRARYDIR equal to wherever it puts the compiled libraries.")
+        message(" Note that you will need to set the address-model based on if you want a 32 or 64bit python library.")
+        message(" Similarly, when you invoke cmake you may have to use cmake's -G option to set the 64 vs. 32bit mode")
+        message(" of visual studio.  Also, if you want a Python3 library will also need to add -DPYTHON3=1.  You do ")
+        message(" this with a statement like: ")
+        message("    cmake -G \"Visual Studio 12 2013 Win64\" -DPYTHON3=1 ..\\..\\tools\\python")
+        message(" Rather than:")
+        message("    cmake ..\\..\\tools\\python")
+        message(" Which will build a 32bit Python2 module by default on most systems.")
+        message("")
+    else()
+        message("")
+        message(" *****************************************************************************************************")
+        message(" To compile Boost.Python yourself download boost from boost.org and then go into the boost root folder")
+        message(" and run these commands: ")
+        message("    ./bootstrap.sh --with-libraries=python") 
+        message("    ./b2")
+        message("    sudo ./b2 install")
+        message(" *****************************************************************************************************")
+        message("")
+    endif()
+endif()
+
+if (WIN32 AND NOT Boost_LIBRARIES)
+    message(FATAL_ERROR "We couldn't find the right version of boost python.  If you installed boost and you are still "
+            "getting this error then you might have installed a version of boost that was compiled with a different "
+            "version of visual studio than the one you are using.  So you have to make sure that the version of "
+            "visual studio is the same version that was used to compile the copy of boost you are using.")
+endif()
+
+
+INCLUDE_DIRECTORIES("${Boost_INCLUDE_DIRS}")
+if (PYTHON_INCLUDE_PATH)
+   INCLUDE_DIRECTORIES("${PYTHON_INCLUDE_PATH}" )
+else()
+   INCLUDE_DIRECTORIES("${PYTHON_INCLUDE_DIRS}" )
+endif()
+
+
+if (CMAKE_COMPILER_IS_GNUCXX)
+    # Just setting CMAKE_POSITION_INDEPENDENT_CODE should be enough to set
+    # -fPIC for GCC but sometimes it still doesn't get set, so make sure it
+    # does.
+    add_definitions("-fPIC")
+else()
+    set(CMAKE_POSITION_INDEPENDENT_CODE True)
+endif()
+
+# include dlib so we can link against it
+string(REGEX REPLACE "add_python_module$" "" dlib_path ${CMAKE_CURRENT_LIST_FILE})
+include(${dlib_path}/cmake)
+
+# We put the extra _ on the end of the name just so it's possible to
+# have a module name of dlib and not get a conflict with the target named
+# dlib in ../dlib/cmake.  We use the target OUPUT_NAME property to ensure the
+# output name is set to what the user asked for (i.e. no _).
+macro(add_python_module module_name module_sources )
+   ADD_LIBRARY(${module_name}_ SHARED ${module_sources} ${ARGN} )
+   TARGET_LINK_LIBRARIES(${module_name}_ ${Boost_LIBRARIES} ${PYTHON_LIBRARIES}  dlib)
+   if(WIN32 AND NOT CYGWIN)
+      SET_TARGET_PROPERTIES( ${module_name}_
+         PROPERTIES
+         PREFIX ""
+         SUFFIX ".pyd"
+         OUTPUT_NAME ${module_name}
+         )
+   elseif(CYGWIN)
+      SET_TARGET_PROPERTIES( ${module_name}_
+         PROPERTIES
+         PREFIX ""
+         SUFFIX ".dll"
+         OUTPUT_NAME ${module_name}
+         )
+   else()
+      SET_TARGET_PROPERTIES( ${module_name}_
+         PROPERTIES
+         PREFIX ""
+         SUFFIX ".so"
+         OUTPUT_NAME ${module_name}
+         )
+   endif()
+
+   macro(install_${module_name}_to path)
+       # Determine the path to our CMakeLists.txt file.
+       string(REGEX REPLACE "CMakeLists.txt$" "" base_path ${CMAKE_CURRENT_LIST_FILE})
+       INSTALL(TARGETS ${module_name}_ 
+            DESTINATION "${base_path}/${path}"
+           )
+
+       # On windows we will usually need to have the boost-python .dll files in the same folder or
+       # you will get an error about how they can't be found.  So copy the boost .dll files along with
+       # your module to the install folder to avoid this.
+       if (WIN32)
+           list(GET Boost_LIBRARIES 1 boostlibs1)
+           list(GET Boost_LIBRARIES 3 boostlibs2)
+           string(REGEX REPLACE ".lib$" ".dll" boostdlls1 ${boostlibs1})
+           string(REGEX REPLACE ".lib$" ".dll" boostdlls2 ${boostlibs2})
+           INSTALL(FILES ${boostdlls1} ${boostdlls2} 
+                DESTINATION "${base_path}/${path}"
+                )
+       endif()
+   endmacro()
+
+endmacro()
+
+
+

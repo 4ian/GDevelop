@@ -1,0 +1,859 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jquant1.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jquant1.c
+ *
+ * Copyright (C) 1991-1996, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains 1-pass color quantization (color mapping) routines.
+ * These routines provide mapping to a fixed color map using equally spaced
+ * color values.  Optional Floyd-Steinberg or ordered dithering is available.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+
+<font color='#0000FF'>#ifdef</font> QUANT_1PASS_SUPPORTED
+
+
+<font color='#009900'>/*
+ * The main purpose of 1-pass quantization is to provide a fast, if not very
+ * high quality, colormapped output capability.  A 2-pass quantizer usually
+ * gives better visual quality; however, for quantized grayscale output this
+ * quantizer is perfectly adequate.  Dithering is highly recommended with this
+ * quantizer, though you can turn it off if you really want to.
+ *
+ * In 1-pass quantization the colormap must be chosen in advance of seeing the
+ * image.  We use a map consisting of all combinations of Ncolors[i] color
+ * values for the i'th component.  The Ncolors[] values are chosen so that
+ * their product, the total number of colors, is no more than that requested.
+ * (In most cases, the product will be somewhat less.)
+ *
+ * Since the colormap is orthogonal, the representative value for each color
+ * component can be determined without considering the other components;
+ * then these indexes can be combined into a colormap index by a standard
+ * N-dimensional-array-subscript calculation.  Most of the arithmetic involved
+ * can be precalculated and stored in the lookup table colorindex[].
+ * colorindex[i][j] maps pixel value j in component i to the nearest
+ * representative value (grid plane) for that component; this index is
+ * multiplied by the array stride for component i, so that the
+ * index of the colormap entry closest to a given pixel value is just
+ *    sum( colorindex[component-number][pixel-component-value] )
+ * Aside from being fast, this scheme allows for variable spacing between
+ * representative values with no additional lookup cost.
+ *
+ * If gamma correction has been applied in color conversion, it might be wise
+ * to adjust the color grid spacing so that the representative colors are
+ * equidistant in linear space.  At this writing, gamma correction is not
+ * implemented by jdcolor, so nothing is done here.
+ */</font>
+
+
+<font color='#009900'>/* Declarations for ordered dithering.
+ *
+ * We use a standard 16x16 ordered dither array.  The basic concept of ordered
+ * dithering is described in many references, for instance Dale Schumacher's
+ * chapter II.2 of Graphics Gems II (James Arvo, ed. Academic Press, 1991).
+ * In place of Schumacher's comparisons against a "threshold" value, we add a
+ * "dither" value to the input pixel and then round the result to the nearest
+ * output value.  The dither value is equivalent to (0.5 - threshold) times
+ * the distance between output values.  For ordered dithering, we assume that
+ * the output colors are equally spaced; if not, results will probably be
+ * worse, since the dither may be too much or too little at a given point.
+ *
+ * The normal calculation would be to form pixel value + dither, range-limit
+ * this to 0..MAXJSAMPLE, and then index into the colorindex table as usual.
+ * We can skip the separate range-limiting step by extending the colorindex
+ * table in both directions.
+ */</font>
+
+<font color='#0000FF'>#define</font> ODITHER_SIZE  <font color='#979000'>16</font>	<font color='#009900'>/* dimension of dither matrix */</font>
+<font color='#009900'>/* NB: if ODITHER_SIZE is not a power of 2, ODITHER_MASK uses will break */</font>
+<font color='#0000FF'>#define</font> ODITHER_CELLS <font face='Lucida Console'>(</font>ODITHER_SIZE<font color='#5555FF'>*</font>ODITHER_SIZE<font face='Lucida Console'>)</font>	<font color='#009900'>/* # cells in matrix */</font>
+<font color='#0000FF'>#define</font> ODITHER_MASK  <font face='Lucida Console'>(</font>ODITHER_SIZE<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#009900'>/* mask for wrapping around counters */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>int</u></font> ODITHER_MATRIX[ODITHER_SIZE][ODITHER_SIZE];
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>int</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>ODITHER_MATRIX_PTR<font face='Lucida Console'>)</font>[ODITHER_SIZE];
+
+<font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> base_dither_matrix[ODITHER_SIZE][ODITHER_SIZE] <font color='#5555FF'>=</font> <b>{</b>
+  <font color='#009900'>/* Bayer's order-4 dither array.  Generated by the code given in
+   * Stephen Hawley's article "Ordered Dithering" in Graphics Gems I.
+   * The values in this array must range from 0 to ODITHER_CELLS-1.
+   */</font>
+  <b>{</b>   <font color='#979000'>0</font>,<font color='#979000'>192</font>, <font color='#979000'>48</font>,<font color='#979000'>240</font>, <font color='#979000'>12</font>,<font color='#979000'>204</font>, <font color='#979000'>60</font>,<font color='#979000'>252</font>,  <font color='#979000'>3</font>,<font color='#979000'>195</font>, <font color='#979000'>51</font>,<font color='#979000'>243</font>, <font color='#979000'>15</font>,<font color='#979000'>207</font>, <font color='#979000'>63</font>,<font color='#979000'>255</font> <b>}</b>,
+  <b>{</b> <font color='#979000'>128</font>, <font color='#979000'>64</font>,<font color='#979000'>176</font>,<font color='#979000'>112</font>,<font color='#979000'>140</font>, <font color='#979000'>76</font>,<font color='#979000'>188</font>,<font color='#979000'>124</font>,<font color='#979000'>131</font>, <font color='#979000'>67</font>,<font color='#979000'>179</font>,<font color='#979000'>115</font>,<font color='#979000'>143</font>, <font color='#979000'>79</font>,<font color='#979000'>191</font>,<font color='#979000'>127</font> <b>}</b>,
+  <b>{</b>  <font color='#979000'>32</font>,<font color='#979000'>224</font>, <font color='#979000'>16</font>,<font color='#979000'>208</font>, <font color='#979000'>44</font>,<font color='#979000'>236</font>, <font color='#979000'>28</font>,<font color='#979000'>220</font>, <font color='#979000'>35</font>,<font color='#979000'>227</font>, <font color='#979000'>19</font>,<font color='#979000'>211</font>, <font color='#979000'>47</font>,<font color='#979000'>239</font>, <font color='#979000'>31</font>,<font color='#979000'>223</font> <b>}</b>,
+  <b>{</b> <font color='#979000'>160</font>, <font color='#979000'>96</font>,<font color='#979000'>144</font>, <font color='#979000'>80</font>,<font color='#979000'>172</font>,<font color='#979000'>108</font>,<font color='#979000'>156</font>, <font color='#979000'>92</font>,<font color='#979000'>163</font>, <font color='#979000'>99</font>,<font color='#979000'>147</font>, <font color='#979000'>83</font>,<font color='#979000'>175</font>,<font color='#979000'>111</font>,<font color='#979000'>159</font>, <font color='#979000'>95</font> <b>}</b>,
+  <b>{</b>   <font color='#979000'>8</font>,<font color='#979000'>200</font>, <font color='#979000'>56</font>,<font color='#979000'>248</font>,  <font color='#979000'>4</font>,<font color='#979000'>196</font>, <font color='#979000'>52</font>,<font color='#979000'>244</font>, <font color='#979000'>11</font>,<font color='#979000'>203</font>, <font color='#979000'>59</font>,<font color='#979000'>251</font>,  <font color='#979000'>7</font>,<font color='#979000'>199</font>, <font color='#979000'>55</font>,<font color='#979000'>247</font> <b>}</b>,
+  <b>{</b> <font color='#979000'>136</font>, <font color='#979000'>72</font>,<font color='#979000'>184</font>,<font color='#979000'>120</font>,<font color='#979000'>132</font>, <font color='#979000'>68</font>,<font color='#979000'>180</font>,<font color='#979000'>116</font>,<font color='#979000'>139</font>, <font color='#979000'>75</font>,<font color='#979000'>187</font>,<font color='#979000'>123</font>,<font color='#979000'>135</font>, <font color='#979000'>71</font>,<font color='#979000'>183</font>,<font color='#979000'>119</font> <b>}</b>,
+  <b>{</b>  <font color='#979000'>40</font>,<font color='#979000'>232</font>, <font color='#979000'>24</font>,<font color='#979000'>216</font>, <font color='#979000'>36</font>,<font color='#979000'>228</font>, <font color='#979000'>20</font>,<font color='#979000'>212</font>, <font color='#979000'>43</font>,<font color='#979000'>235</font>, <font color='#979000'>27</font>,<font color='#979000'>219</font>, <font color='#979000'>39</font>,<font color='#979000'>231</font>, <font color='#979000'>23</font>,<font color='#979000'>215</font> <b>}</b>,
+  <b>{</b> <font color='#979000'>168</font>,<font color='#979000'>104</font>,<font color='#979000'>152</font>, <font color='#979000'>88</font>,<font color='#979000'>164</font>,<font color='#979000'>100</font>,<font color='#979000'>148</font>, <font color='#979000'>84</font>,<font color='#979000'>171</font>,<font color='#979000'>107</font>,<font color='#979000'>155</font>, <font color='#979000'>91</font>,<font color='#979000'>167</font>,<font color='#979000'>103</font>,<font color='#979000'>151</font>, <font color='#979000'>87</font> <b>}</b>,
+  <b>{</b>   <font color='#979000'>2</font>,<font color='#979000'>194</font>, <font color='#979000'>50</font>,<font color='#979000'>242</font>, <font color='#979000'>14</font>,<font color='#979000'>206</font>, <font color='#979000'>62</font>,<font color='#979000'>254</font>,  <font color='#979000'>1</font>,<font color='#979000'>193</font>, <font color='#979000'>49</font>,<font color='#979000'>241</font>, <font color='#979000'>13</font>,<font color='#979000'>205</font>, <font color='#979000'>61</font>,<font color='#979000'>253</font> <b>}</b>,
+  <b>{</b> <font color='#979000'>130</font>, <font color='#979000'>66</font>,<font color='#979000'>178</font>,<font color='#979000'>114</font>,<font color='#979000'>142</font>, <font color='#979000'>78</font>,<font color='#979000'>190</font>,<font color='#979000'>126</font>,<font color='#979000'>129</font>, <font color='#979000'>65</font>,<font color='#979000'>177</font>,<font color='#979000'>113</font>,<font color='#979000'>141</font>, <font color='#979000'>77</font>,<font color='#979000'>189</font>,<font color='#979000'>125</font> <b>}</b>,
+  <b>{</b>  <font color='#979000'>34</font>,<font color='#979000'>226</font>, <font color='#979000'>18</font>,<font color='#979000'>210</font>, <font color='#979000'>46</font>,<font color='#979000'>238</font>, <font color='#979000'>30</font>,<font color='#979000'>222</font>, <font color='#979000'>33</font>,<font color='#979000'>225</font>, <font color='#979000'>17</font>,<font color='#979000'>209</font>, <font color='#979000'>45</font>,<font color='#979000'>237</font>, <font color='#979000'>29</font>,<font color='#979000'>221</font> <b>}</b>,
+  <b>{</b> <font color='#979000'>162</font>, <font color='#979000'>98</font>,<font color='#979000'>146</font>, <font color='#979000'>82</font>,<font color='#979000'>174</font>,<font color='#979000'>110</font>,<font color='#979000'>158</font>, <font color='#979000'>94</font>,<font color='#979000'>161</font>, <font color='#979000'>97</font>,<font color='#979000'>145</font>, <font color='#979000'>81</font>,<font color='#979000'>173</font>,<font color='#979000'>109</font>,<font color='#979000'>157</font>, <font color='#979000'>93</font> <b>}</b>,
+  <b>{</b>  <font color='#979000'>10</font>,<font color='#979000'>202</font>, <font color='#979000'>58</font>,<font color='#979000'>250</font>,  <font color='#979000'>6</font>,<font color='#979000'>198</font>, <font color='#979000'>54</font>,<font color='#979000'>246</font>,  <font color='#979000'>9</font>,<font color='#979000'>201</font>, <font color='#979000'>57</font>,<font color='#979000'>249</font>,  <font color='#979000'>5</font>,<font color='#979000'>197</font>, <font color='#979000'>53</font>,<font color='#979000'>245</font> <b>}</b>,
+  <b>{</b> <font color='#979000'>138</font>, <font color='#979000'>74</font>,<font color='#979000'>186</font>,<font color='#979000'>122</font>,<font color='#979000'>134</font>, <font color='#979000'>70</font>,<font color='#979000'>182</font>,<font color='#979000'>118</font>,<font color='#979000'>137</font>, <font color='#979000'>73</font>,<font color='#979000'>185</font>,<font color='#979000'>121</font>,<font color='#979000'>133</font>, <font color='#979000'>69</font>,<font color='#979000'>181</font>,<font color='#979000'>117</font> <b>}</b>,
+  <b>{</b>  <font color='#979000'>42</font>,<font color='#979000'>234</font>, <font color='#979000'>26</font>,<font color='#979000'>218</font>, <font color='#979000'>38</font>,<font color='#979000'>230</font>, <font color='#979000'>22</font>,<font color='#979000'>214</font>, <font color='#979000'>41</font>,<font color='#979000'>233</font>, <font color='#979000'>25</font>,<font color='#979000'>217</font>, <font color='#979000'>37</font>,<font color='#979000'>229</font>, <font color='#979000'>21</font>,<font color='#979000'>213</font> <b>}</b>,
+  <b>{</b> <font color='#979000'>170</font>,<font color='#979000'>106</font>,<font color='#979000'>154</font>, <font color='#979000'>90</font>,<font color='#979000'>166</font>,<font color='#979000'>102</font>,<font color='#979000'>150</font>, <font color='#979000'>86</font>,<font color='#979000'>169</font>,<font color='#979000'>105</font>,<font color='#979000'>153</font>, <font color='#979000'>89</font>,<font color='#979000'>165</font>,<font color='#979000'>101</font>,<font color='#979000'>149</font>, <font color='#979000'>85</font> <b>}</b>
+<b>}</b>;
+
+
+<font color='#009900'>/* Declarations for Floyd-Steinberg dithering.
+ *
+ * Errors are accumulated into the array fserrors[], at a resolution of
+ * 1/16th of a pixel count.  The error at a given pixel is propagated
+ * to its not-yet-processed neighbors using the standard F-S fractions,
+ *		...	(here)	7/16
+ *		3/16	5/16	1/16
+ * We work left-to-right on even rows, right-to-left on odd rows.
+ *
+ * We can get away with a single array (holding one row's worth of errors)
+ * by using it to store the current row's errors at pixel columns not yet
+ * processed, but the next row's errors at columns already processed.  We
+ * need only a few extra variables to hold the errors immediately around the
+ * current column.  (If we are lucky, those variables are in registers, but
+ * even if not, they're probably cheaper to access than array elements are.)
+ *
+ * The fserrors[] array is indexed [component#][position].
+ * We provide (#columns + 2) entries per component; the extra entry at each
+ * end saves us from special-casing the first and last pixels.
+ *
+ * Note: on a wide image, we might not have enough room in a PC's near data
+ * segment to hold the error array; so it is allocated with alloc_large.
+ */</font>
+
+<font color='#0000FF'>#if</font> BITS_IN_JSAMPLE <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>short</u></font> FSERROR;		<font color='#009900'>/* 16 bits should be enough */</font>
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>int</u></font> LOCFSERROR;		<font color='#009900'>/* use 'int' for calculation temps */</font>
+<font color='#0000FF'>#else</font>
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>long</u></font> FSERROR;		<font color='#009900'>/* may need more than 16 bits */</font>
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>long</u></font> LOCFSERROR;	<font color='#009900'>/* be sure calculation temps are big enough */</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>typedef</font> FSERROR FAR <font color='#5555FF'>*</font>FSERRPTR;	<font color='#009900'>/* pointer to error array (in FAR storage!) */</font>
+
+
+<font color='#009900'>/* Private subobject */</font>
+
+<font color='#0000FF'>#define</font> MAX_Q_COMPS <font color='#979000'>4</font>		<font color='#009900'>/* max components I can handle */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#0000FF'>struct</font> jpeg_color_quantizer pub; <font color='#009900'>/* public fields */</font>
+
+  <font color='#009900'>/* Initially allocated colormap is saved here */</font>
+  JSAMPARRAY sv_colormap;	<font color='#009900'>/* The color map as a 2-D pixel array */</font>
+  <font color='#0000FF'><u>int</u></font> sv_actual;		<font color='#009900'>/* number of entries in use */</font>
+
+  JSAMPARRAY colorindex;	<font color='#009900'>/* Precomputed mapping for speed */</font>
+  <font color='#009900'>/* colorindex[i][j] = index of color closest to pixel value j in component i,
+   * premultiplied as described above.  Since colormap indexes must fit into
+   * JSAMPLEs, the entries of this array will too.
+   */</font>
+  <font color='#0000FF'><u>int</u></font> is_padded;		<font color='#009900'>/* is the colorindex padded for odither? */</font>
+
+  <font color='#0000FF'><u>int</u></font> Ncolors[MAX_Q_COMPS];	<font color='#009900'>/* # of values alloced to each component */</font>
+
+  <font color='#009900'>/* Variables for ordered dithering */</font>
+  <font color='#0000FF'><u>int</u></font> row_index;		<font color='#009900'>/* cur row's vertical index in dither matrix */</font>
+  ODITHER_MATRIX_PTR odither[MAX_Q_COMPS]; <font color='#009900'>/* one dither array per component */</font>
+
+  <font color='#009900'>/* Variables for Floyd-Steinberg dithering */</font>
+  FSERRPTR fserrors[MAX_Q_COMPS]; <font color='#009900'>/* accumulated errors */</font>
+  <font color='#0000FF'><u>int</u></font> on_odd_row;		<font color='#009900'>/* flag to remember which row we are on */</font>
+<b>}</b> my_cquantizer;
+
+<font color='#0000FF'>typedef</font> my_cquantizer <font color='#5555FF'>*</font> my_cquantize_ptr;
+
+
+<font color='#009900'>/*
+ * Policy-making subroutines for create_colormap and create_colorindex.
+ * These routines determine the colormap to be used.  The rest of the module
+ * only assumes that the colormap is orthogonal.
+ *
+ *  * select_ncolors decides how to divvy up the available colors
+ *    among the components.
+ *  * output_value defines the set of representative values for a component.
+ *  * largest_input_value defines the mapping from input values to
+ *    representative values for a component.
+ * Note that the latter two routines may impose different policies for
+ * different components, though this is not currently done.
+ */</font>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='select_ncolors'></a>select_ncolors</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, <font color='#0000FF'><u>int</u></font> Ncolors[]<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Determine allocation of desired colors to components, */</font>
+<font color='#009900'>/* and fill in Ncolors[] array to indicate choice. */</font>
+<font color='#009900'>/* Return value is total number of colors (product of Ncolors[] values). */</font>
+<b>{</b>
+  <font color='#0000FF'><u>int</u></font> nc <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components; <font color='#009900'>/* number of color components */</font>
+  <font color='#0000FF'><u>int</u></font> max_colors <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>desired_number_of_colors;
+  <font color='#0000FF'><u>int</u></font> total_colors, iroot, i, j;
+  <font color='#0000FF'><u>int</u></font> changed;
+  <font color='#0000FF'><u>long</u></font> temp;
+  <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> RGB_order[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <b>{</b> RGB_GREEN, RGB_RED, RGB_BLUE <b>}</b>;
+
+  <font color='#009900'>/* We can allocate at least the nc'th root of max_colors per component. */</font>
+  <font color='#009900'>/* Compute floor(nc'th root of max_colors). */</font>
+  iroot <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+  <font color='#0000FF'>do</font> <b>{</b>
+    iroot<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+    temp <font color='#5555FF'>=</font> iroot;		<font color='#009900'>/* set temp = iroot ** nc */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> nc; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+      temp <font color='#5555FF'>*</font><font color='#5555FF'>=</font> iroot;
+  <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> max_colors<font face='Lucida Console'>)</font>; <font color='#009900'>/* repeat till iroot exceeds root */</font>
+  iroot<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;			<font color='#009900'>/* now iroot = floor(root) */</font>
+
+  <font color='#009900'>/* Must have at least 2 color values per component */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>iroot <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_QUANT_FEW_COLORS, <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> temp<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Initialize to iroot color values for each component */</font>
+  total_colors <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> nc; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    Ncolors[i] <font color='#5555FF'>=</font> iroot;
+    total_colors <font color='#5555FF'>*</font><font color='#5555FF'>=</font> iroot;
+  <b>}</b>
+  <font color='#009900'>/* We may be able to increment the count for one or more components without
+   * exceeding max_colors, though we know not all can be incremented.
+   * Sometimes, the first component can be incremented more than once!
+   * (Example: for 16 colors, we start at 2*2*2, go to 3*2*2, then 4*2*2.)
+   * In RGB colorspace, try to increment G first, then R, then B.
+   */</font>
+  <font color='#0000FF'>do</font> <b>{</b>
+    changed <font color='#5555FF'>=</font> FALSE;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> nc; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      j <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_space <font color='#5555FF'>=</font><font color='#5555FF'>=</font> JCS_RGB ? RGB_order[i] : i<font face='Lucida Console'>)</font>;
+      <font color='#009900'>/* calculate new total_colors if Ncolors[j] is incremented */</font>
+      temp <font color='#5555FF'>=</font> total_colors <font color='#5555FF'>/</font> Ncolors[j];
+      temp <font color='#5555FF'>*</font><font color='#5555FF'>=</font> Ncolors[j]<font color='#5555FF'>+</font><font color='#979000'>1</font>;	<font color='#009900'>/* done in long arith to avoid oflo */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> max_colors<font face='Lucida Console'>)</font>
+	<font color='#0000FF'>break</font>;			<font color='#009900'>/* won't fit, done with this pass */</font>
+      Ncolors[j]<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;		<font color='#009900'>/* OK, apply the increment */</font>
+      total_colors <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> temp;
+      changed <font color='#5555FF'>=</font> TRUE;
+    <b>}</b>
+  <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>changed<font face='Lucida Console'>)</font>;
+
+  <font color='#0000FF'>return</font> total_colors;
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='output_value'></a>output_value</b> <font face='Lucida Console'>(</font>j_decompress_ptr , <font color='#0000FF'><u>int</u></font> , <font color='#0000FF'><u>int</u></font> j, <font color='#0000FF'><u>int</u></font> maxj<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Return j'th output value, where j will range from 0 to maxj */</font>
+<font color='#009900'>/* The output values must fall in 0..MAXJSAMPLE in increasing order */</font>
+<b>{</b>
+  <font color='#009900'>/* We always provide values 0 and MAXJSAMPLE for each component;
+   * any additional values are equally spaced between these limits.
+   * (Forcing the upper and lower values to the limits ensures that
+   * dithering can't produce a color outside the selected gamut.)
+   */</font>
+  <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> j <font color='#5555FF'>*</font> MAXJSAMPLE <font color='#5555FF'>+</font> maxj<font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> maxj<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='largest_input_value'></a>largest_input_value</b> <font face='Lucida Console'>(</font>j_decompress_ptr , <font color='#0000FF'><u>int</u></font> , <font color='#0000FF'><u>int</u></font> j, <font color='#0000FF'><u>int</u></font> maxj<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Return largest input value that should map to j'th output value */</font>
+<font color='#009900'>/* Must have largest(j=0) &gt;= 0, and largest(j=maxj) &gt;= MAXJSAMPLE */</font>
+<b>{</b>
+  <font color='#009900'>/* Breakpoints are halfway between values returned by output_value */</font>
+  <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>j <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> MAXJSAMPLE <font color='#5555FF'>+</font> maxj<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>maxj<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Create the colormap.
+ */</font>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='create_colormap'></a>create_colormap</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_cquantize_ptr cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+  JSAMPARRAY colormap;		<font color='#009900'>/* Created colormap */</font>
+  <font color='#0000FF'><u>int</u></font> total_colors;		<font color='#009900'>/* Number of distinct output colors */</font>
+  <font color='#0000FF'><u>int</u></font> i,j,k, nci, blksize, blkdist, ptr, val;
+
+  <font color='#009900'>/* Select number of colors for each component */</font>
+  total_colors <font color='#5555FF'>=</font> <font color='#BB00BB'>select_ncolors</font><font face='Lucida Console'>(</font>cinfo, cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ncolors<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Report selected color counts */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>TRACEMS4</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>1</font>, JTRC_QUANT_3_NCOLORS,
+	     total_colors, cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ncolors[<font color='#979000'>0</font>],
+	     cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ncolors[<font color='#979000'>1</font>], cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ncolors[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>else</font>
+    <font color='#BB00BB'>TRACEMS1</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>1</font>, JTRC_QUANT_NCOLORS, total_colors<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Allocate and fill in the colormap. */</font>
+  <font color='#009900'>/* The colors are ordered in the map in standard row-major order, */</font>
+  <font color='#009900'>/* i.e. rightmost (highest-indexed) color changes most rapidly. */</font>
+
+  colormap <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_sarray<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+     <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> total_colors, <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* blksize is number of adjacent repeated entries for a component */</font>
+  <font color='#009900'>/* blkdist is distance between groups of identical entries for a component */</font>
+  blkdist <font color='#5555FF'>=</font> total_colors;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* fill in colormap entries for i'th color component */</font>
+    nci <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ncolors[i]; <font color='#009900'>/* # of distinct values for this color */</font>
+    blksize <font color='#5555FF'>=</font> blkdist <font color='#5555FF'>/</font> nci;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> nci; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* Compute j'th output value (out of nci) for component */</font>
+      val <font color='#5555FF'>=</font> <font color='#BB00BB'>output_value</font><font face='Lucida Console'>(</font>cinfo, i, j, nci<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+      <font color='#009900'>/* Fill in all colormap entries that have this value of this component */</font>
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ptr <font color='#5555FF'>=</font> j <font color='#5555FF'>*</font> blksize; ptr <font color='#5555FF'>&lt;</font> total_colors; ptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> blkdist<font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#009900'>/* fill in blksize entries beginning at ptr */</font>
+	<font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> blksize; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+	  colormap[i][ptr<font color='#5555FF'>+</font>k] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> val;
+      <b>}</b>
+    <b>}</b>
+    blkdist <font color='#5555FF'>=</font> blksize;		<font color='#009900'>/* blksize of this color is blkdist of next */</font>
+  <b>}</b>
+
+  <font color='#009900'>/* Save the colormap in private storage,
+   * where it will survive color quantization mode changes.
+   */</font>
+  cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sv_colormap <font color='#5555FF'>=</font> colormap;
+  cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sv_actual <font color='#5555FF'>=</font> total_colors;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Create the color index table.
+ */</font>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='create_colorindex'></a>create_colorindex</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_cquantize_ptr cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+  JSAMPROW indexptr;
+  <font color='#0000FF'><u>int</u></font> i,j,k, nci, blksize, val, pad;
+
+  <font color='#009900'>/* For ordered dither, we pad the color index tables by MAXJSAMPLE in
+   * each direction (input index values can be -MAXJSAMPLE .. 2*MAXJSAMPLE).
+   * This is not necessary in the other dithering modes.  However, we
+   * flag whether it was done in case user changes dithering mode.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dither_mode <font color='#5555FF'>=</font><font color='#5555FF'>=</font> JDITHER_ORDERED<font face='Lucida Console'>)</font> <b>{</b>
+    pad <font color='#5555FF'>=</font> MAXJSAMPLE<font color='#5555FF'>*</font><font color='#979000'>2</font>;
+    cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>is_padded <font color='#5555FF'>=</font> TRUE;
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    pad <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>is_padded <font color='#5555FF'>=</font> FALSE;
+  <b>}</b>
+
+  cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colorindex <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_sarray<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+     <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>MAXJSAMPLE<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>+</font> pad<font face='Lucida Console'>)</font>,
+     <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* blksize is number of adjacent repeated entries for a component */</font>
+  blksize <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sv_actual;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* fill in colorindex entries for i'th color component */</font>
+    nci <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ncolors[i]; <font color='#009900'>/* # of distinct values for this color */</font>
+    blksize <font color='#5555FF'>=</font> blksize <font color='#5555FF'>/</font> nci;
+
+    <font color='#009900'>/* adjust colorindex pointers to provide padding at negative indexes. */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pad<font face='Lucida Console'>)</font>
+      cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colorindex[i] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> MAXJSAMPLE;
+
+    <font color='#009900'>/* in loop, val = index of current output value, */</font>
+    <font color='#009900'>/* and k = largest j that maps to current val */</font>
+    indexptr <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colorindex[i];
+    val <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    k <font color='#5555FF'>=</font> <font color='#BB00BB'>largest_input_value</font><font face='Lucida Console'>(</font>cinfo, i, <font color='#979000'>0</font>, nci<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> MAXJSAMPLE; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>&gt;</font> k<font face='Lucida Console'>)</font>		<font color='#009900'>/* advance val if past boundary */</font>
+	k <font color='#5555FF'>=</font> <font color='#BB00BB'>largest_input_value</font><font face='Lucida Console'>(</font>cinfo, i, <font color='#5555FF'>+</font><font color='#5555FF'>+</font>val, nci<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+      <font color='#009900'>/* premultiply so that no multiplication needed in main processing */</font>
+      indexptr[j] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>val <font color='#5555FF'>*</font> blksize<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#009900'>/* Pad at both ends if necessary */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pad<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> <font color='#979000'>1</font>; j <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> MAXJSAMPLE; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	indexptr[<font color='#5555FF'>-</font>j] <font color='#5555FF'>=</font> indexptr[<font color='#979000'>0</font>];
+	indexptr[MAXJSAMPLE<font color='#5555FF'>+</font>j] <font color='#5555FF'>=</font> indexptr[MAXJSAMPLE];
+      <b>}</b>
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Create an ordered-dither array for a component having ncolors
+ * distinct output values.
+ */</font>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font>ODITHER_MATRIX_PTR<font face='Lucida Console'>)</font>
+<b><a name='make_odither_array'></a>make_odither_array</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, <font color='#0000FF'><u>int</u></font> ncolors<font face='Lucida Console'>)</font>
+<b>{</b>
+  ODITHER_MATRIX_PTR odither;
+  <font color='#0000FF'><u>int</u></font> j,k;
+  <font color='#0000FF'><u>long</u></font> num,den;
+
+  odither <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ODITHER_MATRIX_PTR<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				<font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>ODITHER_MATRIX<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* The inter-value distance for this color is MAXJSAMPLE/(ncolors-1).
+   * Hence the dither value for the matrix cell with fill order f
+   * (f=0..N-1) should be (N-1-2*f)/(2*N) * MAXJSAMPLE/(ncolors-1).
+   * On 16-bit-int machine, be careful to avoid overflow.
+   */</font>
+  den <font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>*</font> ODITHER_CELLS <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>ncolors <font color='#5555FF'>-</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> ODITHER_SIZE; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> ODITHER_SIZE; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      num <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>ODITHER_CELLS<font color='#5555FF'>-</font><font color='#979000'>1</font> <font color='#5555FF'>-</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>base_dither_matrix[j][k]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+	    <font color='#5555FF'>*</font> MAXJSAMPLE;
+      <font color='#009900'>/* Ensure round towards zero despite C's lack of consistency
+       * about rounding negative values in integer division...
+       */</font>
+      odither[j][k] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>num<font color='#5555FF'>&lt;</font><font color='#979000'>0</font> ? <font color='#5555FF'>-</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>num<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>den<font face='Lucida Console'>)</font> : num<font color='#5555FF'>/</font>den<font face='Lucida Console'>)</font>;
+    <b>}</b>
+  <b>}</b>
+  <font color='#0000FF'>return</font> odither;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Create the ordered-dither tables.
+ * Components having the same number of representative colors may 
+ * share a dither table.
+ */</font>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='create_odither_tables'></a>create_odither_tables</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_cquantize_ptr cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+  ODITHER_MATRIX_PTR odither;
+  <font color='#0000FF'><u>int</u></font> i, j, nci;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    nci <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ncolors[i]; <font color='#009900'>/* # of distinct values for this color */</font>
+    odither <font color='#5555FF'>=</font> NULL;		<font color='#009900'>/* search for matching prior component */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> i; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nci <font color='#5555FF'>=</font><font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ncolors[j]<font face='Lucida Console'>)</font> <b>{</b>
+	odither <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>odither[j];
+	<font color='#0000FF'>break</font>;
+      <b>}</b>
+    <b>}</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>odither <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>	<font color='#009900'>/* need a new table? */</font>
+      odither <font color='#5555FF'>=</font> <font color='#BB00BB'>make_odither_array</font><font face='Lucida Console'>(</font>cinfo, nci<font face='Lucida Console'>)</font>;
+    cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>odither[i] <font color='#5555FF'>=</font> odither;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Map some rows of pixels to the output colormapped representation.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='color_quantize'></a>color_quantize</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, JSAMPARRAY input_buf,
+		JSAMPARRAY output_buf, <font color='#0000FF'><u>int</u></font> num_rows<font face='Lucida Console'>)</font>
+<font color='#009900'>/* General case, no dithering */</font>
+<b>{</b>
+  my_cquantize_ptr cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+  JSAMPARRAY colorindex <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colorindex;
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> pixcode, ci;
+  <font color='#0000FF'>register</font> JSAMPROW ptrin, ptrout;
+  <font color='#0000FF'><u>int</u></font> row;
+  JDIMENSION col;
+  JDIMENSION width <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width;
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> nc <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>row <font color='#5555FF'>=</font> <font color='#979000'>0</font>; row <font color='#5555FF'>&lt;</font> num_rows; row<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    ptrin <font color='#5555FF'>=</font> input_buf[row];
+    ptrout <font color='#5555FF'>=</font> output_buf[row];
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>col <font color='#5555FF'>=</font> width; col <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; col<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+      pixcode <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ci <font color='#5555FF'>&lt;</font> nc; ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	pixcode <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>colorindex[ci][<font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>ptrin<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>]<font face='Lucida Console'>)</font>;
+      <b>}</b>
+      <font color='#5555FF'>*</font>ptrout<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> pixcode;
+    <b>}</b>
+  <b>}</b>
+<b>}</b>
+
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='color_quantize3'></a>color_quantize3</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, JSAMPARRAY input_buf,
+		 JSAMPARRAY output_buf, <font color='#0000FF'><u>int</u></font> num_rows<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Fast path for out_color_components==3, no dithering */</font>
+<b>{</b>
+  my_cquantize_ptr cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> pixcode;
+  <font color='#0000FF'>register</font> JSAMPROW ptrin, ptrout;
+  JSAMPROW colorindex0 <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colorindex[<font color='#979000'>0</font>];
+  JSAMPROW colorindex1 <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colorindex[<font color='#979000'>1</font>];
+  JSAMPROW colorindex2 <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colorindex[<font color='#979000'>2</font>];
+  <font color='#0000FF'><u>int</u></font> row;
+  JDIMENSION col;
+  JDIMENSION width <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>row <font color='#5555FF'>=</font> <font color='#979000'>0</font>; row <font color='#5555FF'>&lt;</font> num_rows; row<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    ptrin <font color='#5555FF'>=</font> input_buf[row];
+    ptrout <font color='#5555FF'>=</font> output_buf[row];
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>col <font color='#5555FF'>=</font> width; col <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; col<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+      pixcode  <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>colorindex0[<font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>ptrin<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>]<font face='Lucida Console'>)</font>;
+      pixcode <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>colorindex1[<font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>ptrin<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>]<font face='Lucida Console'>)</font>;
+      pixcode <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>colorindex2[<font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>ptrin<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>]<font face='Lucida Console'>)</font>;
+      <font color='#5555FF'>*</font>ptrout<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> pixcode;
+    <b>}</b>
+  <b>}</b>
+<b>}</b>
+
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='quantize_ord_dither'></a>quantize_ord_dither</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, JSAMPARRAY input_buf,
+		     JSAMPARRAY output_buf, <font color='#0000FF'><u>int</u></font> num_rows<font face='Lucida Console'>)</font>
+<font color='#009900'>/* General case, with ordered dithering */</font>
+<b>{</b>
+  my_cquantize_ptr cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+  <font color='#0000FF'>register</font> JSAMPROW input_ptr;
+  <font color='#0000FF'>register</font> JSAMPROW output_ptr;
+  JSAMPROW colorindex_ci;
+  <font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font> dither;			<font color='#009900'>/* points to active row of dither matrix */</font>
+  <font color='#0000FF'><u>int</u></font> row_index, col_index;	<font color='#009900'>/* current indexes into dither matrix */</font>
+  <font color='#0000FF'><u>int</u></font> nc <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components;
+  <font color='#0000FF'><u>int</u></font> ci;
+  <font color='#0000FF'><u>int</u></font> row;
+  JDIMENSION col;
+  JDIMENSION width <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>row <font color='#5555FF'>=</font> <font color='#979000'>0</font>; row <font color='#5555FF'>&lt;</font> num_rows; row<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Initialize output values to 0 so can process components separately */</font>
+    <font color='#BB00BB'>jzero_far</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> output_buf[row],
+	      <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>width <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    row_index <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_index;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ci <font color='#5555FF'>&lt;</font> nc; ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      input_ptr <font color='#5555FF'>=</font> input_buf[row] <font color='#5555FF'>+</font> ci;
+      output_ptr <font color='#5555FF'>=</font> output_buf[row];
+      colorindex_ci <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colorindex[ci];
+      dither <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>odither[ci][row_index];
+      col_index <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>col <font color='#5555FF'>=</font> width; col <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; col<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#009900'>/* Form pixel value + dither, range-limit to 0..MAXJSAMPLE,
+	 * select output value, accumulate into output code for this pixel.
+	 * Range-limiting need not be done explicitly, as we have extended
+	 * the colorindex table to produce the right answers for out-of-range
+	 * inputs.  The maximum dither is +- MAXJSAMPLE; this sets the
+	 * required amount of padding.
+	 */</font>
+	<font color='#5555FF'>*</font>output_ptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> colorindex_ci[<font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>input_ptr<font face='Lucida Console'>)</font><font color='#5555FF'>+</font>dither[col_index]];
+	input_ptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> nc;
+	output_ptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+	col_index <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>col_index <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> ODITHER_MASK;
+      <b>}</b>
+    <b>}</b>
+    <font color='#009900'>/* Advance row index for next row */</font>
+    row_index <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>row_index <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> ODITHER_MASK;
+    cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_index <font color='#5555FF'>=</font> row_index;
+  <b>}</b>
+<b>}</b>
+
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='quantize3_ord_dither'></a>quantize3_ord_dither</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, JSAMPARRAY input_buf,
+		      JSAMPARRAY output_buf, <font color='#0000FF'><u>int</u></font> num_rows<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Fast path for out_color_components==3, with ordered dithering */</font>
+<b>{</b>
+  my_cquantize_ptr cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> pixcode;
+  <font color='#0000FF'>register</font> JSAMPROW input_ptr;
+  <font color='#0000FF'>register</font> JSAMPROW output_ptr;
+  JSAMPROW colorindex0 <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colorindex[<font color='#979000'>0</font>];
+  JSAMPROW colorindex1 <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colorindex[<font color='#979000'>1</font>];
+  JSAMPROW colorindex2 <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colorindex[<font color='#979000'>2</font>];
+  <font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font> dither0;		<font color='#009900'>/* points to active row of dither matrix */</font>
+  <font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font> dither1;
+  <font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font> dither2;
+  <font color='#0000FF'><u>int</u></font> row_index, col_index;	<font color='#009900'>/* current indexes into dither matrix */</font>
+  <font color='#0000FF'><u>int</u></font> row;
+  JDIMENSION col;
+  JDIMENSION width <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>row <font color='#5555FF'>=</font> <font color='#979000'>0</font>; row <font color='#5555FF'>&lt;</font> num_rows; row<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    row_index <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_index;
+    input_ptr <font color='#5555FF'>=</font> input_buf[row];
+    output_ptr <font color='#5555FF'>=</font> output_buf[row];
+    dither0 <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>odither[<font color='#979000'>0</font>][row_index];
+    dither1 <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>odither[<font color='#979000'>1</font>][row_index];
+    dither2 <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>odither[<font color='#979000'>2</font>][row_index];
+    col_index <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>col <font color='#5555FF'>=</font> width; col <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; col<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+      pixcode  <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>colorindex0[<font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>input_ptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>
+					dither0[col_index]]<font face='Lucida Console'>)</font>;
+      pixcode <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>colorindex1[<font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>input_ptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>
+					dither1[col_index]]<font face='Lucida Console'>)</font>;
+      pixcode <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>colorindex2[<font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>input_ptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>
+					dither2[col_index]]<font face='Lucida Console'>)</font>;
+      <font color='#5555FF'>*</font>output_ptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> pixcode;
+      col_index <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>col_index <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> ODITHER_MASK;
+    <b>}</b>
+    row_index <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>row_index <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> ODITHER_MASK;
+    cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_index <font color='#5555FF'>=</font> row_index;
+  <b>}</b>
+<b>}</b>
+
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='quantize_fs_dither'></a>quantize_fs_dither</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, JSAMPARRAY input_buf,
+		    JSAMPARRAY output_buf, <font color='#0000FF'><u>int</u></font> num_rows<font face='Lucida Console'>)</font>
+<font color='#009900'>/* General case, with Floyd-Steinberg dithering */</font>
+<b>{</b>
+  my_cquantize_ptr cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+  <font color='#0000FF'>register</font> LOCFSERROR cur;	<font color='#009900'>/* current error or pixel value */</font>
+  LOCFSERROR belowerr;		<font color='#009900'>/* error for pixel below cur */</font>
+  LOCFSERROR bpreverr;		<font color='#009900'>/* error for below/prev col */</font>
+  LOCFSERROR bnexterr;		<font color='#009900'>/* error for below/next col */</font>
+  LOCFSERROR delta;
+  <font color='#0000FF'>register</font> FSERRPTR errorptr;	<font color='#009900'>/* =&gt; fserrors[] at column before current */</font>
+  <font color='#0000FF'>register</font> JSAMPROW input_ptr;
+  <font color='#0000FF'>register</font> JSAMPROW output_ptr;
+  JSAMPROW colorindex_ci;
+  JSAMPROW colormap_ci;
+  <font color='#0000FF'><u>int</u></font> pixcode;
+  <font color='#0000FF'><u>int</u></font> nc <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components;
+  <font color='#0000FF'><u>int</u></font> dir;			<font color='#009900'>/* 1 for left-to-right, -1 for right-to-left */</font>
+  <font color='#0000FF'><u>int</u></font> dirnc;			<font color='#009900'>/* dir * nc */</font>
+  <font color='#0000FF'><u>int</u></font> ci;
+  <font color='#0000FF'><u>int</u></font> row;
+  JDIMENSION col;
+  JDIMENSION width <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width;
+  JSAMPLE <font color='#5555FF'>*</font>range_limit <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sample_range_limit;
+  SHIFT_TEMPS
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>row <font color='#5555FF'>=</font> <font color='#979000'>0</font>; row <font color='#5555FF'>&lt;</font> num_rows; row<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Initialize output values to 0 so can process components separately */</font>
+    <font color='#BB00BB'>jzero_far</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> output_buf[row],
+	      <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>width <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ci <font color='#5555FF'>&lt;</font> nc; ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      input_ptr <font color='#5555FF'>=</font> input_buf[row] <font color='#5555FF'>+</font> ci;
+      output_ptr <font color='#5555FF'>=</font> output_buf[row];
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>on_odd_row<font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#009900'>/* work right to left in this row */</font>
+	input_ptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>width<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> nc; <font color='#009900'>/* so point to rightmost pixel */</font>
+	output_ptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> width<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+	dir <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+	dirnc <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>nc;
+	errorptr <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fserrors[ci] <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>width<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>; <font color='#009900'>/* =&gt; entry after last column */</font>
+      <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+	<font color='#009900'>/* work left to right in this row */</font>
+	dir <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+	dirnc <font color='#5555FF'>=</font> nc;
+	errorptr <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fserrors[ci]; <font color='#009900'>/* =&gt; entry before first column */</font>
+      <b>}</b>
+      colorindex_ci <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colorindex[ci];
+      colormap_ci <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sv_colormap[ci];
+      <font color='#009900'>/* Preset error values: no error propagated to first pixel from left */</font>
+      cur <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+      <font color='#009900'>/* and no error propagated to row below yet */</font>
+      belowerr <font color='#5555FF'>=</font> bpreverr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>col <font color='#5555FF'>=</font> width; col <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; col<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#009900'>/* cur holds the error propagated from the previous pixel on the
+	 * current line.  Add the error propagated from the previous line
+	 * to form the complete error correction term for this pixel, and
+	 * round the error term (which is expressed * 16) to an integer.
+	 * RIGHT_SHIFT rounds towards minus infinity, so adding 8 is correct
+	 * for either sign of the error value.
+	 * Note: errorptr points to *previous* column's array entry.
+	 */</font>
+	cur <font color='#5555FF'>=</font> <font color='#BB00BB'>RIGHT_SHIFT</font><font face='Lucida Console'>(</font>cur <font color='#5555FF'>+</font> errorptr[dir] <font color='#5555FF'>+</font> <font color='#979000'>8</font>, <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+	<font color='#009900'>/* Form pixel value + error, and range-limit to 0..MAXJSAMPLE.
+	 * The maximum error is +- MAXJSAMPLE; this sets the required size
+	 * of the range_limit array.
+	 */</font>
+	cur <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>input_ptr<font face='Lucida Console'>)</font>;
+	cur <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>range_limit[cur]<font face='Lucida Console'>)</font>;
+	<font color='#009900'>/* Select output value, accumulate into output code for this pixel */</font>
+	pixcode <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>colorindex_ci[cur]<font face='Lucida Console'>)</font>;
+	<font color='#5555FF'>*</font>output_ptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> pixcode;
+	<font color='#009900'>/* Compute actual representation error at this pixel */</font>
+	<font color='#009900'>/* Note: we can do this even though we don't have the final */</font>
+	<font color='#009900'>/* pixel code, because the colormap is orthogonal. */</font>
+	cur <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>colormap_ci[pixcode]<font face='Lucida Console'>)</font>;
+	<font color='#009900'>/* Compute error fractions to be propagated to adjacent pixels.
+	 * Add these into the running sums, and simultaneously shift the
+	 * next-line error sums left by 1 column.
+	 */</font>
+	bnexterr <font color='#5555FF'>=</font> cur;
+	delta <font color='#5555FF'>=</font> cur <font color='#5555FF'>*</font> <font color='#979000'>2</font>;
+	cur <font color='#5555FF'>+</font><font color='#5555FF'>=</font> delta;		<font color='#009900'>/* form error * 3 */</font>
+	errorptr[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FSERROR<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>bpreverr <font color='#5555FF'>+</font> cur<font face='Lucida Console'>)</font>;
+	cur <font color='#5555FF'>+</font><font color='#5555FF'>=</font> delta;		<font color='#009900'>/* form error * 5 */</font>
+	bpreverr <font color='#5555FF'>=</font> belowerr <font color='#5555FF'>+</font> cur;
+	belowerr <font color='#5555FF'>=</font> bnexterr;
+	cur <font color='#5555FF'>+</font><font color='#5555FF'>=</font> delta;		<font color='#009900'>/* form error * 7 */</font>
+	<font color='#009900'>/* At this point cur contains the 7/16 error value to be propagated
+	 * to the next pixel on the current line, and all the errors for the
+	 * next line have been shifted over. We are therefore ready to move on.
+	 */</font>
+	input_ptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> dirnc;	<font color='#009900'>/* advance input ptr to next column */</font>
+	output_ptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> dir;	<font color='#009900'>/* advance output ptr to next column */</font>
+	errorptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> dir;	<font color='#009900'>/* advance errorptr to current column */</font>
+      <b>}</b>
+      <font color='#009900'>/* Post-loop cleanup: we must unload the final error value into the
+       * final fserrors[] entry.  Note we need not unload belowerr because
+       * it is for the dummy column before or after the actual array.
+       */</font>
+      errorptr[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FSERROR<font face='Lucida Console'>)</font> bpreverr; <font color='#009900'>/* unload prev err into array */</font>
+    <b>}</b>
+    cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>on_odd_row <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>on_odd_row ? FALSE : TRUE<font face='Lucida Console'>)</font>;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Allocate workspace for Floyd-Steinberg errors.
+ */</font>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='alloc_fs_workspace'></a>alloc_fs_workspace</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_cquantize_ptr cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+  <font color='#0000FF'><u>size_t</u></font> arraysize;
+  <font color='#0000FF'><u>int</u></font> i;
+
+  arraysize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width <font color='#5555FF'>+</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>FSERROR<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fserrors[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FSERRPTR<font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_large<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE, arraysize<font face='Lucida Console'>)</font>;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Initialize for one-pass color quantization.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='start_pass_1_quant'></a>start_pass_1_quant</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, <font color='#0000FF'><u>int</u></font> <font face='Lucida Console'>)</font>
+<b>{</b>
+  my_cquantize_ptr cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+  <font color='#0000FF'><u>size_t</u></font> arraysize;
+  <font color='#0000FF'><u>int</u></font> i;
+
+  <font color='#009900'>/* Install my colormap. */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colormap <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sv_colormap;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>actual_number_of_colors <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sv_actual;
+
+  <font color='#009900'>/* Initialize for desired dithering mode. */</font>
+  <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dither_mode<font face='Lucida Console'>)</font> <b>{</b>
+  <font color='#0000FF'>case</font> JDITHER_NONE:
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+      cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.color_quantize <font color='#5555FF'>=</font> color_quantize3;
+    <font color='#0000FF'>else</font>
+      cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.color_quantize <font color='#5555FF'>=</font> color_quantize;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> JDITHER_ORDERED:
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+      cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.color_quantize <font color='#5555FF'>=</font> quantize3_ord_dither;
+    <font color='#0000FF'>else</font>
+      cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.color_quantize <font color='#5555FF'>=</font> quantize_ord_dither;
+    cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_index <font color='#5555FF'>=</font> <font color='#979000'>0</font>;	<font color='#009900'>/* initialize state for ordered dither */</font>
+    <font color='#009900'>/* If user changed to ordered dither from another mode,
+     * we must recreate the color index table with padding.
+     * This will cost extra space, but probably isn't very likely.
+     */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>is_padded<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>create_colorindex</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Create ordered-dither tables if we didn't already. */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>odither[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>create_odither_tables</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> JDITHER_FS:
+    cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.color_quantize <font color='#5555FF'>=</font> quantize_fs_dither;
+    cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>on_odd_row <font color='#5555FF'>=</font> FALSE; <font color='#009900'>/* initialize state for F-S dither */</font>
+    <font color='#009900'>/* Allocate Floyd-Steinberg workspace if didn't already. */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fserrors[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>alloc_fs_workspace</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Initialize the propagated errors to zero. */</font>
+    arraysize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width <font color='#5555FF'>+</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>FSERROR<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>jzero_far</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fserrors[i], arraysize<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>default</font>:
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_NOT_COMPILED<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>break</font>;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Finish up at the end of the pass.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='finish_pass_1_quant'></a>finish_pass_1_quant</b> <font face='Lucida Console'>(</font>j_decompress_ptr <font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#009900'>/* no work in 1-pass case */</font>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Switch to a new external colormap between output passes.
+ * Shouldn't get to this module!
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='new_color_map_1_quant'></a>new_color_map_1_quant</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_MODE_CHANGE<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Module initialization routine for 1-pass color quantization.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jinit_1pass_quantizer'></a>jinit_1pass_quantizer</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_cquantize_ptr cquantize;
+
+  cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				<font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>my_cquantizer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> jpeg_color_quantizer <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> cquantize;
+  cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.start_pass <font color='#5555FF'>=</font> start_pass_1_quant;
+  cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.finish_pass <font color='#5555FF'>=</font> finish_pass_1_quant;
+  cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.new_color_map <font color='#5555FF'>=</font> new_color_map_1_quant;
+  cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fserrors[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> NULL; <font color='#009900'>/* Flag FS workspace not allocated */</font>
+  cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>odither[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> NULL;	<font color='#009900'>/* Also flag odither arrays not allocated */</font>
+
+  <font color='#009900'>/* Make sure my internal arrays won't overflow */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components <font color='#5555FF'>&gt;</font> MAX_Q_COMPS<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_QUANT_COMPONENTS, MAX_Q_COMPS<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Make sure colormap indexes can be represented by JSAMPLEs */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>desired_number_of_colors <font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font>MAXJSAMPLE<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_QUANT_MANY_COLORS, MAXJSAMPLE<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Create the colormap and color index table. */</font>
+  <font color='#BB00BB'>create_colormap</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>create_colorindex</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Allocate Floyd-Steinberg workspace now if requested.
+   * We do this now since it is FAR storage and may affect the memory
+   * manager's space calculations.  If the user changes to FS dither
+   * mode in a later pass, we will allocate the space then, and will
+   * possibly overrun the max_memory_to_use setting.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dither_mode <font color='#5555FF'>=</font><font color='#5555FF'>=</font> JDITHER_FS<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>alloc_fs_workspace</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* QUANT_1PASS_SUPPORTED */</font>
+
+</pre></body></html>

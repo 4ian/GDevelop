@@ -1,0 +1,225 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sliding_buffer_kernel_c.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SLIDING_BUFFER_KERNEl_C_
+<font color='#0000FF'>#define</font> DLIB_SLIDING_BUFFER_KERNEl_C_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sliding_buffer_kernel_abstract.h.html'>sliding_buffer_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sb_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='sliding_buffer_kernel_c'></a>sliding_buffer_kernel_c</b> : <font color='#0000FF'>public</font> sb_base
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sb_base::type T;
+        
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> exp_size
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_element_id'></a>get_element_id</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_element_index'></a>get_element_index</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> element_id 
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sb_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        sliding_buffer_kernel_c<font color='#5555FF'>&lt;</font>sb_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        sliding_buffer_kernel_c<font color='#5555FF'>&lt;</font>sb_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>  
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sb_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> sliding_buffer_kernel_c<font color='#5555FF'>&lt;</font>sb_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> exp_size
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font> exp_size <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> exp_size <font color='#5555FF'>&lt;</font> <font color='#979000'>32</font>,
+            "<font color='#CC0000'>\tvoid sliding_buffer::set_size(unsigned long)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\texp_size must be some number between 1 and 31</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\texp_size: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> exp_size
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        sb_base::<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>exp_size<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sb_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> sliding_buffer_kernel_c<font color='#5555FF'>&lt;</font>sb_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_element_id'></a>get_element_id</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> index <font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tunsigned long sliding_buffer::get_element_id(unsigned long) const</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tindex must be in the range 0 to size()-1</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tsize(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tindex:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> index
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#0000FF'>return</font> sb_base::<font color='#BB00BB'>get_element_id</font><font face='Lucida Console'>(</font>index<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sb_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> sliding_buffer_kernel_c<font color='#5555FF'>&lt;</font>sb_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_element_index'></a>get_element_index</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> element_id
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> element_id <font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tunsigned long sliding_buffer::get_element_index(unsigned long) const</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tid must be in the range 0 to size()-1</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tsize(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tid:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> element_id
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#0000FF'>return</font> sb_base::<font color='#BB00BB'>get_element_index</font><font face='Lucida Console'>(</font>element_id<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sb_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> sb_base::type<font color='#5555FF'>&amp;</font> sliding_buffer_kernel_c<font color='#5555FF'>&lt;</font>sb_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> index <font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tconst T&amp; sliding_buffer::operator[](unsigned long) const</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tindex must be in the range 0 to size()-1</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tsize(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tindex:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> index
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#0000FF'>return</font> sb_base::<font color='#0000FF'>operator</font>[]<font face='Lucida Console'>(</font>index<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sb_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> sb_base::type<font color='#5555FF'>&amp;</font> sliding_buffer_kernel_c<font color='#5555FF'>&lt;</font>sb_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> index <font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tT&amp; sliding_buffer::operator[](unsigned long)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tindex must be in the range 0 to size()-1</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tsize(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tindex:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> index
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#0000FF'>return</font> sb_base::<font color='#0000FF'>operator</font>[]<font face='Lucida Console'>(</font>index<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sb_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> sb_base::type<font color='#5555FF'>&amp;</font> sliding_buffer_kernel_c<font color='#5555FF'>&lt;</font>sb_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>current_element_valid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\tconst T&amp; sliding_buffer::element</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tyou can't access the current element if it doesn't exist</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#0000FF'>return</font> sb_base::<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sb_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> sb_base::type<font color='#5555FF'>&amp;</font> sliding_buffer_kernel_c<font color='#5555FF'>&lt;</font>sb_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>current_element_valid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\tT&amp; sliding_buffer::element</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tyou can't access the current element if it doesn't exist</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#0000FF'>return</font> sb_base::<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SLIDING_BUFFER_KERNEl_C_
+</font>
+
+</pre></body></html>

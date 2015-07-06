@@ -1,0 +1,81 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - spectral_cluster.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2015  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SPECTRAL_CLUSTEr_H_
+<font color='#0000FF'>#define</font> DLIB_SPECTRAL_CLUSTEr_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='spectral_cluster_abstract.h.html'>spectral_cluster_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../svm/kkmeans.h.html'>../svm/kkmeans.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type,
+        <font color='#0000FF'>typename</font> vector_type
+        <font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <b><a name='spectral_cluster'></a>spectral_cluster</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> k,
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_clusters
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>num_clusters <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>, 
+            "<font color='#CC0000'>\t std::vector&lt;unsigned long&gt; spectral_cluster(k,samples,num_clusters)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_clusters can't be 0.</font>"
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_clusters <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// nothing to do, just assign everything to the 0 cluster.
+</font>            <font color='#0000FF'>return</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// compute the similarity matrix.
+</font>        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>K</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> K.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> r<font color='#5555FF'>+</font><font color='#979000'>1</font>; c <font color='#5555FF'>&lt;</font> K.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>K</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>K</font><font face='Lucida Console'>(</font>c,r<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>k</font><font face='Lucida Console'>(</font>samples[r], samples[c]<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> K.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>K</font><font face='Lucida Console'>(</font>r,r<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>D</font><font face='Lucida Console'>(</font>K.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> K.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>D</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>K,r<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        D <font color='#5555FF'>=</font> <font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#BB00BB'>reciprocal</font><font face='Lucida Console'>(</font>D<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        K <font color='#5555FF'>=</font> <font color='#BB00BB'>diagm</font><font face='Lucida Console'>(</font>D<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>K<font color='#5555FF'>*</font><font color='#BB00BB'>diagm</font><font face='Lucida Console'>(</font>D<font face='Lucida Console'>)</font>; 
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> u,w,v;
+        <font color='#009900'>// Use the normal SVD routine unless the matrix is really big, then use the fast
+</font>        <font color='#009900'>// approximate version.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>K.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1000</font><font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>svd3</font><font face='Lucida Console'>(</font>K,u,w,v<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            <font color='#BB00BB'>svd_fast</font><font face='Lucida Console'>(</font>K,u,w,v, num_clusters<font color='#5555FF'>+</font><font color='#979000'>100</font>, <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Pick out the eigenvectors associated with the largest eigenvalues.
+</font>        <font color='#BB00BB'>rsort_columns</font><font face='Lucida Console'>(</font>v,w<font face='Lucida Console'>)</font>;
+        v <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>v, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,num_clusters<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Now build the normalized spectral vectors, one for each input vector.
+</font>        std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> spec_samps, centers;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> v.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            spec_samps.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>v,r<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            spec_samps.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>spec_samps.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#009900'>// Finally do the K-means clustering
+</font>        <font color='#BB00BB'>pick_initial_centers</font><font face='Lucida Console'>(</font>num_clusters, centers, spec_samps<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>find_clusters_using_kmeans</font><font face='Lucida Console'>(</font>spec_samps, centers<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// And then compute the cluster assignments based on the output of K-means.
+</font>        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> assignments;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> spec_samps.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            assignments.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>nearest_center</font><font face='Lucida Console'>(</font>centers, spec_samps[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> assignments;
+    <b>}</b>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SPECTRAL_CLUSTEr_H_
+</font>
+
+</pre></body></html>

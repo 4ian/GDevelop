@@ -1,0 +1,43 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - extra_logger_headers.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_EXTRA_LOGGER_HEADERs_CPP_
+<font color='#0000FF'>#define</font> DLIB_EXTRA_LOGGER_HEADERs_CPP_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='extra_logger_headers.h.html'>extra_logger_headers.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstring<font color='#5555FF'>&gt;</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='print_datetime_logger_header'></a>print_datetime_logger_header</b> <font face='Lucida Console'>(</font>
+        std::ostream<font color='#5555FF'>&amp;</font> out,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> logger_name,
+        <font color='#0000FF'>const</font> log_level<font color='#5555FF'>&amp;</font> l,
+        <font color='#0000FF'>const</font> uint64 thread_id
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> buf;
+
+        time_t t <font color='#5555FF'>=</font> <font color='#BB00BB'>time</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        buf <font color='#5555FF'>=</font> <font color='#BB00BB'>ctime</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>t<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// remove the trailing '\n'
+</font>        <font color='#0000FF'><u>size_t</u></font> size <font color='#5555FF'>=</font> <font color='#BB00BB'>strlen</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>;
+        buf[size<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>\0</font>';
+
+        out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> l.name <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> (</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> buf <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>) [</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> thread_id <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>] </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> logger_name <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>: </font>";
+    <b>}</b>
+
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_EXTRA_LOGGER_HEADERs_CPP_
+</font>
+
+
+</pre></body></html>

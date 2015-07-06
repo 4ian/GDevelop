@@ -1,0 +1,388 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - memory_manager_kernel_3.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2004  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MEMORY_MANAGER_KERNEl_3_
+<font color='#0000FF'>#define</font> DLIB_MEMORY_MANAGER_KERNEl_3_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='memory_manager_kernel_abstract.h.html'>memory_manager_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>new<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='memory_manager_kernel_2.h.html'>memory_manager_kernel_2.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../binary_search_tree/binary_search_tree_kernel_2.h.html'>../binary_search_tree/binary_search_tree_kernel_2.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> chunk_size
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='memory_manager_kernel_3'></a>memory_manager_kernel_3</b>
+    <b>{</b>
+        <font color='#009900'>/*!            
+            INITIAL VALUE
+                allocations == 0
+                next == 0
+                first_chunk == 0
+                bst_of_arrays == 0
+
+            REQUIREMENTS ON chunk_size
+                chunk_size is the number of items of type T we will allocate at a time. so
+                it must be &gt; 0.
+
+            CONVENTION
+                This memory manager implementation allocates memory in blocks of chunk_size*sizeof(T)
+                bytes.  All the sizeof(T) subblocks are kept in a linked list of free memory blocks
+                and are given out whenever an allocation request occurs.  Also, memory is not freed
+                until this object is destructed.  
+                
+
+
+                allocations == get_number_of_allocations()
+
+                - if (next != 0) then
+                    - next == the next pointer to return from allocate()
+                      and next == pointer to the first node in a linked list.  each node
+                      is one item in the memory pool.    
+                    - the last node in the linked list has next set to 0
+                - else
+                    - we need to call new to get the next pointer to return from allocate()
+
+                - if (arrays != 0) then
+                    - someone has called allocate_array()
+                    - (*arrays)[size] == an array of size bytes of memory  
+
+                - if (first_chunk != 0) then
+                    - first_chunk == the first node in a linked list that contains pointers 
+                      to all the chunks we have ever allocated.  The last link in the list
+                      has its next pointer set to 0.
+        !*/</font>
+
+        <font color='#0000FF'>union</font> node
+        <b>{</b>
+            node<font color='#5555FF'>*</font> next;
+            <font color='#0000FF'><u>char</u></font> item[<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font>];
+        <b>}</b>;
+
+        <font color='#0000FF'>struct</font> <b><a name='chunk_node'></a>chunk_node</b>
+        <b>{</b>
+            node<font color='#5555FF'>*</font> chunk;
+            chunk_node<font color='#5555FF'>*</font> next;
+        <b>}</b>;
+
+
+        <font color='#0000FF'>typedef</font> binary_search_tree_kernel_2<font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'><u>size_t</u></font>,
+            <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font>,
+            memory_manager_kernel_2<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font>,<font color='#979000'>5</font><font color='#5555FF'>&gt;</font>
+            <font color='#5555FF'>&gt;</font> bst_of_arrays; 
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> T type;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='rebind'></a>rebind</b> <b>{</b>
+            <font color='#0000FF'>typedef</font> memory_manager_kernel_3<font color='#5555FF'>&lt;</font>U,chunk_size<font color='#5555FF'>&gt;</font> other;
+        <b>}</b>;
+
+
+        <b><a name='memory_manager_kernel_3'></a>memory_manager_kernel_3</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            allocations<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            next<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            first_chunk<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            arrays<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// You FOOL!  You can't have a zero chunk_size.
+</font>            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>chunk_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='memory_manager_kernel_3'></a>memory_manager_kernel_3</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>allocations <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>first_chunk <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    chunk_node<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> first_chunk;
+                    first_chunk <font color='#5555FF'>=</font> first_chunk<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+                    <font color='#009900'>// delete the memory chunk 
+</font>                    ::<font color='#0000FF'>operator</font> <font color='#0000FF'>delete</font> <font face='Lucida Console'>(</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>chunk<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#009900'>// delete the chunk_node
+</font>                    <font color='#0000FF'>delete</font> temp;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>arrays<font face='Lucida Console'>)</font>
+            <b>{</b>
+                arrays<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>arrays<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    ::<font color='#0000FF'>operator</font> <font color='#0000FF'>delete</font> <font face='Lucida Console'>(</font>arrays<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>delete</font> arrays;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_number_of_allocations'></a>get_number_of_allocations</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> allocations; <b>}</b>
+
+        T<font color='#5555FF'>*</font> <b><a name='allocate_array'></a>allocate_array</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>size_t</u></font> block_size <font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>size <font color='#5555FF'>+</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2</font>;
+
+            <font color='#009900'>// make sure we have initialized the arrays object.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>arrays <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                arrays <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> bst_of_arrays;
+            <b>}</b>
+
+            <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> temp;
+
+            <font color='#009900'>// see if we have a suitable block of memory already.
+</font>            arrays<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>position_enumerator</font><font face='Lucida Console'>(</font>block_size<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>arrays<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>current_element_valid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// we have a suitable block of memory already so use that one.
+</font>                arrays<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>remove_current_element</font><font face='Lucida Console'>(</font>block_size,temp<font face='Lucida Console'>)</font>; 
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>::<font color='#0000FF'>operator</font> <font color='#0000FF'>new</font><font face='Lucida Console'>(</font>block_size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>size_t</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> block_size;
+            <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>size_t</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> size;
+            temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2</font>;
+
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                <font color='#BB00BB'>initialize_array</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>,size<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// something was thrown while we were initializing the array so
+</font>                <font color='#009900'>// stick our memory block into arrays and rethrow the exception
+</font>                temp <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2</font>;
+                arrays<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>block_size,temp<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>throw</font>;
+            <b>}</b>
+
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>allocations;
+            <font color='#0000FF'>return</font> <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='deallocate_array'></a>deallocate_array</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>*</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+            temp <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2</font>;
+            <font color='#0000FF'><u>size_t</u></font> block_size <font color='#5555FF'>=</font> <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>size_t</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>[<font color='#979000'>0</font>];
+            <font color='#0000FF'><u>size_t</u></font> size <font color='#5555FF'>=</font> <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>size_t</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>[<font color='#979000'>1</font>];
+
+            <font color='#BB00BB'>deinitialize_array</font><font face='Lucida Console'>(</font>item,size<font face='Lucida Console'>)</font>;
+
+            arrays<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>block_size,temp<font face='Lucida Console'>)</font>;
+            
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>allocations;
+        <b>}</b>
+
+        T<font color='#5555FF'>*</font> <b><a name='allocate'></a>allocate</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>              
+            T<font color='#5555FF'>*</font> temp;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>next <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>next<font face='Lucida Console'>)</font>;
+                node<font color='#5555FF'>*</font> n <font color='#5555FF'>=</font> next<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+
+                <font color='#0000FF'>try</font>
+                <b>{</b>
+                    <font color='#009900'>// construct this new T object with placement new.
+</font>                    <font color='#0000FF'>new</font> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#BB00BB'>T</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    next<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> n;
+                    <font color='#0000FF'>throw</font>;
+                <b>}</b>
+
+                next <font color='#5555FF'>=</font> n;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// the linked list is empty so we need to allocate some more memory
+</font>                node<font color='#5555FF'>*</font> block <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>node<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>::<font color='#0000FF'>operator</font> <font color='#0000FF'>new</font> <font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>node<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>chunk_size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// the first part of this block can be our new object
+</font>                temp <font color='#5555FF'>=</font> <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>block<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>try</font>
+                <b>{</b>
+                    <font color='#009900'>// construct this new T object with placement new.
+</font>                    <font color='#0000FF'>new</font> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#BB00BB'>T</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// construction of the new object threw so delete the block of memory
+</font>                    ::<font color='#0000FF'>operator</font> <font color='#0000FF'>delete</font> <font face='Lucida Console'>(</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>block<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>throw</font>;
+                <b>}</b>
+
+                <font color='#009900'>// allocate a new chunk_node
+</font>                chunk_node<font color='#5555FF'>*</font> chunk;
+                <font color='#0000FF'>try</font> <b>{</b>chunk <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> chunk_node; <b>}</b>
+                <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> 
+                <b>{</b> 
+                    temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>~<font color='#BB00BB'>T</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    ::<font color='#0000FF'>operator</font> <font color='#0000FF'>delete</font> <font face='Lucida Console'>(</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>block<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>throw</font>;
+                <b>}</b>
+
+                <font color='#009900'>// add this block into the chunk list
+</font>                chunk<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>chunk <font color='#5555FF'>=</font> block;
+                chunk<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> first_chunk;
+                first_chunk <font color='#5555FF'>=</font> chunk;
+
+
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>block;
+                <font color='#009900'>// now add the rest of the block into the linked list of free nodes.
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> chunk_size<font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    block<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> next;
+                    next <font color='#5555FF'>=</font> block;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>block;
+                <b>}</b>
+
+            <b>}</b>
+
+
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>allocations;
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='deallocate'></a>deallocate</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>*</font> item
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>allocations;  
+            item<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>~<font color='#BB00BB'>T</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// add this memory into our linked list.
+</font>            node<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font>node<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+            temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> next;
+            next <font color='#5555FF'>=</font> temp;                
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            memory_manager_kernel_3<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>allocations,item.allocations<font face='Lucida Console'>)</font>; 
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>next,item.next<font face='Lucida Console'>)</font>; 
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>first_chunk,item.first_chunk<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>arrays,item.arrays<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// data members
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> allocations;
+        node<font color='#5555FF'>*</font> next;
+
+        chunk_node<font color='#5555FF'>*</font> first_chunk;
+        bst_of_arrays<font color='#5555FF'>*</font> arrays;
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='initialize_array'></a>initialize_array</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>*</font> array,
+            <font color='#0000FF'><u>size_t</u></font> size
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'><u>size_t</u></font> i;
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// construct this new T object with placement new.
+</font>                    <font color='#0000FF'>new</font> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>array<font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#BB00BB'>T</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// Catch any exceptions thrown during the construction process
+</font>                <font color='#009900'>// and then destruct any T objects that actually were successfully
+</font>                <font color='#009900'>// constructed.
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> i; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    array[i].~<font color='#BB00BB'>T</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>throw</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='deinitialize_array'></a>deinitialize_array</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>*</font> array,
+            <font color='#0000FF'><u>size_t</u></font> size
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                array[i].~<font color='#BB00BB'>T</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// don't do any initialization for the built in types
+</font>        <font color='#0000FF'><u>void</u></font> <b><a name='initialize_array'></a>initialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b> 
+        <font color='#0000FF'><u>void</u></font> <b><a name='deinitialize_array'></a>deinitialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='initialize_array'></a>initialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b> 
+        <font color='#0000FF'><u>void</u></font> <b><a name='deinitialize_array'></a>deinitialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='initialize_array'></a>initialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b> 
+        <font color='#0000FF'><u>void</u></font> <b><a name='deinitialize_array'></a>deinitialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='initialize_array'></a>initialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b> 
+        <font color='#0000FF'><u>void</u></font> <b><a name='deinitialize_array'></a>deinitialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='initialize_array'></a>initialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b> 
+        <font color='#0000FF'><u>void</u></font> <b><a name='deinitialize_array'></a>deinitialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='initialize_array'></a>initialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b> 
+        <font color='#0000FF'><u>void</u></font> <b><a name='deinitialize_array'></a>deinitialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='initialize_array'></a>initialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b> 
+        <font color='#0000FF'><u>void</u></font> <b><a name='deinitialize_array'></a>deinitialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='initialize_array'></a>initialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b> 
+        <font color='#0000FF'><u>void</u></font> <b><a name='deinitialize_array'></a>deinitialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='initialize_array'></a>initialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b> 
+        <font color='#0000FF'><u>void</u></font> <b><a name='deinitialize_array'></a>deinitialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='initialize_array'></a>initialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>short</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b> 
+        <font color='#0000FF'><u>void</u></font> <b><a name='deinitialize_array'></a>deinitialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>short</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='initialize_array'></a>initialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b> 
+        <font color='#0000FF'><u>void</u></font> <b><a name='deinitialize_array'></a>deinitialize_array</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>*</font>, <font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='memory_manager_kernel_3'></a>memory_manager_kernel_3</b><font face='Lucida Console'>(</font>memory_manager_kernel_3<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        memory_manager_kernel_3<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>memory_manager_kernel_3<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> chunk_size
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        memory_manager_kernel_3<font color='#5555FF'>&lt;</font>T,chunk_size<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        memory_manager_kernel_3<font color='#5555FF'>&lt;</font>T,chunk_size<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MEMORY_MANAGER_KERNEl_3_
+</font>
+
+</pre></body></html>

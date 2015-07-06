@@ -1,0 +1,165 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - png_loader_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net), Nils Labugt
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_PNG_IMPORT_ABSTRACT
+<font color='#0000FF'>#ifdef</font> DLIB_PNG_IMPORT_ABSTRACT
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='image_loader_abstract.h.html'>image_loader_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../dir_nav.h.html'>../dir_nav.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/generic_image.h.html'>../image_processing/generic_image.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='png_loader'></a>png_loader</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                Defined by the constructors
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a class capable of loading PNG image files.
+                Once an instance of it is created to contain a PNG file from
+                disk you can obtain the image stored in it via get_image().
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='png_loader'></a>png_loader</b><font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> filename 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - loads the PNG file with the given file name into this object
+            throws
+                - std::bad_alloc
+                - image_load_error
+                  This exception is thrown if there is some error that prevents
+                  us from loading the given PNG file.
+        !*/</font>
+
+        <b><a name='png_loader'></a>png_loader</b><font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - loads the PNG file with the given file name into this object
+            throws
+                - std::bad_alloc
+                - image_load_error
+                  This exception is thrown if there is some error that prevents
+                  us from loading the given PNG file.
+        !*/</font>
+
+        <b><a name='png_loader'></a>png_loader</b><font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> dlib::file<font color='#5555FF'>&amp;</font> f 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - loads the PNG file with the given file name into this object
+            throws
+                - std::bad_alloc
+                - image_load_error
+                  This exception is thrown if there is some error that prevents
+                  us from loading the given PNG file.
+        !*/</font>
+
+        ~<b><a name='png_loader'></a>png_loader</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources associated with *this has been released
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_gray'></a>is_gray</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (this object contains a grayscale image without an alpha channel) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+        
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_graya'></a>is_graya</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (this object contains a grayscale image with an alpha channel) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+        
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_rgb'></a>is_rgb</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (this object contains a 3 channel RGB image) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_rgba'></a>is_rgba</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (this object contains a 4 channel RGB alpha image) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> <b><a name='bit_depth'></a>bit_depth</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of bits per channel in the image contained by this
+                  object.  The possible values are 8 or 16.
+        !*/</font>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type 
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_image'></a>get_image</b><font face='Lucida Console'>(</font> 
+            image_type<font color='#5555FF'>&amp;</font> img
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+            ensures
+                - loads the PNG image stored in this object into img
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='load_png'></a>load_png</b> <font face='Lucida Console'>(</font>
+        image_type<font color='#5555FF'>&amp;</font> image,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+        ensures
+            - performs: png_loader(file_name).get_image(image);
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_PNG_IMPORT_ABSTRACT
+</font>
+
+
+</pre></body></html>

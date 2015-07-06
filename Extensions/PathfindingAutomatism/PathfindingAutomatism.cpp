@@ -50,7 +50,7 @@ std::ostream& operator<<(std::ostream& stream, const NodePosition & nodePos)
 
 bool operator==(const NodePosition &a, const NodePosition &b)
 {
-    return ((a.x == b.y) && (a.y == b.y));
+    return ((a.x == b.x) && (a.y == b.y));
 }
 
 namespace std

@@ -1,0 +1,330 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - linearly_independent_subset_finder_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_LISf_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_LISf_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel_abstract.h.html'>kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='linearly_independent_subset_finder'></a>linearly_independent_subset_finder</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON kernel_type
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+
+            INITIAL VALUE
+                - size() == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of an online algorithm for recursively finding a
+                set (aka dictionary) of linearly independent vectors in a kernel induced 
+                feature space.  To use it you decide how large you would like the dictionary 
+                to be and then you feed it sample points.  
+
+                The implementation uses the Approximately Linearly Dependent metric described 
+                in the paper The Kernel Recursive Least Squares Algorithm by Yaakov Engel to 
+                decide which points are more linearly independent than others.  The metric is 
+                simply the squared distance between a test point and the subspace spanned by 
+                the set of dictionary vectors.
+
+                Each time you present this object with a new sample point (via this-&gt;add()) 
+                it calculates the projection distance and if it is sufficiently large then this 
+                new point is included into the dictionary.  Note that this object can be configured 
+                to have a maximum size.  Once the max dictionary size is reached each new point 
+                kicks out a previous point.  This is done by removing the dictionary vector that 
+                has the smallest projection distance onto the others.  That is, the "least linearly 
+                independent" vector is removed to make room for the new one.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mem_manager_type;
+
+        <b><a name='linearly_independent_subset_finder'></a>linearly_independent_subset_finder</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #minimum_tolerance() == 0.001 
+                - this object is properly initialized
+                - #get_kernel() == kernel_type()  (i.e. whatever the default is for the supplied kernel) 
+                - #max_dictionary_size() == 100 
+        !*/</font>
+
+        <b><a name='linearly_independent_subset_finder'></a>linearly_independent_subset_finder</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> kernel_, 
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_dictionary_size_,
+            scalar_type min_tolerance <font color='#5555FF'>=</font> <font color='#979000'>0.001</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - min_tolerance &gt; 0
+                - max_dictionary_size &gt; 1
+            ensures
+                - #minimum_tolerance() == min_tolerance
+                - this object is properly initialized
+                - #get_kernel() == kernel_
+                - #max_dictionary_size() == max_dictionary_size_
+        !*/</font>
+
+        <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> <b><a name='get_kernel'></a>get_kernel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a const reference to the kernel used by this object
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='max_dictionary_size'></a>max_dictionary_size</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the maximum number of dictionary vectors this object
+                  will accumulate.  That is, size() will never be
+                  greater than max_dictionary_size().
+        !*/</font>
+
+        scalar_type <b><a name='minimum_tolerance'></a>minimum_tolerance</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the minimum projection error necessary to include a sample point
+                  into the dictionary.   
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_minimum_tolerance'></a>set_minimum_tolerance</b> <font face='Lucida Console'>(</font>
+            scalar_type min_tolerance 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - min_tolerance &gt; 0
+            ensures
+                - #minimum_tolerance() == min_tolerance
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear_dictionary'></a>clear_dictionary</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - clears out all the data (e.g. #size() == 0)
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (size() &lt; max_dictionary_size() then
+                    - if (projection_error(x) &gt; minimum_tolerance()) then 
+                        - adds x into the dictionary
+                        - (*this)[#size()-1] == x
+                        - #size() == size() + 1
+                        - returns true
+                    - else
+                        - the dictionary is not changed
+                        - returns false
+                - else
+                    - #size() == size() 
+                      (i.e. the number of vectors in this object doesn't change)
+                    - since the dictionary is full adding a new element means we have to 
+                      remove one of the current ones.  So let proj_error[i] be equal to the 
+                      projection error obtained when projecting dictionary vector (*this)[i] 
+                      onto the other elements of the dictionary.  Then let min_proj_error 
+                      be equal to the minimum value in proj_error.  The dictionary element
+                      with the minimum projection error is the "least linearly independent"
+                      vector in the dictionary and is the one which will be removed to make
+                      room for a new element.
+                    - if (projection_error(x) &gt; minimum_tolerance() &amp;&amp; projection_error(x) &gt; min_proj_error)
+                        - the least linearly independent vector in this object is removed
+                        - adds x into the dictionary
+                        - (*this)[#size()-1] == x
+                        - returns true
+                    - else
+                        - the dictionary is not changed
+                        - returns false
+        !*/</font>
+
+        scalar_type <b><a name='projection_error'></a>projection_error</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the squared distance between x and the subspace spanned by 
+                  the set of dictionary vectors.  (e.g. this is the same number that
+                  gets returned by the empirical_kernel_map::project() function's 
+                  projection_error argument when the ekm is loaded with the dictionary
+                  vectors.)
+                - Note that if the dictionary is empty then the return value is
+                  equal to get_kernel()(x,x).
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            linearly_independent_subset_finder<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this with item
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of vectors in the dictionary.  
+        !*/</font>
+
+        <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - index &lt; size()
+            ensures
+                - returns the index'th element in the set of linearly independent 
+                  vectors contained in this object.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>sample_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font> <b><a name='get_dictionary'></a>get_dictionary</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a column vector that contains all the dictionary
+                  vectors in this object.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_kernel_matrix'></a>get_kernel_matrix</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a matrix K such that:
+                    - K.nr() == K.nc() == size()
+                    - K == kernel_matrix(get_kernel(), get_dictionary())
+                      i.e. K == the kernel matrix for the dictionary vectors
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_inv_kernel_marix'></a>get_inv_kernel_marix</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (size() != 0)
+                    - returns inv(get_kernel_matrix())
+                - else
+                    - returns an empty matrix
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+        linearly_independent_subset_finder<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        linearly_independent_subset_finder<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> linearly_independent_subset_finder<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for linearly_independent_subset_finder objects
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        linearly_independent_subset_finder<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for linearly_independent_subset_finder objects
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='mat'></a>mat</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> linearly_independent_subset_finder<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - converts m into a matrix
+            - returns a matrix R such that:
+                - is_col_vector(R) == true 
+                - R.size() == m.size()
+                - for all valid r:
+                  R(r) == m[r]
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type,
+        <font color='#0000FF'>typename</font> vector_type,
+        <font color='#0000FF'>typename</font> rand_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='fill_lisf'></a>fill_lisf</b> <font face='Lucida Console'>(</font>
+        linearly_independent_subset_finder<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lisf,
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples,
+        rand_type<font color='#5555FF'>&amp;</font> rnd,
+        <font color='#0000FF'><u>int</u></font> sampling_size <font color='#5555FF'>=</font> <font color='#979000'>2000</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - vector_type == a dlib::matrix or something convertible to one via 
+              mat()
+            - is_vector(mat(samples)) == true
+            - rand_type == an implementation of rand/rand_kernel_abstract.h or a type
+              convertible to a string via cast_to_string()
+            - sampling_size &gt; 0
+        ensures
+            - The purpose of this function is to fill lisf with points from samples.  It does
+              this by randomly sampling elements of samples until no more can be added.  The
+              precise stopping condition is when sampling_size additions to lisf have failed
+              or the max dictionary size has been reached.
+            - This function employs a random number generator.  If rand_type is a random 
+              number generator then it uses the instance given.  Otherwise it uses cast_to_string(rnd)
+              to seed a new random number generator.
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type,
+        <font color='#0000FF'>typename</font> vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='fill_lisf'></a>fill_lisf</b> <font face='Lucida Console'>(</font>
+        linearly_independent_subset_finder<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lisf,
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - vector_type == a dlib::matrix or something convertible to one via 
+              mat()
+            - is_vector(mat(samples)) == true
+        ensures
+            - performs fill_lisf(lisf, samples, default_rand_generator, 2000)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LISf_ABSTRACT_
+</font>
+
+</pre></body></html>

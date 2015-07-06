@@ -1,0 +1,746 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - http_client.cpp</title></head><body bgcolor='white'><pre>
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sockets.h.html'>../sockets.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../string.h.html'>../string.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../logger.h.html'>../logger.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sockstreambuf.h.html'>../sockstreambuf.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../timeout.h.html'>../timeout.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='http_client.h.html'>http_client.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>time.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>stdio.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>typedef</font> dlib::shared_ptr<font color='#5555FF'>&lt;</font>dlib::timeout<font color='#5555FF'>&gt;</font> timeout_ptr;
+
+
+<font color='#0000FF'>#ifdef</font> _MSC_VER
+<font color='#0000FF'>#define</font> BR_CASECMP strnicmp
+<font color='#0000FF'>#else</font>
+<font color='#0000FF'>#define</font> BR_CASECMP strncasecmp
+<font color='#0000FF'>#endif</font>
+<font color='#009900'>// Default timeout after 60 seconds
+</font><font color='#0000FF'>#define</font> DEFAULT_TIMEOUT <font color='#979000'>60000</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='isXdigit'></a>isXdigit</b><font face='Lucida Console'>(</font> <font color='#0000FF'><u>char</u></font> c <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font>  <font face='Lucida Console'>(</font>c <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>0</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>9</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                <font face='Lucida Console'>(</font>c <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>A</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>Z</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                <font face='Lucida Console'>(</font>c <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>a</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>z</font>'<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    std::string http_client::<b><a name='urldecode'></a>urldecode</b><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> s <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::stringstream ss;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>char</u></font> <font color='#0000FF'>const</font> <font color='#5555FF'>*</font> p_read <font color='#5555FF'>=</font> s.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>*</font> p_end <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>s.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> s.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; p_read <font color='#5555FF'>&lt;</font> p_end; p_read<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> p_read[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>%</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p_read<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> p_end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p_read<font color='#5555FF'>+</font><font color='#979000'>2</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> p_end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>isXdigit</font><font face='Lucida Console'>(</font>p_read[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>isXdigit</font><font face='Lucida Console'>(</font>p_read[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                ss <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>p_read[<font color='#979000'>1</font>] <font color='#5555FF'>&amp;</font> <font color='#979000'>0xf</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>p_read[<font color='#979000'>1</font>] <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>A</font>'<font face='Lucida Console'>)</font> ? <font color='#979000'>9</font> : <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>4</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>p_read[<font color='#979000'>2</font>] <font color='#5555FF'>&amp;</font> <font color='#979000'>0xf</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>p_read[<font color='#979000'>2</font>] <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>A</font>'<font face='Lucida Console'>)</font> ? <font color='#979000'>9</font> : <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                p_read <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> p_read[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>+</font>' <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// Undo the encoding that replaces spaces with plus signs.
+</font>                ss <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'> </font>';
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                ss <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> p_read[<font color='#979000'>0</font>];
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> ss.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>//! \return modified string ``s'' with spaces trimmed from left
+</font>    <font color='#0000FF'>inline</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='triml'></a>triml</b><font face='Lucida Console'>(</font>std::string<font color='#5555FF'>&amp;</font> s<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>int</u></font> <font color='#BB00BB'>pos</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> ; s[pos] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> s[pos] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\t</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> s[pos] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\r</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> s[pos] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>' ; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>pos <font face='Lucida Console'>)</font>;
+        s.<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, pos<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> s;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>//! \return modified string ``s'' with spaces trimmed from right
+</font>    <font color='#0000FF'>inline</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='trimr'></a>trimr</b><font face='Lucida Console'>(</font>std::string<font color='#5555FF'>&amp;</font> s<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>int</u></font> <font color='#BB00BB'>pos</font><font face='Lucida Console'>(</font>s.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> ; pos <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>s[pos<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> s[pos<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\t</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> s[pos<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\r</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> s[pos<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>'<font face='Lucida Console'>)</font> ; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>pos <font face='Lucida Console'>)</font>;
+        s.<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font>pos, s.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>pos<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> s;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>//! \return modified string ``s'' with spaces trimmed from edges
+</font>    <font color='#0000FF'>inline</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='trim'></a>trim</b><font face='Lucida Console'>(</font>std::string<font color='#5555FF'>&amp;</font> s<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>triml</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trimr</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    http_client::
+    <b><a name='http_client'></a>http_client</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> : 
+        http_return<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        timeout<font face='Lucida Console'>(</font>DEFAULT_TIMEOUT<font face='Lucida Console'>)</font>,
+        OnDownload<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    std::string http_client::<b><a name='get_header'></a>get_header</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> header_name<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        stringmap::const_iterator ci <font color='#5555FF'>=</font> headers.<font color='#BB00BB'>find</font><font face='Lucida Console'>(</font>header_name<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> ci <font color='#5555FF'>!</font><font color='#5555FF'>=</font> headers.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> ? ci<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second : std::<font color='#BB00BB'>string</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> http_client::<b><a name='set_header'></a>set_header</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> header_name, <font color='#0000FF'><u>long</u></font> header_value<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>char</u></font> buf[<font color='#979000'>21</font>] <font color='#5555FF'>=</font> <b>{</b> <font color='#979000'>0</font> <b>}</b>;
+<font color='#0000FF'>#ifdef</font> __WXMSW__
+        ::<font color='#BB00BB'>ltoa</font><font face='Lucida Console'>(</font>header_value, buf, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+        <font color='#BB00BB'>sprintf</font><font face='Lucida Console'>(</font>buf, "<font color='#CC0000'>%ld</font>", header_value<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+        <font color='#BB00BB'>set_header</font><font face='Lucida Console'>(</font>header_name, buf<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> http_client::<b><a name='set_header'></a>set_header</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> header_name, <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> header_value<font face='Lucida Console'>)</font>
+    <b>{</b>
+        headers[header_name] <font color='#5555FF'>=</font> header_value;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> http_client::<b><a name='is_header_set'></a>is_header_set</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> header_name<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        stringmap::const_iterator ci <font color='#5555FF'>=</font> headers.<font color='#BB00BB'>find</font><font face='Lucida Console'>(</font>header_name<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> ci <font color='#5555FF'>!</font><font color='#5555FF'>=</font> headers.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>ci<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> http_client::<b><a name='remove_header'></a>remove_header</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> header_name<font face='Lucida Console'>)</font>
+    <b>{</b>
+        headers.<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font>header_name<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> http_client::<b><a name='set_cookie'></a>set_cookie</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> cookie_name, <font color='#0000FF'><u>long</u></font> cookie_value<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>char</u></font> buf[<font color='#979000'>21</font>] <font color='#5555FF'>=</font> <b>{</b> <font color='#979000'>0</font> <b>}</b>;
+<font color='#0000FF'>#ifdef</font> __WXMSW__
+        ::<font color='#BB00BB'>ltoa</font><font face='Lucida Console'>(</font>cookie_value, buf, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+        <font color='#BB00BB'>sprintf</font><font face='Lucida Console'>(</font>buf, "<font color='#CC0000'>%ld</font>", cookie_value<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+        <font color='#BB00BB'>set_cookie</font><font face='Lucida Console'>(</font>cookie_name, buf<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> http_client::<b><a name='set_cookie'></a>set_cookie</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> cookie_name, <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> cookie_value<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cookies[cookie_name] <font color='#5555FF'>=</font> cookie_value;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> http_client::<b><a name='remove_cookie'></a>remove_cookie</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> cookie_name<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cookies.<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font>cookie_name<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// POST
+</font>    <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> http_client::<b><a name='post_url'></a>post_url</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> url, <font color='#0000FF'>const</font> string_to_stringmap<font color='#5555FF'>&amp;</font> postvars, <font color='#0000FF'>const</font> string_to_stringmap<font color='#5555FF'>&amp;</font> filenames<font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::string CT;
+        std::string postBody <font color='#5555FF'>=</font> <font color='#BB00BB'>build_post</font><font face='Lucida Console'>(</font>CT, postvars, filenames<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_header</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Content-Type</font>", CT<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_header</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Content-Length</font>", <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>postBody.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>grab_url</font><font face='Lucida Console'>(</font>url, "<font color='#CC0000'>POST</font>", postBody<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> returned_body;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> http_client::<b><a name='post_url'></a>post_url</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> url, <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> postbuffer<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font color='#BB00BB'>is_header_set</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Content-Type</font>"<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font> <font color='#009900'>// Maybe they just forgot it?
+</font>            <font color='#BB00BB'>set_header</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Content-Type</font>", "<font color='#CC0000'>application/x-www-form-urlencoded</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>set_header</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Content-Length</font>", <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>postbuffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>grab_url</font><font face='Lucida Console'>(</font>url, "<font color='#CC0000'>POST</font>", postbuffer<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> returned_body;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    std::string http_client::<b><a name='get_random_string'></a>get_random_string</b><font face='Lucida Console'>(</font> <font color='#0000FF'><u>size_t</u></font> length <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> <font color='#BB00BB'>has_seeded</font><font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>static</font> std::string <font color='#BB00BB'>allowed_chars</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#5555FF'>!</font>has_seeded <font face='Lucida Console'>)</font>
+        <b>{</b>
+            has_seeded <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            ::<font color='#BB00BB'>srand</font><font face='Lucida Console'>(</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>::<font color='#BB00BB'>time</font><font face='Lucida Console'>(</font>NULL<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        std::string retVal; retVal.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>length<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> retVal.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> length <font face='Lucida Console'>)</font>
+        <b>{</b>
+            retVal <font color='#5555FF'>+</font><font color='#5555FF'>=</font> allowed_chars[<font face='Lucida Console'>(</font><font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>%</font> allowed_chars.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>];
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> retVal;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// static
+</font>    std::string http_client::<b><a name='urlencode'></a>urlencode</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> in, <font color='#0000FF'><u>bool</u></font> post_encode<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>static</font> std::string <font color='#BB00BB'>allowed_chars</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_</font>"<font face='Lucida Console'>)</font>;
+
+        std::stringstream ss;
+        ss <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::hex;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>std::string::const_iterator ci <font color='#5555FF'>=</font> in.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; ci <font color='#5555FF'>!</font><font color='#5555FF'>=</font> in.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ci<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> allowed_chars.<font color='#BB00BB'>find</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>ci<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> std::string::npos <font face='Lucida Console'>)</font>
+            <b>{</b>
+                ss <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#5555FF'>*</font>ci;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> post_encode <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>*</font>ci <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>' <font face='Lucida Console'>)</font>
+            <b>{</b>
+                ss <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'>+</font>';
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                ss <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'>%</font>' <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::<font color='#BB00BB'>setfill</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>0</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::<font color='#BB00BB'>setw</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::right <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>ci<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> ss.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    std::string http_client::<b><a name='get_basename'></a>get_basename</b><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        std::string::size_type pos <font color='#5555FF'>=</font> filename.<font color='#BB00BB'>find_last_of</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>\\/</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> pos <font color='#5555FF'>=</font><font color='#5555FF'>=</font> std::string::npos <font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> filename;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> filename.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font>pos<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> http_client::<b><a name='parse_url'></a>parse_url</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> url,
+        std::string<font color='#5555FF'>&amp;</font> scheme,
+        std::string<font color='#5555FF'>&amp;</font> user,
+        std::string<font color='#5555FF'>&amp;</font> pass,
+        std::string<font color='#5555FF'>&amp;</font> host,
+        <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&amp;</font> port,
+        std::string<font color='#5555FF'>&amp;</font> path
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        scheme.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        user.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        pass.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        host.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        path.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        port <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#009900'>// Find scheme
+</font>        std::string::size_type pos_scheme <font color='#5555FF'>=</font> url.<font color='#BB00BB'>find</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>://</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> pos_scheme <font color='#5555FF'>=</font><font color='#5555FF'>=</font> std::string::npos <font face='Lucida Console'>)</font>
+        <b>{</b>
+            pos_scheme <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            scheme <font color='#5555FF'>=</font> <font color='#BB00BB'>strtolower</font><font face='Lucida Console'>(</font>url.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, pos_scheme<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            pos_scheme <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        <b>}</b>
+
+        std::string::size_type pos_path <font color='#5555FF'>=</font> url.<font color='#BB00BB'>find</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>/</font>', pos_scheme<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> pos_path <font color='#5555FF'>=</font><font color='#5555FF'>=</font> std::string::npos <font face='Lucida Console'>)</font>
+        <b>{</b>
+            host <font color='#5555FF'>=</font> url.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font>pos_scheme<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            host <font color='#5555FF'>=</font> url.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font>pos_scheme, pos_path <font color='#5555FF'>-</font> pos_scheme<font face='Lucida Console'>)</font>;
+            path <font color='#5555FF'>=</font> url.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font>pos_path<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        std::string::size_type pos_at <font color='#5555FF'>=</font> host.<font color='#BB00BB'>find</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>@</font>'<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> pos_at <font color='#5555FF'>!</font><font color='#5555FF'>=</font> std::string::npos <font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::string::size_type pos_dp <font color='#5555FF'>=</font> host.<font color='#BB00BB'>find</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>:</font>'<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> pos_dp <font color='#5555FF'>!</font><font color='#5555FF'>=</font> std::string::npos <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pos_dp <font color='#5555FF'>&lt;</font> pos_at <font face='Lucida Console'>)</font>
+            <b>{</b>
+                user <font color='#5555FF'>=</font> host.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, pos_dp<font face='Lucida Console'>)</font>;
+                pass <font color='#5555FF'>=</font> host.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font>pos_dp<font color='#5555FF'>+</font><font color='#979000'>1</font>, pos_at<font color='#5555FF'>-</font>pos_dp<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                user <font color='#5555FF'>=</font> host.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, pos_at<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            host <font color='#5555FF'>=</font> host.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font>pos_at<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        std::string::size_type pos_dp <font color='#5555FF'>=</font> host.<font color='#BB00BB'>find</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>:</font>'<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> pos_dp <font color='#5555FF'>!</font><font color='#5555FF'>=</font> std::string::npos <font face='Lucida Console'>)</font>
+        <b>{</b>
+            port <font color='#5555FF'>=</font> dlib::string_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>host.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font>pos_dp<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            host <font color='#5555FF'>=</font> host.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, pos_dp<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        host <font color='#5555FF'>=</font> <font color='#BB00BB'>strtolower</font><font face='Lucida Console'>(</font>host<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> port <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> scheme <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>http</font>" <font face='Lucida Console'>)</font>
+                port <font color='#5555FF'>=</font> <font color='#979000'>80</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> scheme <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>ftp</font>" <font face='Lucida Console'>)</font>
+                port <font color='#5555FF'>=</font> <font color='#979000'>21</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> scheme <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>https</font>" <font face='Lucida Console'>)</font>
+                port <font color='#5555FF'>=</font> <font color='#979000'>443</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#5555FF'>!</font>host.<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    std::string http_client::<b><a name='strtolower'></a>strtolower</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        std::string retVal <font color='#5555FF'>=</font> in;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>std::string::iterator ii <font color='#5555FF'>=</font> retVal.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; ii <font color='#5555FF'>!</font><font color='#5555FF'>=</font> retVal.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ii<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font>ii <font color='#5555FF'>=</font> ::<font color='#BB00BB'>tolower</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>ii<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> retVal;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    std::string http_client::<b><a name='strtoupper'></a>strtoupper</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        std::string retVal <font color='#5555FF'>=</font> in;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>std::string::iterator ii <font color='#5555FF'>=</font> retVal.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; ii <font color='#5555FF'>!</font><font color='#5555FF'>=</font> retVal.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ii<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font>ii <font color='#5555FF'>=</font> ::<font color='#BB00BB'>toupper</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>ii<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> retVal;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// GET
+</font>    <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> http_client::<b><a name='get_url'></a>get_url</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> url<font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::string CT <font color='#5555FF'>=</font> <font color='#BB00BB'>get_header</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Content-Type</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// You do a GET with a POST header??
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> CT <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>application/x-www-form-urlencoded</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> CT <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>multipart/form-data</font>" <font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>remove_header</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Content-Type</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>grab_url</font><font face='Lucida Console'>(</font>url<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> returned_body;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    std::string http_client::<b><a name='build_post'></a>build_post</b><font face='Lucida Console'>(</font>std::string<font color='#5555FF'>&amp;</font> content_type, <font color='#0000FF'>const</font> string_to_stringmap<font color='#5555FF'>&amp;</font> postvars, <font color='#0000FF'>const</font> string_to_stringmap<font color='#5555FF'>&amp;</font> filenames_in<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> postvars.<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> filenames_in.<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> std::<font color='#BB00BB'>string</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        string_to_stringmap filenames <font color='#5555FF'>=</font> filenames_in;
+
+        <font color='#009900'>// sanitize the files
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#5555FF'>!</font>filenames.<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+            string_to_stringmap::iterator var_names <font color='#5555FF'>=</font> filenames.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>var_names <font color='#5555FF'>!</font><font color='#5555FF'>=</font> filenames.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                stringmap::iterator fnames <font color='#5555FF'>=</font> var_names<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>while</font><font face='Lucida Console'>(</font> fnames <font color='#5555FF'>!</font><font color='#5555FF'>=</font> var_names<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    FILE <font color='#5555FF'>*</font>fp <font color='#5555FF'>=</font> ::<font color='#BB00BB'>fopen</font><font face='Lucida Console'>(</font>fnames<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, "<font color='#CC0000'>rb</font>"<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> fp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        stringmap::iterator old_one <font color='#5555FF'>=</font> fnames<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+                        var_names<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font>old_one<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>fclose</font><font face='Lucida Console'>(</font>fp<font face='Lucida Console'>)</font>;
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>fnames;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> fnames<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    string_to_stringmap::iterator old_one <font color='#5555FF'>=</font> var_names<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+                    filenames.<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font>old_one<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>var_names;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        content_type <font color='#5555FF'>=</font> <font color='#5555FF'>!</font>filenames.<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> ? "<font color='#CC0000'>multipart/form-data</font>" : "<font color='#CC0000'>application/x-www-form-urlencoded</font>";
+        std::stringstream postBody;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#5555FF'>!</font>filenames.<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::string mime_boundary <font color='#5555FF'>=</font> <font color='#BB00BB'>get_random_string</font><font face='Lucida Console'>(</font><font color='#979000'>32</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// First add the form vars
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>string_to_stringmap::const_iterator ci <font color='#5555FF'>=</font> postvars.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; ci <font color='#5555FF'>!</font><font color='#5555FF'>=</font> postvars.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ci<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>stringmap::const_iterator si <font color='#5555FF'>=</font> ci<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; si <font color='#5555FF'>!</font><font color='#5555FF'>=</font> ci<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>si<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    postBody <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>--</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> mime_boundary <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\r\n</font>"
+                        "<font color='#CC0000'>Content-Disposition: form-data; name=\"</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> ci<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\"\r\n\r\n</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> si<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\r\n</font>";
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#009900'>// Then add the files
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>string_to_stringmap::const_iterator ci <font color='#5555FF'>=</font> filenames.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; ci <font color='#5555FF'>!</font><font color='#5555FF'>=</font> filenames.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ci<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>stringmap::const_iterator si <font color='#5555FF'>=</font> ci<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; si <font color='#5555FF'>!</font><font color='#5555FF'>=</font> ci<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>si<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    std::ifstream <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font>si<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    postBody <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>--</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> mime_boundary <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\r\n</font>"
+                        "<font color='#CC0000'>Content-Disposition: form-data; name=\"</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> ci<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\"; filename=\"</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_basename</font><font face='Lucida Console'>(</font>si<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\"\r\n\r\n</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> in <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\r\n</font>";
+                <b>}</b>
+            <b>}</b>
+
+            postBody <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>--</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> mime_boundary <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>--\r\n</font>";
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// No files...
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>string_to_stringmap::const_iterator ci <font color='#5555FF'>=</font> postvars.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; ci <font color='#5555FF'>!</font><font color='#5555FF'>=</font> postvars.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ci<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>stringmap::const_iterator si <font color='#5555FF'>=</font> ci<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; si <font color='#5555FF'>!</font><font color='#5555FF'>=</font> ci<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>si<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    postBody <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>urlencode</font><font face='Lucida Console'>(</font>ci<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'>=</font>' <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>urlencode</font><font face='Lucida Console'>(</font>si<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'>&amp;</font>';
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#009900'>// read the last '&amp;'
+</font>            <font color='#0000FF'><u>char</u></font> c;
+            postBody.<font color='#BB00BB'>read</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>c, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> postBody.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> http_client::<b><a name='grab_url'></a>grab_url</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> url, <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> method, <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> post_body<font face='Lucida Console'>)</font>
+    <b>{</b>
+        error_field.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        returned_headers.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        http_return <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        returned_body.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        std::string to_use_method <font color='#5555FF'>=</font> <font color='#BB00BB'>strtoupper</font><font face='Lucida Console'>(</font>method<font face='Lucida Console'>)</font>;
+
+        std::string scheme, user, pass, host, path;
+        <font color='#0000FF'><u>short</u></font> port;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font color='#BB00BB'>parse_url</font><font face='Lucida Console'>(</font>url, scheme, user, pass, host, port, path<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+            error_field <font color='#5555FF'>=</font> "<font color='#CC0000'>Couldn't parse the URL!</font>";
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#009900'>// Build request
+</font>        std::stringstream ret;
+        ret <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> to_use_method <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'> </font>' <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> path <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> HTTP/1.0\r\n</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Host: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> host;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>port <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>80</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> port <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>443</font><font face='Lucida Console'>)</font> ret <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'>:</font>' <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> port;
+        ret <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\r\n</font>";
+
+        <font color='#0000FF'><u>bool</u></font> content_length_said <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+        <font color='#BB00BB'>set_header</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Connection</font>", "<font color='#CC0000'>Close</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>stringmap::iterator ci <font color='#5555FF'>=</font> headers.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; ci <font color='#5555FF'>!</font><font color='#5555FF'>=</font> headers.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ci<font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::string head <font color='#5555FF'>=</font> <font color='#BB00BB'>strtolower</font><font face='Lucida Console'>(</font>ci<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> head <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>content-length</font>" <font face='Lucida Console'>)</font>
+            <b>{</b>
+                content_length_said <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <b>}</b>
+
+            ret <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> ci<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'>:</font>' <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'> </font>' <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> ci<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\r\n</font>";
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#5555FF'>!</font>content_length_said <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> to_use_method <font color='#5555FF'>!</font><font color='#5555FF'>=</font> "<font color='#CC0000'>GET</font>" <font face='Lucida Console'>)</font>
+            ret <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Content-Length: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>post_body.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\r\n</font>";
+
+        std::stringstream cookie_ss;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>stringmap::iterator ci <font color='#5555FF'>=</font> cookies.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; ci <font color='#5555FF'>!</font><font color='#5555FF'>=</font> cookies.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ci<font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::string var <font color='#5555FF'>=</font> ci<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first ; <font color='#BB00BB'>trim</font><font face='Lucida Console'>(</font>var<font face='Lucida Console'>)</font>;
+            std::string val <font color='#5555FF'>=</font> ci<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second; <font color='#BB00BB'>trim</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> val.<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> var.<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+                <font color='#0000FF'>continue</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#5555FF'>!</font>cookie_ss.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+                cookie_ss <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'>;</font>' <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'> </font>';
+
+            cookie_ss <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>urlencode</font><font face='Lucida Console'>(</font>var<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'>=</font>' <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>urlencode</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#5555FF'>!</font>cookie_ss.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+            ret <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Cookie: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cookie_ss.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\r\n</font>";
+
+        ret <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\r\n</font>";
+        ret <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> post_body;
+
+        std::string request_build <font color='#5555FF'>=</font> ret.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        std::stringstream ss;
+        <b>{</b>
+            dlib::connection <font color='#5555FF'>*</font> <font color='#BB00BB'>conn</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>timeout <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    conn <font color='#5555FF'>=</font> dlib::<font color='#BB00BB'>connect</font><font face='Lucida Console'>(</font>host, port, timeout<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    conn <font color='#5555FF'>=</font> dlib::<font color='#BB00BB'>connect</font><font face='Lucida Console'>(</font>host, port<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> dlib::socket_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                error_field <font color='#5555FF'>=</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+
+            <font color='#009900'>// Implement a timeout
+</font>            timeout_ptr t;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> timeout <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font face='Lucida Console'>)</font>
+                t.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font> <font color='#0000FF'>new</font> dlib::<font color='#BB00BB'>timeout</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>conn, <font color='#5555FF'>&amp;</font>dlib::connection::shutdown, timeout<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Write our request
+</font>            conn<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>write</font><font face='Lucida Console'>(</font>request_build.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>request_build.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            t.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// And read the response
+</font>            <font color='#0000FF'><u>char</u></font> buf[<font color='#979000'>512</font>];
+            <font color='#0000FF'><u>long</u></font> <font color='#BB00BB'>bytes_read</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>bytes_total</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>bool</u></font> <font color='#BB00BB'>read_headers</font><font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> timeout <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font face='Lucida Console'>)</font>
+                t.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font> <font color='#0000FF'>new</font> dlib::<font color='#BB00BB'>timeout</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>conn, <font color='#5555FF'>&amp;</font>dlib::connection::shutdown, timeout<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>bytes_read <font color='#5555FF'>=</font> conn<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>read</font><font face='Lucida Console'>(</font>buf, <font color='#979000'>512</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                ss.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font>buf, bytes_read<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// Incremental read headers
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> read_headers <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    std::string body_with_headers <font color='#5555FF'>=</font> ss.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    std::string::size_type <font color='#BB00BB'>ctr</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> <font color='#979000'>true</font> <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        std::string::size_type pos <font color='#5555FF'>=</font> body_with_headers.<font color='#BB00BB'>find</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>\r\n</font>", ctr<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> pos <font color='#5555FF'>=</font><font color='#5555FF'>=</font> std::string::npos <font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#009900'>// This is our last position of "\r\n"
+</font>                            ss.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+                            ss.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font> body_with_headers.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font>ctr<font face='Lucida Console'>)</font>.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, body_with_headers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> ctr <font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>break</font>;
+                        <b>}</b>
+
+                        std::string header <font color='#5555FF'>=</font> body_with_headers.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font>ctr, pos<font color='#5555FF'>-</font>ctr<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> header.<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#009900'>// Ok, we're done reading the headers
+</font>                            read_headers <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                            <font color='#009900'>// What follows now is the body
+</font>                            ss.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+                            ss.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font> body_with_headers.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font>pos <font color='#5555FF'>+</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, body_with_headers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> pos <font color='#5555FF'>-</font> <font color='#979000'>2</font> <font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>break</font>;
+                        <b>}</b>
+                        ctr <font color='#5555FF'>=</font> pos <font color='#5555FF'>+</font> <font color='#979000'>2</font>;
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> returned_headers.<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>
+                                header[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>H</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                                header[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>T</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                                header[<font color='#979000'>2</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>T</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                                header[<font color='#979000'>3</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>P</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                                header[<font color='#979000'>4</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>/</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                                <font face='Lucida Console'>(</font>header[<font color='#979000'>5</font>] <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>0</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> header[<font color='#979000'>5</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>9</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                                header[<font color='#979000'>6</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>.</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                                <font face='Lucida Console'>(</font>header[<font color='#979000'>7</font>] <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>0</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> header[<font color='#979000'>7</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>9</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                                header[<font color='#979000'>8</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>'
+                            <font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                http_return <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>header[<font color='#979000'>9</font> ] <font color='#5555FF'>-</font> '<font color='#FF0000'>0</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#979000'>100</font> <font color='#5555FF'>+</font>
+                                    <font face='Lucida Console'>(</font>header[<font color='#979000'>10</font>] <font color='#5555FF'>-</font> '<font color='#FF0000'>0</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#979000'>10</font> <font color='#5555FF'>+</font>
+                                    <font face='Lucida Console'>(</font>header[<font color='#979000'>11</font>] <font color='#5555FF'>-</font> '<font color='#FF0000'>0</font>'<font face='Lucida Console'>)</font>;
+                                <font color='#0000FF'>continue</font>;
+                            <b>}</b>
+                        <b>}</b>
+
+                        std::string::size_type pos_dp <font color='#5555FF'>=</font> header.<font color='#BB00BB'>find_first_of</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>:</font>'<font face='Lucida Console'>)</font>;
+                        std::string header_name, header_value;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> pos_dp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> std::string::npos <font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#009900'>// **TODO** what should I do here??
+</font>                            header_name <font color='#5555FF'>=</font> header;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            header_name  <font color='#5555FF'>=</font> <font color='#BB00BB'>trim</font><font face='Lucida Console'>(</font>header.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, pos_dp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                            header_value <font color='#5555FF'>=</font> <font color='#BB00BB'>trim</font><font face='Lucida Console'>(</font>header.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font>pos_dp<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        <b>}</b>
+
+                        returned_headers[ header_name ].<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>header_value<font face='Lucida Console'>)</font>;
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>BR_CASECMP</font><font face='Lucida Console'>(</font>header_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, "<font color='#CC0000'>Content-Length</font>", <font color='#979000'>14</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            bytes_total <font color='#5555FF'>=</font> <font color='#BB00BB'>atol</font><font face='Lucida Console'>(</font> header_value.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>BR_CASECMP</font><font face='Lucida Console'>(</font>header_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, "<font color='#CC0000'>Set-Cookie</font>", <font color='#979000'>10</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            std::string::size_type <font color='#BB00BB'>cur_pos</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, pos_pk, pos_is;
+                            std::string work, var, val;
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> cur_pos <font color='#5555FF'>=</font> <font color='#979000'>0</font>; cur_pos <font color='#5555FF'>&lt;</font> header_value.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; cur_pos<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                pos_pk <font color='#5555FF'>=</font> header_value.<font color='#BB00BB'>find</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>;</font>', cur_pos<font face='Lucida Console'>)</font>;
+                                work   <font color='#5555FF'>=</font> <font color='#BB00BB'>trim</font><font face='Lucida Console'>(</font> header_value.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font>cur_pos, pos_pk <font color='#5555FF'>-</font> cur_pos<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+
+                                pos_is <font color='#5555FF'>=</font> work.<font color='#BB00BB'>find</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>=</font>'<font face='Lucida Console'>)</font>;
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> pos_is <font color='#5555FF'>!</font><font color='#5555FF'>=</font> std::string::npos <font face='Lucida Console'>)</font>
+                                <b>{</b> <font color='#009900'>// Hmmm? what in the else case?
+</font>                                    var <font color='#5555FF'>=</font> <font color='#BB00BB'>trim</font><font face='Lucida Console'>(</font> http_client::<font color='#BB00BB'>urldecode</font><font face='Lucida Console'>(</font> work.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, pos_is<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+                                    val <font color='#5555FF'>=</font> <font color='#BB00BB'>trim</font><font face='Lucida Console'>(</font> http_client::<font color='#BB00BB'>urldecode</font><font face='Lucida Console'>(</font> work.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font>pos_is <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+
+                                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> var <font color='#5555FF'>!</font><font color='#5555FF'>=</font> "<font color='#CC0000'>expires</font>" <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> var <font color='#5555FF'>!</font><font color='#5555FF'>=</font> "<font color='#CC0000'>domain</font>" <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> var <font color='#5555FF'>!</font><font color='#5555FF'>=</font> "<font color='#CC0000'>path</font>" <font face='Lucida Console'>)</font>
+                                        <font color='#BB00BB'>set_cookie</font><font face='Lucida Console'>(</font> var, val <font face='Lucida Console'>)</font>;
+                                <b>}</b>
+                                cur_pos <font color='#5555FF'>=</font> pos_pk <font color='#5555FF'>=</font><font color='#5555FF'>=</font> std::string::npos ? pos_pk <font color='#5555FF'>-</font> <font color='#979000'>1</font> : pos_pk;
+                            <b>}</b>
+                        <b>}</b> <font color='#009900'>// Set-Cookie?
+</font>
+                    <b>}</b> <font color='#009900'>// while (true)
+</font>                <b>}</b> <font color='#009900'>// read_headers?
+</font>
+                <font color='#009900'>// Call the OnDownload function if it's set
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> OnDownload <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>read_headers <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>OnDownload<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>ss.<font color='#BB00BB'>tellp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, bytes_total, user_info<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        t.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>break</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> bytes_total <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>ss.<font color='#BB00BB'>tellp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> bytes_total <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    t.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>break</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> timeout <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font face='Lucida Console'>)</font>
+                    t.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font> <font color='#0000FF'>new</font> dlib::<font color='#BB00BB'>timeout</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>conn, <font color='#5555FF'>&amp;</font>dlib::connection::shutdown, timeout<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+            <b>}</b> <font color='#009900'>// while still data to read
+</font>
+            t.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>delete</font> conn;
+
+
+            <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font> bytes_read <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>case</font> dlib::TIMEOUT:      error_field <font color='#5555FF'>=</font> "<font color='#CC0000'>Timeout</font>";     <font color='#0000FF'>return</font> <font color='#979000'>false</font>; <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> dlib::WOULDBLOCK:   error_field <font color='#5555FF'>=</font> "<font color='#CC0000'>Would block</font>"; <font color='#0000FF'>return</font> <font color='#979000'>false</font>; <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> dlib::OTHER_ERROR:  error_field <font color='#5555FF'>=</font> "<font color='#CC0000'>Other error</font>"; <font color='#0000FF'>return</font> <font color='#979000'>false</font>; <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> dlib::SHUTDOWN:     error_field <font color='#5555FF'>=</font> "<font color='#CC0000'>Timeout</font>";     <font color='#0000FF'>return</font> <font color='#979000'>false</font>; <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> dlib::PORTINUSE:    error_field <font color='#5555FF'>=</font> "<font color='#CC0000'>Port in use</font>"; <font color='#0000FF'>return</font> <font color='#979000'>false</font>; <font color='#0000FF'>break</font>;
+            <b>}</b>
+        <b>}</b>
+
+        returned_body <font color='#5555FF'>=</font> ss.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> http_client::<b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        headers.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        cookies.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> http_client::<b><a name='prepare_for_next_url'></a>prepare_for_next_url</b><font face='Lucida Console'>(</font> <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>remove_header</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Content-Type</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>remove_header</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Content-Length</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+
+
+</pre></body></html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+<head>
+  <title></title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <style type="text/css">
+td.linenos { background-color: #f0f0f0; padding-right: 10px; }
+span.lineno { background-color: #f0f0f0; padding: 0 5px 0 5px; }
+pre { line-height: 125%; }
+body .hll { background-color: #ffffcc }
+body  { background: #ffffff; }
+body .c { color: #008000 } /* Comment */
+body .err { border: 1px solid #FF0000 } /* Error */
+body .k { color: #0000ff } /* Keyword */
+body .cm { color: #008000 } /* Comment.Multiline */
+body .cp { color: #0000ff } /* Comment.Preproc */
+body .c1 { color: #008000 } /* Comment.Single */
+body .cs { color: #008000 } /* Comment.Special */
+body .ge { font-style: italic } /* Generic.Emph */
+body .gh { font-weight: bold } /* Generic.Heading */
+body .gp { font-weight: bold } /* Generic.Prompt */
+body .gs { font-weight: bold } /* Generic.Strong */
+body .gu { font-weight: bold } /* Generic.Subheading */
+body .kc { color: #0000ff } /* Keyword.Constant */
+body .kd { color: #0000ff } /* Keyword.Declaration */
+body .kn { color: #0000ff } /* Keyword.Namespace */
+body .kp { color: #0000ff } /* Keyword.Pseudo */
+body .kr { color: #0000ff } /* Keyword.Reserved */
+body .kt { color: #2b91af } /* Keyword.Type */
+body .s { color: #a31515 } /* Literal.String */
+body .nc { color: #2b91af } /* Name.Class */
+body .ow { color: #0000ff } /* Operator.Word */
+body .sb { color: #a31515 } /* Literal.String.Backtick */
+body .sc { color: #a31515 } /* Literal.String.Char */
+body .sd { color: #a31515 } /* Literal.String.Doc */
+body .s2 { color: #a31515 } /* Literal.String.Double */
+body .se { color: #a31515 } /* Literal.String.Escape */
+body .sh { color: #a31515 } /* Literal.String.Heredoc */
+body .si { color: #a31515 } /* Literal.String.Interpol */
+body .sx { color: #a31515 } /* Literal.String.Other */
+body .sr { color: #a31515 } /* Literal.String.Regex */
+body .s1 { color: #a31515 } /* Literal.String.Single */
+body .ss { color: #a31515 } /* Literal.String.Symbol */
+
+  </style>
+</head>
+<body>
+<h2></h2>
+
+<div class="highlight"><pre><span class="c">#!/usr/bin/python</span>
+<span class="c"># The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt</span>
+<span class="c">#</span>
+<span class="c"># </span>
+<span class="c"># This is an example illustrating the use of the SVM-Rank tool from the dlib C++</span>
+<span class="c"># Library.  This is a tool useful for learning to rank objects.  For example,</span>
+<span class="c"># you might use it to learn to rank web pages in response to a user&#39;s query.</span>
+<span class="c"># The idea being to rank the most relevant pages higher than non-relevant pages.</span>
+<span class="c"># </span>
+<span class="c"># In this example, we will create a simple test dataset and show how to learn a</span>
+<span class="c"># ranking function from it.  The purpose of the function will be to give</span>
+<span class="c"># &quot;relevant&quot; objects higher scores than &quot;non-relevant&quot; objects.  The idea is</span>
+<span class="c"># that you use this score to order the objects so that the most relevant objects</span>
+<span class="c"># come to the top of the ranked list.</span>
+<span class="c">#</span>
+<span class="c"># COMPILING THE DLIB PYTHON INTERFACE</span>
+<span class="c">#   Dlib comes with a compiled python interface for python 2.7 on MS Windows. If</span>
+<span class="c">#   you are using another python version or operating system then you need to</span>
+<span class="c">#   compile the dlib python interface before you can use this file.  To do this,</span>
+<span class="c">#   run compile_dlib_python_module.bat.  This should work on any operating</span>
+<span class="c">#   system so long as you have CMake and boost-python installed.</span>
+<span class="c">#   On Ubuntu, this can be done easily by running the command:</span>
+<span class="c">#       sudo apt-get install libboost-python-dev cmake</span>
+<span class="kn">import</span> <span class="nn">dlib</span>
+
+
+<span class="c"># Now let&#39;s make some testing data.  To make it really simple, let&#39;s suppose</span>
+<span class="c"># that we are ranking 2D vectors and that vectors with positive values in the</span>
+<span class="c"># first dimension should rank higher than other vectors.  So what we do is make</span>
+<span class="c"># examples of relevant (i.e. high ranking) and non-relevant (i.e. low ranking)</span>
+<span class="c"># vectors and store them into a ranking_pair object like so:</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">ranking_pair</span><span class="p">()</span>
+<span class="c"># Here we add two examples.  In real applications, you would want lots of</span>
+<span class="c"># examples of relevant and non-relevant vectors.</span>
+<span class="n">data</span><span class="o">.</span><span class="n">relevant</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dlib</span><span class="o">.</span><span class="n">vector</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+<span class="n">data</span><span class="o">.</span><span class="n">nonrelevant</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dlib</span><span class="o">.</span><span class="n">vector</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
+
+<span class="c"># Now that we have some data, we can use a machine learning method to learn a</span>
+<span class="c"># function that will give high scores to the relevant vectors and low scores to</span>
+<span class="c"># the non-relevant vectors.</span>
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">svm_rank_trainer</span><span class="p">()</span>
+<span class="c"># Note that the trainer object has some parameters that control how it behaves.</span>
+<span class="c"># For example, since this is the SVM-Rank algorithm it has a C parameter that</span>
+<span class="c"># controls the trade-off between trying to fit the training data exactly or</span>
+<span class="c"># selecting a &quot;simpler&quot; solution which might generalize better. </span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c"># So let&#39;s do the training.</span>
+<span class="n">rank</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="c"># Now if you call rank on a vector it will output a ranking score.  In</span>
+<span class="c"># particular, the ranking score for relevant vectors should be larger than the</span>
+<span class="c"># score for non-relevant vectors.  </span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Ranking score for a relevant vector:     {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">rank</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">relevant</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Ranking score for a non-relevant vector: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">rank</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">nonrelevant</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+<span class="c"># The output is the following:</span>
+<span class="c">#    ranking score for a relevant vector:     0.5</span>
+<span class="c">#    ranking score for a non-relevant vector: -0.5</span>
+
+
+<span class="c"># If we want an overall measure of ranking accuracy we can compute the ordering</span>
+<span class="c"># accuracy and mean average precision values by calling test_ranking_function().</span>
+<span class="c"># In this case, the ordering accuracy tells us how often a non-relevant vector</span>
+<span class="c"># was ranked ahead of a relevant vector.  In this case, it returns 1 for both</span>
+<span class="c"># metrics, indicating that the rank function outputs a perfect ranking.</span>
+<span class="k">print</span><span class="p">(</span><span class="n">dlib</span><span class="o">.</span><span class="n">test_ranking_function</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">data</span><span class="p">))</span>
+
+<span class="c"># The ranking scores are computed by taking the dot product between a learned</span>
+<span class="c"># weight vector and a data vector.  If you want to see the learned weight vector</span>
+<span class="c"># you can display it like so:</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Weights: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rank</span><span class="o">.</span><span class="n">weights</span><span class="p">))</span>
+<span class="c"># In this case the weights are:</span>
+<span class="c">#  0.5 </span>
+<span class="c"># -0.5 </span>
+
+<span class="c"># In the above example, our data contains just two sets of objects.  The</span>
+<span class="c"># relevant set and non-relevant set.  The trainer is attempting to find a</span>
+<span class="c"># ranking function that gives every relevant vector a higher score than every</span>
+<span class="c"># non-relevant vector.  Sometimes what you want to do is a little more complex</span>
+<span class="c"># than this. </span>
+<span class="c">#</span>
+<span class="c"># For example, in the web page ranking example we have to rank pages based on a</span>
+<span class="c"># user&#39;s query.  In this case, each query will have its own set of relevant and</span>
+<span class="c"># non-relevant documents.  What might be relevant to one query may well be</span>
+<span class="c"># non-relevant to another.  So in this case we don&#39;t have a single global set of</span>
+<span class="c"># relevant web pages and another set of non-relevant web pages.  </span>
+<span class="c">#</span>
+<span class="c"># To handle cases like this, we can simply give multiple ranking_pair instances</span>
+<span class="c"># to the trainer.  Therefore, each ranking_pair would represent the</span>
+<span class="c"># relevant/non-relevant sets for a particular query.  An example is shown below</span>
+<span class="c"># (for simplicity, we reuse our data from above to make 4 identical &quot;queries&quot;).</span>
+<span class="n">queries</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">ranking_pairs</span><span class="p">()</span>
+<span class="n">queries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">queries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">queries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">queries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="c"># We can train just as before.  </span>
+<span class="n">rank</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span>
+
+<span class="c"># Now that we have multiple ranking_pair instances, we can also use</span>
+<span class="c"># cross_validate_ranking_trainer().  This performs cross-validation by splitting</span>
+<span class="c"># the queries up into folds.  That is, it lets the trainer train on a subset of</span>
+<span class="c"># ranking_pair instances and tests on the rest.  It does this over 4 different</span>
+<span class="c"># splits and returns the overall ranking accuracy based on the held out data.</span>
+<span class="c"># Just like test_ranking_function(), it reports both the ordering accuracy and</span>
+<span class="c"># mean average precision.</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Cross validation results: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">dlib</span><span class="o">.</span><span class="n">cross_validate_ranking_trainer</span><span class="p">(</span><span class="n">trainer</span><span class="p">,</span> <span class="n">queries</span><span class="p">,</span> <span class="mi">4</span><span class="p">)))</span>
+
+<span class="c"># Finally, note that the ranking tools also support the use of sparse vectors in</span>
+<span class="c"># addition to dense vectors (which we used above).  So if we wanted to do</span>
+<span class="c"># exactly what we did in the first part of the example program above but using</span>
+<span class="c"># sparse vectors we would do it like so:</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">sparse_ranking_pair</span><span class="p">()</span>
+<span class="n">samp</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">sparse_vector</span><span class="p">()</span>
+
+<span class="c"># Make samp represent the same vector as dlib.vector([1, 0]).  In dlib, a sparse</span>
+<span class="c"># vector is just an array of pair objects.  Each pair stores an index and a</span>
+<span class="c"># value.  Moreover, the svm-ranking tools require sparse vectors to be sorted</span>
+<span class="c"># and to have unique indices.  This means that the indices are listed in</span>
+<span class="c"># increasing order and no index value shows up more than once.  If necessary,</span>
+<span class="c"># you can use the dlib.make_sparse_vector() routine to make a sparse vector</span>
+<span class="c"># object properly sorted and contain unique indices. </span>
+<span class="n">samp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dlib</span><span class="o">.</span><span class="n">pair</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">data</span><span class="o">.</span><span class="n">relevant</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">samp</span><span class="p">)</span>
+
+<span class="c"># Now make samp represent the same vector as dlib.vector([0, 1])</span>
+<span class="n">samp</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="n">samp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dlib</span><span class="o">.</span><span class="n">pair</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">data</span><span class="o">.</span><span class="n">nonrelevant</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">samp</span><span class="p">)</span>
+
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">svm_rank_trainer_sparse</span><span class="p">()</span>
+<span class="n">rank</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Ranking score for a relevant vector:     {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">rank</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">relevant</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Ranking score for a non-relevant vector: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">rank</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">nonrelevant</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+<span class="c"># Just as before, the output is the following:</span>
+<span class="c">#    ranking score for a relevant vector:     0.5</span>
+<span class="c">#    ranking score for a non-relevant vector: -0.5</span>
+</pre></div>
+</body>
+</html>

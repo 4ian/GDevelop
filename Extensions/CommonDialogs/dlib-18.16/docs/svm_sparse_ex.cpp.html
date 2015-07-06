@@ -1,0 +1,123 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - svm_sparse_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example showing how to use sparse feature vectors with
+    the dlib C++ library's machine learning tools.
+
+    This example creates a simple binary classification problem and shows
+    you how to train a support vector machine on that data.
+
+    The data used in this example will be 100 dimensional data and will
+    come from a simple linearly separable distribution.  
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// In this example program we will be dealing with feature vectors that are sparse (i.e. most
+</font>    <font color='#009900'>// of the values in each vector are zero).  So rather than using a dlib::matrix we can use
+</font>    <font color='#009900'>// one of the containers from the STL to represent our sample vectors.  In particular, we 
+</font>    <font color='#009900'>// can use the std::map to represent sparse vectors.  (Note that you don't have to use std::map.
+</font>    <font color='#009900'>// Any STL container of std::pair objects that is sorted can be used.  So for example, you could 
+</font>    <font color='#009900'>// use a std::vector&lt;std::pair&lt;unsigned long,double&gt; &gt; here so long as you took care to sort every vector)
+</font>    <font color='#0000FF'>typedef</font> std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> sample_type;
+
+
+    <font color='#009900'>// This is a typedef for the type of kernel we are going to use in this example.
+</font>    <font color='#009900'>// Since our data is linearly separable I picked the linear kernel.  Note that if you
+</font>    <font color='#009900'>// are using a sparse vector representation like std::map then you have to use a kernel
+</font>    <font color='#009900'>// meant to be used with that kind of data type.  
+</font>    <font color='#0000FF'>typedef</font> sparse_linear_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> kernel_type;
+
+
+    <font color='#009900'>// Here we create an instance of the pegasos svm trainer object we will be using.
+</font>    svm_pegasos<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> trainer;
+    <font color='#009900'>// Here we setup a parameter to this object.  See the dlib documentation for a 
+</font>    <font color='#009900'>// description of what this parameter does. 
+</font>    trainer.<font color='#BB00BB'>set_lambda</font><font face='Lucida Console'>(</font><font color='#979000'>0.00001</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Let's also use the svm trainer specially optimized for the linear_kernel and
+</font>    <font color='#009900'>// sparse_linear_kernel.
+</font>    svm_c_linear_trainer<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> linear_trainer;
+    <font color='#009900'>// This trainer solves the "C" formulation of the SVM.  See the documentation for
+</font>    <font color='#009900'>// details.
+</font>    linear_trainer.<font color='#BB00BB'>set_c</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samples;
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> labels;
+
+    <font color='#009900'>// make an instance of a sample vector so we can use it below
+</font>    sample_type sample;
+
+
+    <font color='#009900'>// Now let's go into a loop and randomly generate 10000 samples.
+</font>    <font color='#BB00BB'>srand</font><font face='Lucida Console'>(</font><font color='#BB00BB'>time</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>double</u></font> label <font color='#5555FF'>=</font> <font color='#5555FF'>+</font><font color='#979000'>1</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// flip this flag
+</font>        label <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+        sample.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now make a random sparse sample with at most 10 non-zero elements
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> idx <font color='#5555FF'>=</font> std::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>100</font>;
+            <font color='#0000FF'><u>double</u></font> value <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>RAND_MAX;
+
+            sample[idx] <font color='#5555FF'>=</font> label<font color='#5555FF'>*</font>value;
+        <b>}</b>
+
+        <font color='#009900'>// let the svm_pegasos learn about this sample.  
+</font>        trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>sample,label<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Also save the samples we are generating so we can let the svm_c_linear_trainer
+</font>        <font color='#009900'>// learn from them below.  
+</font>        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font>;
+        labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>label<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>// In addition to the rule we learned with the pegasos trainer, let's also use our
+</font>    <font color='#009900'>// linear_trainer to learn a decision rule.
+</font>    decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> df <font color='#5555FF'>=</font> linear_trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Now we have trained our SVMs.  Let's test them out a bit.  
+</font>    <font color='#009900'>// Each of these statements prints the output of the SVMs given a particular sample.  
+</font>    <font color='#009900'>// Each SVM outputs a number &gt; 0 if a sample is predicted to be in the +1 class and &lt; 0 
+</font>    <font color='#009900'>// if a sample is predicted to be in the -1 class.
+</font>
+
+    sample.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sample[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> <font color='#979000'>0.3</font>;
+    sample[<font color='#979000'>10</font>] <font color='#5555FF'>=</font> <font color='#979000'>0.9</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>This is a +1 example, its SVM output is: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trainer</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>df: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    sample.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sample[<font color='#979000'>83</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.3</font>;
+    sample[<font color='#979000'>26</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.9</font>;
+    sample[<font color='#979000'>58</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.7</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>This is a -1 example, its SVM output is: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trainer</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>df: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    sample.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sample[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.2</font>;
+    sample[<font color='#979000'>9</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.8</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>This is a -1 example, its SVM output is: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trainer</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>df: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+<b>}</b>
+
+
+</pre></body></html>

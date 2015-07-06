@@ -1,0 +1,459 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html xmlns:gcse="googleCustomSearch"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="shortcut icon" href="dlib-icon.ico"><meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I="><meta name="google-site-verification" content="DGSSJMKDomaDaDTIRJ8jDkv0YMx9Cz7OESbXHjjr6Jw"><title>dlib C++ Library
+   - Introduction</title><script language="JavaScript">
+
+// ---------------------------------------------
+// --- Name:    Easy DHTML Treeview           --
+// --- Author:  D.D. de Kerf                  --
+// --- Version: 0.2          Date: 13-6-2001  --
+// ---------------------------------------------
+function Toggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "minus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "plus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+function BigToggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigminus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigplus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+</script><style type="text/css">
+   body {margin:0px;}
+   pre {margin:0px;}
+
+   ul.tree  li { list-style: none;  margin-left:10px;} 
+   ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
+   ul.tree  li ul { margin-left:10px; padding:0px; }
+
+   li#term { list-style: none; }
+
+   div.component {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      padding: 0.7em;
+   }
+
+   div.question {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      margin-bottom: 90%;
+      padding: 0.7em;
+   }
+
+   div.function {
+      background-color:white; 
+      border: 2px solid rgb(102,102,255); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.class {
+      background-color:white; 
+      border: 2px solid rgb(255,102,102); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.extension {
+      background-color:#FDFDFD; 
+      border: 1px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.0em;
+      padding: 0.7em;
+   }
+
+   div.logb {
+      text-align:left;
+      padding: 0.0em;
+      float: left;
+      background-color:#c0c0c0; 
+      border: double ; 
+      margin: 0.5em;
+   }
+
+   div.name {
+      float: left;
+   }
+   div.line1 {
+      float:left;
+      width:100%;
+      background-color:#dfdfdf; 
+   }
+   div.line2 {
+      float:left;
+      width:100%;
+   }
+   div.inc {
+      float: right;
+   }
+
+
+   .code_box
+   {
+      color: black;
+      margin: 1em 0.25in;
+      padding: 0.5em;
+      background: rgb(240,240,240);
+      border-top: black dotted 1px;
+      border-left: black dotted 1px;
+      border-right: black solid 2px;
+      border-bottom: black solid 2px;
+   }
+
+
+
+   .bdotted {border-bottom: 1px dotted}
+   .bdashed {border-bottom: 1px dashed}
+   .bsolid {border-bottom: 1px solid}
+   .bdouble {border-bottom: 1px double}
+   .bgroove {border-bottom: 1px groove}
+   .bridge {border-bottom: 1px ridge}
+   .binset {border-bottom: 1px inset}
+   .boutset {border-bottom: 1px outset}
+
+   div.row1 {
+      background-color:#dfdfdf; 
+   }
+   div.row2 {
+      background-color:#f2f2f2; 
+   }
+
+   div.typedefs {
+      margin-left: 1.5em;
+      margin-top: 0.2em;
+      border: 1px dotted;
+      width: 52em;
+   }
+
+   div.tdn {
+      width: 10em;
+   }
+
+   .fullhr {
+      clear: both;
+   }
+
+   body {
+      text-align: center;
+   }
+
+   div.entire_page_header {
+      width:62.5em;  
+      text-align: left;
+      margin-top: 0.4em;
+      margin-left: auto;
+      margin-right: auto;
+   }
+   div.entire_page {
+      width:62.5em;  
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      clear:both;
+   }
+</style></head><body bgcolor="#EDF3EE"><a name="top"></a><div class="entire_page_header"><a href="http://dlib.net"><img src="dlib-logo.png"></a></div><div class="entire_page"><table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px"><tr height="100%"><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="145" height="100%"><tr><td VALIGN="TOP"><b>The Library</b><ul class="tree"><li><a href="algorithms.html">Algorithms</a></li><li><a href="api.html">API Wrappers</a></li><li><a href="bayes.html">Bayesian Nets</a></li><li><a href="compression.html">Compression</a></li><li><a href="containers.html">Containers</a></li><li><a href="graph_tools.html">Graph Tools</a></li><li><a href="imaging.html">Image Processing</a></li><li><a href="linear_algebra.html">Linear Algebra</a></li><li><a href="ml.html">Machine Learning</a></li><li><a href="metaprogramming.html">Metaprogramming</a></li><li><a href="other.html">Miscellaneous</a></li><li><a href="network.html">Networking</a></li><li><a href="optimization.html">Optimization</a></li><li><a href="parsing.html">Parsing</a></li></ul><br><b>Help/Info</b><ul class="tree"><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: C++</u></font></a><ul style="display:none;"><li><a href="3d_point_cloud_ex.cpp.html">3D_Point_Cloud</a></li><li><a href="assignment_learning_ex.cpp.html">Assignment_Learning</a></li><li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li><li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li><li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li><li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li><li><a href="bridge_ex.cpp.html">Bridge</a></li><li><a href="bsp_ex.cpp.html">BSP</a></li><li><a href="svm_c_ex.cpp.html">C-Support_Vector_Machine</a></li><li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li><li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li><li><a href="config_reader_ex.cpp.html">Config_File_Reader</a></li><li><a href="custom_trainer_ex.cpp.html">Custom_Trainers</a></li><li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li><li><a href="empirical_kernel_map_ex.cpp.html">Empirical_Kernel_Map</a></li><li><a href="face_detection_ex.cpp.html">Face_Detection</a></li><li><a href="face_landmark_detection_ex.cpp.html">Face_Landmark_Detection</a></li><li><a href="fhog_ex.cpp.html">FHOG_Feature_Extraction</a></li><li><a href="fhog_object_detector_ex.cpp.html">FHOG_Object_Detection</a></li><li><a href="graph_labeling_ex.cpp.html">Graph_Labeling</a></li><li><a href="gui_api_ex.cpp.html">GUI</a></li><li><a href="hough_transform_ex.cpp.html">Hough_Transform</a></li><li><a href="server_http_ex.cpp.html">HTTP_Server</a></li><li><a href="image_ex.cpp.html">Image</a></li><li><a href="iosockstream_ex.cpp.html">IO Socket Streams</a></li><li><a href="server_iostream_ex.cpp.html">IO Streams Server</a></li><li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li><li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li><li><a href="krr_regression_ex.cpp.html">Kernel_Ridge_Regression</a></li><li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li><li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li><li><a href="krr_classification_ex.cpp.html">KRR_Classification</a></li><li><a href="learning_to_track_ex.cpp.html">Learning_to_Track</a></li><li><a href="max_cost_assignment_ex.cpp.html">Linear_Assignment_Problems</a></li><li><a href="linear_manifold_regularizer_ex.cpp.html">Linear_Manifold_Regularizer</a></li><li><a href="mpc_ex.cpp.html">Linear_Model_Predictive_Control</a></li><li><a href="logger_ex.cpp.html">Logger</a></li><li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li><li><a href="logger_custom_output_ex.cpp.html">Logger_Custom_Output</a></li><li><a href="matrix_ex.cpp.html">Matrix</a></li><li><a href="matrix_expressions_ex.cpp.html">Matrix_Expressions</a></li><li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li><li><a href="model_selection_ex.cpp.html">Model_Selection</a></li><li><a href="multiclass_classification_ex.cpp.html">Multiclass_Classification</a></li><li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li><li><a href="mlp_ex.cpp.html">Neural_Network</a></li><li><a href="least_squares_ex.cpp.html">Non-Linear Least Squares</a></li><li><a href="svm_ex.cpp.html">Nu-Support_Vector_Machine</a></li><li><a href="integrate_function_adapt_simp_ex.cpp.html">Numerical_Integration</a></li><li><a href="object_detector_ex.cpp.html">Object_Detector</a></li><li><a href="object_detector_advanced_ex.cpp.html">Object_Detector_Advanced</a></li><li><a href="one_class_classifiers_ex.cpp.html">One_Class_Classifiers</a></li><li><a href="svm_pegasos_ex.cpp.html">Online_SVM</a></li><li><a href="optimization_ex.cpp.html">Optimization</a></li><li><a href="parallel_for_ex.cpp.html">Parallel_For_Loops</a></li><li><a href="pipe_ex.cpp.html">Pipe</a></li><li><a href="pipe_ex_2.cpp.html">Pipe_2</a></li><li><a href="quantum_computing_ex.cpp.html">Quantum_Computing</a></li><li><a href="queue_ex.cpp.html">Queue</a></li><li><a href="rank_features_ex.cpp.html">Rank_Features</a></li><li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li><li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li><li><a href="running_stats_ex.cpp.html">Running_Stats</a></li><li><a href="sequence_labeler_ex.cpp.html">Sequence_Labeling</a></li><li><a href="sequence_segmenter_ex.cpp.html">Sequence_Segmentation</a></li><li><a href="sockets_ex.cpp.html">Sockets</a></li><li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li><li><a href="svm_sparse_ex.cpp.html">Sparse_Vectors</a></li><li><a href="sqlite_ex.cpp.html">SQLite</a></li><li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li><li><a href="svm_struct_ex.cpp.html">Structural_Support_Vector_Machines</a></li><li><a href="svr_ex.cpp.html">Support_Vector_Regression</a></li><li><a href="surf_ex.cpp.html">SURF</a></li><li><a href="svm_rank_ex.cpp.html">SVM-Rank</a></li><li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li><li><a href="threads_ex.cpp.html">Threads</a></li><li><a href="thread_function_ex.cpp.html">Thread_Function</a></li><li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li><li><a href="timer_ex.cpp.html">Timer</a></li><li><a href="train_object_detector.cpp.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor_ex.cpp.html">Train_Shape_Predictor</a></li><li><a href="using_custom_kernels_ex.cpp.html">Using_Custom_Kernels</a></li><li><a href="video_tracking_ex.cpp.html">Video_Object_Tracking</a></li><li><a href="webcam_face_pose_ex.cpp.html">Webcam_Face_Pose_Estimation</a></li><li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: Python</u></font></a><ul style="display:none;"><li><a href="face_detector.py.html">Face_Detector</a></li><li><a href="face_landmark_detection.py.html">Face_Landmark_Detection</a></li><li><a href="find_candidate_object_locations.py.html">find_candidate_object_locations</a></li><li><a href="max_cost_assignment.py.html">Linear_Assignment_Problems</a></li><li><a href="sequence_segmenter.py.html">Sequence_Segmenter</a></li><li><a href="svm_struct.py.html">Structural_Support_Vector_Machines</a></li><li><a href="svm_rank.py.html">SVM-Rank</a></li><li><a href="train_object_detector.py.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor.py.html">Train_Shape_Predictor</a></li><li><a href="correlation_tracker.py.html">Video_Object_Tracking</a></li></ul></li><li><a href="faq.html">FAQ</a></li><li><a href="index.html">Home</a></li><li><a href="compile.html">How to compile</a></li><li><a href="howto_contribute.html">How to contribute</a></li><li><a href="term_index.html">Index</a></li><li><a href="intro.html">Introduction</a></li><li><a href="license.html">License</a></li><li><a href="python/index.html">Python API</a></li><li><a href="books.html">Suggested Books</a></li></ul><br><b>Current Release</b><ul class="tree"><li><a href="change_log.html">Change Log</a></li><li><a href="release_notes.html">Release Notes</a></li><li>Version: 18.16</li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"><br><br><br><br><br><br><br><br><br>
+      Last Modified:<br>Feb 18, 2015<br><br></td></tr></table></td><td VALIGN="TOP" width="100%" style="border: 1px solid rgb(102,102,102);"><center><h1>Introduction</h1></center><br><br><a name="Overview"></a><h1>Overview</h1><p>
+            Dlib is a general purpose cross-platform open source software library written in the C++ programming
+            language. Its design is heavily influenced by ideas from design by contract and component-based 
+            software engineering. This means it is, first and foremost, a collection of independent
+            software components, each accompanied by extensive documentation and thorough debugging modes. 
+         </p><p>
+           Since development began in 2002, dlib has grown to include a wide
+           variety of tools.  In particular, it now contains software components 
+           for dealing with networking, threads, graphical interfaces, complex
+           data structures, linear algebra, statistical machine learning, image
+           processing, data mining, XML and text parsing, numerical
+           optimization, Bayesian networks, and numerous other tasks.  In
+           recent years, much of the development has been focused on creating 
+           a broad set of statistical machine learning tools.  However, dlib
+           remains a general purpose library and <a href="howto_contribute.html">welcomes contributions</a> of high
+           quality software components useful in any domain.
+        </p><p>
+         Part of the development philosophy of dlib is a dedication to
+         portability and ease of use.  Therefore, all code in dlib is designed
+         to be as portable as possible and similarly to not require a user to
+         configure or install anything.  To help achieve this, all platform
+         specific code is confined inside the API wrappers.  Everything else is
+         either layered on top of those wrappers or is written in pure ISO
+         standard C++.  Currently the library is known to work on OS X, MS
+         Windows, Linux, Solaris, the BSDs, and HP-UX.  It should work on any
+         POSIX platform but I haven't had the opportunity to test it on any
+         others (if you have access to other platforms and would like to help
+         increase this list then let me know).
+        </p><p>
+         The rest of this page explains everything you need to know to get started using the library.  It 
+         explains where to find the documentation for each object/function and how to interpret
+         what you find there.   For help compiling with dlib check out the <a href="compile.html">how to compile</a>
+        page.  Or if you are having trouble finding where a particular object's documentation is located you may
+        be able to find it by consulting the <a href="term_index.html">index</a>.</p><p>
+         The library is also covered by the very liberal Boost Software License
+         so feel free to use it any way you like.  However, if you use dlib in
+         your research then please cite <a href="faq.html#HowcanIcitedlib">its Journal of Machine Learning Research paper</a> when
+         publishing.
+        </p><p>
+           Finally, I must give some credit to the <a href="http://www.cse.ohio-state.edu/~weide/rsrg/index.html">Reusable
+           Software Research Group</a> at Ohio State since they taught me much
+           of the software engineering techniques used in the creation of this library.  
+        </p><a name="Notation"></a><h1>Notation</h1><p>
+        For the most part I try to document my code in a way that any C++ programmer would understand, 
+        but for the sake of brevity I use some of the following uncommon notation.
+        </p><ul><li><b> kernel, extension, and abstract </b><ul>
+                Each component of the library has a specification which defines its core behavior and interface.  This 
+                specification defines what is called the component's kernel.  Additionally, each component may have any number of 
+                extensions.  An extension is essentially a specification for something that layers functionality on top of the 
+                kernel of a component.  
+                <br><br>  In the naming of files I use the word abstract to indicate that a file
+                contains a specification of a kernel component or extension rather than an actual implementation.
+            </ul><br><li><b>/*! comments like this !*/</b><ul>
+                This is just for "formal comments."  Generally these appear after a function prototype and contain
+                the requires/ensures stuff or at the top of a class and tell you general things about the class. 
+            </ul><br><li><b> requires/ensures/throws </b><ul>
+                These words appear in the formal comment following function prototypes and have the following meanings.
+                <br><br><u>requires</u>:   This defines a list of requirements for calling the function.  These requirements
+                MUST be met or a call to the function has undefined results.   (note that when the checking/debugging modes
+                are enabled on an object then it will throw the dlib::fatal_error exception with fatal_error::type == EBROKEN_ASSERT when the requires clause is
+                broken rather than causing "undefined results")
+
+               <br><br><u>ensures</u>:    This defines what the function does.  It is a list of conditions that will be 
+                true after the function finishes executing.  Note that if an exception is thrown then nothing in the 
+                ensures clause is guaranteed to be true.
+
+               <br><br><u>throws</u>:     This defines what exceptions may be thrown by this function.  It generally
+                tells you why the exception might be thrown.  It also tells you what the function does in this event: 
+                Does it have no effect at all? Does it corrupt any objects?  etc.  
+
+                <br><br>
+                Sometimes these blocks do not appear in the formal comment.  The meanings in these cases are as follows:
+                <br><u>missing requires</u>:   There are no requirements, you may put anything in the function arguments.
+                <br><u>missing ensures</u>:    This means that the effects of the function are unspecified.  This is often used
+                for call backs where the client programmer implements the actual function. 
+                <br><u>missing throws</u>:     This doesn't mean anything.  A function without a throws block
+                might throw exceptions or it might not.
+                                    
+                <br><br>
+                So in summary, the requires clause must always be satisfied, the ensures clause tells you what the 
+                function does when it does <i>not</i> throw or return an error, and the throws clause tells you what happens when the function
+                <i>does</i> throw.
+
+            </ul><br><li><a name="meaning_of_hash"></a><b> meaning of # symbol </b><ul>
+                I use this as a prefix on identifiers to make reference to the value of the identifier "after"
+                some event has occurred.  
+                <br><br>
+                The most common place I use this notation is inside the formal comment following a function prototype.  
+                If the # symbol appears in a requires/ensures/throws block then it means the value of
+                the identifier after the function has finished, otherwise all references to an identifier 
+                refer to its value before the function was called.
+                <br><br>
+                An example will make it clear.
+
+
+                <pre class="code_box"><font color="#3333FF">int</font> <b>funct</b><font color="">(</font>
+<font color="#3333FF">    int</font>&amp; something
+<font color="">);</font>
+<font color="#009900">/*!
+    requires
+        - something &gt; 4     
+    ensures
+        - #some_other_function() == 9
+        - #something == something + 1
+        - returns something
+!*/</font>
+</pre>
+
+                This says that funct() requires that "something" be greater than 4, that funct() will increment "something" 
+                by 1, and funct() returns the original value of something.  It also says that
+                <i>after</i> the call to funct() ends a call to some_other_function() will return the value 9.
+
+            </ul><br><li><a name="CONVENTION"></a><b> CONVENTION </b><ul>
+                This is a section of the formal comment which appears at the top of classes which are 
+                actual implementations (as opposed to specifications).  This section of the comment contains
+                a list of invariants that tell you what the member variables are used for.  It also relates 
+                the state of the member variables to the class interface.
+                <br><br>
+                For example, you might see a line in this section that says "my_size == size()".  This just means
+                that the member variable my_size always contains the value returned by the size() function.
+            </ul><br><li><b> "initial value for its type" </b><ul>
+                I frequently say that after a function executes some variable or argument will have an 
+                initial value for its type.  This makes sense for objects with a user defined constructor,
+                but for anything else not so much.   Therefore the initial value of a type with no user defined
+                constructor is undefined. 
+            </ul></ul><a name="Organization"></a><h1>Organization</h1><p>
+        The library can be thought of as a collection of components.  Each component always consists of
+        at least two separate files, a specification file and an implementation file.  The specification
+        files are the ones that end with _abstract.h.  Each of these specification files don't actually 
+        contain any code and they even have preprocessor directives that prevent any of their contents from 
+        being included.  Their purpose is purely to document a component's interface in a file that isn't
+        cluttered with implementation details the user shouldn't need to know about.  
+        </p><p>
+           The next important concept in dlib organization is multi-implementation components.  That is, 
+           some components provide more than one implementation of what is defined in their specification.  
+           When you use these components you have to identify them with names like <tt>dlib::component::kernel_1a</tt>.
+           Often these components will have just a debugging and non-debugging implementation.  However, many components
+           provide a large number of alternate implementations.  For example, the <a href="compression.html#entropy_encoder_model">entropy_encoder_model</a>
+           has 32 different implementations you can choose from.  
+        </p><ul><li><b>File organization for multi-implementation components</b><ul>
+                Each component gets its own folder and one file in the root of the directory tree.
+                <br><br>
+                I will use the <a href="containers.html#queue">queue</a> object as a typical example and
+                explain what each of its files contain.
+                Below is the directory structure and all the files related to the queue component.  
+
+                <br><br><ul><li><b> file tree </b><ul><li> dlib/
+                        <ul><li> queue.h
+                            <li> queue/
+                            <ul><li> queue_kernel_abstract.h  
+                                <li> queue_kernel_1.h
+                                <li> queue_kernel_2.h
+                                <li> queue_kernel_c.h
+                                <li> queue_sort_abstract.h
+                                <li> queue_sort_1.h
+                            </ul></ul></ul><br><li><a href="dlib/queue.h.html">queue.h</a><ul> This file does not contain any executable code.  All it does is define the typedefs such as 
+                    kernel_1a, kernel_1a_c, etc. for the queue object.  See the <a href="#creating_objects">Creating Objects</a>
+                    section to learn what these typedefs are for.
+                    </ul><li><a href="dlib/queue/queue_kernel_abstract.h.html"> queue_kernel_abstract.h </a><ul> 
+                    This file does not contain any code.  It even has preprocessor directives that prevent
+                    any of its contents from being included.   
+                    <br><br>
+                    The purpose of this file is to define exactly what a queue object does and what its 
+                    interface is.   
+                    </ul><li><a href="dlib/queue/queue_sort_abstract.h.html"> queue_sort_abstract.h </a><ul> 
+                    This file also doesn't contain any code.  Its only purpose is to define the sort
+                    extension to queue objects.  
+                    </ul><li><a href="dlib/queue/queue_kernel_1.h.html"> queue_kernel_1.h </a><ul> 
+                    This file contains an implementation of the queue kernel specification found 
+                    in queue_kernel_abstract.h 
+                    </ul><li><a href="dlib/queue/queue_kernel_2.h.html"> queue_kernel_2.h </a><ul> 
+                    This file contains another implementation of the queue kernel specification found 
+                    in queue_kernel_abstract.h 
+                    </ul><li><a href="dlib/queue/queue_sort_1.h.html"> queue_sort_1.h </a><ul> 
+                    This file contains an implementation of the queue sort extension specification found 
+                    in queue_sort_abstract.h 
+                    </ul><li><a href="dlib/queue/queue_kernel_c.h.html"> queue_kernel_c.h </a><ul> 
+                    This file contains a templated class which wraps any implementation of the queue kernel
+                    specification.  It is used during debugging to check that the requires clauses are never
+                    violated.
+                    </ul></ul></ul></ul><a name="creating_objects"></a><a name="Creating%20Objects"></a><h1>Creating Objects</h1><p>
+        To create many of the objects in this library you need to choose which kernel implementation you would like and if you 
+        want the checking version or any extensions.   
+        </p><p>
+        To make this easy there are header files which define typedefs of all this stuff.  For 
+        example, to create a queue of ints using queue kernel implementation 1 you would type
+        <tt>dlib::queue&lt;int&gt;::kernel_1a my_queue;</tt>.   Or to get the debugging/checking version you 
+        would type <tt>dlib::queue&lt;int&gt;::kernel_1a_c my_queue;</tt>.
+        </p><p>
+        There can be a lot of different typedefs for each component.  You can find a list of them
+        in the section for the component in question.  For the queue component they can be found
+        <a href="containers.html#queue">here</a>.
+        </p><p>
+        None of the above applies to the single-implementation components, that is, anything that doesn't have an "implementations"
+        section in its documentation.  These tools are designed to have only one implementation and thus do not follow the
+        above naming convention.  For example, to create a 
+        <a href="other.html#logger">logger</a> object you would simply type <tt>dlib::logger mylog("name");</tt>. 
+        For the purposes of object creation the API components also appear to be single-implementation.  That is, there is no 
+        need to specify which implementation you want since it is automatically determined by which platform you compile under.
+        Note also that there are no explicit checking versions of these components.  However, there are 
+        <a href="metaprogramming.html#DLIB_ASSERT">DLIB_ASSERT</a> statements that perform checking and you can 
+        enable them by #defining DEBUG or ENABLE_ASSERTS. 
+        </p><a name="Assumptions"></a><h1>Assumptions</h1>
+        There are some restrictions on the behavior of certain objects or functions.  
+        Rather than replicating these restrictions all over the place in my documentation they
+        are listed here.  
+
+        <ul><li><b> global swap() </b><ul>
+        It is assumed that this operator does not throw.  Undefined behavior results if it does.
+        Note that std::swap() for all intrinsics and std::string does not throw.  
+        </ul><br><li><b> operator&lt;() </b><ul>
+        It is assumed that this operator (or std::less or any similar functor supplied by you to the library) 
+        does not throw.  Undefined behavior results if it does.  
+        </ul><br><li><b> dlib::general_hash </b><ul>
+        It is assumed that general_hash does not throw.  Undefined behavior results if it does.
+        This is actually noted in the general hash spec file but I'm listing it here also for good measure.
+
+        </ul></ul><a name="thread_safety"></a><a name="Thread%20Safety"></a><h1>Thread Safety</h1><p>
+        In the library there are three kinds of objects with regards to threading:  
+        <ul><li>Objects which are completely thread safe.  This means that any pattern of access from 
+           multiple threads is safe.</li><li>Objects which are safe to use if no threads touch the same instance, but require access
+           to a particular instance to be serialized via a mutex if it is shared among threads. </li><li>Objects which share some kind of global resource or are reference counted.  This kind of object is
+               extremely thread unfriendly and can only be used in a threaded program with great care. </li></ul></p><p>
+        How do you know which components/objects are thread safe and which aren't?   The rule is that if
+        the specification for the component doesn't mention threading or thread safety then 
+        it is ok to use as long as you serialize access to shared instances.   If the component might have
+        some global resources or be reference counted then the specifications will tell you this. 
+        Lastly if the component is completely thread safe then the specification will tell you this.
+        </p><p>
+           Also note that global functions in dlib are always thread safe. 
+        </p></td></tr></table></div></body></html>

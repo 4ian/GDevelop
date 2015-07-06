@@ -1,0 +1,507 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - lz77_buffer_kernel_2.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2004  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_LZ77_BUFFER_KERNEl_2_
+<font color='#0000FF'>#define</font> DLIB_LZ77_BUFFER_KERNEl_2_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='lz77_buffer_kernel_abstract.h.html'>lz77_buffer_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sliding_buffer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='lz77_buffer_kernel_2'></a>lz77_buffer_kernel_2</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON sliding_buffer
+                sliding_buffer must be an implementation of sliding_buffer/sliding_buffer_kernel_abstract.h
+                and must be instantiated to contain unsigned char data
+
+            INITIAL VALUE
+                history_limit == defined by constructor arguments
+                lookahead_limit == defined by constructor arguments
+                history_size == 0
+                lookahead_size == 0
+                buffer.size() == history_limit + lookahead_limit
+                buffer[i] == 0 for all valid i
+
+                nodes == an array of history_limit-3 nodes
+                id_table == an array of buffer.size() pointers
+                hash_table == an array of buffer.size() pointers and all are set to 0
+                mask == buffer.size() - 1
+                next_free_node == 0
+
+
+            CONVENTION           
+                history_limit == get_history_buffer_limit()
+                lookahead_limit == get_lookahead_buffer_limit()
+                history_size == get_history_buffer_size()
+                lookahead_limit == get_lookahead_buffer_size()
+                              
+                buffer.size() == history_limit + lookahead_limit
+
+                lookahead_buffer(i) == buffer[lookahead_limit-1-i]
+                history_buffer(i) == buffer[lookahead_limit+i]
+
+
+                hash_table[hash(a,b,c,d)] points to the head of a linked list.
+                    Each node in this linked list tells the location in the buffer
+                    of a string that begins with abcd or a string who's first four
+                    letters have the same hash.  The linked list is terminated by a
+                    node with a null next pointer.
+
+                hash_table[i] == 0 if there is no linked list for this element of the hash
+                    table.
+
+                each node in the hash table is allocated from the array nodes.
+                When adding a node to hash_table:
+                    if (if all nodes aren't already in the hash_table) then
+                    {
+                        the next node to use is nodes[next_free_node].                
+                    }
+                    else
+                    {
+                        recycle nodes from the hash_table itself.  This works because
+                        when we add new nodes we also have to remove nodes.
+                    }
+
+                if (there is a node defined with an id of i) then
+                {
+                    if (id_table[i] != 0) then
+                        id_table[i]-&gt;next-&gt;id == i
+                    else
+                        hash_table[some_hash]-&gt;id == i
+                }
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='lz77_buffer_kernel_2'></a>lz77_buffer_kernel_2</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total_limit_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> lookahead_limit_  
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='lz77_buffer_kernel_2'></a>lz77_buffer_kernel_2</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> symbol
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='find_match'></a>find_match</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> index,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> length,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> min_match_length
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_history_buffer_limit'></a>get_history_buffer_limit</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> history_limit; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_lookahead_buffer_limit'></a>get_lookahead_buffer_limit</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> lookahead_limit; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_history_buffer_size'></a>get_history_buffer_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> history_size; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_lookahead_buffer_size'></a>get_lookahead_buffer_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> lookahead_size; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <b><a name='lookahead_buffer'></a>lookahead_buffer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> buffer[lookahead_limit<font color='#5555FF'>-</font><font color='#979000'>1</font><font color='#5555FF'>-</font>index]; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <b><a name='history_buffer'></a>history_buffer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> buffer[lookahead_limit<font color='#5555FF'>+</font>index]; <b>}</b>
+
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='shift_buffers'></a>shift_buffers</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> N
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>shift_buffer</font><font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='hash'></a>hash</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> a,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> b,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> c,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> d
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            ensures
+                - returns a hash of the 4 arguments and the hash is in the range
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> B <font color='#5555FF'>=</font> b <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>3</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> C <font color='#5555FF'>=</font> c <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>6</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> D <font color='#5555FF'>=</font> d <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>9</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> a <font color='#5555FF'>+</font> B;
+            temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> C;
+            temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> D;
+
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>temp<font color='#5555FF'>&amp;</font>mask<font face='Lucida Console'>)</font>; <font color='#009900'>/**/</font>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='shift_buffer'></a>shift_buffer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> N
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - N &lt;= lookahead_size
+            ensuers
+                - #lookahead_size == lookahead_size - N
+                - if (history_size+N &lt; history_limit) then
+                    - #history_size == history_size+N
+                - else
+                    - #history_size == history_limit
+                - for all i where 0 &lt;= i &lt; N:
+                  #history_buffer(N-1-i) == lookahead_buffer(i)
+                - for all i where 0 &lt;= i &lt; #history_size-N:
+                  #history_buffer(N+i) == history_buffer(i)
+                - for all i where 0 &lt;= i &lt; #lookahead_size
+                  #lookahead_buffer(i) == lookahead_buffer(N+i)                
+        !*/</font>
+
+
+
+        <font color='#009900'>// member data        
+</font>        sliding_buffer buffer;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> lookahead_limit;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> history_limit;
+
+        <font color='#0000FF'>struct</font> <b><a name='node'></a>node</b>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> id;
+            node<font color='#5555FF'>*</font> next;
+        <b>}</b>;
+        
+        node<font color='#5555FF'>*</font><font color='#5555FF'>*</font> hash_table;
+        node<font color='#5555FF'>*</font> nodes;
+        node<font color='#5555FF'>*</font><font color='#5555FF'>*</font> id_table;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> next_free_node;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> mask;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> lookahead_size;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> history_size;
+
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='lz77_buffer_kernel_2'></a>lz77_buffer_kernel_2</b><font face='Lucida Console'>(</font>lz77_buffer_kernel_2<font color='#5555FF'>&lt;</font>sliding_buffer<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        lz77_buffer_kernel_2<font color='#5555FF'>&lt;</font>sliding_buffer<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>lz77_buffer_kernel_2<font color='#5555FF'>&lt;</font>sliding_buffer<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;   
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sliding_buffer
+        <font color='#5555FF'>&gt;</font>
+    lz77_buffer_kernel_2<font color='#5555FF'>&lt;</font>sliding_buffer<font color='#5555FF'>&gt;</font>::
+    <b><a name='lz77_buffer_kernel_2'></a>lz77_buffer_kernel_2</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total_limit_,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> lookahead_limit_  
+    <font face='Lucida Console'>)</font> :        
+        lookahead_size<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,       
+        history_size<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        buffer.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>total_limit_<font face='Lucida Console'>)</font>;
+        lookahead_limit <font color='#5555FF'>=</font> lookahead_limit_;
+        history_limit <font color='#5555FF'>=</font> buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> lookahead_limit_;
+
+        nodes <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> node[history_limit<font color='#5555FF'>-</font><font color='#979000'>3</font>];
+
+        <font color='#0000FF'>try</font> <b>{</b> id_table <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> node<font color='#5555FF'>*</font>[buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>]; <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>delete</font> [] nodes; <font color='#0000FF'>throw</font>; <b>}</b>
+
+        <font color='#0000FF'>try</font> <b>{</b> hash_table <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> node<font color='#5555FF'>*</font>[buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>]; <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>delete</font> [] id_table; <font color='#0000FF'>delete</font> [] nodes; <font color='#0000FF'>throw</font>; <b>}</b>
+
+        mask <font color='#5555FF'>=</font> buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        next_free_node <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            
+        node<font color='#5555FF'>*</font><font color='#5555FF'>*</font> start <font color='#5555FF'>=</font> hash_table;
+        node<font color='#5555FF'>*</font><font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> hash_table <font color='#5555FF'>+</font> buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>start <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font>start <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>start;
+        <b>}</b>
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            buffer[i] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sliding_buffer
+        <font color='#5555FF'>&gt;</font>
+    lz77_buffer_kernel_2<font color='#5555FF'>&lt;</font>sliding_buffer<font color='#5555FF'>&gt;</font>::
+    ~<b><a name='lz77_buffer_kernel_2'></a>lz77_buffer_kernel_2</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>      
+    <b>{</b>
+        <font color='#0000FF'>delete</font> [] nodes;
+        <font color='#0000FF'>delete</font> [] hash_table;
+        <font color='#0000FF'>delete</font> [] id_table;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sliding_buffer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> lz77_buffer_kernel_2<font color='#5555FF'>&lt;</font>sliding_buffer<font color='#5555FF'>&gt;</font>::
+    <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        lookahead_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        history_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        next_free_node <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        node<font color='#5555FF'>*</font><font color='#5555FF'>*</font> start <font color='#5555FF'>=</font> hash_table;
+        node<font color='#5555FF'>*</font><font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> hash_table <font color='#5555FF'>+</font> buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>start <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font>start <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>start;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>      
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sliding_buffer
+        <font color='#5555FF'>&gt;</font>      
+    <font color='#0000FF'><u>void</u></font> lz77_buffer_kernel_2<font color='#5555FF'>&lt;</font>sliding_buffer<font color='#5555FF'>&gt;</font>::
+    <b><a name='shift_buffer'></a>shift_buffer</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> N
+    <font face='Lucida Console'>)</font>        
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> old_history_size <font color='#5555FF'>=</font> history_size;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> history_size<font color='#5555FF'>+</font>N;    
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_nodes; <font color='#009900'>// the number of nodes to pull from the nodes array
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> recycled_nodes; <font color='#009900'>// the number of nodes to pull from hash_table
+</font>        lookahead_size <font color='#5555FF'>-</font><font color='#5555FF'>=</font> N;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> history_limit<font face='Lucida Console'>)</font>
+        <b>{</b>               
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>history_size <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>-</font>history_size<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> N<font face='Lucida Console'>)</font>
+                    new_nodes <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>else</font>
+                    new_nodes <font color='#5555FF'>=</font> N <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>-</font>history_size<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                new_nodes <font color='#5555FF'>=</font> N;
+            <b>}</b>
+                
+            recycled_nodes <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            history_size <font color='#5555FF'>=</font> temp;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>history_size <font color='#5555FF'>!</font><font color='#5555FF'>=</font> history_limit<font face='Lucida Console'>)</font>
+            <b>{</b>
+                new_nodes <font color='#5555FF'>=</font> history_limit <font color='#5555FF'>-</font> history_size;
+                recycled_nodes <font color='#5555FF'>=</font> temp <font color='#5555FF'>-</font> history_limit;
+                history_size <font color='#5555FF'>=</font> history_limit;                
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                new_nodes <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                recycled_nodes <font color='#5555FF'>=</font> N;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> lookahead_limit <font color='#5555FF'>+</font> <font color='#979000'>2</font>;
+    
+        <font color='#009900'>// if there are any "new" nodes to add to the hash table 
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>new_nodes <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> stop <font color='#5555FF'>=</font> i <font color='#5555FF'>-</font> new_nodes;             
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; i <font color='#5555FF'>&gt;</font> stop; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                nodes[next_free_node].next <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                nodes[next_free_node].id <font color='#5555FF'>=</font> buffer.<font color='#BB00BB'>get_element_id</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                id_table[nodes[next_free_node].id] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_hash <font color='#5555FF'>=</font> <font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>buffer[i],buffer[i<font color='#5555FF'>-</font><font color='#979000'>1</font>],buffer[i<font color='#5555FF'>-</font><font color='#979000'>2</font>],buffer[i<font color='#5555FF'>-</font><font color='#979000'>3</font>]<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hash_table[new_hash] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    id_table[hash_table[new_hash]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>id] <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>nodes[next_free_node];
+                nodes[next_free_node].next <font color='#5555FF'>=</font> hash_table[new_hash];
+                hash_table[new_hash] <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>nodes[next_free_node];
+
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>next_free_node;                
+            <b>}</b>
+        <b>}</b> <font color='#009900'>// if (new_nodes != 0)
+</font>
+
+    
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> stop <font color='#5555FF'>=</font> i <font color='#5555FF'>-</font> recycled_nodes;     
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> old <font color='#5555FF'>=</font> old_history_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font color='#5555FF'>+</font>lookahead_limit;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; i <font color='#5555FF'>&gt;</font> stop; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>            
+            <font color='#009900'>// find the next node to recycle in hash_table
+</font>            node<font color='#5555FF'>*</font> recycled_node;
+            
+            
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> old_id <font color='#5555FF'>=</font> buffer.<font color='#BB00BB'>get_element_id</font><font face='Lucida Console'>(</font>old<font face='Lucida Console'>)</font>;
+            
+            <font color='#009900'>// find the node with id old_id  
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>id_table[old_id] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> old_hash <font color='#5555FF'>=</font> <font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>buffer[old],buffer[old<font color='#5555FF'>-</font><font color='#979000'>1</font>],buffer[old<font color='#5555FF'>-</font><font color='#979000'>2</font>],buffer[old<font color='#5555FF'>-</font><font color='#979000'>3</font>]<font face='Lucida Console'>)</font>;
+                recycled_node <font color='#5555FF'>=</font> hash_table[old_hash];
+
+                <font color='#009900'>// fill the gap left by removing this node
+</font>                hash_table[old_hash] <font color='#5555FF'>=</font> recycled_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                recycled_node <font color='#5555FF'>=</font> id_table[old_id]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+
+                <font color='#009900'>// fill the gap left by removing this node
+</font>                id_table[old_id]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> recycled_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+            <b>}</b>
+
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>old;
+
+
+
+
+
+
+            recycled_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            recycled_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>id <font color='#5555FF'>=</font> buffer.<font color='#BB00BB'>get_element_id</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+            id_table[recycled_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>id] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_hash <font color='#5555FF'>=</font> <font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>buffer[i],buffer[i<font color='#5555FF'>-</font><font color='#979000'>1</font>],buffer[i<font color='#5555FF'>-</font><font color='#979000'>2</font>],buffer[i<font color='#5555FF'>-</font><font color='#979000'>3</font>]<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hash_table[new_hash] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+                id_table[hash_table[new_hash]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>id] <font color='#5555FF'>=</font> recycled_node;
+
+            recycled_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> hash_table[new_hash];
+            hash_table[new_hash] <font color='#5555FF'>=</font> recycled_node;
+       
+        <b>}</b> <font color='#009900'>// for (; i &gt; stop; --i)
+</font>
+
+
+
+        buffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sliding_buffer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> lz77_buffer_kernel_2<font color='#5555FF'>&lt;</font>sliding_buffer<font color='#5555FF'>&gt;</font>::
+    <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> symbol
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lookahead_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> lookahead_limit<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>shift_buffer</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;            
+        <b>}</b>
+        buffer[lookahead_limit<font color='#5555FF'>-</font><font color='#979000'>1</font><font color='#5555FF'>-</font>lookahead_size] <font color='#5555FF'>=</font> symbol;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>lookahead_size;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sliding_buffer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> lz77_buffer_kernel_2<font color='#5555FF'>&lt;</font>sliding_buffer<font color='#5555FF'>&gt;</font>::
+    <b><a name='find_match'></a>find_match</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> index,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> length,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> min_match_length
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> match_length <font color='#5555FF'>=</font> <font color='#979000'>0</font>;   <font color='#009900'>// the length of the longest match we find
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> match_index <font color='#5555FF'>=</font> <font color='#979000'>0</font>;    <font color='#009900'>// the index of the longest match we find
+</font>
+ 
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> hash_value <font color='#5555FF'>=</font> <font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font><font color='#BB00BB'>lookahead_buffer</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                                              <font color='#BB00BB'>lookahead_buffer</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,
+                                              <font color='#BB00BB'>lookahead_buffer</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>,
+                                              <font color='#BB00BB'>lookahead_buffer</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>
+                                              <font face='Lucida Console'>)</font>;
+
+
+ 
+        node<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> hash_table[hash_value];
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>             
+            <font color='#009900'>// current position in the history buffer
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> hpos <font color='#5555FF'>=</font> buffer.<font color='#BB00BB'>get_element_index</font><font face='Lucida Console'>(</font>temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>id<font face='Lucida Console'>)</font><font color='#5555FF'>-</font>lookahead_limit;  
+            <font color='#009900'>// current position in the lookahead buffer
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> lpos <font color='#5555FF'>=</font> <font color='#979000'>0</font>;             
+
+            <font color='#009900'>// find length of this match
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>history_buffer</font><font face='Lucida Console'>(</font>hpos<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>lookahead_buffer</font><font face='Lucida Console'>(</font>lpos<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>lpos;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hpos <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+                <font color='#5555FF'>-</font><font color='#5555FF'>-</font>hpos;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lpos <font color='#5555FF'>=</font><font color='#5555FF'>=</font> lookahead_size<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;                    
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lpos <font color='#5555FF'>&gt;</font> match_length<font face='Lucida Console'>)</font>
+            <b>{</b>
+                match_length <font color='#5555FF'>=</font> lpos;
+                match_index <font color='#5555FF'>=</font> buffer.<font color='#BB00BB'>get_element_index</font><font face='Lucida Console'>(</font>temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>id<font face='Lucida Console'>)</font><font color='#5555FF'>-</font>lookahead_limit;
+                <font color='#009900'>// if this is the longest possible match then stop looking
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lpos <font color='#5555FF'>=</font><font color='#5555FF'>=</font> lookahead_limit<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+            <b>}</b>
+            
+
+            temp <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+        <b>}</b> <font color='#009900'>// while (temp != 0)
+</font>
+
+
+
+        <font color='#009900'>// if we found a match that was long enough then report it
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>match_length <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> min_match_length<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>shift_buffer</font><font face='Lucida Console'>(</font>match_length<font face='Lucida Console'>)</font>;
+            index <font color='#5555FF'>=</font> match_index;
+            length <font color='#5555FF'>=</font> match_length;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            length <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LZ77_BUFFER_KERNEl_2_
+</font>
+
+</pre></body></html>

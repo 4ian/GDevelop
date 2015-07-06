@@ -1,0 +1,380 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html xmlns:gcse="googleCustomSearch"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="shortcut icon" href="dlib-icon.ico"><meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I="><meta name="google-site-verification" content="DGSSJMKDomaDaDTIRJ8jDkv0YMx9Cz7OESbXHjjr6Jw"><title>dlib C++ Library
+   - Parsing</title><script language="JavaScript">
+
+// ---------------------------------------------
+// --- Name:    Easy DHTML Treeview           --
+// --- Author:  D.D. de Kerf                  --
+// --- Version: 0.2          Date: 13-6-2001  --
+// ---------------------------------------------
+function Toggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "minus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "plus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+function BigToggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigminus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigplus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+</script><style type="text/css">
+   body {margin:0px;}
+   pre {margin:0px;}
+
+   ul.tree  li { list-style: none;  margin-left:10px;} 
+   ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
+   ul.tree  li ul { margin-left:10px; padding:0px; }
+
+   li#term { list-style: none; }
+
+   div.component {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      padding: 0.7em;
+   }
+
+   div.question {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      margin-bottom: 90%;
+      padding: 0.7em;
+   }
+
+   div.function {
+      background-color:white; 
+      border: 2px solid rgb(102,102,255); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.class {
+      background-color:white; 
+      border: 2px solid rgb(255,102,102); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.extension {
+      background-color:#FDFDFD; 
+      border: 1px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.0em;
+      padding: 0.7em;
+   }
+
+   div.logb {
+      text-align:left;
+      padding: 0.0em;
+      float: left;
+      background-color:#c0c0c0; 
+      border: double ; 
+      margin: 0.5em;
+   }
+
+   div.name {
+      float: left;
+   }
+   div.line1 {
+      float:left;
+      width:100%;
+      background-color:#dfdfdf; 
+   }
+   div.line2 {
+      float:left;
+      width:100%;
+   }
+   div.inc {
+      float: right;
+   }
+
+
+   .code_box
+   {
+      color: black;
+      margin: 1em 0.25in;
+      padding: 0.5em;
+      background: rgb(240,240,240);
+      border-top: black dotted 1px;
+      border-left: black dotted 1px;
+      border-right: black solid 2px;
+      border-bottom: black solid 2px;
+   }
+
+
+
+   .bdotted {border-bottom: 1px dotted}
+   .bdashed {border-bottom: 1px dashed}
+   .bsolid {border-bottom: 1px solid}
+   .bdouble {border-bottom: 1px double}
+   .bgroove {border-bottom: 1px groove}
+   .bridge {border-bottom: 1px ridge}
+   .binset {border-bottom: 1px inset}
+   .boutset {border-bottom: 1px outset}
+
+   div.row1 {
+      background-color:#dfdfdf; 
+   }
+   div.row2 {
+      background-color:#f2f2f2; 
+   }
+
+   div.typedefs {
+      margin-left: 1.5em;
+      margin-top: 0.2em;
+      border: 1px dotted;
+      width: 52em;
+   }
+
+   div.tdn {
+      width: 10em;
+   }
+
+   .fullhr {
+      clear: both;
+   }
+
+   body {
+      text-align: center;
+   }
+
+   div.entire_page_header {
+      width:62.5em;  
+      text-align: left;
+      margin-top: 0.4em;
+      margin-left: auto;
+      margin-right: auto;
+   }
+   div.entire_page {
+      width:62.5em;  
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      clear:both;
+   }
+</style></head><body bgcolor="#EDF3EE"><a name="top"></a><div class="entire_page_header"><a href="http://dlib.net"><img src="dlib-logo.png"></a></div><div class="entire_page"><table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px"><tr height="100%"><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="145" height="100%"><tr><td VALIGN="TOP"><b>The Library</b><ul class="tree"><li><a href="algorithms.html">Algorithms</a></li><li><a href="api.html">API Wrappers</a></li><li><a href="bayes.html">Bayesian Nets</a></li><li><a href="compression.html">Compression</a></li><li><a href="containers.html">Containers</a></li><li><a href="graph_tools.html">Graph Tools</a></li><li><a href="imaging.html">Image Processing</a></li><li><a href="linear_algebra.html">Linear Algebra</a></li><li><a href="ml.html">Machine Learning</a></li><li><a href="metaprogramming.html">Metaprogramming</a></li><li><a href="other.html">Miscellaneous</a></li><li><a href="network.html">Networking</a></li><li><a href="optimization.html">Optimization</a></li><li><a href="parsing.html">Parsing</a></li></ul><br><b>Help/Info</b><ul class="tree"><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: C++</u></font></a><ul style="display:none;"><li><a href="3d_point_cloud_ex.cpp.html">3D_Point_Cloud</a></li><li><a href="assignment_learning_ex.cpp.html">Assignment_Learning</a></li><li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li><li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li><li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li><li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li><li><a href="bridge_ex.cpp.html">Bridge</a></li><li><a href="bsp_ex.cpp.html">BSP</a></li><li><a href="svm_c_ex.cpp.html">C-Support_Vector_Machine</a></li><li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li><li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li><li><a href="config_reader_ex.cpp.html">Config_File_Reader</a></li><li><a href="custom_trainer_ex.cpp.html">Custom_Trainers</a></li><li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li><li><a href="empirical_kernel_map_ex.cpp.html">Empirical_Kernel_Map</a></li><li><a href="face_detection_ex.cpp.html">Face_Detection</a></li><li><a href="face_landmark_detection_ex.cpp.html">Face_Landmark_Detection</a></li><li><a href="fhog_ex.cpp.html">FHOG_Feature_Extraction</a></li><li><a href="fhog_object_detector_ex.cpp.html">FHOG_Object_Detection</a></li><li><a href="graph_labeling_ex.cpp.html">Graph_Labeling</a></li><li><a href="gui_api_ex.cpp.html">GUI</a></li><li><a href="hough_transform_ex.cpp.html">Hough_Transform</a></li><li><a href="server_http_ex.cpp.html">HTTP_Server</a></li><li><a href="image_ex.cpp.html">Image</a></li><li><a href="iosockstream_ex.cpp.html">IO Socket Streams</a></li><li><a href="server_iostream_ex.cpp.html">IO Streams Server</a></li><li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li><li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li><li><a href="krr_regression_ex.cpp.html">Kernel_Ridge_Regression</a></li><li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li><li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li><li><a href="krr_classification_ex.cpp.html">KRR_Classification</a></li><li><a href="learning_to_track_ex.cpp.html">Learning_to_Track</a></li><li><a href="max_cost_assignment_ex.cpp.html">Linear_Assignment_Problems</a></li><li><a href="linear_manifold_regularizer_ex.cpp.html">Linear_Manifold_Regularizer</a></li><li><a href="mpc_ex.cpp.html">Linear_Model_Predictive_Control</a></li><li><a href="logger_ex.cpp.html">Logger</a></li><li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li><li><a href="logger_custom_output_ex.cpp.html">Logger_Custom_Output</a></li><li><a href="matrix_ex.cpp.html">Matrix</a></li><li><a href="matrix_expressions_ex.cpp.html">Matrix_Expressions</a></li><li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li><li><a href="model_selection_ex.cpp.html">Model_Selection</a></li><li><a href="multiclass_classification_ex.cpp.html">Multiclass_Classification</a></li><li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li><li><a href="mlp_ex.cpp.html">Neural_Network</a></li><li><a href="least_squares_ex.cpp.html">Non-Linear Least Squares</a></li><li><a href="svm_ex.cpp.html">Nu-Support_Vector_Machine</a></li><li><a href="integrate_function_adapt_simp_ex.cpp.html">Numerical_Integration</a></li><li><a href="object_detector_ex.cpp.html">Object_Detector</a></li><li><a href="object_detector_advanced_ex.cpp.html">Object_Detector_Advanced</a></li><li><a href="one_class_classifiers_ex.cpp.html">One_Class_Classifiers</a></li><li><a href="svm_pegasos_ex.cpp.html">Online_SVM</a></li><li><a href="optimization_ex.cpp.html">Optimization</a></li><li><a href="parallel_for_ex.cpp.html">Parallel_For_Loops</a></li><li><a href="pipe_ex.cpp.html">Pipe</a></li><li><a href="pipe_ex_2.cpp.html">Pipe_2</a></li><li><a href="quantum_computing_ex.cpp.html">Quantum_Computing</a></li><li><a href="queue_ex.cpp.html">Queue</a></li><li><a href="rank_features_ex.cpp.html">Rank_Features</a></li><li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li><li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li><li><a href="running_stats_ex.cpp.html">Running_Stats</a></li><li><a href="sequence_labeler_ex.cpp.html">Sequence_Labeling</a></li><li><a href="sequence_segmenter_ex.cpp.html">Sequence_Segmentation</a></li><li><a href="sockets_ex.cpp.html">Sockets</a></li><li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li><li><a href="svm_sparse_ex.cpp.html">Sparse_Vectors</a></li><li><a href="sqlite_ex.cpp.html">SQLite</a></li><li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li><li><a href="svm_struct_ex.cpp.html">Structural_Support_Vector_Machines</a></li><li><a href="svr_ex.cpp.html">Support_Vector_Regression</a></li><li><a href="surf_ex.cpp.html">SURF</a></li><li><a href="svm_rank_ex.cpp.html">SVM-Rank</a></li><li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li><li><a href="threads_ex.cpp.html">Threads</a></li><li><a href="thread_function_ex.cpp.html">Thread_Function</a></li><li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li><li><a href="timer_ex.cpp.html">Timer</a></li><li><a href="train_object_detector.cpp.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor_ex.cpp.html">Train_Shape_Predictor</a></li><li><a href="using_custom_kernels_ex.cpp.html">Using_Custom_Kernels</a></li><li><a href="video_tracking_ex.cpp.html">Video_Object_Tracking</a></li><li><a href="webcam_face_pose_ex.cpp.html">Webcam_Face_Pose_Estimation</a></li><li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: Python</u></font></a><ul style="display:none;"><li><a href="face_detector.py.html">Face_Detector</a></li><li><a href="face_landmark_detection.py.html">Face_Landmark_Detection</a></li><li><a href="find_candidate_object_locations.py.html">find_candidate_object_locations</a></li><li><a href="max_cost_assignment.py.html">Linear_Assignment_Problems</a></li><li><a href="sequence_segmenter.py.html">Sequence_Segmenter</a></li><li><a href="svm_struct.py.html">Structural_Support_Vector_Machines</a></li><li><a href="svm_rank.py.html">SVM-Rank</a></li><li><a href="train_object_detector.py.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor.py.html">Train_Shape_Predictor</a></li><li><a href="correlation_tracker.py.html">Video_Object_Tracking</a></li></ul></li><li><a href="faq.html">FAQ</a></li><li><a href="index.html">Home</a></li><li><a href="compile.html">How to compile</a></li><li><a href="howto_contribute.html">How to contribute</a></li><li><a href="term_index.html">Index</a></li><li><a href="intro.html">Introduction</a></li><li><a href="license.html">License</a></li><li><a href="python/index.html">Python API</a></li><li><a href="books.html">Suggested Books</a></li></ul><br><b>Current Release</b><ul class="tree"><li><a href="change_log.html">Change Log</a></li><li><a href="release_notes.html">Release Notes</a></li><li>Version: 18.16</li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"><br><br><br><br><br><br><br><br><br>
+      Last Modified:<br>Apr 16, 2014<br><br></td></tr></table></td><td VALIGN="TOP" width="100%" style="border: 1px solid rgb(102,102,102);"><center><h1>Parsing</h1></center><br><br><p>
+      This page documents the objects and functions that in some way deal with parsing or otherwise 
+      manipulating text.  
+      Everything here follows the same conventions as the rest of the library.
+      </p></td><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="150" height="100%"><tr><td VALIGN="TOP"><b>Objects</b><ul class="tree"><li><a href="#base64">base64</a></li><li><a href="#basic_utf8_ifstream">basic_utf8_ifstream</a></li><li><a href="#cmd_line_parser">cmd_line_parser</a></li><li><a href="#config_reader">config_reader</a></li><li><a href="#cpp_pretty_printer">cpp_pretty_printer</a></li><li><a href="#cpp_tokenizer">cpp_tokenizer</a></li><li><a href="#tokenizer">tokenizer</a></li><li><a href="#unichar">unichar</a></li><li><a href="#ustring">ustring</a></li><li><a href="#xml_parser">xml_parser</a></li></ul><br><b>Global Functions</b><ul class="tree"><li><a href="#cast_to_string">cast_to_string</a></li><li><a href="#cast_to_wstring">cast_to_wstring</a></li><li><a href="#convert_utf8_to_utf32">convert_utf8_to_utf32</a></li><li><a href="#is_combining_char">is_combining_char</a></li><li><a href="#left_substr">left_substr</a></li><li><a href="#lpad">lpad</a></li><li><a href="#ltrim">ltrim</a></li><li><a href="#narrow">narrow</a></li><li><a href="#pad">pad</a></li><li><a href="#pad_int_with_zeros">pad_int_with_zeros</a></li><li><a href="#right_substr">right_substr</a></li><li><a href="#rpad">rpad</a></li><li><a href="#rtrim">rtrim</a></li><li><a href="#split">split</a></li><li><a href="#split_on_first">split_on_first</a></li><li><a href="#split_on_last">split_on_last</a></li><li><a href="#strings_equal_ignore_case">strings_equal_ignore_case</a></li><li><a href="#string_assign">string_assign</a></li><li><a href="#string_cast">string_cast</a></li><li><a href="#tolower">tolower</a></li><li><a href="#toupper">toupper</a></li><li><a href="#trim">trim</a></li><li><a href="#wrap_string">wrap_string</a></li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"></td></tr></table></td></tr></table><a name="base64"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">base64</h1><BR><BR>
+                This object allows you to encode and decode data to and from
+                the Base64 Content-Transfer-Encoding defined in section 6.8 of
+                rfc2045.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/base64.h&gt;</tt></font></B><BR><b><a href="dlib/base64/base64_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="file_to_code_ex.cpp.html">file_to_code_ex.cpp</a><br><br><center></center></div></a><a name="basic_utf8_ifstream"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">basic_utf8_ifstream</h1><BR><BR>        
+                This object represents an input file stream much like the
+                normal std::ifstream except that it knows how to read UTF-8 
+                data.  So when you read characters out of this stream it will
+                automatically convert them from the UTF-8 multibyte encoding
+                into a fixed width wide character encoding.
+                
+               <p>
+                  There are also two typedefs of this object.  The first is utf8_wifstream which is a
+                  typedef for wchar_t as the wide character to read into.  The second is utf8_uifstream 
+                  which uses unichar instead of wchar_t.
+               </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/unicode.h&gt;</tt></font></B><BR><b><a href="dlib/unicode/unicode_abstract.h.html#basic_utf8_ifstream"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="cast_to_string"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cast_to_string</h1><BR><BR>        
+            cast_to_string is a templated function which makes it easy to convert arbitrary objects to 
+            std::string strings.  The types supported are any types that can be written to std::ostream via 
+            operator&lt;&lt;.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#cast_to_string"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="cast_to_wstring"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cast_to_wstring</h1><BR><BR>        
+            cast_to_string is a templated function which makes it easy to convert arbitrary objects to 
+            std::wstring strings.  The types supported are any types that can be written to std::wostream via 
+            operator&lt;&lt;.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#cast_to_wstring"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="cmd_line_parser"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cmd_line_parser</h1><BR><BR>
+            This object allows you to easily parse a command line.      Note that the
+            documentation for the <a href="dlib/interfaces/cmd_line_parser_option.h.html">cmd_line_parser_option</a>
+            (the object returned by the parser's .option() function) is in a separate file.
+            <p>
+               Note also that there are standard typedefs for the ASCII and wide character versions of the
+               cmd_line_parser template.  These are the <tt>command_line_parser</tt> and <tt>wcommand_line_parser</tt>
+               types respectively.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/cmd_line_parser.h&gt;</tt></font></B><BR><b><a href="dlib/cmd_line_parser/cmd_line_parser_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="compress_stream_ex.cpp.html">compress_stream_ex.cpp</a>,
+               <a href="train_object_detector.cpp.html">train_object_detector.cpp</a><br><br><br><center><h1>Extensions to cmd_line_parser</h1></center><div class="extension"><a name="get_option"><B><font size="5">get_option</font></B></a><Br><BR>This extension provides a convenience function for accessing the 
+                  options to a command line argument or a <a href="#config_reader">config_reader</a>.  It 
+                  is automatically #included when using the command line parser or config reader.
+                  <BR><BR><b><a href="dlib/cmd_line_parser/get_option_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b></div><center></center></div></a><a name="config_reader"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">config_reader</h1><BR><BR>
+            This object represents something which is intended to be used to read
+                         text configuration files.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/config_reader.h&gt;</tt></font></B><BR><b><a href="dlib/config_reader/config_reader_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="config_reader_ex.cpp.html">config_reader_ex.cpp</a><br><br><br><center><h1>Extensions to config_reader</h1></center><div class="extension"><a name="config_reader_thread_safe"><B><font size="5">config_reader_thread_safe</font></B></a><Br><BR>
+                This object extends a normal config_reader by simply wrapping all 
+                its member functions inside mutex locks to make it safe to use
+                in a threaded program.  
+               <BR><BR><b><a href="dlib/config_reader/config_reader_thread_safe_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b></div><center></center></div></a><a name="convert_utf8_to_utf32"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">convert_utf8_to_utf32</h1><BR><BR>        
+            This is a global function that can convert UTF-8 strings into strings
+            of 32bit unichar characters. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/unicode.h&gt;</tt></font></B><BR><b><a href="dlib/unicode/unicode_abstract.h.html#convert_utf8_to_utf32"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="cpp_pretty_printer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cpp_pretty_printer</h1><BR><BR>
+            This object represents an HTML pretty printer for C++ source code.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/cpp_pretty_printer.h&gt;</tt></font></B><BR><b><a href="dlib/cpp_pretty_printer/cpp_pretty_printer_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/cpp_pretty_printer/cpp_pretty_printer_kernel_1.h.html">cpp_pretty_printer_kernel_1</a>:
+                  <br> 
+                  This is implemented by using the <a href="#cpp_tokenizer">cpp_tokenizer</a> object.  
+                  This is the pretty printer I use on all the source in this library.  It applies a color scheme, turns
+                  include directives such as #include "file.h" into links to file.h.html and puts HTML anchor points
+                  on function and class declarations.  It also looks for comments starting with /*!A and puts an anchor
+                  before the comment using the word following the A as the name of the anchor.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for cpp_pretty_printer_kernel_1</td></tr></table></div></blockquote><blockquote><a href="dlib/cpp_pretty_printer/cpp_pretty_printer_kernel_2.h.html">cpp_pretty_printer_kernel_2</a>:
+                  <br> 
+                  This is implemented by using the <a href="#cpp_tokenizer">cpp_tokenizer</a> object.  
+                  It applies a black and white color scheme suitable 
+                  for printing on a black and white printer.  It also places the document title 
+                  prominently at the top of the pretty printed source file.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for cpp_pretty_printer_kernel_2</td></tr></table></div></blockquote><center></center></div></a><a name="cpp_tokenizer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cpp_tokenizer</h1><BR><BR>
+                This object represents a simple tokenizer for C++ source code. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/cpp_tokenizer.h&gt;</tt></font></B><BR><b><a href="dlib/cpp_tokenizer/cpp_tokenizer_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/cpp_tokenizer/cpp_tokenizer_kernel_1.h.html">cpp_tokenizer_kernel_1</a>:
+                  <br> 
+                  This is implemented by using the <a href="#tokenizer">tokenizer</a> object in the obvious way. 
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for cpp_tokenizer_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><center></center></div></a><a name="is_combining_char"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_combining_char</h1><BR><BR>        
+            This is a global function that can tell you if a character is a Unicode 
+            combining character or not.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/unicode.h&gt;</tt></font></B><BR><b><a href="dlib/unicode/unicode_abstract.h.html#is_combining_char"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="left_substr"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">left_substr</h1><BR><BR>
+            This is a function to return the part of a string to the left of a user supplied delimiter.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#left_substr"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="lpad"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">lpad</h1><BR><BR>
+            This is a function to pad whitespace (or user specified characters) onto the left most end of a string.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#lpad"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="ltrim"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">ltrim</h1><BR><BR>
+            This is a function to remove the whitespace (or user specified characters) from the left most end of a string.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#ltrim"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="narrow"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">narrow</h1><BR><BR>
+            This is a function for converting a string of type std::string or std::wstring 
+    to a plain std::string. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#narrow"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="pad"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">pad</h1><BR><BR>
+            This is a function to pad whitespace (or user specified characters) onto the ends of a string.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#pad"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="pad_int_with_zeros"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">pad_int_with_zeros</h1><BR><BR>        
+            Converts an integer into a string and pads it with leading zeros.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#pad_int_with_zeros"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="right_substr"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">right_substr</h1><BR><BR>
+            This is a function to return the part of a string to the right of a user supplied delimiter.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#right_substr"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="rpad"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rpad</h1><BR><BR>
+            This is a function to pad whitespace (or user specified characters) onto the right most end of a string.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#rpad"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="rtrim"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rtrim</h1><BR><BR>
+            This is a function to remove the whitespace (or user specified characters) from the right most end of a string.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#rtrim"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="split"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">split</h1><BR><BR>
+             Breaks a string into a sequence of substrings delimited
+             by a user specified set of characters.   
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#split"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="split_on_first"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">split_on_first</h1><BR><BR>
+            Breaks a string into two parts.  The split point is selected based
+            on the first occurrence of a delimiter character.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#split_on_first"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="split_on_last"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">split_on_last</h1><BR><BR>
+            Breaks a string into two parts.  The split point is selected based
+            on the last occurrence of a delimiter character.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#split_on_last"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="strings_equal_ignore_case"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">strings_equal_ignore_case</h1><BR><BR>        
+            This is a pair of functions to do a case insensitive comparison between strings.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#strings_equal_ignore_case"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="string_assign"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">string_assign</h1><BR><BR>        
+            string_assign is an object which makes it easy to convert strings to 
+            other types.  The types supported are any types that can be read by the basic_istream operator&gt;&gt;.  It
+            also supports casting between wstring, string, and ustring objects.  Since
+            string_assign is a simple stateless object there is a global instance of it
+            called dlib::sa.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#string_assign"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="config_reader_ex.cpp.html">config_reader_ex.cpp</a><br><br><center></center></div></a><a name="string_cast"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">string_cast</h1><BR><BR>        
+            string_cast is a templated function which makes it easy to convert strings to 
+            other types.  The types supported are any types that can be read by the basic_istream operator&gt;&gt;.  It
+            also supports casting between wstring, string, and ustring objects.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#string_cast"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="tokenizer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">tokenizer</h1><BR><BR>
+            This object represents a simple tokenizer for textual data.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/tokenizer.h&gt;</tt></font></B><BR><b><a href="dlib/tokenizer/tokenizer_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/tokenizer/tokenizer_kernel_1.h.html">tokenizer_kernel_1</a>:
+                  <br> 
+                  This is implemented in the obvious way. 
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for tokenizer_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><center></center></div></a><a name="tolower"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">tolower</h1><BR><BR>
+            This is a function to convert a string to all lowercase.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#tolower"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="toupper"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">toupper</h1><BR><BR>
+            This is a function to convert a string to all uppercase.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#toupper"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="trim"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">trim</h1><BR><BR>
+            This is a function to remove the whitespace (or user specified characters) from the ends of a string.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#trim"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="unichar"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">unichar</h1><BR><BR>        
+            This is a typedef for an unsigned 32bit integer which we use to store
+            Unicode values.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/unicode.h&gt;</tt></font></B><BR><b><a href="dlib/unicode/unicode_abstract.h.html#unichar"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="ustring"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">ustring</h1><BR><BR>        
+            This is a typedef for a std::basic_string&lt;unichar&gt;.  That is, it is a typedef
+            for a string object that stores unichar Unicode characters. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/unicode.h&gt;</tt></font></B><BR><b><a href="dlib/unicode/unicode_abstract.h.html#ustring"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="wrap_string"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">wrap_string</h1><BR><BR>        
+            wrap_string is a function that takes a string and breaks it into a number of
+            lines of a given length.  You can use this to make a string
+            fit nicely into a command prompt window for example.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/string.h&gt;</tt></font></B><BR><b><a href="dlib/string/string_abstract.h.html#wrap_string"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="xml_parser"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">xml_parser</h1><BR><BR>
+            
+                This object represents a simple SAX style event driven XML parser.  
+                It takes its input from an input stream object and sends events to all 
+                registered document_handler and error_handler objects.
+            <br><br>
+            
+            The xml_parser object also uses the interface classes 
+            <a href="dlib/xml_parser/xml_parser_kernel_interfaces.h.html#document_handler">document_handler</a>
+            and 
+            <a href="dlib/xml_parser/xml_parser_kernel_interfaces.h.html#error_handler">error_handler</a>.
+            Subclasses of these classes are passed to the xml_parser which generates events while it's
+            parsing and sends them to the appropriate handler.
+            
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/xml_parser.h&gt;</tt></font></B><BR><b><a href="dlib/xml_parser/xml_parser_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="xml_parser_ex.cpp.html">xml_parser_ex.cpp</a><br><br><center></center></div></a></div></body></html>

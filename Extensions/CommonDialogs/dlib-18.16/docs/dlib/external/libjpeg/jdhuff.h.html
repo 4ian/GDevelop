@@ -1,0 +1,204 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jdhuff.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jdhuff.h
+ *
+ * Copyright (C) 1991-1997, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains declarations for Huffman entropy decoding routines
+ * that are shared between the sequential decoder (jdhuff.c) and the
+ * progressive decoder (jdphuff.c).  No other modules need to see these.
+ */</font>
+
+<font color='#009900'>/* Short forms of external names for systems with brain-damaged linkers. */</font>
+
+<font color='#0000FF'>#ifdef</font> NEED_SHORT_EXTERNAL_NAMES
+<font color='#0000FF'>#define</font> jpeg_make_d_derived_tbl	jMkDDerived
+<font color='#0000FF'>#define</font> jpeg_fill_bit_buffer	jFilBitBuf
+<font color='#0000FF'>#define</font> jpeg_huff_decode	jHufDecode
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* NEED_SHORT_EXTERNAL_NAMES */</font>
+
+
+<font color='#009900'>/* Derived data constructed for each Huffman table */</font>
+
+<font color='#0000FF'>#define</font> HUFF_LOOKAHEAD	<font color='#979000'>8</font>	<font color='#009900'>/* # of bits of lookahead */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#009900'>/* Basic tables: (element [0] of each array is unused) */</font>
+  <font color='#0000FF'><u>long</u></font> maxcode[<font color='#979000'>18</font>];		<font color='#009900'>/* largest code of length k (-1 if none) */</font>
+  <font color='#009900'>/* (maxcode[17] is a sentinel to ensure jpeg_huff_decode terminates) */</font>
+  <font color='#0000FF'><u>long</u></font> valoffset[<font color='#979000'>17</font>];		<font color='#009900'>/* huffval[] offset for codes of length k */</font>
+  <font color='#009900'>/* valoffset[k] = huffval[] index of 1st symbol of code length k, less
+   * the smallest code of length k; so given a code of length k, the
+   * corresponding symbol is huffval[code + valoffset[k]]
+   */</font>
+
+  <font color='#009900'>/* Link to public Huffman table (needed only in jpeg_huff_decode) */</font>
+  JHUFF_TBL <font color='#5555FF'>*</font>pub;
+
+  <font color='#009900'>/* Lookahead tables: indexed by the next HUFF_LOOKAHEAD bits of
+   * the input data stream.  If the next Huffman code is no more
+   * than HUFF_LOOKAHEAD bits long, we can obtain its length and
+   * the corresponding symbol directly from these tables.
+   */</font>
+  <font color='#0000FF'><u>int</u></font> look_nbits[<font color='#979000'>1</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>HUFF_LOOKAHEAD]; <font color='#009900'>/* # bits, or 0 if too long */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> look_sym[<font color='#979000'>1</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>HUFF_LOOKAHEAD]; <font color='#009900'>/* symbol, or unused */</font>
+<b>}</b> d_derived_tbl;
+
+<font color='#009900'>/* Expand a Huffman table definition into the derived format */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_make_d_derived_tbl
+	<b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo, <font color='#0000FF'><u>int</u></font> isDC, <font color='#0000FF'><u>int</u></font> tblno,
+	     d_derived_tbl <font color='#5555FF'>*</font><font color='#5555FF'>*</font> pdtbl<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+<font color='#009900'>/*
+ * Fetching the next N bits from the input stream is a time-critical operation
+ * for the Huffman decoders.  We implement it with a combination of inline
+ * macros and out-of-line subroutines.  Note that N (the number of bits
+ * demanded at one time) never exceeds 15 for JPEG use.
+ *
+ * We read source bytes into get_buffer and dole out bits as needed.
+ * If get_buffer already contains enough bits, they are fetched in-line
+ * by the macros CHECK_BIT_BUFFER and GET_BITS.  When there aren't enough
+ * bits, jpeg_fill_bit_buffer is called; it will attempt to fill get_buffer
+ * as full as possible (not just to the number of bits needed; this
+ * prefetching reduces the overhead cost of calling jpeg_fill_bit_buffer).
+ * Note that jpeg_fill_bit_buffer may return FALSE to indicate suspension.
+ * On TRUE return, jpeg_fill_bit_buffer guarantees that get_buffer contains
+ * at least the requested number of bits --- dummy zeroes are inserted if
+ * necessary.
+ */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>long</u></font> bit_buf_type;	<font color='#009900'>/* type of bit-extraction buffer */</font>
+<font color='#0000FF'>#define</font> BIT_BUF_SIZE  <font color='#979000'>32</font>	<font color='#009900'>/* size of buffer in bits */</font>
+
+<font color='#009900'>/* If long is &gt; 32 bits on your machine, and shifting/masking longs is
+ * reasonably fast, making bit_buf_type be long and setting BIT_BUF_SIZE
+ * appropriately should be a win.  Unfortunately we can't define the size
+ * with something like  #define BIT_BUF_SIZE (sizeof(bit_buf_type)*8)
+ * because not all machines measure sizeof in 8-bit bytes.
+ */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>		<font color='#009900'>/* Bitreading state saved across MCUs */</font>
+  bit_buf_type get_buffer;	<font color='#009900'>/* current bit-extraction buffer */</font>
+  <font color='#0000FF'><u>int</u></font> bits_left;		<font color='#009900'>/* # of unused bits in it */</font>
+<b>}</b> bitread_perm_state;
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>		<font color='#009900'>/* Bitreading working state within an MCU */</font>
+  <font color='#009900'>/* Current data source location */</font>
+  <font color='#009900'>/* We need a copy, rather than munging the original, in case of suspension */</font>
+  <font color='#0000FF'>const</font> JOCTET <font color='#5555FF'>*</font> next_input_byte; <font color='#009900'>/* =&gt; next byte to read from source */</font>
+  <font color='#0000FF'><u>size_t</u></font> bytes_in_buffer;	<font color='#009900'>/* # of bytes remaining in source buffer */</font>
+  <font color='#009900'>/* Bit input buffer --- note these values are kept in register variables,
+   * not in this struct, inside the inner loops.
+   */</font>
+  bit_buf_type get_buffer;	<font color='#009900'>/* current bit-extraction buffer */</font>
+  <font color='#0000FF'><u>int</u></font> bits_left;		<font color='#009900'>/* # of unused bits in it */</font>
+  <font color='#009900'>/* Pointer needed by jpeg_fill_bit_buffer. */</font>
+  j_decompress_ptr cinfo;	<font color='#009900'>/* back link to decompress master record */</font>
+<b>}</b> bitread_working_state;
+
+<font color='#009900'>/* Macros to declare and load/save bitread local variables. */</font>
+<font color='#0000FF'>#define</font> BITREAD_STATE_VARS  \
+	<font color='#0000FF'>register</font> bit_buf_type get_buffer;  \
+	<font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> bits_left;  \
+	bitread_working_state br_state
+
+<font color='#0000FF'>#define</font> BITREAD_LOAD_STATE<font face='Lucida Console'>(</font>cinfop,permstate<font face='Lucida Console'>)</font>  \
+	br_state.cinfo <font color='#5555FF'>=</font> cinfop; \
+	br_state.next_input_byte <font color='#5555FF'>=</font> cinfop<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_input_byte; \
+	br_state.bytes_in_buffer <font color='#5555FF'>=</font> cinfop<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bytes_in_buffer; \
+	get_buffer <font color='#5555FF'>=</font> permstate.get_buffer; \
+	bits_left <font color='#5555FF'>=</font> permstate.bits_left;
+
+<font color='#0000FF'>#define</font> BITREAD_SAVE_STATE<font face='Lucida Console'>(</font>cinfop,permstate<font face='Lucida Console'>)</font>  \
+	cinfop<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_input_byte <font color='#5555FF'>=</font> br_state.next_input_byte; \
+	cinfop<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bytes_in_buffer <font color='#5555FF'>=</font> br_state.bytes_in_buffer; \
+	permstate.get_buffer <font color='#5555FF'>=</font> get_buffer; \
+	permstate.bits_left <font color='#5555FF'>=</font> bits_left
+
+<font color='#009900'>/*
+ * These macros provide the in-line portion of bit fetching.
+ * Use CHECK_BIT_BUFFER to ensure there are N bits in get_buffer
+ * before using GET_BITS, PEEK_BITS, or DROP_BITS.
+ * The variables get_buffer and bits_left are assumed to be locals,
+ * but the state struct might not be (jpeg_huff_decode needs this).
+ *	CHECK_BIT_BUFFER(state,n,action);
+ *		Ensure there are N bits in get_buffer; if suspend, take action.
+ *      val = GET_BITS(n);
+ *		Fetch next N bits.
+ *      val = PEEK_BITS(n);
+ *		Fetch next N bits without removing them from the buffer.
+ *	DROP_BITS(n);
+ *		Discard next N bits.
+ * The value N should be a simple variable, not an expression, because it
+ * is evaluated multiple times.
+ */</font>
+
+<font color='#0000FF'>#define</font> CHECK_BIT_BUFFER<font face='Lucida Console'>(</font>state,nbits,action<font face='Lucida Console'>)</font> \
+	<b>{</b> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bits_left <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>nbits<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>  \
+	    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> <font color='#BB00BB'>jpeg_fill_bit_buffer</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font>,get_buffer,bits_left,nbits<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>  \
+	      <b>{</b> action; <b>}</b>  \
+	    get_buffer <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font>.get_buffer; bits_left <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font>.bits_left; <b>}</b> <b>}</b>
+
+<font color='#0000FF'>#define</font> GET_BITS<font face='Lucida Console'>(</font>nbits<font face='Lucida Console'>)</font> \
+	<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>get_buffer <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font>bits_left <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>nbits<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font face='Lucida Console'>(</font>nbits<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>#define</font> PEEK_BITS<font face='Lucida Console'>(</font>nbits<font face='Lucida Console'>)</font> \
+	<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>get_buffer <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font>bits_left <font color='#5555FF'>-</font>  <font face='Lucida Console'>(</font>nbits<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font face='Lucida Console'>(</font>nbits<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>#define</font> DROP_BITS<font face='Lucida Console'>(</font>nbits<font face='Lucida Console'>)</font> \
+	<font face='Lucida Console'>(</font>bits_left <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>nbits<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>/* Load up the bit buffer to a depth of at least nbits */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> jpeg_fill_bit_buffer
+	<b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>bitread_working_state <font color='#5555FF'>*</font> state, <font color='#0000FF'>register</font> bit_buf_type get_buffer,
+	     <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> bits_left, <font color='#0000FF'><u>int</u></font> nbits<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+<font color='#009900'>/*
+ * Code for extracting next Huffman-coded symbol from input bit stream.
+ * Again, this is time-critical and we make the main paths be macros.
+ *
+ * We use a lookahead table to process codes of up to HUFF_LOOKAHEAD bits
+ * without looping.  Usually, more than 95% of the Huffman codes will be 8
+ * or fewer bits long.  The few overlength codes are handled with a loop,
+ * which need not be inline code.
+ *
+ * Notes about the HUFF_DECODE macro:
+ * 1. Near the end of the data segment, we may fail to get enough bits
+ *    for a lookahead.  In that case, we do it the hard way.
+ * 2. If the lookahead table contains no entry, the next code must be
+ *    more than HUFF_LOOKAHEAD bits long.
+ * 3. jpeg_huff_decode returns -1 if forced to suspend.
+ */</font>
+
+<font color='#0000FF'>#define</font> HUFF_DECODE<font face='Lucida Console'>(</font>result,state,htbl,failaction,slowlabel<font face='Lucida Console'>)</font> \
+<b>{</b> <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> nb, look; \
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bits_left <font color='#5555FF'>&lt;</font> HUFF_LOOKAHEAD<font face='Lucida Console'>)</font> <b>{</b> \
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> <font color='#BB00BB'>jpeg_fill_bit_buffer</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>state,get_buffer,bits_left, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>failaction;<b>}</b> \
+    get_buffer <font color='#5555FF'>=</font> state.get_buffer; bits_left <font color='#5555FF'>=</font> state.bits_left; \
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bits_left <font color='#5555FF'>&lt;</font> HUFF_LOOKAHEAD<font face='Lucida Console'>)</font> <b>{</b> \
+      nb <font color='#5555FF'>=</font> <font color='#979000'>1</font>; <font color='#0000FF'>goto</font> slowlabel; \
+    <b>}</b> \
+  <b>}</b> \
+  look <font color='#5555FF'>=</font> <font color='#BB00BB'>PEEK_BITS</font><font face='Lucida Console'>(</font>HUFF_LOOKAHEAD<font face='Lucida Console'>)</font>; \
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>nb <font color='#5555FF'>=</font> htbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>look_nbits[look]<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b> \
+    <font color='#BB00BB'>DROP_BITS</font><font face='Lucida Console'>(</font>nb<font face='Lucida Console'>)</font>; \
+    result <font color='#5555FF'>=</font> htbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>look_sym[look]; \
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b> \
+    nb <font color='#5555FF'>=</font> HUFF_LOOKAHEAD<font color='#5555FF'>+</font><font color='#979000'>1</font>; \
+slowlabel: \
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>result<font color='#5555FF'>=</font><font color='#BB00BB'>jpeg_huff_decode</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>state,get_buffer,bits_left,htbl,nb<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> \
+	<b>{</b> failaction; <b>}</b> \
+    get_buffer <font color='#5555FF'>=</font> state.get_buffer; bits_left <font color='#5555FF'>=</font> state.bits_left; \
+  <b>}</b> \
+<b>}</b>
+
+<font color='#009900'>/* Out-of-line case for Huffman code fetching */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> jpeg_huff_decode
+	<b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>bitread_working_state <font color='#5555FF'>*</font> state, <font color='#0000FF'>register</font> bit_buf_type get_buffer,
+	     <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> bits_left, d_derived_tbl <font color='#5555FF'>*</font> htbl, <font color='#0000FF'><u>int</u></font> min_bits<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+</pre></body></html>

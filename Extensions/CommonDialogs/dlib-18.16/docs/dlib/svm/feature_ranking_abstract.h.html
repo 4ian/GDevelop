@@ -1,0 +1,139 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - feature_ranking_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_KERNEL_FEATURE_RANKINg_ABSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_KERNEL_FEATURE_RANKINg_ABSTRACT_H_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm_abstract.h.html'>svm_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kcentroid_abstract.h.html'>kcentroid_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../is_kind.h.html'>../is_kind.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type,
+        <font color='#0000FF'>typename</font> sample_matrix_type,
+        <font color='#0000FF'>typename</font> label_matrix_type
+        <font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type::scalar_type<font color='#5555FF'>&gt;</font> <b><a name='rank_features'></a>rank_features</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> kc,
+        <font color='#0000FF'>const</font> sample_matrix_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> label_matrix_type<font color='#5555FF'>&amp;</font> labels,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_features <font color='#5555FF'>=</font> <font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - sample_matrix_type == a matrix or something convertible to a matrix via mat()
+            - label_matrix_type  == a matrix or something convertible to a matrix via mat()
+            - is_binary_classification_problem(samples, labels) == true
+            - kc.train(samples(0)) must be a valid expression.  This means that
+              kc must use a kernel type that is capable of operating on the
+              contents of the samples matrix
+            - 0 &lt; num_features &lt;= samples(0).nr()
+        ensures
+            - Let Class1 denote the centroid of all the samples with labels that are &lt; 0
+            - Let Class2 denote the centroid of all the samples with labels that are &gt; 0
+            - finds a ranking of the features where the best features come first.  This 
+              function does this by computing the distance between the centroid of the Class1 
+              samples and the Class2 samples in kernel defined feature space.
+              Good features are then ones that result in the biggest separation between
+              the two centroids of Class1 and Class2.
+            - Uses the kc object to compute the centroids of the two classes
+            - returns a ranking matrix R where:
+                - R.nr() == num_features
+                - r.nc() == 2
+                - R(i,0) == the index of the ith best feature according to our ranking.
+                  (e.g. samples(n)(R(0,0)) is the best feature from sample(n) and
+                   samples(n)(R(1,0)) is the second best, samples(n)(R(2,0)) the
+                   third best and so on)
+                - R(i,1) == a number that indicates how much separation exists between 
+                  the two centroids when features 0 through i are used.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sample_matrix_type,
+        <font color='#0000FF'>typename</font> label_matrix_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_gamma_with_big_centroid_gap'></a>find_gamma_with_big_centroid_gap</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> sample_matrix_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> label_matrix_type<font color='#5555FF'>&amp;</font> labels,
+        <font color='#0000FF'><u>double</u></font> initial_gamma <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_sv <font color='#5555FF'>=</font> <font color='#979000'>40</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - initial_gamma &gt; 0
+            - num_sv &gt; 0
+            - is_binary_classification_problem(samples, labels) == true
+        ensures
+            - This is a function that tries to pick a reasonable default value for the gamma 
+              parameter of the radial_basis_kernel.  It picks the parameter that gives the 
+              largest separation between the centroids, in kernel feature space, of two classes 
+              of data. It does this using the kcentroid object and it sets the kcentroid up 
+              to use num_sv dictionary vectors.
+            - This function does a search for the best gamma and the search starts with
+              the value given by initial_gamma.  Better initial guesses will give 
+              better results since the routine may get stuck in a local minima.
+            - returns the value of gamma that results in the largest separation.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sample_matrix_type,
+        <font color='#0000FF'>typename</font> label_matrix_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='verbose_find_gamma_with_big_centroid_gap'></a>verbose_find_gamma_with_big_centroid_gap</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> sample_matrix_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> label_matrix_type<font color='#5555FF'>&amp;</font> labels,
+        <font color='#0000FF'><u>double</u></font> initial_gamma <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_sv <font color='#5555FF'>=</font> <font color='#979000'>40</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - initial_gamma &gt; 0
+            - num_sv &gt; 0
+            - is_binary_classification_problem(samples, labels) == true
+        ensures
+            - This function does the same exact thing as the above find_gamma_with_big_centroid_gap()
+              except that it is also verbose in the sense that it will print status messages to
+              standard out during its processing.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='compute_mean_squared_distance'></a>compute_mean_squared_distance</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - vector_type is something with an interface compatible with std::vector.  
+              Additionally, it must in turn contain dlib::matrix types which contain 
+              scalars such as float or double values.
+            - for all valid i: is_vector(samples[i]) == true
+        ensures
+            - computes the average value of the squares of all the pairwise 
+              distances between every element of samples.  
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_KERNEL_FEATURE_RANKINg_ABSTRACT_H_
+</font>
+
+
+
+</pre></body></html>

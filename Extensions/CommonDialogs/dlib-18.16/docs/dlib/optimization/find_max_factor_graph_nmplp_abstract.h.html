@@ -1,0 +1,368 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - find_max_factor_graph_nmplp_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_FIND_MAX_FACTOR_GRAPH_nMPLP_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_FIND_MAX_FACTOR_GRAPH_nMPLP_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='map_problem'></a>map_problem</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a factor graph or graphical model.  In 
+                particular, this object defines the interface a MAP problem on
+                a factor graph must implement if it is to be solved using the 
+                find_max_factor_graph_nmplp() routine defined at the bottom of this file.  
+
+                Note that there is no dlib::map_problem object.  What you are
+                looking at here is simply the interface definition for a map problem.
+                You must implement your own version of this object for the problem
+                you wish to solve and then pass it to the find_max_factor_graph_nmplp() routine.
+
+
+                Note also that a factor graph should not have any nodes which are 
+                neighbors with themselves.  Additionally, the graph is undirected. This
+                mean that if A is a neighbor of B then B must be a neighbor of A for
+                the map problem to be valid.
+
+
+                Finally, note that the "neighbor" relationship between nodes means the
+                following:  Two nodes are neighbors if and only if there is a potential 
+                function (implemented by the factor_value() method) which operates on 
+                the nodes.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>class</font> <b><a name='node_iterator'></a>node_iterator</b>
+        <b>{</b>
+            <font color='#009900'>/*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is a simple forward iterator for iterating over 
+                    the nodes/variables in this factor graph.  
+
+                    Note that you can't dereference the iterator and
+                    obtain a value.  That is, the iterator is opaque to 
+                    the user.  It is used only as an argument to the other 
+                    methods defined in this interface.
+            !*/</font>
+
+        <font color='#0000FF'>public</font>:
+            <b><a name='node_iterator'></a>node_iterator</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - constructs an iterator in an undefined state
+            !*/</font>
+
+            <b><a name='node_iterator'></a>node_iterator</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> node_iterator<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - #*this is a copy of item
+            !*/</font>
+
+            node_iterator<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> node_iterator<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - #*this is a copy of item
+                    - returns #*this
+            !*/</font>
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> node_iterator<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+            <font color='#009900'>/*!
+                ensures
+                    - returns true if *this and item both reference
+                      the same node in the factor graph and false 
+                      otherwise.
+            !*/</font>
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> node_iterator<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - returns false if *this and item both reference
+                      the same node in the factor graph and true 
+                      otherwise.
+            !*/</font>
+
+            node_iterator<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - advances *this to the next node in the factor graph.
+                    - returns a reference to the updated *this
+                      (i.e. this is the ++object form of the increment operator)
+            !*/</font>
+        <b>}</b>;
+
+        <font color='#0000FF'>class</font> <b><a name='neighbor_iterator'></a>neighbor_iterator</b>
+        <b>{</b>
+            <font color='#009900'>/*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is a simple forward iterator for iterating over 
+                    the nodes/variables in this factor graph.  This version
+                    of the iterator is used for iterating over the neighbors
+                    of another node in the graph.
+            !*/</font>
+
+        <font color='#0000FF'>public</font>:
+            <b><a name='neighbor_iterator'></a>neighbor_iterator</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>; 
+            <font color='#009900'>/*!
+                ensures
+                    - constructs an iterator in an undefined state
+            !*/</font>
+
+            <b><a name='neighbor_iterator'></a>neighbor_iterator</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> neighbor_iterator<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - #*this is a copy of item
+            !*/</font>
+
+            neighbor_iterator<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> neighbor_iterator<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - #*this is a copy of item
+                    - returns #*this
+            !*/</font>
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> neighbor_iterator<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+            <font color='#009900'>/*!
+                ensures
+                    - returns true if *this and item both reference
+                      the same node in the factor graph and false 
+                      otherwise.
+            !*/</font>
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> neighbor_iterator<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - returns false if *this and item both reference
+                      the same node in the factor graph and true 
+                      otherwise.
+            !*/</font>
+
+            neighbor_iterator<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>; 
+            <font color='#009900'>/*!
+                ensures
+                    - advances *this to the next node in the factor graph.
+                    - returns a reference to the updated *this
+                      (i.e. this is the ++object form of the increment operator) 
+            !*/</font>
+        <b>}</b>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_nodes'></a>number_of_nodes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of nodes in the factor graph.  Or in other words, 
+                  returns the number of variables in the MAP problem.
+        !*/</font>
+
+        node_iterator <b><a name='begin'></a>begin</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns an iterator to the first node in the graph.  If no such
+                  node exists then returns end().
+        !*/</font>
+
+        node_iterator <b><a name='end'></a>end</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns an iterator to one past the last node in the graph.
+        !*/</font>
+
+        neighbor_iterator <b><a name='begin'></a>begin</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> node_iterator<font color='#5555FF'>&amp;</font> it
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - it == a valid iterator (i.e. it must be in the range [begin(), end()))
+            ensures
+                - returns an iterator to the first neighboring node of the node
+                  referenced by it.  If no such node exists then returns end(it).
+        !*/</font>
+
+        neighbor_iterator <b><a name='begin'></a>begin</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> neighbor_iterator<font color='#5555FF'>&amp;</font> it
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - it == a valid iterator. (i.e. it must be in the range 
+                  [begin(i), end(i)) where i is some valid iterator. ) 
+            ensures
+                - returns an iterator to the first neighboring node of the node
+                  referenced by it.  If no such node exists then returns end(it).
+        !*/</font>
+
+        neighbor_iterator <b><a name='end'></a>end</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> node_iterator<font color='#5555FF'>&amp;</font> it
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - it == a valid iterator (i.e. it must be in the range [begin(), end()))
+            ensures
+                - returns an iterator to one past the last neighboring node of the node
+                  referenced by it.
+        !*/</font>
+
+        neighbor_iterator <b><a name='end'></a>end</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> neighbor_iterator<font color='#5555FF'>&amp;</font> it
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - it == a valid iterator. (i.e. it must be in the range 
+                  [begin(i), end(i)) where i is some valid iterator. ) 
+            ensures
+                - returns an iterator to one past the last neighboring node of the node
+                  referenced by it.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='node_id'></a>node_id</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> node_iterator<font color='#5555FF'>&amp;</font> it
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - it == a valid iterator (i.e. it must be in the range [begin(), end()))
+            ensures
+                - returns a number ID such that:
+                    - 0 &lt;= ID &lt; number_of_nodes()
+                    - ID == a number which uniquely identifies the node pointed to by it.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='node_id'></a>node_id</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> neighbor_iterator<font color='#5555FF'>&amp;</font> it
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - it == a valid iterator. (i.e. it must be in the range 
+                  [begin(i), end(i)) where i is some valid iterator. ) 
+            ensures
+                - returns a number ID such that:
+                    - 0 &lt;= ID &lt; number_of_nodes()
+                    - ID == a number which uniquely identifies the node pointed to by it.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_states'></a>num_states</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> node_iterator<font color='#5555FF'>&amp;</font> it
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - it == a valid iterator (i.e. it must be in the range [begin(), end()))
+            ensures
+                - returns the number of states attainable by the node/variable referenced by it.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_states'></a>num_states</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> neighbor_iterator<font color='#5555FF'>&amp;</font> it
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - it == a valid iterator. (i.e. it must be in the range 
+                  [begin(i), end(i)) where i is some valid iterator. ) 
+            ensures
+                - returns the number of states attainable by the node/variable referenced by it.
+        !*/</font>
+
+        <font color='#009900'>// The next four functions all have the same contract.
+</font>        <font color='#0000FF'><u>double</u></font> <b><a name='factor_value'></a>factor_value</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> node_iterator<font color='#5555FF'>&amp;</font> it1,     <font color='#0000FF'>const</font> node_iterator<font color='#5555FF'>&amp;</font> it2,     <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> s1, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> s2<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#0000FF'><u>double</u></font> <b><a name='factor_value'></a>factor_value</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> neighbor_iterator<font color='#5555FF'>&amp;</font> it1, <font color='#0000FF'>const</font> node_iterator<font color='#5555FF'>&amp;</font> it2,     <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> s1, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> s2<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#0000FF'><u>double</u></font> <b><a name='factor_value'></a>factor_value</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> node_iterator<font color='#5555FF'>&amp;</font> it1,     <font color='#0000FF'>const</font> neighbor_iterator<font color='#5555FF'>&amp;</font> it2, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> s1, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> s2<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#0000FF'><u>double</u></font> <b><a name='factor_value'></a>factor_value</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> neighbor_iterator<font color='#5555FF'>&amp;</font> it1, <font color='#0000FF'>const</font> neighbor_iterator<font color='#5555FF'>&amp;</font> it2, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> s1, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> s2<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - it1 == a valid iterator
+                - it2 == a valid iterator
+                - 0 &lt;= s1 &lt; num_states(it1)
+                - 0 &lt;= s2 &lt; num_states(it2)
+                - it1 and it2 reference nodes which are neighbors in the factor graph
+            ensures
+                - returns the value of the factor/potential function for the given pair of 
+                  nodes, defined by it1 and it2, for the case where they take on the values
+                  s1 and s2 respectively.
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_problem
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_max_factor_graph_nmplp'></a>find_max_factor_graph_nmplp</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> map_problem<font color='#5555FF'>&amp;</font> prob,
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> map_assignment,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter,
+        <font color='#0000FF'><u>double</u></font> eps
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - for all valid i: prob.num_states(i) &gt;= 2
+            - map_problem == an object with an interface compatible with the map_problem
+              object defined at the top of this file.
+            - eps &gt; 0
+        ensures
+            - This function is a tool for approximately solving the given MAP problem in a graphical 
+              model or factor graph with pairwise potential functions.  That is, it attempts 
+              to solve a certain kind of optimization problem which can be defined as follows:
+                 maximize: f(X)
+                 where X is a set of integer valued variables and f(X) can be written as the 
+                 sum of functions which each involve only two variables from X.  In reference 
+                 to the prob object, the nodes in prob represent the variables in X and the 
+                 functions which are summed are represented by prob.factor_value().
+            - #map_assignment == the result of the optimization.   
+            - #map_assignment.size() == prob.number_of_nodes()
+            - for all valid i:
+                - #map_assignment[prob.node_id(i)] &lt; prob.num_states(i)
+                - #map_assignment[prob.node_id(i)] == The approximate MAP assignment for node/variable i.
+            - eps controls the stopping condition, smaller values of eps lead to more accurate 
+              solutions of the relaxed linear program but may take more iterations.  Note that
+              the algorithm will never execute more than max_iter iterations regardless of
+              the setting of eps.
+            - If the graph is tree-structured then this routine always gives the exact solution 
+              to the MAP problem.  However, for graphs with cycles, the solution may be approximate.
+              
+
+            - This function is an implementation of the NMPLP algorithm introduced in the
+              following papers:
+                Fixing Max-Product: Convergent Message Passing Algorithms for MAP LP-Relaxations (2008)
+                by Amir Globerson and Tommi Jaakkola
+
+                Introduction to dual decomposition for inference (2011)
+                by David Sontag, Amir Globerson, and Tommi Jaakkola 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_FIND_MAX_FACTOR_GRAPH_nMPLP_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

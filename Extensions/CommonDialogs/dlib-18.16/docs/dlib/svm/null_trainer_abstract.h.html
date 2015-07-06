@@ -1,0 +1,104 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - null_trainer_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_NULL_TRAINERs_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_NULL_TRAINERs_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='function_abstract.h.html'>function_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> dec_funct_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='null_trainer_type'></a>null_trainer_type</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON dec_funct_type
+                dec_funct_type can be any copyable type that provides the needed 
+                typedefs used below (e.g. kernel_type, scalar_type, etc.).
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a simple tool for turning a decision function 
+                into a trainer object that always returns the original decision
+                function when you try to train with it.  
+
+                dlib contains a few "training post processing" algorithms (e.g. 
+                reduced() and reduced2()).  These tools take in a trainer object,
+                tell it to perform training, and then they take the output decision
+                function and do some kind of post processing to it.  The null_trainer_type 
+                object is useful because you can use it to run an already
+                learned decision function through the training post processing
+                algorithms by turning a decision function into a null_trainer_type
+                and then giving it to a post processor.  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> dec_funct_type::kernel_type kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> dec_funct_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> dec_funct_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> dec_funct_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> dec_funct_type trained_function_type;
+
+        <b><a name='null_trainer_type'></a>null_trainer_type</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - any call to this-&gt;train(x,y) will return a default initialized
+                  dec_funct_type object.
+        !*/</font>
+
+        <b><a name='null_trainer_type'></a>null_trainer_type</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> dec_funct_type<font color='#5555FF'>&amp;</font> dec_funct
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - any call to this-&gt;train(x,y) will always return a copy of
+                  the given dec_funct object.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> dec_funct_type<font color='#5555FF'>&amp;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a copy of the decision function object given to
+                  this object's constructor.
+        !*/</font>
+
+    <b>}</b>; 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> dec_funct_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> null_trainer_type<font color='#5555FF'>&lt;</font>dec_funct_type<font color='#5555FF'>&gt;</font> <b><a name='null_trainer'></a>null_trainer</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> dec_funct_type<font color='#5555FF'>&amp;</font> dec_funct
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> null_trainer_type<font color='#5555FF'>&lt;</font>dec_funct_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>dec_funct<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        ensures
+            - returns a null_trainer_type object that has been instantiated with 
+              the given arguments.  That is, this function returns a null_trainer_type
+              trainer that will return a copy of the given dec_funct object every time 
+              someone calls its train() function.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_NULL_TRAINERs_ABSTRACT_
+</font>
+
+
+</pre></body></html>

@@ -1,0 +1,208 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sliding_buffer_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2004  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SLIDING_BUFFER_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_SLIDING_BUFFER_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/enumerable.h.html'>../interfaces/enumerable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='sliding_buffer'></a>sliding_buffer</b> : <font color='#0000FF'>public</font> enumerable<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T
+                T must have a default constructor
+
+            INITIAL VALUE
+                size() == 0
+
+            ENUMERATION ORDER
+                The enumerator will iterate over the elements of the sliding_buffer in the
+                order (*this)[0], (*this)[1], (*this)[2], ...
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents an array of T objects.  The main
+                feature of this object is its ability to rotate its contents
+                left or right.   An example will make it clear.
+
+                suppose we have the following buffer (assuming T is a char):
+                "some data!"    &lt;-- the data in the buffer
+                 9876543210     &lt;-- the index numbers associated with each character
+
+                applying rotate_left(2) to this buffer would give us
+                "me data!so"
+                 9876543210
+
+                if instead of calling rotate_left we call rotate_right(3) instead we would have
+                "ta!some da"
+                 9876543210                              
+
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> T type;
+
+        <b><a name='sliding_buffer'></a>sliding_buffer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures                
+                - #*this is properly initialized           
+            throws
+                - std::bad_alloc or any exception thrown by T's constructor.
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='sliding_buffer'></a>sliding_buffer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - any resources associated with *this have been released
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this has its initial value
+            throws
+                - std::bad_alloc or any exception thrown by T's constructor.
+                    if this exception is thrown then #*this is unusable 
+                    until clear() is called and succeeds
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> exp_size
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt; exp_size &lt; 32
+            ensures
+                - #size() == 2^exp_size
+                - the value of all elements in the buffer are undefined
+                - #at_start() == true
+            throws
+                - std::bad_alloc or any exception thrown by T's constructor.
+                    if this exception is thrown then #size() == 0
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='rotate_left'></a>rotate_left</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> amount
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - for all i where 0 &lt;= i &lt; size():
+                  (#*this)[i] == (*this)[(i-amount)&amp;(size()-1)]
+                  i.e. rotates the contents of *this left by amount spaces
+                - #at_start() == true
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='rotate_right'></a>rotate_right</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> amount
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - for all i where 0 &lt;= i &lt; size():
+                  (#*this)[i] == (*this)[(i+amount)&amp;(size()-1)]
+                  i.e. rotates the contents of *this right by amount spaces
+                - #at_start() == true
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_element_id'></a>get_element_id</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - index &lt; size()
+            ensures 
+                - returns an element id number that uniquely references the element at 
+                  the given index.  (you can use this id to locate the new position of 
+                  an element after the buffer has been rotated)
+                - returned value is &lt; size()
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_element_index'></a>get_element_index</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> element_id 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            require
+                - element_id &lt; size()
+            ensures
+                - returns the index of the element with the given element_id.
+                  ( (*this)[get_element_index(element_id)] will always refer to the same element
+                  no matter where it has been rotated to)
+                - returned value is &lt; size()
+        !*/</font>
+
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - index &lt; size()
+            ensures
+                - returns a const reference to the element in *this at position index
+        !*/</font>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - index &lt; size()
+            ensures
+                - returns a reference to the element in *this at position index
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            sliding_buffer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font> 
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='sliding_buffer'></a>sliding_buffer</b><font face='Lucida Console'>(</font>sliding_buffer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        sliding_buffer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>sliding_buffer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;      
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        sliding_buffer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        sliding_buffer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        sliding_buffer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SLIDING_BUFFER_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

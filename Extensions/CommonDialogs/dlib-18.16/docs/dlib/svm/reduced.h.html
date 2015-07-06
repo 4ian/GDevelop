@@ -1,0 +1,616 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - reduced.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_REDUCEd_TRAINERS_
+<font color='#0000FF'>#define</font> DLIB_REDUCEd_TRAINERS_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='reduced_abstract.h.html'>reduced_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='function.h.html'>function.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel.h.html'>kernel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kcentroid.h.html'>kcentroid.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='linearly_independent_subset_finder.h.html'>linearly_independent_subset_finder.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../optimization.h.html'>../optimization.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='reduced_decision_function_trainer'></a>reduced_decision_function_trainer</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::kernel_type kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::trained_function_type trained_function_type;
+
+        <b><a name='reduced_decision_function_trainer'></a>reduced_decision_function_trainer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :num_bv<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <b><a name='reduced_decision_function_trainer'></a>reduced_decision_function_trainer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer_,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_sb_ 
+        <font face='Lucida Console'>)</font> :
+            trainer<font face='Lucida Console'>(</font>trainer_<font face='Lucida Console'>)</font>,
+            num_bv<font face='Lucida Console'>(</font>num_sb_<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>num_bv <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                        "<font color='#CC0000'>\t reduced_decision_function_trainer()</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you have given invalid arguments to this function</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_bv: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_bv 
+            <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>num_bv <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                        "<font color='#CC0000'>\t reduced_decision_function_trainer::train(x,y)</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You have tried to use an uninitialized version of this object</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_bv: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_bv <font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>do_train</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>y<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='do_train'></a>do_train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// get the decision function object we are going to try and approximate
+</font>            <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dec_funct <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>;
+            
+            <font color='#009900'>// now find a linearly independent subset of the training points of num_bv points.
+</font>            linearly_independent_subset_finder<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>lisf</font><font face='Lucida Console'>(</font>dec_funct.kernel_function, num_bv<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>fill_lisf</font><font face='Lucida Console'>(</font>lisf, x<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// The next few statements just find the best weights with which to approximate 
+</font>            <font color='#009900'>// the dec_funct object with the smaller set of vectors in the lisf dictionary.  This
+</font>            <font color='#009900'>// is really just a simple application of some linear algebra.  For the details 
+</font>            <font color='#009900'>// see page 554 of Learning with kernels by Scholkopf and Smola where they talk 
+</font>            <font color='#009900'>// about "Optimal Expansion Coefficients."
+</font>
+            <font color='#0000FF'>const</font> kernel_type <font color='#BB00BB'>kern</font><font face='Lucida Console'>(</font>dec_funct.kernel_function<font face='Lucida Console'>)</font>;
+
+            matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font> alpha;
+
+            alpha <font color='#5555FF'>=</font> lisf.<font color='#BB00BB'>get_inv_kernel_marix</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern,lisf,dec_funct.basis_vectors<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>dec_funct.alpha<font face='Lucida Console'>)</font>;
+
+            decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>new_df</font><font face='Lucida Console'>(</font>alpha, 
+                                                  <font color='#979000'>0</font>,
+                                                  kern, 
+                                                  lisf.<font color='#BB00BB'>get_dictionary</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now we have to figure out what the new bias should be.  It might be a little
+</font>            <font color='#009900'>// different since we just messed with all the weights and vectors.
+</font>            <font color='#0000FF'><u>double</u></font> bias <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> x.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                bias <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>new_df</font><font face='Lucida Console'>(</font><font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>dec_funct</font><font face='Lucida Console'>(</font><font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            
+            new_df.b <font color='#5555FF'>=</font> bias<font color='#5555FF'>/</font>x.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> new_df;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        trainer_type trainer;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_bv; 
+
+
+    <b>}</b>; <font color='#009900'>// end of class reduced_decision_function_trainer
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> trainer_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> reduced_decision_function_trainer<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font> <b><a name='reduced'></a>reduced</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_bv
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>num_bv <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                    "<font color='#CC0000'>\tconst reduced_decision_function_trainer reduced()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you have given invalid arguments to this function</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_bv: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_bv 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> reduced_decision_function_trainer<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>trainer, num_bv<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> red_impl
+    <b>{</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='objective'></a>objective</b>
+        <b>{</b>
+            <font color='#009900'>/*
+                This object represents the objective function we will try to
+                minimize in approximate_distance_function().  
+
+                The objective is the distance, in kernel induced feature space, between
+                the original distance function and the approximated version.
+
+            */</font>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>public</font>:
+            <b><a name='objective'></a>objective</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> distance_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dist_funct_,
+                matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b_,
+                matrix<font color='#5555FF'>&lt;</font>sample_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> out_vectors_
+            <font face='Lucida Console'>)</font> :
+                dist_funct<font face='Lucida Console'>(</font>dist_funct_<font face='Lucida Console'>)</font>,
+                b<font face='Lucida Console'>(</font>b_<font face='Lucida Console'>)</font>,
+                out_vectors<font face='Lucida Console'>(</font>out_vectors_<font face='Lucida Console'>)</font>
+            <b>{</b>
+            <b>}</b>
+
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>scalar_type, <font color='#979000'>0</font>, <font color='#979000'>1</font>, mem_manager_type<font color='#5555FF'>&gt;</font> <b><a name='state_to_vector'></a>state_to_vector</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <font color='#009900'>/*!
+                ensures
+                    - returns a vector that contains all the information necessary to
+                      reproduce the current state of the approximated distance function
+            !*/</font>
+            <b>{</b>
+                matrix<font color='#5555FF'>&lt;</font>scalar_type, <font color='#979000'>0</font>, <font color='#979000'>1</font>, mem_manager_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>z</font><font face='Lucida Console'>(</font>b.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> out_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>out_vectors</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>z</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>b</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+                <b>}</b>
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> out_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>out_vectors</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>z</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>out_vectors</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font>;
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'>return</font> z;
+            <b>}</b>
+
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='vector_to_state'></a>vector_to_state</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>scalar_type, <font color='#979000'>0</font>, <font color='#979000'>1</font>, mem_manager_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> z
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <font color='#009900'>/*!
+                requires
+                    - z came from the state_to_vector() function or has a compatible format
+                ensures
+                    - loads the vector z into the state variables of the approximate
+                      distance function (i.e. b and out_vectors)
+            !*/</font>
+            <b>{</b>
+                <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>b</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>z</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+                <b>}</b>
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> out_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>out_vectors</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>out_vectors</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>z</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>scalar_type, <font color='#979000'>0</font>, <font color='#979000'>1</font>, mem_manager_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> z
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <font color='#009900'>/*!
+                ensures
+                    - loads the current approximate distance function with z
+                    - returns the distance between the original distance function
+                      and the approximate one.
+            !*/</font>
+            <b>{</b>
+                <font color='#BB00BB'>vector_to_state</font><font face='Lucida Console'>(</font>z<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> kernel_type <font color='#BB00BB'>k</font><font face='Lucida Console'>(</font>dist_funct.<font color='#BB00BB'>get_kernel</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'><u>double</u></font> temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> out_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> dist_funct.<font color='#BB00BB'>get_basis_vectors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        temp <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>b</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>dist_funct.<font color='#BB00BB'>get_alpha</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>k</font><font face='Lucida Console'>(</font><font color='#BB00BB'>out_vectors</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>, dist_funct.<font color='#BB00BB'>get_basis_vectors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                temp <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> out_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> out_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>b</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>b</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>k</font><font face='Lucida Console'>(</font><font color='#BB00BB'>out_vectors</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>, <font color='#BB00BB'>out_vectors</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#0000FF'>return</font> temp <font color='#5555FF'>+</font> dist_funct.<font color='#BB00BB'>get_squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#0000FF'>const</font> distance_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dist_funct;
+            matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b;
+            matrix<font color='#5555FF'>&lt;</font>sample_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> out_vectors;
+
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='objective_derivative'></a>objective_derivative</b>
+        <b>{</b>
+            <font color='#009900'>/*!
+                This object represents the derivative of the objective object
+            !*/</font>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>public</font>:
+
+
+            <b><a name='objective_derivative'></a>objective_derivative</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> distance_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dist_funct_,
+                matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b_,
+                matrix<font color='#5555FF'>&lt;</font>sample_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> out_vectors_
+            <font face='Lucida Console'>)</font> :
+                dist_funct<font face='Lucida Console'>(</font>dist_funct_<font face='Lucida Console'>)</font>,
+                b<font face='Lucida Console'>(</font>b_<font face='Lucida Console'>)</font>,
+                out_vectors<font face='Lucida Console'>(</font>out_vectors_<font face='Lucida Console'>)</font>
+            <b>{</b>
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='vector_to_state'></a>vector_to_state</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>scalar_type, <font color='#979000'>0</font>, <font color='#979000'>1</font>, mem_manager_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> z
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <font color='#009900'>/*!
+                requires
+                    - z came from the state_to_vector() function or has a compatible format
+                ensures
+                    - loads the vector z into the state variables of the approximate
+                      distance function (i.e. b and out_vectors)
+            !*/</font>
+            <b>{</b>
+                <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>b</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>z</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+                <b>}</b>
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> out_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>out_vectors</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>out_vectors</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>z</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>scalar_type, <font color='#979000'>0</font>, <font color='#979000'>1</font>, mem_manager_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> z
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <font color='#009900'>/*!
+                ensures
+                    - loads the current approximate distance function with z
+                    - returns the derivative of the distance between the original 
+                      distance function and the approximate one.
+            !*/</font>
+            <b>{</b>
+                <font color='#BB00BB'>vector_to_state</font><font face='Lucida Console'>(</font>z<font face='Lucida Console'>)</font>;
+                res.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>z.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>set_all_elements</font><font face='Lucida Console'>(</font>res,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> kernel_type <font color='#BB00BB'>k</font><font face='Lucida Console'>(</font>dist_funct.<font color='#BB00BB'>get_kernel</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> kernel_derivative<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>K_der</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// first compute the gradient for the beta weights
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> out_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> out_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>res</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>b</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>k</font><font face='Lucida Console'>(</font><font color='#BB00BB'>out_vectors</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>, <font color='#BB00BB'>out_vectors</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> out_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> dist_funct.<font color='#BB00BB'>get_basis_vectors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>res</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> dist_funct.<font color='#BB00BB'>get_alpha</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>k</font><font face='Lucida Console'>(</font><font color='#BB00BB'>out_vectors</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>, dist_funct.<font color='#BB00BB'>get_basis_vectors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+                    <b>}</b>
+                <b>}</b>
+
+
+                <font color='#009900'>// now compute the gradient of the actual vectors that go into the kernel functions
+</font>                <font color='#0000FF'><u>long</u></font> pos <font color='#5555FF'>=</font> out_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> <font color='#BB00BB'>out_vectors</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                temp.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>num,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> out_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>set_all_elements</font><font face='Lucida Console'>(</font>temp,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> out_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>b</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>K_der</font><font face='Lucida Console'>(</font><font color='#BB00BB'>out_vectors</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>, <font color='#BB00BB'>out_vectors</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> dist_funct.<font color='#BB00BB'>get_basis_vectors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        temp <font color='#5555FF'>-</font><font color='#5555FF'>=</font> dist_funct.<font color='#BB00BB'>get_alpha</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>K_der</font><font face='Lucida Console'>(</font>dist_funct.<font color='#BB00BB'>get_basis_vectors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>, <font color='#BB00BB'>out_vectors</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    <font color='#009900'>// store the gradient for out_vectors(i) into result in the proper spot
+</font>                    <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>res,pos,<font color='#979000'>0</font>,num,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>b</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>temp;
+                    pos <font color='#5555FF'>+</font><font color='#5555FF'>=</font> num;
+                <b>}</b>
+
+
+                res <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+                <font color='#0000FF'>return</font> res;
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#0000FF'>mutable</font> matrix<font color='#5555FF'>&lt;</font>scalar_type, <font color='#979000'>0</font>, <font color='#979000'>1</font>, mem_manager_type<font color='#5555FF'>&gt;</font> res;
+            <font color='#0000FF'>mutable</font> sample_type temp;
+
+            <font color='#0000FF'>const</font> distance_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dist_funct;
+            matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b;
+            matrix<font color='#5555FF'>&lt;</font>sample_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> out_vectors;
+
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K,
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    distance_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font> <b><a name='approximate_distance_function'></a>approximate_distance_function</b> <font face='Lucida Console'>(</font>
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> distance_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> target,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> starting_basis
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>target.<font color='#BB00BB'>get_basis_vectors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    starting_basis.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                    "<font color='#CC0000'>\t  distance_function approximate_distance_function()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t target.get_basis_vectors().size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> target.<font color='#BB00BB'>get_basis_vectors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t starting_basis.size():             </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> starting_basis.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> red_impl;
+        <font color='#009900'>// The next few statements just find the best weights with which to approximate 
+</font>        <font color='#009900'>// the target object with the set of basis vectors in starting_basis.  This
+</font>        <font color='#009900'>// is really just a simple application of some linear algebra.  For the details 
+</font>        <font color='#009900'>// see page 554 of Learning with kernels by Scholkopf and Smola where they talk 
+</font>        <font color='#009900'>// about "Optimal Expansion Coefficients."
+</font>
+        <font color='#0000FF'>const</font> K <font color='#BB00BB'>kern</font><font face='Lucida Console'>(</font>target.<font color='#BB00BB'>get_kernel</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::mem_manager_type mem_manager_type;
+
+        matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font> beta;
+
+        <font color='#009900'>// Now we compute the fist approximate distance function.  
+</font>        beta <font color='#5555FF'>=</font> <font color='#BB00BB'>pinv</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern,starting_basis<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font>
+            <font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern,starting_basis,target.<font color='#BB00BB'>get_basis_vectors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>target.<font color='#BB00BB'>get_alpha</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        matrix<font color='#5555FF'>&lt;</font>sample_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>out_vectors</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>starting_basis<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Now setup to do a global optimization of all the parameters in the approximate 
+</font>        <font color='#009900'>// distance function.  
+</font>        <font color='#0000FF'>const</font> objective<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>obj</font><font face='Lucida Console'>(</font>target, beta, out_vectors<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> objective_derivative<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>obj_der</font><font face='Lucida Console'>(</font>target, beta, out_vectors<font face='Lucida Console'>)</font>;
+        matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>opt_starting_point</font><font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>state_to_vector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// perform a full optimization of all the parameters (i.e. both beta and the basis vectors together)
+</font>        <font color='#BB00BB'>find_min</font><font face='Lucida Console'>(</font><font color='#BB00BB'>lbfgs_search_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>,
+                 stop_strategy,
+                 obj, obj_der, opt_starting_point, <font color='#979000'>0</font><font face='Lucida Console'>)</font>; 
+
+        <font color='#009900'>// now make sure that the final optimized value is loaded into the beta and
+</font>        <font color='#009900'>// out_vectors matrices
+</font>        obj.<font color='#BB00BB'>vector_to_state</font><font face='Lucida Console'>(</font>opt_starting_point<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Do a final reoptimization of beta just to make sure it is optimal given the new
+</font>        <font color='#009900'>// set of basis vectors.
+</font>        beta <font color='#5555FF'>=</font> <font color='#BB00BB'>pinv</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern,out_vectors<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern,out_vectors,target.<font color='#BB00BB'>get_basis_vectors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>target.<font color='#BB00BB'>get_alpha</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// It is possible that some of the beta weights will be very close to zero.  Lets remove
+</font>        <font color='#009900'>// the basis vectors with these essentially zero weights.
+</font>        <font color='#0000FF'>const</font> scalar_type eps <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>beta<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>std::numeric_limits<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> beta.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// if beta(i) is zero (but leave at least one beta no matter what)
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>beta</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> eps <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> beta.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                beta <font color='#5555FF'>=</font> <font color='#BB00BB'>remove_row</font><font face='Lucida Console'>(</font>beta, i<font face='Lucida Console'>)</font>;
+                out_vectors <font color='#5555FF'>=</font> <font color='#BB00BB'>remove_row</font><font face='Lucida Console'>(</font>out_vectors, i<font face='Lucida Console'>)</font>;
+                <font color='#5555FF'>-</font><font color='#5555FF'>-</font>i;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> distance_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>beta, kern, out_vectors<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='reduced_decision_function_trainer2'></a>reduced_decision_function_trainer2</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::kernel_type kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::trained_function_type trained_function_type;
+
+        <b><a name='reduced_decision_function_trainer2'></a>reduced_decision_function_trainer2</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : num_bv<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <b><a name='reduced_decision_function_trainer2'></a>reduced_decision_function_trainer2</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer_,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_sb_,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> eps_ <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>3</font>
+        <font face='Lucida Console'>)</font> :
+            trainer<font face='Lucida Console'>(</font>trainer_<font face='Lucida Console'>)</font>,
+            num_bv<font face='Lucida Console'>(</font>num_sb_<font face='Lucida Console'>)</font>,
+            eps<font face='Lucida Console'>(</font>eps_<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_matrix<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>num_bv <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> eps <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                        "<font color='#CC0000'>\t reduced_decision_function_trainer2()</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you have given invalid arguments to this function</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_bv: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_bv 
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> eps 
+            <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>num_bv <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                        "<font color='#CC0000'>\t reduced_decision_function_trainer2::train(x,y)</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You have tried to use an uninitialized version of this object</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_bv: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_bv <font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>do_train</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>y<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='do_train'></a>do_train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// get the decision function object we are going to try and approximate
+</font>            <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dec_funct <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> kernel_type <font color='#BB00BB'>kern</font><font face='Lucida Console'>(</font>dec_funct.kernel_function<font face='Lucida Console'>)</font>;
+            
+            <font color='#009900'>// now find a linearly independent subset of the training points of num_bv points.
+</font>            linearly_independent_subset_finder<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>lisf</font><font face='Lucida Console'>(</font>kern, num_bv<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>fill_lisf</font><font face='Lucida Console'>(</font>lisf,x<font face='Lucida Console'>)</font>;
+
+            distance_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> approx, target;
+            target <font color='#5555FF'>=</font> dec_funct;
+            approx <font color='#5555FF'>=</font> <font color='#BB00BB'>approximate_distance_function</font><font face='Lucida Console'>(</font><font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font>eps<font face='Lucida Console'>)</font>, target, lisf<font face='Lucida Console'>)</font>;
+
+            decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>new_df</font><font face='Lucida Console'>(</font>approx.<font color='#BB00BB'>get_alpha</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+                                                  <font color='#979000'>0</font>,
+                                                  kern, 
+                                                  approx.<font color='#BB00BB'>get_basis_vectors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now we have to figure out what the new bias should be.  It might be a little
+</font>            <font color='#009900'>// different since we just messed with all the weights and vectors.
+</font>            <font color='#0000FF'><u>double</u></font> bias <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> x.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                bias <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>new_df</font><font face='Lucida Console'>(</font><font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>dec_funct</font><font face='Lucida Console'>(</font><font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            
+            new_df.b <font color='#5555FF'>=</font> bias<font color='#5555FF'>/</font>x.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> new_df;
+
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        trainer_type trainer;
+        <font color='#0000FF'><u>long</u></font> num_bv;
+        <font color='#0000FF'><u>double</u></font> eps;
+
+
+    <b>}</b>; <font color='#009900'>// end of class reduced_decision_function_trainer2
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> trainer_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> reduced_decision_function_trainer2<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font> <b><a name='reduced2'></a>reduced2</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_bv,
+        <font color='#0000FF'><u>double</u></font> eps <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>3</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> trainer_type::sample_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>num_bv <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> eps <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                    "<font color='#CC0000'>\tconst reduced_decision_function_trainer2 reduced2()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you have given invalid arguments to this function</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_bv: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_bv 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> eps 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> reduced_decision_function_trainer2<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>trainer, num_bv, eps<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_REDUCEd_TRAINERS_
+</font>
+
+</pre></body></html>

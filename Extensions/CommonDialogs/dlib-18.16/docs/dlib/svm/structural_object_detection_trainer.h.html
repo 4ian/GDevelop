@@ -1,0 +1,405 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - structural_object_detection_trainer.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_STRUCTURAL_OBJECT_DETECTION_TRAiNER_Hh_
+<font color='#0000FF'>#define</font> DLIB_STRUCTURAL_OBJECT_DETECTION_TRAiNER_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='structural_object_detection_trainer_abstract.h.html'>structural_object_detection_trainer_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../optimization.h.html'>../optimization.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='structural_svm_object_detection_problem.h.html'>structural_svm_object_detection_problem.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/object_detector.h.html'>../image_processing/object_detector.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/box_overlap_testing.h.html'>../image_processing/box_overlap_testing.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/full_object_detection.h.html'>../image_processing/full_object_detection.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_scanner_type,
+        <font color='#0000FF'>typename</font> svm_struct_prob_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='configure_nuclear_norm_regularizer'></a>configure_nuclear_norm_regularizer</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_scanner_type<font color='#5555FF'>&amp;</font>,
+        svm_struct_prob_type<font color='#5555FF'>&amp;</font> 
+    <font face='Lucida Console'>)</font>
+    <b>{</b> 
+        <font color='#009900'>// does nothing by default.  Specific scanner types overload this function to do
+</font>        <font color='#009900'>// whatever is appropriate.
+</font>    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_scanner_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='structural_object_detection_trainer'></a>structural_object_detection_trainer</b> : noncopyable
+    <b>{</b>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>double</u></font> scalar_type;
+        <font color='#0000FF'>typedef</font> default_memory_manager mem_manager_type;
+        <font color='#0000FF'>typedef</font> object_detector<font color='#5555FF'>&lt;</font>image_scanner_type<font color='#5555FF'>&gt;</font> trained_function_type;
+
+
+        <font color='#0000FF'>explicit</font> <b><a name='structural_object_detection_trainer'></a>structural_object_detection_trainer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_scanner_type<font color='#5555FF'>&amp;</font> scanner_
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>scanner_.<font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t structural_object_detection_trainer::structural_object_detection_trainer(scanner_)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You can't have zero detection templates</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            C <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            eps <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>;
+            num_threads <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+            max_cache_size <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+            match_eps <font color='#5555FF'>=</font> <font color='#979000'>0.5</font>;
+            loss_per_missed_target <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            loss_per_false_alarm <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            scanner.<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>scanner_<font face='Lucida Console'>)</font>;
+
+            auto_overlap_tester <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> image_scanner_type<font color='#5555FF'>&amp;</font> <b><a name='get_scanner'></a>get_scanner</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> scanner;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='auto_set_overlap_tester'></a>auto_set_overlap_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#0000FF'>return</font> auto_overlap_tester; 
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_overlap_tester'></a>set_overlap_tester</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> test_box_overlap<font color='#5555FF'>&amp;</font> tester
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            overlap_tester <font color='#5555FF'>=</font> tester;
+            auto_overlap_tester <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        test_box_overlap <b><a name='get_overlap_tester'></a>get_overlap_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>auto_set_overlap_tester</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+                "<font color='#CC0000'>\t test_box_overlap structural_object_detection_trainer::get_overlap_tester()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You can't call this function if the overlap tester is generated dynamically.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> overlap_tester;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_num_threads'></a>set_num_threads</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            num_threads <font color='#5555FF'>=</font> num;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_threads'></a>get_num_threads</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> num_threads;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_epsilon'></a>set_epsilon</b> <font face='Lucida Console'>(</font>
+            scalar_type eps_
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>eps_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t void structural_object_detection_trainer::set_epsilon()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps_ must be greater than 0</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps_: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> eps_ 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            eps <font color='#5555FF'>=</font> eps_;
+        <b>}</b>
+
+        scalar_type <b><a name='get_epsilon'></a>get_epsilon</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> eps; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_cache_size'></a>set_max_cache_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_size
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            max_cache_size <font color='#5555FF'>=</font> max_size;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_cache_size'></a>get_max_cache_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> max_cache_size; 
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_verbose'></a>be_verbose</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_quiet'></a>be_quiet</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_oca'></a>set_oca</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> oca<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            solver <font color='#5555FF'>=</font> item;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> oca <b><a name='get_oca'></a>get_oca</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> solver;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_c'></a>set_c</b> <font face='Lucida Console'>(</font>
+            scalar_type C_ 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>C_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t void structural_object_detection_trainer::set_c()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t C_ must be greater than 0</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t C_:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C_ 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            C <font color='#5555FF'>=</font> C_;
+        <b>}</b>
+
+        scalar_type <b><a name='get_c'></a>get_c</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> C;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_match_eps'></a>set_match_eps</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> eps
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font> eps <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> eps <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font>, 
+                "<font color='#CC0000'>\t void structural_object_detection_trainer::set_match_eps(eps)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function </font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> eps 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            match_eps <font color='#5555FF'>=</font> eps;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_match_eps'></a>get_match_eps</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> match_eps;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_loss_per_missed_target'></a>get_loss_per_missed_target</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> loss_per_missed_target;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_loss_per_missed_target'></a>set_loss_per_missed_target</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> loss
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>loss <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>, 
+                "<font color='#CC0000'>\t void structural_object_detection_trainer::set_loss_per_missed_target(loss)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function </font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t loss: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> loss
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            loss_per_missed_target <font color='#5555FF'>=</font> loss;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_loss_per_false_alarm'></a>get_loss_per_false_alarm</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> loss_per_false_alarm;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_loss_per_false_alarm'></a>set_loss_per_false_alarm</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> loss
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>loss <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>, 
+                "<font color='#CC0000'>\t void structural_object_detection_trainer::set_loss_per_false_alarm(loss)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function </font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t loss: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> loss
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            loss_per_false_alarm <font color='#5555FF'>=</font> loss;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_array_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> trained_function_type <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_array_type<font color='#5555FF'>&amp;</font> images,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> truth_object_detections
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>empty_ignore</font><font face='Lucida Console'>(</font>images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>train_impl</font><font face='Lucida Console'>(</font>images, truth_object_detections, empty_ignore, <font color='#BB00BB'>test_box_overlap</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_array_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> trained_function_type <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_array_type<font color='#5555FF'>&amp;</font> images,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> truth_object_detections,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> ignore,
+            <font color='#0000FF'>const</font> test_box_overlap<font color='#5555FF'>&amp;</font> ignore_overlap_tester <font color='#5555FF'>=</font> <font color='#BB00BB'>test_box_overlap</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>train_impl</font><font face='Lucida Console'>(</font>images, truth_object_detections, ignore, ignore_overlap_tester<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_array_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> trained_function_type <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_array_type<font color='#5555FF'>&amp;</font> images,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> truth_object_detections
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>empty_ignore</font><font face='Lucida Console'>(</font>images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>images, truth_object_detections, empty_ignore, <font color='#BB00BB'>test_box_overlap</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_array_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> trained_function_type <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_array_type<font color='#5555FF'>&amp;</font> images,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> truth_object_detections,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> ignore,
+            <font color='#0000FF'>const</font> test_box_overlap<font color='#5555FF'>&amp;</font> ignore_overlap_tester <font color='#5555FF'>=</font> <font color='#BB00BB'>test_box_overlap</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>truth_dets</font><font face='Lucida Console'>(</font>truth_object_detections.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> truth_object_detections.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> truth_object_detections[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    truth_dets[i].<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>full_object_detection</font><font face='Lucida Console'>(</font>truth_object_detections[i][j]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>train_impl</font><font face='Lucida Console'>(</font>images, truth_dets, ignore, ignore_overlap_tester<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_array_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> trained_function_type <b><a name='train_impl'></a>train_impl</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_array_type<font color='#5555FF'>&amp;</font> images,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> truth_object_detections,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> ignore,
+            <font color='#0000FF'>const</font> test_box_overlap<font color='#5555FF'>&amp;</font> ignore_overlap_tester
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+<font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_learning_problem</font><font face='Lucida Console'>(</font>images,truth_object_detections<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ignore.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\t trained_function_type structural_object_detection_trainer::train()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t images.size():      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t ignore.size():      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> ignore.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t truth_object_detections.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> truth_object_detections.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_learning_problem(images,truth_object_detections): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_learning_problem</font><font face='Lucida Console'>(</font>images,truth_object_detections<font face='Lucida Console'>)</font>
+                <font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> truth_object_detections.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> truth_object_detections[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>truth_object_detections[i][j].<font color='#BB00BB'>num_parts</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>get_scanner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>get_num_movable_components_per_detection_template</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                                <font color='#BB00BB'>all_parts_in_rect</font><font face='Lucida Console'>(</font>truth_object_detections[i][j]<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+                        "<font color='#CC0000'>\t trained_function_type structural_object_detection_trainer::train()</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t truth_object_detections[</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>][</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>j<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>].num_parts():                </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> 
+                            truth_object_detections[i][j].<font color='#BB00BB'>num_parts</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t get_scanner().get_num_movable_components_per_detection_template(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> 
+                            <font color='#BB00BB'>get_scanner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>get_num_movable_components_per_detection_template</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t all_parts_in_rect(truth_object_detections[</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>][</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>j<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>]): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>all_parts_in_rect</font><font face='Lucida Console'>(</font>truth_object_detections[i][j]<font face='Lucida Console'>)</font>
+                    <font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+            structural_svm_object_detection_problem<font color='#5555FF'>&lt;</font>image_scanner_type,image_array_type <font color='#5555FF'>&gt;</font> 
+                <font color='#BB00BB'>svm_prob</font><font face='Lucida Console'>(</font>scanner, overlap_tester, auto_overlap_tester, images,
+                    truth_object_detections, ignore, ignore_overlap_tester, num_threads<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>verbose<font face='Lucida Console'>)</font>
+                svm_prob.<font color='#BB00BB'>be_verbose</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            svm_prob.<font color='#BB00BB'>set_c</font><font face='Lucida Console'>(</font>C<font face='Lucida Console'>)</font>;
+            svm_prob.<font color='#BB00BB'>set_epsilon</font><font face='Lucida Console'>(</font>eps<font face='Lucida Console'>)</font>;
+            svm_prob.<font color='#BB00BB'>set_max_cache_size</font><font face='Lucida Console'>(</font>max_cache_size<font face='Lucida Console'>)</font>;
+            svm_prob.<font color='#BB00BB'>set_match_eps</font><font face='Lucida Console'>(</font>match_eps<font face='Lucida Console'>)</font>;
+            svm_prob.<font color='#BB00BB'>set_loss_per_missed_target</font><font face='Lucida Console'>(</font>loss_per_missed_target<font face='Lucida Console'>)</font>;
+            svm_prob.<font color='#BB00BB'>set_loss_per_false_alarm</font><font face='Lucida Console'>(</font>loss_per_false_alarm<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>configure_nuclear_norm_regularizer</font><font face='Lucida Console'>(</font>scanner, svm_prob<font face='Lucida Console'>)</font>;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> w;
+
+            <font color='#009900'>// Run the optimizer to find the optimal w.
+</font>            <font color='#BB00BB'>solver</font><font face='Lucida Console'>(</font>svm_prob,w<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// report the results of the training.
+</font>            <font color='#0000FF'>return</font> object_detector<font color='#5555FF'>&lt;</font>image_scanner_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>scanner, svm_prob.<font color='#BB00BB'>get_overlap_tester</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, w<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        image_scanner_type scanner;
+        test_box_overlap overlap_tester;
+
+        <font color='#0000FF'><u>double</u></font> C;
+        oca solver;
+        <font color='#0000FF'><u>double</u></font> eps;
+        <font color='#0000FF'><u>double</u></font> match_eps;
+        <font color='#0000FF'><u>bool</u></font> verbose;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_cache_size;
+        <font color='#0000FF'><u>double</u></font> loss_per_missed_target;
+        <font color='#0000FF'><u>double</u></font> loss_per_false_alarm;
+        <font color='#0000FF'><u>bool</u></font> auto_overlap_tester;
+
+    <b>}</b>; 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_STRUCTURAL_OBJECT_DETECTION_TRAiNER_Hh_
+</font>
+
+
+</pre></body></html>

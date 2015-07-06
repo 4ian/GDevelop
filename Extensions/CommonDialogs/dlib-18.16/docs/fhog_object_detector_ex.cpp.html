@@ -1,0 +1,272 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - fhog_object_detector_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This example program shows how you can use dlib to make an object detector
+    for things like faces, pedestrians, and any other semi-rigid object.  In
+    particular, we go though the steps to train the kind of sliding window
+    object detector first published by Dalal and Triggs in 2005 in the paper
+    Histograms of Oriented Gradients for Human Detection.  
+
+    Note that this program executes fastest when compiled with at least SSE2
+    instructions enabled.  So if you are using a PC with an Intel or AMD chip
+    then you should enable at least SSE2 instructions.  If you are using cmake
+    to compile this program you can enable them by using one of the following
+    commands when you create the build project:
+        cmake path_to_dlib_root/examples -DUSE_SSE2_INSTRUCTIONS=ON
+        cmake path_to_dlib_root/examples -DUSE_SSE4_INSTRUCTIONS=ON
+        cmake path_to_dlib_root/examples -DUSE_AVX_INSTRUCTIONS=ON
+    This will set the appropriate compiler options for GCC, clang, Visual
+    Studio, or the Intel compiler.  If you are using another compiler then you
+    need to consult your compiler's manual to determine how to enable these
+    instructions.  Note that AVX is the fastest but requires a CPU from at least
+    2011.  SSE4 is the next fastest and is supported by most current machines.  
+
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm_threaded.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>gui_widgets.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_processing.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>data_io.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> argc, <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>*</font> argv<font face='Lucida Console'>)</font>
+<b>{</b>  
+
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// In this example we are going to train a face detector based on the
+</font>        <font color='#009900'>// small faces dataset in the examples/faces directory.  So the first
+</font>        <font color='#009900'>// thing we do is load that dataset.  This means you need to supply the
+</font>        <font color='#009900'>// path to this faces folder as a command line argument so we will know
+</font>        <font color='#009900'>// where it is.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>argc <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Give the path to the examples/faces directory as the argument to this</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>program.  For example, if you are in the examples folder then execute </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>this program by running: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   ./fhog_object_detector_ex faces</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>const</font> std::string faces_directory <font color='#5555FF'>=</font> argv[<font color='#979000'>1</font>];
+        <font color='#009900'>// The faces directory contains a training dataset and a separate
+</font>        <font color='#009900'>// testing dataset.  The training data consists of 4 images, each
+</font>        <font color='#009900'>// annotated with rectangles that bound each human face.  The idea is 
+</font>        <font color='#009900'>// to use this training data to learn to identify human faces in new
+</font>        <font color='#009900'>// images.  
+</font>        <font color='#009900'>// 
+</font>        <font color='#009900'>// Once you have trained an object detector it is always important to
+</font>        <font color='#009900'>// test it on data it wasn't trained on.  Therefore, we will also load
+</font>        <font color='#009900'>// a separate testing set of 5 images.  Once we have a face detector
+</font>        <font color='#009900'>// created from the training data we will see how well it works by
+</font>        <font color='#009900'>// running it on the testing images. 
+</font>        <font color='#009900'>// 
+</font>        <font color='#009900'>// So here we create the variables that will hold our dataset.
+</font>        <font color='#009900'>// images_train will hold the 4 training images and face_boxes_train
+</font>        <font color='#009900'>// holds the locations of the faces in the training images.  So for
+</font>        <font color='#009900'>// example, the image images_train[0] has the faces given by the
+</font>        <font color='#009900'>// rectangles in face_boxes_train[0].
+</font>        dlib::array<font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> images_train, images_test;
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> face_boxes_train, face_boxes_test;
+
+        <font color='#009900'>// Now we load the data.  These XML files list the images in each
+</font>        <font color='#009900'>// dataset and also contain the positions of the face boxes.  Obviously
+</font>        <font color='#009900'>// you can use any kind of input format you like so long as you store
+</font>        <font color='#009900'>// the data into images_train and face_boxes_train.  But for convenience
+</font>        <font color='#009900'>// dlib comes with tools for creating and loading XML image dataset
+</font>        <font color='#009900'>// files.  Here you see how to load the data.  To create the XML files
+</font>        <font color='#009900'>// you can use the imglab tool which can be found in the tools/imglab
+</font>        <font color='#009900'>// folder.  It is a simple graphical tool for labeling objects in images
+</font>        <font color='#009900'>// with boxes.  To see how to use it read the tools/imglab/README.txt
+</font>        <font color='#009900'>// file.
+</font>        <font color='#BB00BB'>load_image_dataset</font><font face='Lucida Console'>(</font>images_train, face_boxes_train, faces_directory<font color='#5555FF'>+</font>"<font color='#CC0000'>/training.xml</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>load_image_dataset</font><font face='Lucida Console'>(</font>images_test, face_boxes_test, faces_directory<font color='#5555FF'>+</font>"<font color='#CC0000'>/testing.xml</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now we do a little bit of pre-processing.  This is optional but for
+</font>        <font color='#009900'>// this training data it improves the results.  The first thing we do is
+</font>        <font color='#009900'>// increase the size of the images by a factor of two.  We do this
+</font>        <font color='#009900'>// because it will allow us to detect smaller faces than otherwise would
+</font>        <font color='#009900'>// be practical (since the faces are all now twice as big).  Note that,
+</font>        <font color='#009900'>// in addition to resizing the images, these functions also make the
+</font>        <font color='#009900'>// appropriate adjustments to the face boxes so that they still fall on
+</font>        <font color='#009900'>// top of the faces after the images are resized.
+</font>        upsample_image_dataset<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>images_train, face_boxes_train<font face='Lucida Console'>)</font>;
+        upsample_image_dataset<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>images_test,  face_boxes_test<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Since human faces are generally left-right symmetric we can increase
+</font>        <font color='#009900'>// our training dataset by adding mirrored versions of each image back
+</font>        <font color='#009900'>// into images_train.  So this next step doubles the size of our
+</font>        <font color='#009900'>// training dataset.  Again, this is obviously optional but is useful in
+</font>        <font color='#009900'>// many object detection tasks.
+</font>        <font color='#BB00BB'>add_image_left_right_flips</font><font face='Lucida Console'>(</font>images_train, face_boxes_train<font face='Lucida Console'>)</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>num training images: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> images_train.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>num testing images:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> images_test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+        <font color='#009900'>// Finally we get to the training code.  dlib contains a number of
+</font>        <font color='#009900'>// object detectors.  This typedef tells it that you want to use the one
+</font>        <font color='#009900'>// based on Felzenszwalb's version of the Histogram of Oriented
+</font>        <font color='#009900'>// Gradients (commonly called HOG) detector.  The 6 means that you want
+</font>        <font color='#009900'>// it to use an image pyramid that downsamples the image at a ratio of
+</font>        <font color='#009900'>// 5/6.  Recall that HOG detectors work by creating an image pyramid and
+</font>        <font color='#009900'>// then running the detector over each pyramid level in a sliding window
+</font>        <font color='#009900'>// fashion.   
+</font>        <font color='#0000FF'>typedef</font> scan_fhog_pyramid<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>6</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> image_scanner_type; 
+        image_scanner_type scanner;
+        <font color='#009900'>// The sliding window detector will be 80 pixels wide and 80 pixels tall.
+</font>        scanner.<font color='#BB00BB'>set_detection_window_size</font><font face='Lucida Console'>(</font><font color='#979000'>80</font>, <font color='#979000'>80</font><font face='Lucida Console'>)</font>; 
+        structural_object_detection_trainer<font color='#5555FF'>&lt;</font>image_scanner_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>trainer</font><font face='Lucida Console'>(</font>scanner<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Set this to the number of processing cores on your machine.
+</font>        trainer.<font color='#BB00BB'>set_num_threads</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;  
+        <font color='#009900'>// The trainer is a kind of support vector machine and therefore has the usual SVM
+</font>        <font color='#009900'>// C parameter.  In general, a bigger C encourages it to fit the training data
+</font>        <font color='#009900'>// better but might lead to overfitting.  You must find the best C value
+</font>        <font color='#009900'>// empirically by checking how well the trained detector works on a test set of
+</font>        <font color='#009900'>// images you haven't trained on.  Don't just leave the value set at 1.  Try a few
+</font>        <font color='#009900'>// different C values and see what works best for your data.
+</font>        trainer.<font color='#BB00BB'>set_c</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// We can tell the trainer to print it's progress to the console if we want.  
+</font>        trainer.<font color='#BB00BB'>be_verbose</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// The trainer will run until the "risk gap" is less than 0.01.  Smaller values
+</font>        <font color='#009900'>// make the trainer solve the SVM optimization problem more accurately but will
+</font>        <font color='#009900'>// take longer to train.  For most problems a value in the range of 0.1 to 0.01 is
+</font>        <font color='#009900'>// plenty accurate.  Also, when in verbose mode the risk gap is printed on each
+</font>        <font color='#009900'>// iteration so you can see how close it is to finishing the training.  
+</font>        trainer.<font color='#BB00BB'>set_epsilon</font><font face='Lucida Console'>(</font><font color='#979000'>0.01</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Now we run the trainer.  For this example, it should take on the order of 10
+</font>        <font color='#009900'>// seconds to train.
+</font>        object_detector<font color='#5555FF'>&lt;</font>image_scanner_type<font color='#5555FF'>&gt;</font> detector <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>images_train, face_boxes_train<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now that we have a face detector we can test it.  The first statement tests it
+</font>        <font color='#009900'>// on the training data.  It will print the precision, recall, and then average precision.
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>training results: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test_object_detection_function</font><font face='Lucida Console'>(</font>detector, images_train, face_boxes_train<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#009900'>// However, to get an idea if it really worked without overfitting we need to run
+</font>        <font color='#009900'>// it on images it wasn't trained on.  The next line does this.  Happily, we see
+</font>        <font color='#009900'>// that the object detector works perfectly on the testing images.
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing results:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test_object_detection_function</font><font face='Lucida Console'>(</font>detector, images_test, face_boxes_test<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+        <font color='#009900'>// If you have read any papers that use HOG you have probably seen the nice looking
+</font>        <font color='#009900'>// "sticks" visualization of a learned HOG detector.  This next line creates a
+</font>        <font color='#009900'>// window with such a visualization of our detector.  It should look somewhat like
+</font>        <font color='#009900'>// a face.
+</font>        image_window <font color='#BB00BB'>hogwin</font><font face='Lucida Console'>(</font><font color='#BB00BB'>draw_fhog</font><font face='Lucida Console'>(</font>detector<font face='Lucida Console'>)</font>, "<font color='#CC0000'>Learned fHOG detector</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now for the really fun part.  Let's display the testing images on the screen and
+</font>        <font color='#009900'>// show the output of the face detector overlaid on each image.  You will see that
+</font>        <font color='#009900'>// it finds all the faces without false alarming on any non-faces.
+</font>        image_window win; 
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> images_test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// Run the detector and get the face detections.
+</font>            std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> dets <font color='#5555FF'>=</font> <font color='#BB00BB'>detector</font><font face='Lucida Console'>(</font>images_test[i]<font face='Lucida Console'>)</font>;
+            win.<font color='#BB00BB'>clear_overlay</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            win.<font color='#BB00BB'>set_image</font><font face='Lucida Console'>(</font>images_test[i]<font face='Lucida Console'>)</font>;
+            win.<font color='#BB00BB'>add_overlay</font><font face='Lucida Console'>(</font>dets, <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Hit enter to process the next image...</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        <font color='#009900'>// Like everything in dlib, you can save your detector to disk using the
+</font>        <font color='#009900'>// serialize() function.
+</font>        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>face_detector.svm</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> detector;
+
+        <font color='#009900'>// Then you can recall it using the deserialize() function.
+</font>        object_detector<font color='#5555FF'>&lt;</font>image_scanner_type<font color='#5555FF'>&gt;</font> detector2;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>face_detector.svm</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> detector2;
+
+
+
+
+        <font color='#009900'>// Now let's talk about some optional features of this training tool as well as some
+</font>        <font color='#009900'>// important points you should understand.
+</font>        <font color='#009900'>//
+</font>        <font color='#009900'>// The first thing that should be pointed out is that, since this is a sliding
+</font>        <font color='#009900'>// window classifier, it can't output an arbitrary rectangle as a detection.  In
+</font>        <font color='#009900'>// this example our sliding window is 80 by 80 pixels and is run over an image
+</font>        <font color='#009900'>// pyramid.  This means that it can only output detections that are at least 80 by
+</font>        <font color='#009900'>// 80 pixels in size (recall that this is why we upsampled the images after loading
+</font>        <font color='#009900'>// them).  It also means that the aspect ratio of the outputs is 1.  So if,
+</font>        <font color='#009900'>// for example, you had a box in your training data that was 200 pixels by 10
+</font>        <font color='#009900'>// pixels then it would simply be impossible for the detector to learn to detect
+</font>        <font color='#009900'>// it.  Similarly, if you had a really small box it would be unable to learn to
+</font>        <font color='#009900'>// detect it.  
+</font>        <font color='#009900'>//
+</font>        <font color='#009900'>// So the training code performs an input validation check on the training data and
+</font>        <font color='#009900'>// will throw an exception if it detects any boxes that are impossible to detect
+</font>        <font color='#009900'>// given your setting of scanning window size and image pyramid resolution.  You
+</font>        <font color='#009900'>// can use a statement like:
+</font>        <font color='#009900'>//   remove_unobtainable_rectangles(trainer, images_train, face_boxes_train)
+</font>        <font color='#009900'>// to automatically discard these impossible boxes from your training dataset
+</font>        <font color='#009900'>// before running the trainer.  This will avoid getting the "impossible box"
+</font>        <font color='#009900'>// exception.  However, I would recommend you be careful that you are not throwing
+</font>        <font color='#009900'>// away truth boxes you really care about.  The remove_unobtainable_rectangles()
+</font>        <font color='#009900'>// will return the set of removed rectangles so you can visually inspect them and
+</font>        <font color='#009900'>// make sure you are OK that they are being removed. 
+</font>        <font color='#009900'>// 
+</font>        <font color='#009900'>// Next, note that any location in the images not marked with a truth box is
+</font>        <font color='#009900'>// implicitly treated as a negative example.  This means that when creating
+</font>        <font color='#009900'>// training data it is critical that you label all the objects you want to detect.
+</font>        <font color='#009900'>// So for example, if you are making a face detector then you must mark all the
+</font>        <font color='#009900'>// faces in each image.  However, sometimes there are objects in images you are
+</font>        <font color='#009900'>// unsure about or simply don't care if the detector identifies or not.  For these
+</font>        <font color='#009900'>// objects you can pass in a set of "ignore boxes" as a third argument to the
+</font>        <font color='#009900'>// trainer.train() function.  The trainer will simply disregard any detections that
+</font>        <font color='#009900'>// happen to hit these boxes.  
+</font>        <font color='#009900'>//
+</font>        <font color='#009900'>// Another useful thing you can do is evaluate multiple HOG detectors together. The
+</font>        <font color='#009900'>// benefit of this is increased testing speed since it avoids recomputing the HOG
+</font>        <font color='#009900'>// features for each run of the detector.  You do this by storing your detectors
+</font>        <font color='#009900'>// into a std::vector and then invoking evaluate_detectors() like so:
+</font>        std::vector<font color='#5555FF'>&lt;</font>object_detector<font color='#5555FF'>&lt;</font>image_scanner_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> my_detectors;
+        my_detectors.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>detector<font face='Lucida Console'>)</font>;
+        std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> dets <font color='#5555FF'>=</font> <font color='#BB00BB'>evaluate_detectors</font><font face='Lucida Console'>(</font>my_detectors, images_train[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>; 
+        <font color='#009900'>//
+</font>        <font color='#009900'>//
+</font>        <font color='#009900'>// Finally, you can add a nuclear norm regularizer to the SVM trainer.  Doing has
+</font>        <font color='#009900'>// two benefits.  First, it can cause the learned HOG detector to be composed of
+</font>        <font color='#009900'>// separable filters and therefore makes it execute faster when detecting objects.
+</font>        <font color='#009900'>// It can also help with generalization since it tends to make the learned HOG
+</font>        <font color='#009900'>// filters smoother.  To enable this option you call the following function before
+</font>        <font color='#009900'>// you create the trainer object:
+</font>        <font color='#009900'>//    scanner.set_nuclear_norm_regularization_strength(1.0);
+</font>        <font color='#009900'>// The argument determines how important it is to have a small nuclear norm.  A
+</font>        <font color='#009900'>// bigger regularization strength means it is more important.  The smaller the
+</font>        <font color='#009900'>// nuclear norm the smoother and faster the learned HOG filters will be, but if the
+</font>        <font color='#009900'>// regularization strength value is too large then the SVM will not fit the data
+</font>        <font color='#009900'>// well.  This is analogous to giving a C value that is too small.
+</font>        <font color='#009900'>//
+</font>        <font color='#009900'>// You can see how many separable filters are inside your detector like so:
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>num filters: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>num_separable_filters</font><font face='Lucida Console'>(</font>detector<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#009900'>// You can also control how many filters there are by explicitly thresholding the
+</font>        <font color='#009900'>// singular values of the filters like this:
+</font>        detector <font color='#5555FF'>=</font> <font color='#BB00BB'>threshold_filter_singular_values</font><font face='Lucida Console'>(</font>detector,<font color='#979000'>0.1</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// That removes filter components with singular values less than 0.1.  The bigger
+</font>        <font color='#009900'>// this number the fewer separable filters you will have and the faster the
+</font>        <font color='#009900'>// detector will run.  However, a large enough threshold will hurt detection
+</font>        <font color='#009900'>// accuracy.  
+</font>
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nexception thrown!</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

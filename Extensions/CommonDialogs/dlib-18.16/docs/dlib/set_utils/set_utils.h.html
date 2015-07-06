@@ -1,0 +1,249 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - set_utils.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SET_UTILs_
+<font color='#0000FF'>#define</font> DLIB_SET_UTILs_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='set_utils_abstract.h.html'>set_utils_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='set_intersection_size'></a>set_intersection_size</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_same_object</font><font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            a.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>b.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>num;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            b.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>b.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>b.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>num;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> num;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U,
+        <font color='#0000FF'>typename</font> V
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='set_union'></a>set_union</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> b,
+        V<font color='#5555FF'>&amp;</font> u
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type type;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_same_object</font><font face='Lucida Console'>(</font>a,u<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font color='#BB00BB'>is_same_object</font><font face='Lucida Console'>(</font>b,u<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            V local_u;
+            type temp;
+            a.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                local_u.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            b.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>b.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>b.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    temp <font color='#5555FF'>=</font> b.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    local_u.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            local_u.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>u<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            u.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            type temp;
+            a.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                u.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            b.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>b.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>b.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    temp <font color='#5555FF'>=</font> b.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    u.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U,
+        <font color='#0000FF'>typename</font> V
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='set_intersection'></a>set_intersection</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> b,
+        V<font color='#5555FF'>&amp;</font> i
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type type;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_same_object</font><font face='Lucida Console'>(</font>a,i<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font color='#BB00BB'>is_same_object</font><font face='Lucida Console'>(</font>b,i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            V local_i;
+
+            type temp;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                a.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>b.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        temp <font color='#5555FF'>=</font> a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        local_i.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                b.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>b.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>b.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        temp <font color='#5555FF'>=</font> b.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        local_i.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+            local_i.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            i.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            type temp;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                a.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>b.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        temp <font color='#5555FF'>=</font> a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        i.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                b.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>b.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>b.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        temp <font color='#5555FF'>=</font> b.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        i.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U,
+        <font color='#0000FF'>typename</font> V
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='set_difference'></a>set_difference</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> b,
+        V<font color='#5555FF'>&amp;</font> d 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type type;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_same_object</font><font face='Lucida Console'>(</font>a,d<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font color='#BB00BB'>is_same_object</font><font face='Lucida Console'>(</font>b,d<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            V local_d;
+
+            type temp;
+
+            a.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>b.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    temp <font color='#5555FF'>=</font> a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    local_d.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            local_d.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>d<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            d.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            type temp;
+
+            a.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>b.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    temp <font color='#5555FF'>=</font> a.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    d.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SET_UTILs_
+</font>
+
+
+
+</pre></body></html>

@@ -1,0 +1,425 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - train_object_detector.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example showing how you might use dlib to create a reasonably 
+    functional command line tool for object detection.  This example assumes 
+    you are familiar with the contents of at least the following example 
+    programs:
+        - <a href="fhog_object_detector_ex.cpp.html">fhog_object_detector_ex.cpp</a>
+        - <a href="compress_stream_ex.cpp.html">compress_stream_ex.cpp</a>
+
+
+
+
+    This program is a command line tool for learning to detect objects in images.  
+    Therefore, to create an object detector it requires a set of annotated training 
+    images.  To create this annotated data you will need to use the imglab tool 
+    included with dlib.  It is located in the tools/imglab folder and can be compiled
+    using the following commands.  
+        cd tools/imglab
+        mkdir build
+        cd build
+        cmake ..
+        cmake --build . --config Release
+    Note that you may need to install CMake (www.cmake.org) for this to work.  
+
+    Next, let's assume you have a folder of images called /tmp/images.  These images 
+    should contain examples of the objects you want to learn to detect.  You will 
+    use the imglab tool to label these objects.  Do this by typing the following
+        ./imglab -c mydataset.xml /tmp/images
+    This will create a file called mydataset.xml which simply lists the images in 
+    /tmp/images.  To annotate them run
+        ./imglab mydataset.xml
+    A window will appear showing all the images.  You can use the up and down arrow 
+    keys to cycle though the images and the mouse to label objects.  In particular, 
+    holding the shift key, left clicking, and dragging the mouse will allow you to 
+    draw boxes around the objects you wish to detect.  So next, label all the objects 
+    with boxes.  Note that it is important to label all the objects since any object 
+    not labeled is implicitly assumed to be not an object we should detect.  If there
+    are objects you are not sure about you should draw a box around them, then double
+    click the box and press i.  This will cross out the box and mark it as "ignore".
+    The training code in dlib will then simply ignore detections matching that box.
+    
+
+    Once you finish labeling objects go to the file menu, click save, and then close 
+    the program. This will save the object boxes back to mydataset.xml.  You can verify 
+    this by opening the tool again with
+        ./imglab mydataset.xml
+    and observing that the boxes are present.
+
+    Returning to the present example program, we can compile it using cmake just as we 
+    did with the imglab tool.  Once compiled, we can issue the command 
+        ./train_object_detector -tv mydataset.xml
+    which will train an object detection model based on our labeled data.  The model 
+    will be saved to the file object_detector.svm.  Once this has finished we can use 
+    the object detector to locate objects in new images with a command like
+        ./train_object_detector some_image.png
+    This command will display some_image.png in a window and any detected objects will
+    be indicated by a red box.
+
+    Finally, to make running this example easy dlib includes some training data in the
+    examples/faces folder.  Therefore, you can test this program out by running the
+    following sequence of commands:
+      ./train_object_detector -tv examples/faces/training.xml -u1 --flip
+      ./train_object_detector --test examples/faces/testing.xml -u1
+      ./train_object_detector examples/faces/*.jpg -u1
+    That will make a face detector that performs perfectly on the test images listed in
+    testing.xml and then it will show you the detections on all the images.
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm_threaded.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>string.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>gui_widgets.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_processing.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>data_io.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>cmd_line_parser.h<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='pick_best_window_size'></a>pick_best_window_size</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> boxes,
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> width,
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> height,
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> target_size
+<font face='Lucida Console'>)</font>
+<font color='#009900'>/*!
+    ensures
+        - Finds the average aspect ratio of the elements of boxes and outputs a width
+          and height such that the aspect ratio is equal to the average and also the
+          area is equal to target_size.  That is, the following will be approximately true:
+            - #width*#height == target_size
+            - #width/#height == the average aspect ratio of the elements of boxes.
+!*/</font>
+<b>{</b>
+    <font color='#009900'>// find the average width and height
+</font>    running_stats<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> avg_width, avg_height;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> boxes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> boxes[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+        <b>{</b>
+            avg_width.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>boxes[i][j].<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            avg_height.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>boxes[i][j].<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#009900'>// now adjust the box size so that it is about target_pixels pixels in size
+</font>    <font color='#0000FF'><u>double</u></font> size <font color='#5555FF'>=</font> avg_width.<font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>avg_height.<font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>double</u></font> scale <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>target_size<font color='#5555FF'>/</font>size<font face='Lucida Console'>)</font>;
+
+    width <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>avg_width.<font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>scale<font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+    height <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>avg_height.<font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>scale<font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// make sure the width and height never round to zero.
+</font>    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>width <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        width <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>height <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        height <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>bool</u></font> <b><a name='contains_any_boxes'></a>contains_any_boxes</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> boxes
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> boxes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>boxes[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+    <b>}</b>
+    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='throw_invalid_box_error_message'></a>throw_invalid_box_error_message</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> dataset_filename,
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> removed,
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> target_size
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    image_dataset_metadata::dataset data;
+    <font color='#BB00BB'>load_image_dataset_metadata</font><font face='Lucida Console'>(</font>data, dataset_filename<font face='Lucida Console'>)</font>;
+
+    std::ostringstream sout;
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Error!  An impossible set of object boxes was given for training. </font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>All the boxes need to have a similar aspect ratio and also not be </font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>smaller than about </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> target_size <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> pixels in area. </font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>The following images contain invalid boxes:\n</font>";
+    std::ostringstream sout2;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> removed.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>removed[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> std::string imgname <font color='#5555FF'>=</font> data.images[i].filename;
+            sout2 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> imgname <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>";
+        <b>}</b>
+    <b>}</b>
+    <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>\n</font>"<font color='#5555FF'>+</font><font color='#BB00BB'>wrap_string</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> "<font color='#CC0000'>\n</font>" <font color='#5555FF'>+</font> sout2.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> argc, <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>*</font> argv<font face='Lucida Console'>)</font>
+<b>{</b>  
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        command_line_parser parser;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>h</font>","<font color='#CC0000'>Display this help message.</font>"<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>t</font>","<font color='#CC0000'>Train an object detector and save the detector to disk.</font>"<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>cross-validate</font>",
+                          "<font color='#CC0000'>Perform cross-validation on an image dataset and print the results.</font>"<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>test</font>", "<font color='#CC0000'>Test a trained detector on an image dataset and print the results.</font>"<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>u</font>", "<font color='#CC0000'>Upsample each input image &lt;arg&gt; times. Each upsampling quadruples the number of pixels in the image (default: 0).</font>", <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        parser.<font color='#BB00BB'>set_group_name</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>training/cross-validation sub-options</font>"<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>v</font>","<font color='#CC0000'>Be verbose.</font>"<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>folds</font>","<font color='#CC0000'>When doing cross-validation, do &lt;arg&gt; folds (default: 3).</font>",<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>c</font>","<font color='#CC0000'>Set the SVM C parameter to &lt;arg&gt; (default: 1.0).</font>",<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>threads</font>", "<font color='#CC0000'>Use &lt;arg&gt; threads for training (default: 4).</font>",<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>eps</font>", "<font color='#CC0000'>Set training epsilon to &lt;arg&gt; (default: 0.01).</font>", <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>target-size</font>", "<font color='#CC0000'>Set size of the sliding window to about &lt;arg&gt; pixels in area (default: 80*80).</font>", <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>flip</font>", "<font color='#CC0000'>Add left/right flipped copies of the images into the training dataset.  Useful when the objects </font>"
+            "<font color='#CC0000'>you want to detect are left/right symmetric.</font>"<font face='Lucida Console'>)</font>;
+
+
+        parser.<font color='#BB00BB'>parse</font><font face='Lucida Console'>(</font>argc, argv<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now we do a little command line validation.  Each of the following functions
+</font>        <font color='#009900'>// checks something and throws an exception if the test fails.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> one_time_opts[] <font color='#5555FF'>=</font> <b>{</b>"<font color='#CC0000'>h</font>", "<font color='#CC0000'>v</font>", "<font color='#CC0000'>t</font>", "<font color='#CC0000'>cross-validate</font>", "<font color='#CC0000'>c</font>", "<font color='#CC0000'>threads</font>", "<font color='#CC0000'>target-size</font>",
+                                        "<font color='#CC0000'>folds</font>", "<font color='#CC0000'>test</font>", "<font color='#CC0000'>eps</font>", "<font color='#CC0000'>u</font>", "<font color='#CC0000'>flip</font>"<b>}</b>;
+        parser.<font color='#BB00BB'>check_one_time_options</font><font face='Lucida Console'>(</font>one_time_opts<font face='Lucida Console'>)</font>; <font color='#009900'>// Can't give an option more than once
+</font>        <font color='#009900'>// Make sure the arguments to these options are within valid ranges if they are supplied by the user.
+</font>        parser.<font color='#BB00BB'>check_option_arg_range</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>c</font>", <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>12</font>, <font color='#979000'>1e12</font><font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>check_option_arg_range</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>eps</font>", <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font>, <font color='#979000'>1e4</font><font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>check_option_arg_range</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>threads</font>", <font color='#979000'>1</font>, <font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>check_option_arg_range</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>folds</font>", <font color='#979000'>2</font>, <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>check_option_arg_range</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>u</font>", <font color='#979000'>0</font>, <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>check_option_arg_range</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>target-size</font>", <font color='#979000'>4</font><font color='#5555FF'>*</font><font color='#979000'>4</font>, <font color='#979000'>10000</font><font color='#5555FF'>*</font><font color='#979000'>10000</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> incompatible[] <font color='#5555FF'>=</font> <b>{</b>"<font color='#CC0000'>t</font>", "<font color='#CC0000'>cross-validate</font>", "<font color='#CC0000'>test</font>"<b>}</b>;
+        parser.<font color='#BB00BB'>check_incompatible_options</font><font face='Lucida Console'>(</font>incompatible<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// You are only allowed to give these training_sub_ops if you also give either -t or --cross-validate.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> training_ops[] <font color='#5555FF'>=</font> <b>{</b>"<font color='#CC0000'>t</font>", "<font color='#CC0000'>cross-validate</font>"<b>}</b>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> training_sub_ops[] <font color='#5555FF'>=</font> <b>{</b>"<font color='#CC0000'>v</font>", "<font color='#CC0000'>c</font>", "<font color='#CC0000'>threads</font>", "<font color='#CC0000'>target-size</font>", "<font color='#CC0000'>eps</font>", "<font color='#CC0000'>flip</font>"<b>}</b>;
+        parser.<font color='#BB00BB'>check_sub_options</font><font face='Lucida Console'>(</font>training_ops, training_sub_ops<font face='Lucida Console'>)</font>; 
+        parser.<font color='#BB00BB'>check_sub_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>cross-validate</font>", "<font color='#CC0000'>folds</font>"<font face='Lucida Console'>)</font>; 
+
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>h</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Usage: train_object_detector [options] &lt;image dataset file|image file&gt;\n</font>";
+            parser.<font color='#BB00BB'>print_options</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+                                       
+            <font color='#0000FF'>return</font> EXIT_SUCCESS;
+        <b>}</b>
+
+
+        <font color='#0000FF'>typedef</font> scan_fhog_pyramid<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>6</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> image_scanner_type; 
+        <font color='#009900'>// Get the upsample option from the user but use 0 if it wasn't given.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> upsample_amount <font color='#5555FF'>=</font> <font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>parser, "<font color='#CC0000'>u</font>", <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>t</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>cross-validate</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>You must give an image dataset metadata XML file produced by the imglab tool.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nTry the -h option for more information.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                <font color='#0000FF'>return</font> EXIT_FAILURE;
+            <b>}</b>
+
+            dlib::array<font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> images;
+            std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> object_locations, ignore;
+
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Loading image dataset from metadata file </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> parser[<font color='#979000'>0</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            ignore <font color='#5555FF'>=</font> <font color='#BB00BB'>load_image_dataset</font><font face='Lucida Console'>(</font>images, object_locations, parser[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Number of images loaded: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+            <font color='#009900'>// Get the options from the user, but use default values if they are not
+</font>            <font color='#009900'>// supplied.
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> threads <font color='#5555FF'>=</font> <font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>parser, "<font color='#CC0000'>threads</font>", <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> C   <font color='#5555FF'>=</font> <font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>parser, "<font color='#CC0000'>c</font>", <font color='#979000'>1.0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> eps <font color='#5555FF'>=</font> <font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>parser, "<font color='#CC0000'>eps</font>", <font color='#979000'>0.01</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> num_folds <font color='#5555FF'>=</font> <font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>parser, "<font color='#CC0000'>folds</font>", <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> target_size <font color='#5555FF'>=</font> <font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>parser, "<font color='#CC0000'>target-size</font>", <font color='#979000'>80</font><font color='#5555FF'>*</font><font color='#979000'>80</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// You can't do more folds than there are images.  
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_folds <font color='#5555FF'>&gt;</font> images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                num_folds <font color='#5555FF'>=</font> images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Upsample images if the user asked us to do that.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> upsample_amount; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                upsample_image_dataset<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>images, object_locations, ignore<font face='Lucida Console'>)</font>;
+
+
+            image_scanner_type scanner;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width, height;
+            <font color='#BB00BB'>pick_best_window_size</font><font face='Lucida Console'>(</font>object_locations, width, height, target_size<font face='Lucida Console'>)</font>;
+            scanner.<font color='#BB00BB'>set_detection_window_size</font><font face='Lucida Console'>(</font>width, height<font face='Lucida Console'>)</font>; 
+
+            structural_object_detection_trainer<font color='#5555FF'>&lt;</font>image_scanner_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>trainer</font><font face='Lucida Console'>(</font>scanner<font face='Lucida Console'>)</font>;
+            trainer.<font color='#BB00BB'>set_num_threads</font><font face='Lucida Console'>(</font>threads<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>v</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                trainer.<font color='#BB00BB'>be_verbose</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            trainer.<font color='#BB00BB'>set_c</font><font face='Lucida Console'>(</font>C<font face='Lucida Console'>)</font>;
+            trainer.<font color='#BB00BB'>set_epsilon</font><font face='Lucida Console'>(</font>eps<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Now make sure all the boxes are obtainable by the scanner.  
+</font>            std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> removed;
+            removed <font color='#5555FF'>=</font> <font color='#BB00BB'>remove_unobtainable_rectangles</font><font face='Lucida Console'>(</font>trainer, images, object_locations<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// if we weren't able to get all the boxes to match then throw an error 
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>contains_any_boxes</font><font face='Lucida Console'>(</font>removed<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> scale <font color='#5555FF'>=</font> upsample_amount<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+                scale <font color='#5555FF'>=</font> scale<font color='#5555FF'>*</font>scale;
+                <font color='#BB00BB'>throw_invalid_box_error_message</font><font face='Lucida Console'>(</font>parser[<font color='#979000'>0</font>], removed, target_size<font color='#5555FF'>/</font>scale<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>flip</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>add_image_left_right_flips</font><font face='Lucida Console'>(</font>images, object_locations, ignore<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>t</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// Do the actual training and save the results into the detector object.  
+</font>                object_detector<font color='#5555FF'>&lt;</font>image_scanner_type<font color='#5555FF'>&gt;</font> detector <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>images, object_locations, ignore<font face='Lucida Console'>)</font>;
+
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Saving trained detector to object_detector.svm</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>object_detector.svm</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> detector;
+
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Testing detector on training data...</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Test detector (precision,recall,AP): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test_object_detection_function</font><font face='Lucida Console'>(</font>detector, images, object_locations<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// shuffle the order of the training images
+</font>                <font color='#BB00BB'>randomize_samples</font><font face='Lucida Console'>(</font>images, object_locations<font face='Lucida Console'>)</font>;
+
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_folds <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>-fold cross validation (precision,recall,AP): </font>"
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>cross_validate_object_detection_trainer</font><font face='Lucida Console'>(</font>trainer, images, object_locations, ignore, num_folds<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <b>}</b>
+
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Parameters used: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  threads:                 </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> threads <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  C:                       </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  eps:                     </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> eps <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  target-size:             </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> target_size <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  detection window width:  </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> width <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  detection window height: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> height <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  upsample this many times : </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> upsample_amount <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>flip</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  trained using left/right flips.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>cross-validate</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  num_folds: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_folds <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+            <font color='#0000FF'>return</font> EXIT_SUCCESS;
+        <b>}</b>
+
+
+
+
+
+
+
+        <font color='#009900'>// The rest of the code is devoted to testing an already trained object detector.
+</font>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>You must give an image or an image dataset metadata XML file produced by the imglab tool.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nTry the -h option for more information.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <font color='#0000FF'>return</font> EXIT_FAILURE;
+        <b>}</b>
+
+        <font color='#009900'>// load a previously trained object detector and try it out on some data
+</font>        ifstream <font color='#BB00BB'>fin</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>object_detector.svm</font>", ios::binary<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>fin<font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Can't find a trained object detector file object_detector.svm. </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>You need to train one using the -t option.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nTry the -h option for more information.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <font color='#0000FF'>return</font> EXIT_FAILURE;
+
+        <b>}</b>
+        object_detector<font color='#5555FF'>&lt;</font>image_scanner_type<font color='#5555FF'>&gt;</font> detector;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>detector, fin<font face='Lucida Console'>)</font>;
+
+        dlib::array<font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> images;
+        <font color='#009900'>// Check if the command line argument is an XML file
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>tolower</font><font face='Lucida Console'>(</font><font color='#BB00BB'>right_substr</font><font face='Lucida Console'>(</font>parser[<font color='#979000'>0</font>],"<font color='#CC0000'>.</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>xml</font>"<font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> object_locations, ignore;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Loading image dataset from metadata file </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> parser[<font color='#979000'>0</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            ignore <font color='#5555FF'>=</font> <font color='#BB00BB'>load_image_dataset</font><font face='Lucida Console'>(</font>images, object_locations, parser[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Number of images loaded: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+            <font color='#009900'>// Upsample images if the user asked us to do that.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> upsample_amount; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                upsample_image_dataset<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>images, object_locations, ignore<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>test</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Testing detector on data...</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Results (precision,recall,AP): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test_object_detection_function</font><font face='Lucida Console'>(</font>detector, images, object_locations, ignore<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                <font color='#0000FF'>return</font> EXIT_SUCCESS;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// In this case, the user should have given some image files.  So just
+</font>            <font color='#009900'>// load them.
+</font>            images.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>load_image</font><font face='Lucida Console'>(</font>images[i], parser[i]<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Upsample images if the user asked us to do that.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> upsample_amount; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>pyramid_up</font><font face='Lucida Console'>(</font>images[j]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+
+        <font color='#009900'>// Test the detector on the images we loaded and display the results
+</font>        <font color='#009900'>// in a window.
+</font>        image_window win;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// Run the detector on images[i] 
+</font>            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> rects <font color='#5555FF'>=</font> <font color='#BB00BB'>detector</font><font face='Lucida Console'>(</font>images[i]<font face='Lucida Console'>)</font>;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Number of detections: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+            <font color='#009900'>// Put the image and detections into the window.
+</font>            win.<font color='#BB00BB'>clear_overlay</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            win.<font color='#BB00BB'>set_image</font><font face='Lucida Console'>(</font>images[i]<font face='Lucida Console'>)</font>;
+            win.<font color='#BB00BB'>add_overlay</font><font face='Lucida Console'>(</font>rects, <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Hit enter to see the next image.</font>";
+            cin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nexception thrown!</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nTry the -h option for more information.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#0000FF'>return</font> EXIT_FAILURE;
+    <b>}</b>
+
+    <font color='#0000FF'>return</font> EXIT_SUCCESS;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

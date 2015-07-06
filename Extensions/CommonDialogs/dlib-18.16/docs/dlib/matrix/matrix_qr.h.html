@@ -1,0 +1,467 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - matrix_qr.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#009900'>// This code was adapted from code from the JAMA part of NIST's TNT library.
+</font><font color='#009900'>//    See: http://math.nist.gov/tnt/ 
+</font><font color='#0000FF'>#ifndef</font> DLIB_MATRIX_QR_DECOMPOSITION_H
+<font color='#0000FF'>#define</font> DLIB_MATRIX_QR_DECOMPOSITION_H
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix.h.html'>matrix.h</a>" 
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_utilities.h.html'>matrix_utilities.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_subexp.h.html'>matrix_subexp.h</a>"
+
+<font color='#0000FF'>#ifdef</font> DLIB_USE_LAPACK
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='lapack/geqrf.h.html'>lapack/geqrf.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='lapack/ormqr.h.html'>lapack/ormqr.h</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_trsm.h.html'>matrix_trsm.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib 
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> matrix_exp_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='qr_decomposition'></a>qr_decomposition</b> 
+    <b>{</b>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> matrix_exp_type::NR;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> matrix_exp_type::NC;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::type type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::layout_type layout_type;
+
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font>  matrix_type;
+
+        <font color='#009900'>// You have supplied an invalid type of matrix_exp_type.  You have
+</font>        <font color='#009900'>// to use this object with matrices that contain float or double type data.
+</font>        <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>, type<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font> 
+                             is_same_type<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, type<font color='#5555FF'>&gt;</font>::value <font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <b><a name='qr_decomposition'></a>qr_decomposition</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_full_rank'></a>is_full_rank</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> matrix_type <b><a name='get_r'></a>get_r</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> matrix_type <b><a name='get_q'></a>get_q</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_q'></a>get_q</b> <font face='Lucida Console'>(</font>
+            matrix_type<font color='#5555FF'>&amp;</font> Q
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> matrix_type <b><a name='solve'></a>solve</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> B
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+    <font color='#0000FF'>private</font>:
+
+<font color='#0000FF'>#ifndef</font> DLIB_USE_LAPACK
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> matrix_type <b><a name='solve_mat'></a>solve_mat</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> B
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> matrix_type <b><a name='solve_vect'></a>solve_vect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> B
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+<font color='#0000FF'>#endif</font>
+
+
+        <font color='#009900'>/** Array for internal storage of decomposition.
+        @serial internal array storage.
+        */</font>
+        matrix<font color='#5555FF'>&lt;</font>type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type,column_major_layout<font color='#5555FF'>&gt;</font> QR_;
+
+        <font color='#009900'>/** Row and column dimensions.
+        @serial column dimension.
+        @serial row dimension.
+        */</font>
+        <font color='#0000FF'><u>long</u></font> m, n;
+
+        <font color='#009900'>/** Array for internal storage of diagonal of R.
+        @serial diagonal of R.
+        */</font>
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type,column_major_layout<font color='#5555FF'>&gt;</font> column_vector_type;
+        column_vector_type tau;
+        column_vector_type Rdiag;
+
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                                      Member functions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    qr_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='qr_decomposition'></a>qr_decomposition</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A
+    <font face='Lucida Console'>)</font>		
+    <b>{</b>
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>type, <font color='#0000FF'>typename</font> EXP::type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> A.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> A.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\tqr_decomposition::qr_decomposition(A)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tA.nr():   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tA.nc():   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> A.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tA.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> A.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+
+        QR_ <font color='#5555FF'>=</font> A;
+        m <font color='#5555FF'>=</font> A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        n <font color='#5555FF'>=</font> A.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#ifdef</font> DLIB_USE_LAPACK
+
+        lapack::<font color='#BB00BB'>geqrf</font><font face='Lucida Console'>(</font>QR_, tau<font face='Lucida Console'>)</font>;
+        Rdiag <font color='#5555FF'>=</font> <font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font>QR_<font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#else</font>
+        Rdiag.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>long</u></font> i<font color='#5555FF'>=</font><font color='#979000'>0</font>, j<font color='#5555FF'>=</font><font color='#979000'>0</font>, k<font color='#5555FF'>=</font><font color='#979000'>0</font>;
+
+        <font color='#009900'>// Main loop.
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> n; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#009900'>// Compute 2-norm of k-th column without under/overflow.
+</font>            type nrm <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> k; i <font color='#5555FF'>&lt;</font> m; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                nrm <font color='#5555FF'>=</font> <font color='#BB00BB'>hypot</font><font face='Lucida Console'>(</font>nrm,<font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>i,k<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nrm <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0.0</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#009900'>// Form k-th Householder vector.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>k,k<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    nrm <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>nrm;
+                <b>}</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> k; i <font color='#5555FF'>&lt;</font> m; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>i,k<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font><font color='#5555FF'>=</font> nrm;
+                <b>}</b>
+                <font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>k,k<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1.0</font>;
+
+                <font color='#009900'>// Apply transformation to remaining columns.
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> k<font color='#5555FF'>+</font><font color='#979000'>1</font>; j <font color='#5555FF'>&lt;</font> n; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    type s <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>; 
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> k; i <font color='#5555FF'>&lt;</font> m; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        s <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>i,k<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    s <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>s<font color='#5555FF'>/</font><font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>k,k<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> k; i <font color='#5555FF'>&lt;</font> m; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        <font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> s<font color='#5555FF'>*</font><font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>i,k<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+            <font color='#BB00BB'>Rdiag</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>nrm;
+        <b>}</b>
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>long</u></font> qr_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> m;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>long</u></font> qr_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> n;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> qr_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='is_full_rank'></a>is_full_rank</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>		
+    <b>{</b>
+        type eps <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>Rdiag<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>eps <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            eps <font color='#5555FF'>*</font><font color='#5555FF'>=</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>100</font>;
+        <font color='#0000FF'>else</font>
+            eps <font color='#5555FF'>=</font> <font color='#979000'>1</font>;  <font color='#009900'>// there is no max so just use 1
+</font>
+        <font color='#009900'>// check if any of the elements of Rdiag are effectively 0
+</font>        <font color='#0000FF'>return</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>Rdiag<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> eps;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> qr_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::matrix_type qr_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_r'></a>get_r</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        matrix_type <font color='#BB00BB'>R</font><font face='Lucida Console'>(</font>n,n<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> n; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> n; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font> j<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>R</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font>;
+                <b>}</b> 
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> j<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>R</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>Rdiag</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                <b>}</b> 
+                <font color='#0000FF'>else</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>R</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>return</font> R;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> qr_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::matrix_type qr_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_q'></a>get_q</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        matrix_type Q;
+        <font color='#BB00BB'>get_q</font><font face='Lucida Console'>(</font>Q<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> Q;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> qr_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_q'></a>get_q</b><font face='Lucida Console'>(</font>
+        matrix_type<font color='#5555FF'>&amp;</font> X
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+<font color='#0000FF'>#ifdef</font> DLIB_USE_LAPACK
+        <font color='#009900'>// Take only the first n columns of an identity matrix.  This way
+</font>        <font color='#009900'>// X ends up being an m by n matrix.
+</font>        X <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>identity_matrix<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Compute Y = Q*X 
+</font>        lapack::<font color='#BB00BB'>ormqr</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>L</font>','<font color='#FF0000'>N</font>', QR_, tau, X<font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'><u>long</u></font> i<font color='#5555FF'>=</font><font color='#979000'>0</font>, j<font color='#5555FF'>=</font><font color='#979000'>0</font>, k<font color='#5555FF'>=</font><font color='#979000'>0</font>;
+
+        X.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>m,n<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>=</font> n<font color='#5555FF'>-</font><font color='#979000'>1</font>; k <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; k<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> m; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>i,k<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+            <b>}</b>
+            <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>k,k<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1.0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> k; j <font color='#5555FF'>&lt;</font> n; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>k,k<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    type s <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> k; i <font color='#5555FF'>&lt;</font> m; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        s <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>i,k<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    s <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>s<font color='#5555FF'>/</font><font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>k,k<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> k; i <font color='#5555FF'>&lt;</font> m; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> s<font color='#5555FF'>*</font><font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>i,k<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> qr_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::matrix_type qr_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='solve'></a>solve</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> B
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>type, <font color='#0000FF'>typename</font> EXP::type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>B.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tconst matrix_type qr_decomposition::solve(B)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tB.nr():         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> B.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnr():           </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:           </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#ifdef</font> DLIB_USE_LAPACK
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> blas_bindings;
+        matrix<font color='#5555FF'>&lt;</font>type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type,column_major_layout<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Compute Y = transpose(Q)*B
+</font>        lapack::<font color='#BB00BB'>ormqr</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>L</font>','<font color='#FF0000'>T</font>',QR_, tau, X<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Solve R*X = Y;
+</font>        <font color='#BB00BB'>triangular_solver</font><font face='Lucida Console'>(</font>CblasLeft, CblasUpper, CblasNoTrans, CblasNonUnit, QR_, X, n<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>/* return n x nx portion of X */</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>X,<font color='#979000'>0</font>,<font color='#979000'>0</font>,n,B.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#else</font>
+        <font color='#009900'>// just call the right version of the solve function
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>B.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>solve_vect</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>solve_mat</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                           Private member functions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#ifndef</font> DLIB_USE_LAPACK
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> qr_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::matrix_type qr_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='solve_vect'></a>solve_vect</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> B
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+
+        column_vector_type <font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Compute Y = transpose(Q)*B
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> n; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            type s <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>; 
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> k; i <font color='#5555FF'>&lt;</font> m; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                s <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>i,k<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            s <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>s<font color='#5555FF'>/</font><font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>k,k<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> k; i <font color='#5555FF'>&lt;</font> m; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> s<font color='#5555FF'>*</font><font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>i,k<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#009900'>// Solve R*X = Y;
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> n<font color='#5555FF'>-</font><font color='#979000'>1</font>; k <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; k<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#BB00BB'>Rdiag</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> k; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>i,k<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+
+        <font color='#009900'>/* return n x 1 portion of x */</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>x,<font color='#979000'>0</font>,n<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> qr_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::matrix_type qr_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='solve_mat'></a>solve_mat</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> B
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> nx <font color='#5555FF'>=</font> B.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        matrix_type <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>long</u></font> i<font color='#5555FF'>=</font><font color='#979000'>0</font>, j<font color='#5555FF'>=</font><font color='#979000'>0</font>, k<font color='#5555FF'>=</font><font color='#979000'>0</font>;
+
+        <font color='#009900'>// Compute Y = transpose(Q)*B
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> n; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> nx; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                type s <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>; 
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> k; i <font color='#5555FF'>&lt;</font> m; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    s <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>i,k<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                s <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>s<font color='#5555FF'>/</font><font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>k,k<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> k; i <font color='#5555FF'>&lt;</font> m; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> s<font color='#5555FF'>*</font><font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>i,k<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+        <font color='#009900'>// Solve R*X = Y;
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>=</font> n<font color='#5555FF'>-</font><font color='#979000'>1</font>; k <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; k<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> nx; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>k,j<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#BB00BB'>Rdiag</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> k; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> nx; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>k,j<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>QR_</font><font face='Lucida Console'>(</font>i,k<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>/* return n x nx portion of X */</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>X,<font color='#979000'>0</font>,<font color='#979000'>0</font>,n,nx<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_USE_LAPACK not defined
+</font>
+<b>}</b> 
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MATRIX_QR_DECOMPOSITION_H 
+</font>
+
+
+
+</pre></body></html>

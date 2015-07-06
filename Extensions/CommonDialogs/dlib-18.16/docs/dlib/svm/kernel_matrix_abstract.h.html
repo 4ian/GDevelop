@@ -1,0 +1,118 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - kernel_matrix_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SVm_KERNEL_MATRIX_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_SVm_KERNEL_MATRIX_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel_abstract.h.html'>kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type,
+        <font color='#0000FF'>typename</font> V
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='kernel_matrix'></a>kernel_matrix</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> kernel,
+        <font color='#0000FF'>const</font> V<font color='#5555FF'>&amp;</font> v
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - kernel == a kernel function object as defined by the file dlib/svm/kernel_abstract.h.
+              This kernel must also be capable of operating on the contents of v.
+            - V == dlib::matrix, std::vector, dlib::std_vector_c, dlib::random_subset_selector, 
+              dlib::linearly_independent_subset_finder, or kernel_type::sample_type.
+            - if (V is a dlib::matrix) then
+                - is_vector(v) == true
+        ensures
+            - if (V is of type kernel_type::sample_type) then
+                - returns a matrix R such that:
+                    - R::type == kernel_type::scalar_type
+                    - R.size() == 1
+                    - R(0,0) == kernel(v,v)
+            - else
+                - returns a matrix R such that:
+                    - R::type == kernel_type::scalar_type
+                    - R is a square matrix of v.size() rows by v.size() columns
+                    - for all valid r and c:
+                        - R(r,c) == kernel(v(r), v(c))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type,
+        <font color='#0000FF'>typename</font> V1,
+        <font color='#0000FF'>typename</font> V2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='kernel_matrix'></a>kernel_matrix</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> kernel,
+        <font color='#0000FF'>const</font> V1<font color='#5555FF'>&amp;</font> v1,
+        <font color='#0000FF'>const</font> V2<font color='#5555FF'>&amp;</font> v2
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - kernel == a kernel function object as defined by the file dlib/svm/kernel_abstract.h
+              This kernel must also be capable of operating on the contents of v1 and v2.
+            - V1 == dlib::matrix, std::vector, dlib::std_vector_c, dlib::random_subset_selector,  
+              dlib::linearly_independent_subset_finder, or kernel_type::sample_type.
+            - V2 == dlib::matrix, std::vector, dlib::std_vector_c, dlib::random_subset_selector, 
+              dlib::linearly_independent_subset_finder, or kernel_type::sample_type.
+            - if (V1 is a dlib::matrix) then
+                - is_vector(v1) == true
+            - if (V2 is a dlib::matrix) then
+                - is_vector(v2) == true
+        ensures
+            - if (V1 and V2 are of type kernel_type::sample_type) then
+                - returns a matrix R such that:
+                    - R::type == kernel_type::scalar_type
+                    - R.size() == 1
+                    - R(0,0) == kernel(v1,v2)
+            - else if (V1 is of type kernel_type::sample_type) then
+                - returns a matrix R such that:
+                    - R::type == kernel_type::scalar_type
+                    - R.nr() == 1
+                    - R.nc() == v2.size()
+                    - for all valid c:
+                        - R(0,c) == kernel(v1, v2(c))
+            - else if (V2 is of type kernel_type::sample_type) then
+                - returns a matrix R such that:
+                    - R::type == kernel_type::scalar_type
+                    - R.nr() == v1.size()
+                    - R.nc() == 1
+                    - for all valid r:
+                        - R(r,0) == kernel(v1(r), v2)
+            - else
+                - returns a matrix R such that:
+                    - R::type == kernel_type::scalar_type
+                    - R.nr() == v1.size()
+                    - R.nc() == v2.size()
+                    - for all valid r and c:
+                        - R(r,c) == kernel(v1(r), v2(c))
+
+
+            A note about aliasing (see the examples/matrix_expressions_ex.cpp example program
+            for a discussion of what aliasing is in the context of the dlib::matrix): 
+                kernel_matrix() expressions can detect aliasing of an argument if that 
+                argument is of type kernel_type::sample_type.  However, it can't detect
+                aliasing though std::vectors or other "list of sample type" container class
+                arguments.  This means that it is safe to assign a kernel_matrix() expression
+                to a sample_type if V1 or V2 are of sample_type but not safe otherwise.  However,
+                since the latter case results in a general n by m matrix rather than a column
+                or row vector you shouldn't ever be doing it anyway.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+    
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SVm_KERNEL_MATRIX_ABSTRACT_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,92 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - integrate_function_adapt_simp_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain.  See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This example demonstrates the usage of the numerical quadrature function
+    integrate_function_adapt_simp().  This function takes as input a single variable
+    function, the endpoints of a domain over which the function will be integrated, and a
+    tolerance parameter.  It outputs an approximation of the integral of this function over
+    the specified domain.  The algorithm is based on the adaptive Simpson method outlined in: 
+
+        Numerical Integration method based on the adaptive Simpson method in
+        Gander, W. and W. Gautschi, "Adaptive Quadrature – Revisited,"
+        BIT, Vol. 40, 2000, pp. 84-101
+
+*/</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>matrix.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>numeric_constants.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>numerical_integration.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// Here we the set of functions that we wish to integrate and comment in the domain of
+</font><font color='#009900'>// integration.
+</font>
+<font color='#009900'>// x in [0,1]
+</font><font color='#0000FF'><u>double</u></font> <b><a name='gg1'></a>gg1</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> x<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>return</font> <font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>e,x<font face='Lucida Console'>)</font>;
+<b>}</b>   
+
+<font color='#009900'>// x in [0,1]
+</font><font color='#0000FF'><u>double</u></font> <b><a name='gg2'></a>gg2</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> x<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>return</font> x<font color='#5555FF'>*</font>x;
+<b>}</b>
+
+<font color='#009900'>// x in [0, pi]
+</font><font color='#0000FF'><u>double</u></font> <b><a name='gg3'></a>gg3</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> x<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>return</font> <font color='#979000'>1</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>x<font color='#5555FF'>*</font>x <font color='#5555FF'>+</font> <font color='#BB00BB'>cos</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>cos</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// x in [-pi, pi]
+</font><font color='#0000FF'><u>double</u></font> <b><a name='gg4'></a>gg4</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> x<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>return</font> <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// x in [0,2]
+</font><font color='#0000FF'><u>double</u></font> <b><a name='gg5'></a>gg5</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> x<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>return</font> <font color='#979000'>1</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>+</font> x<font color='#5555FF'>*</font>x<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// We first define a tolerance parameter.  Roughly speaking, a lower tolerance will
+</font>    <font color='#009900'>// result in a more accurate approximation of the true integral.  However, there are 
+</font>    <font color='#009900'>// instances where too small of a tolerance may yield a less accurate approximation
+</font>    <font color='#009900'>// than a larger tolerance.  We recommend taking the tolerance to be in the
+</font>    <font color='#009900'>// [1e-10, 1e-8] region.
+</font>    
+    <font color='#0000FF'><u>double</u></font> tol <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font>;
+
+
+    <font color='#009900'>// Here we compute the integrals of the five functions defined above using the same 
+</font>    <font color='#009900'>// tolerance level for each.
+</font>
+    <font color='#0000FF'><u>double</u></font> m1 <font color='#5555FF'>=</font> <font color='#BB00BB'>integrate_function_adapt_simp</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>gg1, <font color='#979000'>0.0</font>, <font color='#979000'>1.0</font>, tol<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>double</u></font> m2 <font color='#5555FF'>=</font> <font color='#BB00BB'>integrate_function_adapt_simp</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>gg2, <font color='#979000'>0.0</font>, <font color='#979000'>1.0</font>, tol<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>double</u></font> m3 <font color='#5555FF'>=</font> <font color='#BB00BB'>integrate_function_adapt_simp</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>gg3, <font color='#979000'>0.0</font>, pi, tol<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>double</u></font> m4 <font color='#5555FF'>=</font> <font color='#BB00BB'>integrate_function_adapt_simp</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>gg4, <font color='#5555FF'>-</font>pi, pi, tol<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>double</u></font> m5 <font color='#5555FF'>=</font> <font color='#BB00BB'>integrate_function_adapt_simp</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>gg5, <font color='#979000'>0.0</font>, <font color='#979000'>2.0</font>, tol<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// We finally print out the values of each of the approximated integrals to ten
+</font>    <font color='#009900'>// significant digits.
+</font>
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nThe integral of exp(x) for x in [0,1] is </font>"          <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::<font color='#BB00BB'>setprecision</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>  m1  <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl; 
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>The integral of x^2 for in [0,1] is </font>"                 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::<font color='#BB00BB'>setprecision</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>  m2  <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl; 
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>The integral of 1/(x^2 + cos(x)^2) for in [0,pi] is </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::<font color='#BB00BB'>setprecision</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>  m3  <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>The integral of sin(x) for in [-pi,pi] is </font>"           <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::<font color='#BB00BB'>setprecision</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>  m4  <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>The integral of 1/(1+x^2) for in [0,2] is </font>"           <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::<font color='#BB00BB'>setprecision</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>  m5  <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+<b>}</b>
+
+
+</pre></body></html>

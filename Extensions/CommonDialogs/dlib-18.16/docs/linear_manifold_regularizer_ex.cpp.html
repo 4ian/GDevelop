@@ -1,0 +1,287 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - linear_manifold_regularizer_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use of the linear_manifold_regularizer 
+    and empirical_kernel_map from the dlib C++ Library.
+
+    This example program assumes you are familiar with some general elements of 
+    the library.  In particular, you should have at least read the <a href="svm_ex.cpp.html">svm_ex.cpp</a> 
+    and <a href="matrix_ex.cpp.html">matrix_ex.cpp</a> examples.  You should also have read the <a href="empirical_kernel_map_ex.cpp.html">empirical_kernel_map_ex.cpp</a>
+    example program as the present example builds upon it.
+
+
+
+    This program shows an example of what is called semi-supervised learning.  
+    That is, a small amount of labeled data is augmented with a large amount 
+    of unlabeled data.  A learning algorithm is then run on all the data 
+    and the hope is that by including the unlabeled data we will end up with
+    a better result.
+
+
+    In this particular example we will generate 200,000 sample points of
+    unlabeled data along with 2 samples of labeled data.  The sample points
+    will be drawn randomly from two concentric circles.  One labeled data
+    point will be drawn from each circle.  The goal is to learn to
+    correctly separate the two circles using only the 2 labeled points 
+    and the unlabeled data.
+
+    To do this we will first run an approximate form of k nearest neighbors
+    to determine which of the unlabeled samples are closest together.  We will
+    then make the manifold assumption, that is, we will assume that points close
+    to each other should share the same classification label.  
+
+    Once we have determined which points are near neighbors we will use the 
+    empirical_kernel_map and linear_manifold_regularizer to transform all the 
+    data points into a new vector space where any linear rule will have similar 
+    output for points which we have decided are near neighbors.
+
+    Finally, we will classify all the unlabeled data according to which of 
+    the two labeled points are nearest.  Normally this would not work but by 
+    using the manifold assumption we will be able to successfully classify
+    all the unlabeled data.
+
+
+    
+    For further information on this subject you should begin with the following
+    paper as it discusses a very similar application of manifold regularization.
+
+        Beyond the Point Cloud: from Transductive to Semi-supervised Learning
+        by Vikas Sindhwani, Partha Niyogi, and Mikhail Belkin
+
+
+
+
+                    ******** SAMPLE PROGRAM OUTPUT ********
+
+    Testing manifold regularization with an intrinsic_regularization_strength of 0.
+    number of edges generated: 49998
+    Running simple test...
+    error: 0.37022
+    error: 0.44036
+    error: 0.376715
+    error: 0.307545
+    error: 0.463455
+    error: 0.426065
+    error: 0.416155
+    error: 0.288295
+    error: 0.400115
+    error: 0.46347
+
+    Testing manifold regularization with an intrinsic_regularization_strength of 10000.
+    number of edges generated: 49998
+    Running simple test...
+    error: 0
+    error: 0
+    error: 0
+    error: 0
+    error: 0
+    error: 0
+    error: 0
+    error: 0
+    error: 0
+    error: 0
+
+
+*/</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>manifold_regularization.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>rand.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>statistics.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// First let's make a typedef for the kind of samples we will be using. 
+</font><font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, <font color='#979000'>0</font>, <font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample_type;
+
+<font color='#009900'>// We will be using the radial_basis_kernel in this example program.
+</font><font color='#0000FF'>typedef</font> radial_basis_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> kernel_type;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='generate_circle'></a>generate_circle</b> <font face='Lucida Console'>(</font>
+    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+    <font color='#0000FF'><u>double</u></font> radius,
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num
+<font face='Lucida Console'>)</font>;
+<font color='#009900'>/*!
+    requires
+        - num &gt; 0
+        - radius &gt; 0
+    ensures
+        - generates num points centered at (0,0) with the given radius.  Adds these
+          points into the given samples vector.
+!*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='test_manifold_regularization'></a>test_manifold_regularization</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> intrinsic_regularization_strength
+<font face='Lucida Console'>)</font>;
+<font color='#009900'>/*!
+    ensures
+        - Runs an example test using the linear_manifold_regularizer with the given
+          intrinsic_regularization_strength.   
+!*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// Run the test without any manifold regularization. 
+</font>    <font color='#BB00BB'>test_manifold_regularization</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Run the test with manifold regularization.  You can think of this number as
+</font>    <font color='#009900'>// a measure of how much we trust the manifold assumption.  So if you are really
+</font>    <font color='#009900'>// confident that you can select neighboring points which should have the same
+</font>    <font color='#009900'>// classification then make this number big.   
+</font>    <font color='#BB00BB'>test_manifold_regularization</font><font face='Lucida Console'>(</font><font color='#979000'>10000.0</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='test_manifold_regularization'></a>test_manifold_regularization</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> intrinsic_regularization_strength
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Testing manifold regularization with an intrinsic_regularization_strength of </font>" 
+         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> intrinsic_regularization_strength <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.\n</font>";
+
+    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samples;
+
+    <font color='#009900'>// Declare an instance of the kernel we will be using.  
+</font>    <font color='#0000FF'>const</font> kernel_type <font color='#BB00BB'>kern</font><font face='Lucida Console'>(</font><font color='#979000'>0.1</font><font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_points <font color='#5555FF'>=</font> <font color='#979000'>100000</font>;
+
+    <font color='#009900'>// create a large dataset with two concentric circles.  There will be 100000 points on each circle
+</font>    <font color='#009900'>// for a total of 200000 samples.
+</font>    <font color='#BB00BB'>generate_circle</font><font face='Lucida Console'>(</font>samples, <font color='#979000'>2</font>, num_points<font face='Lucida Console'>)</font>;  <font color='#009900'>// circle of radius 2
+</font>    <font color='#BB00BB'>generate_circle</font><font face='Lucida Console'>(</font>samples, <font color='#979000'>4</font>, num_points<font face='Lucida Console'>)</font>;  <font color='#009900'>// circle of radius 4
+</font>
+    <font color='#009900'>// Create a set of sample_pairs that tells us which samples are "close" and should thus 
+</font>    <font color='#009900'>// be classified similarly.  These edges will be used to define the manifold regularizer.
+</font>    <font color='#009900'>// To find these edges we use a simple function that samples point pairs randomly and 
+</font>    <font color='#009900'>// returns the top 5% with the shortest edges.
+</font>    std::vector<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font> edges;
+    <font color='#BB00BB'>find_percent_shortest_edges_randomly</font><font face='Lucida Console'>(</font>samples, <font color='#BB00BB'>squared_euclidean_distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>0.05</font>, <font color='#979000'>1000000</font>, <font color='#BB00BB'>time</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, edges<font face='Lucida Console'>)</font>;
+
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>number of edges generated: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    empirical_kernel_map<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> ekm;
+
+    <font color='#009900'>// Since the circles are not linearly separable we will use an empirical kernel map to 
+</font>    <font color='#009900'>// map them into a space where they are separable.  We create an empirical_kernel_map 
+</font>    <font color='#009900'>// using a random subset of our data samples as basis samples.  Note, however, that even
+</font>    <font color='#009900'>// though the circles are linearly separable in this new space given by the empirical_kernel_map
+</font>    <font color='#009900'>// we still won't be able to correctly classify all the points given just the 2 labeled examples.
+</font>    <font color='#009900'>// We will need to make use of the nearest neighbor information stored in edges.  To do that
+</font>    <font color='#009900'>// we will use the linear_manifold_regularizer.
+</font>    ekm.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>kern, <font color='#BB00BB'>randomly_subsample</font><font face='Lucida Console'>(</font>samples, <font color='#979000'>50</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Project all the samples into the span of our 50 basis samples
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        samples[i] <font color='#5555FF'>=</font> ekm.<font color='#BB00BB'>project</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// Now create the manifold regularizer.  The result is a transformation matrix that
+</font>    <font color='#009900'>// embodies the manifold assumption discussed above.  
+</font>    linear_manifold_regularizer<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> lmr;
+    <font color='#009900'>// use_gaussian_weights is a function object that tells lmr how to weight each edge.  In this
+</font>    <font color='#009900'>// case we let the weight decay as edges get longer.  So shorter edges are more important than
+</font>    <font color='#009900'>// longer edges.
+</font>    lmr.<font color='#BB00BB'>build</font><font face='Lucida Console'>(</font>samples, edges, <font color='#BB00BB'>use_gaussian_weights</font><font face='Lucida Console'>(</font><font color='#979000'>0.1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> T <font color='#5555FF'>=</font> lmr.<font color='#BB00BB'>get_transformation_matrix</font><font face='Lucida Console'>(</font>intrinsic_regularization_strength<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Apply the transformation generated by the linear_manifold_regularizer to 
+</font>    <font color='#009900'>// all our samples.
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        samples[i] <font color='#5555FF'>=</font> T<font color='#5555FF'>*</font>samples[i];
+
+
+    <font color='#009900'>// For convenience, generate a projection_function and merge the transformation
+</font>    <font color='#009900'>// matrix T into it.  That is, we will have: proj(x) == T*ekm.project(x).
+</font>    projection_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> proj <font color='#5555FF'>=</font> ekm.<font color='#BB00BB'>get_projection_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    proj.weights <font color='#5555FF'>=</font> T<font color='#5555FF'>*</font>proj.weights;
+
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Running simple test...</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>// Pick 2 different labeled points.  One on the inner circle and another on the outer.  
+</font>    <font color='#009900'>// For each of these test points we will see if using the single plane that separates
+</font>    <font color='#009900'>// them is a good way to separate the concentric circles.  We also do this a bunch 
+</font>    <font color='#009900'>// of times with different randomly chosen points so we can see how robust the result is.
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> itr <font color='#5555FF'>=</font> <font color='#979000'>0</font>; itr <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>itr<font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> test_points;
+        <font color='#009900'>// generate a random point from the radius 2 circle
+</font>        <font color='#BB00BB'>generate_circle</font><font face='Lucida Console'>(</font>test_points, <font color='#979000'>2</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// generate a random point from the radius 4 circle
+</font>        <font color='#BB00BB'>generate_circle</font><font face='Lucida Console'>(</font>test_points, <font color='#979000'>4</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// project the two test points into kernel space.  Recall that this projection_function
+</font>        <font color='#009900'>// has the manifold regularizer incorporated into it.  
+</font>        <font color='#0000FF'>const</font> sample_type class1_point <font color='#5555FF'>=</font> <font color='#BB00BB'>proj</font><font face='Lucida Console'>(</font>test_points[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> sample_type class2_point <font color='#5555FF'>=</font> <font color='#BB00BB'>proj</font><font face='Lucida Console'>(</font>test_points[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>double</u></font> num_wrong <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#009900'>// Now attempt to classify all the data samples according to which point
+</font>        <font color='#009900'>// they are closest to.  The output of this program shows that without manifold 
+</font>        <font color='#009900'>// regularization this test will fail but with it it will perfectly classify
+</font>        <font color='#009900'>// all the points.
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>double</u></font> distance_to_class1 <font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>samples[i] <font color='#5555FF'>-</font> class1_point<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>double</u></font> distance_to_class2 <font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>samples[i] <font color='#5555FF'>-</font> class2_point<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>bool</u></font> predicted_as_class_1 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>distance_to_class1 <font color='#5555FF'>&lt;</font> distance_to_class2<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>bool</u></font> really_is_class_1 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font> num_points<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now count how many times we make a mistake
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>predicted_as_class_1 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> really_is_class_1<font face='Lucida Console'>)</font>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>num_wrong;
+        <b>}</b>
+
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>error: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_wrong<font color='#5555FF'>/</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+dlib::rand rnd;
+
+<font color='#0000FF'><u>void</u></font> <b><a name='generate_circle'></a>generate_circle</b> <font face='Lucida Console'>(</font>
+    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+    <font color='#0000FF'><u>double</u></font> radius,
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    sample_type <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>double</u></font> sign <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>
+            sign <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>radius<font color='#5555FF'>*</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>radius;
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> sign<font color='#5555FF'>*</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>radius<font color='#5555FF'>*</font>radius <font color='#5555FF'>-</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

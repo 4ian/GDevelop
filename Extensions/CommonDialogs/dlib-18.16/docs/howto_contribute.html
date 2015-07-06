@@ -1,0 +1,681 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html xmlns:gcse="googleCustomSearch"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="shortcut icon" href="dlib-icon.ico"><meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I="><meta name="google-site-verification" content="DGSSJMKDomaDaDTIRJ8jDkv0YMx9Cz7OESbXHjjr6Jw"><title>dlib C++ Library
+   - How to Contribute</title><script language="JavaScript">
+
+// ---------------------------------------------
+// --- Name:    Easy DHTML Treeview           --
+// --- Author:  D.D. de Kerf                  --
+// --- Version: 0.2          Date: 13-6-2001  --
+// ---------------------------------------------
+function Toggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "minus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "plus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+function BigToggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigminus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigplus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+</script><style type="text/css">
+   body {margin:0px;}
+   pre {margin:0px;}
+
+   ul.tree  li { list-style: none;  margin-left:10px;} 
+   ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
+   ul.tree  li ul { margin-left:10px; padding:0px; }
+
+   li#term { list-style: none; }
+
+   div.component {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      padding: 0.7em;
+   }
+
+   div.question {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      margin-bottom: 90%;
+      padding: 0.7em;
+   }
+
+   div.function {
+      background-color:white; 
+      border: 2px solid rgb(102,102,255); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.class {
+      background-color:white; 
+      border: 2px solid rgb(255,102,102); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.extension {
+      background-color:#FDFDFD; 
+      border: 1px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.0em;
+      padding: 0.7em;
+   }
+
+   div.logb {
+      text-align:left;
+      padding: 0.0em;
+      float: left;
+      background-color:#c0c0c0; 
+      border: double ; 
+      margin: 0.5em;
+   }
+
+   div.name {
+      float: left;
+   }
+   div.line1 {
+      float:left;
+      width:100%;
+      background-color:#dfdfdf; 
+   }
+   div.line2 {
+      float:left;
+      width:100%;
+   }
+   div.inc {
+      float: right;
+   }
+
+
+   .code_box
+   {
+      color: black;
+      margin: 1em 0.25in;
+      padding: 0.5em;
+      background: rgb(240,240,240);
+      border-top: black dotted 1px;
+      border-left: black dotted 1px;
+      border-right: black solid 2px;
+      border-bottom: black solid 2px;
+   }
+
+
+
+   .bdotted {border-bottom: 1px dotted}
+   .bdashed {border-bottom: 1px dashed}
+   .bsolid {border-bottom: 1px solid}
+   .bdouble {border-bottom: 1px double}
+   .bgroove {border-bottom: 1px groove}
+   .bridge {border-bottom: 1px ridge}
+   .binset {border-bottom: 1px inset}
+   .boutset {border-bottom: 1px outset}
+
+   div.row1 {
+      background-color:#dfdfdf; 
+   }
+   div.row2 {
+      background-color:#f2f2f2; 
+   }
+
+   div.typedefs {
+      margin-left: 1.5em;
+      margin-top: 0.2em;
+      border: 1px dotted;
+      width: 52em;
+   }
+
+   div.tdn {
+      width: 10em;
+   }
+
+   .fullhr {
+      clear: both;
+   }
+
+   body {
+      text-align: center;
+   }
+
+   div.entire_page_header {
+      width:62.5em;  
+      text-align: left;
+      margin-top: 0.4em;
+      margin-left: auto;
+      margin-right: auto;
+   }
+   div.entire_page {
+      width:62.5em;  
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      clear:both;
+   }
+</style></head><body bgcolor="#EDF3EE"><a name="top"></a><div class="entire_page_header"><a href="http://dlib.net"><img src="dlib-logo.png"></a></div><div class="entire_page"><table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px"><tr height="100%"><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="145" height="100%"><tr><td VALIGN="TOP"><b>The Library</b><ul class="tree"><li><a href="algorithms.html">Algorithms</a></li><li><a href="api.html">API Wrappers</a></li><li><a href="bayes.html">Bayesian Nets</a></li><li><a href="compression.html">Compression</a></li><li><a href="containers.html">Containers</a></li><li><a href="graph_tools.html">Graph Tools</a></li><li><a href="imaging.html">Image Processing</a></li><li><a href="linear_algebra.html">Linear Algebra</a></li><li><a href="ml.html">Machine Learning</a></li><li><a href="metaprogramming.html">Metaprogramming</a></li><li><a href="other.html">Miscellaneous</a></li><li><a href="network.html">Networking</a></li><li><a href="optimization.html">Optimization</a></li><li><a href="parsing.html">Parsing</a></li></ul><br><b>Help/Info</b><ul class="tree"><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: C++</u></font></a><ul style="display:none;"><li><a href="3d_point_cloud_ex.cpp.html">3D_Point_Cloud</a></li><li><a href="assignment_learning_ex.cpp.html">Assignment_Learning</a></li><li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li><li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li><li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li><li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li><li><a href="bridge_ex.cpp.html">Bridge</a></li><li><a href="bsp_ex.cpp.html">BSP</a></li><li><a href="svm_c_ex.cpp.html">C-Support_Vector_Machine</a></li><li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li><li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li><li><a href="config_reader_ex.cpp.html">Config_File_Reader</a></li><li><a href="custom_trainer_ex.cpp.html">Custom_Trainers</a></li><li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li><li><a href="empirical_kernel_map_ex.cpp.html">Empirical_Kernel_Map</a></li><li><a href="face_detection_ex.cpp.html">Face_Detection</a></li><li><a href="face_landmark_detection_ex.cpp.html">Face_Landmark_Detection</a></li><li><a href="fhog_ex.cpp.html">FHOG_Feature_Extraction</a></li><li><a href="fhog_object_detector_ex.cpp.html">FHOG_Object_Detection</a></li><li><a href="graph_labeling_ex.cpp.html">Graph_Labeling</a></li><li><a href="gui_api_ex.cpp.html">GUI</a></li><li><a href="hough_transform_ex.cpp.html">Hough_Transform</a></li><li><a href="server_http_ex.cpp.html">HTTP_Server</a></li><li><a href="image_ex.cpp.html">Image</a></li><li><a href="iosockstream_ex.cpp.html">IO Socket Streams</a></li><li><a href="server_iostream_ex.cpp.html">IO Streams Server</a></li><li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li><li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li><li><a href="krr_regression_ex.cpp.html">Kernel_Ridge_Regression</a></li><li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li><li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li><li><a href="krr_classification_ex.cpp.html">KRR_Classification</a></li><li><a href="learning_to_track_ex.cpp.html">Learning_to_Track</a></li><li><a href="max_cost_assignment_ex.cpp.html">Linear_Assignment_Problems</a></li><li><a href="linear_manifold_regularizer_ex.cpp.html">Linear_Manifold_Regularizer</a></li><li><a href="mpc_ex.cpp.html">Linear_Model_Predictive_Control</a></li><li><a href="logger_ex.cpp.html">Logger</a></li><li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li><li><a href="logger_custom_output_ex.cpp.html">Logger_Custom_Output</a></li><li><a href="matrix_ex.cpp.html">Matrix</a></li><li><a href="matrix_expressions_ex.cpp.html">Matrix_Expressions</a></li><li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li><li><a href="model_selection_ex.cpp.html">Model_Selection</a></li><li><a href="multiclass_classification_ex.cpp.html">Multiclass_Classification</a></li><li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li><li><a href="mlp_ex.cpp.html">Neural_Network</a></li><li><a href="least_squares_ex.cpp.html">Non-Linear Least Squares</a></li><li><a href="svm_ex.cpp.html">Nu-Support_Vector_Machine</a></li><li><a href="integrate_function_adapt_simp_ex.cpp.html">Numerical_Integration</a></li><li><a href="object_detector_ex.cpp.html">Object_Detector</a></li><li><a href="object_detector_advanced_ex.cpp.html">Object_Detector_Advanced</a></li><li><a href="one_class_classifiers_ex.cpp.html">One_Class_Classifiers</a></li><li><a href="svm_pegasos_ex.cpp.html">Online_SVM</a></li><li><a href="optimization_ex.cpp.html">Optimization</a></li><li><a href="parallel_for_ex.cpp.html">Parallel_For_Loops</a></li><li><a href="pipe_ex.cpp.html">Pipe</a></li><li><a href="pipe_ex_2.cpp.html">Pipe_2</a></li><li><a href="quantum_computing_ex.cpp.html">Quantum_Computing</a></li><li><a href="queue_ex.cpp.html">Queue</a></li><li><a href="rank_features_ex.cpp.html">Rank_Features</a></li><li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li><li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li><li><a href="running_stats_ex.cpp.html">Running_Stats</a></li><li><a href="sequence_labeler_ex.cpp.html">Sequence_Labeling</a></li><li><a href="sequence_segmenter_ex.cpp.html">Sequence_Segmentation</a></li><li><a href="sockets_ex.cpp.html">Sockets</a></li><li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li><li><a href="svm_sparse_ex.cpp.html">Sparse_Vectors</a></li><li><a href="sqlite_ex.cpp.html">SQLite</a></li><li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li><li><a href="svm_struct_ex.cpp.html">Structural_Support_Vector_Machines</a></li><li><a href="svr_ex.cpp.html">Support_Vector_Regression</a></li><li><a href="surf_ex.cpp.html">SURF</a></li><li><a href="svm_rank_ex.cpp.html">SVM-Rank</a></li><li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li><li><a href="threads_ex.cpp.html">Threads</a></li><li><a href="thread_function_ex.cpp.html">Thread_Function</a></li><li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li><li><a href="timer_ex.cpp.html">Timer</a></li><li><a href="train_object_detector.cpp.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor_ex.cpp.html">Train_Shape_Predictor</a></li><li><a href="using_custom_kernels_ex.cpp.html">Using_Custom_Kernels</a></li><li><a href="video_tracking_ex.cpp.html">Video_Object_Tracking</a></li><li><a href="webcam_face_pose_ex.cpp.html">Webcam_Face_Pose_Estimation</a></li><li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: Python</u></font></a><ul style="display:none;"><li><a href="face_detector.py.html">Face_Detector</a></li><li><a href="face_landmark_detection.py.html">Face_Landmark_Detection</a></li><li><a href="find_candidate_object_locations.py.html">find_candidate_object_locations</a></li><li><a href="max_cost_assignment.py.html">Linear_Assignment_Problems</a></li><li><a href="sequence_segmenter.py.html">Sequence_Segmenter</a></li><li><a href="svm_struct.py.html">Structural_Support_Vector_Machines</a></li><li><a href="svm_rank.py.html">SVM-Rank</a></li><li><a href="train_object_detector.py.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor.py.html">Train_Shape_Predictor</a></li><li><a href="correlation_tracker.py.html">Video_Object_Tracking</a></li></ul></li><li><a href="faq.html">FAQ</a></li><li><a href="index.html">Home</a></li><li><a href="compile.html">How to compile</a></li><li><a href="howto_contribute.html">How to contribute</a></li><li><a href="term_index.html">Index</a></li><li><a href="intro.html">Introduction</a></li><li><a href="license.html">License</a></li><li><a href="python/index.html">Python API</a></li><li><a href="books.html">Suggested Books</a></li></ul><br><b>Current Release</b><ul class="tree"><li><a href="change_log.html">Change Log</a></li><li><a href="release_notes.html">Release Notes</a></li><li>Version: 18.16</li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"><br><br><br><br><br><br><br><br><br>
+      Last Modified:<br>Dec 28, 2014<br><br></td></tr></table></td><td VALIGN="TOP" width="100%" style="border: 1px solid rgb(102,102,102);"><center><h1>How to Contribute</h1></center><br><br>
+
+         There are some simple ways to contribute to dlib:
+
+         <ul><li> Find confusing or incorrect documentation </li><li> Help make the web page prettier </li><li> Link to dlib from your web page </li><li> Add yourself or your project to the list of 
+            <a href="http://sourceforge.net/p/dclib/wiki/Known_users/">dlib users</a></li><li> Try to run the dlib regression test suite on any platforms you
+            have access to </li></ul><a name="Contributing%20Code"></a><h2>Contributing Code</h2>
+
+         Code contributions are also welcome.  I use <a href="http://mercurial.selenic.com/">Mercurial</a> 
+         for version control.  So the simplest
+         way to contribute code is to clone from the dlib repository, make your changes, and then email
+         them to me as a bundle file.  An example is shown below.
+
+<pre class="code_box">
+hg clone http://hg.code.sf.net/p/dclib/code dclib-code
+cd dclib-code
+[make changes to dlib source code]
+hg commit -u "Your Name &lt;your.email@host.com&gt;"
+hg bundle dlibchanges.hg
+</pre>
+Then <a href="mailto:davis@dlib.net">email me</a> the dlibchanges.hg file and I'll review it and get back to you.
+Alternatively, you can submit a pull request to my clone of <a href="https://github.com/davisking/dlib">dlib on github</a>.
+
+         <p> If you want to make a big change or feature addition, it's probably a good idea to talk to me about it first.  
+            Additionally, you should read over the coding guidelines below
+            and try to follow them.  It is also probably a good idea to read the books Effective C++ and 
+            More Effective C++ by Scott Myers.  Finally, if you are not familiar with Mercurial you also 
+            might want to read the excellent <a href="http://hginit.com">introduction</a> by Joel Spolsky.  
+         </p><a name="Coding%20Guidelines"></a><h2>Coding Guidelines</h2>
+
+         1. <a href="#1">Use Design by Contract</a><br>
+         2. <a href="#2">Use spaces instead of tabs.</a><br>
+         3. <a href="#3">Use the standard C++ naming convention</a><br>
+         4. <a href="#4">Use RAII</a><br>
+         5. <a href="#5">Don't use pointers</a><br>
+         6. <a href="#6">Don't use #define for constants.</a><br>
+         7. <a href="#7">Don't use stack based arrays.</a><br>
+         8. <a href="#8">Use exceptions, but don't abuse them</a><br>
+         9. <a href="#9">Write portable code</a><br>
+         10. <a href="#10">Setup regression tests</a><br>
+         11. <a href="#11">Use the Boost Software License</a><br><ul><a name="1"></a><li><a name="Apply%20Design%20by%20Contract%20to%20Your%20Code%20%20"></a><h3> Apply Design by Contract to Your Code  </h3><ul><p>
+                  The most important part of a software library isn't the code, it is the set
+                  of interfaces the library exposes to the user.  These interfaces need to be easy 
+                  to use right, and hard to use wrong.  The only way this
+                  happens is if the interfaces are documented in a simple, consistent, and precise way.
+               </p><p>
+                  The name for the way I design and document these interfaces is known as
+                  Design by Contract.   There is a lot that can be said about Design by Contract, in fact,
+                  whole books have been written about it, and programming languages exist which
+                  use Design by Contract as a central element.  Here I will just go over some
+                  of the basic ways it is used in dlib as well as some of the reasons why it is a 
+                  Good Thing.
+               </p><li><b>Functions should have documented preconditions which are programmatically verifiable</b><ul><p>
+                     Many functions have a set of requirements or preconditions that need to be satisfied
+                     if they are to be used.  If these requirements are not satisfied 
+                     when a function is called then the function will not do what it is supposed to do.  Moreover,
+                     any piece of software that calls a function but doesn't make sure all preconditions
+                     are satisfied contains a bug, <i>by definition</i>.  
+                     </p><p>
+                        This means all functions must precisely document their preconditions if they are to be
+                        usable.  In fact, all preconditions should be programmatically verifiable.  Doing this
+                        has a number of benefits.  First, it means they are unambiguous.  English
+                        can be confusing and vague, but saying "<tt>some_predicate == true</tt>" uses a 
+                        formal language, C++, that we all should understand quite well.  Second, it means 
+                        you can put checks into the code that will catch <i>all</i> usage errors. 
+                     </p><p>
+                        These checks should always be implemented using 
+                        <a href="metaprogramming.html#DLIB_ASSERT">DLIB_ASSERT</a> or
+                        <a href="metaprogramming.html#DLIB_CASSERT">DLIB_CASSERT</a> and they should always
+                        cover all preconditions.   
+                        These macros take a boolean argument and if it is false they throw dlib::fatal_error.  So
+                        you can use them to check that all your preconditions are true.  Also, don't forget that
+                        a violated function precondition indicates a bug in a program.  
+                        That is, when dlib::fatal_error is thrown it means a bug has been found and the only thing 
+                        an application can do at that point is print an error message and terminate.  
+                        In fact, dlib::fatal_error has checks in it to make sure someone doesn't catch the
+                        exception and ignore it.  These checks will abruptly terminate any program that attempts
+                        to ignore fatal errors.   
+                     </p><p>
+                        The above considerations bring me to my next bit of advice.  Developers new to Design by Contract
+                        often confuse input validation requirements with function preconditions.   When I tell them 
+                        to consider any violation of a function's preconditions a bug and terminate their application 
+                        with an error message they complain that this is not at all what an application should do when 
+                        it receives invalid user inputs.
+
+                        They are right, that would be a bad thing
+                        and you should not write software that behaves that way.  The way out of this problem is, of
+                        course, to not consider invalid input as a bug.  Instead, you should perform explicit input validation 
+                        on any
+                        data coming into your program <i>before</i> it gets to any functions that have preconditions
+                        which demand the validated inputs.  Moreover, if you make your preconditions programmatically verifiable
+                        then it should be easy to validate any inputs by simply using whatever it is you
+                        use to check your preconditions.  
+                     </p><p>
+                        Consider the function <a href="dlib/svm/svm_abstract.h.html#cross_validate_trainer">cross_validate_trainer</a> as an 
+                        example.  One of its requirements is that the input forms a valid binary classification problem.
+                        This is documented in the list of preconditions as 
+                        "<tt>is_binary_classification_problem(x,y) == true</tt>".  This precondition is just saying 
+                        that when you call
+                        the <a href="dlib/svm/svm_abstract.h.html#is_binary_classification_problem">is_binary_classification_problem</a> 
+                        function on the x and y inputs it had better return true 
+                        if you want to use those inputs with the <tt>cross_validate_trainer</tt> function.   
+                        Given this information it is trivial to perform input validation.  All you have to do is
+                        call <tt>is_binary_classification_problem</tt> on your input data and you are done.   
+                     </p><p>
+                        Using the above technique you have validated your inputs, documented your preconditions, and are
+                        buffered by DLIB_ASSERT statements that will catch you if you accidentally forget to validate any
+                        inputs.   
+                     </p><p>The thing to understand here is that
+                        a violation of a function's preconditions means you have a bug on your hands.  Or in other words,
+                        you should never intentionally violate any function preconditions.  But of course 
+                        it will happen from time to time because bugs are unavoidable.  But at least with 
+                        this approach you will get a detailed error message early in development rather than a 
+                        mysterious segmentation fault days or weeks later.
+                     </p></ul></li><li><b>Functions should have documented postconditions  </b><ul><p>
+                     I don't have nearly as much to say about postconditions as I did about function requirements.  You should
+                     strive to write programmatically verifiable postconditions because that makes your postconditions
+                     more precise.  However, it is sometimes the case that this isn't practical and that is fine.  
+                     But whatever you do write needs to clearly communicate to the
+                     user what it is your function does.  
+                  </p></ul></li><p>
+                  Now you may be wondering why this is called <i>Design</i> by Contract and not Documentation
+                  by Contract.  The reason is that the process of writing down all these detailed descriptions
+                  of what your code does becomes part of how you design software.  For example, often you 
+                  will find that when you go to write down the requirements for calling a function you are unable 
+                  to do so.  This may be because the requirements are so complex you can't think of a way 
+                  to describe them, or you may realize that you don't even know what they are.  Alternatively, 
+                  you may know what they are but discover there isn't any way to verify them programmatically.   All these
+                  things are symptoms of a bad <i>design</i> and the reason you became aware of this design problem 
+                  was by attempting to apply Design by Contract.  
+               </p><p>
+                  After you get enough practice with this way of writing software you begin to think a lot
+                  more about questions like "how can I design this class such that every member function
+                  has a very simple set of requirements and postconditions?"  Once you start doing this
+                  you are well on your way to creating software components that are easy to use right, and 
+                  hard to use wrong.
+               </p><p>
+                  The notation dlib uses to document preconditions and postconditions is described in
+                  the <a href="intro.html#Notation">introduction</a>.  All code that goes into dlib
+                  must document itself using this notation.  You should also separate the implementation
+                  and specification of a component into two separate files as described in the introduction.  This
+                  way users aren't confused or distracted by implementation details when they look at the documentation.  
+               </p></ul></li><a name="2"></a><li><a name="Use%20spaces%20instead%20of%20tabs.%20%20%20"></a><h3>Use spaces instead of tabs.   </h3><ul><p>This is just generally good advice but
+                  it is especially important in dlib since everything is viewable 
+                  as pretty-printed HTML.  Tabs show up as 8 characters in most browsers
+                  and this results in the HTML version being difficult to read.  So 
+                  don't use tabs.  Additionally, please use 4 spaces for each tab level.</p></ul></li><a name="3"></a><li><a name="Don't%20use%20capitol%20letters%20in%20the%20names%20of%20variables,%20functions,%20or%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20classes.%20%20Use%20the%20_%20character%20to%20separate%20words.%20%20"></a><h3> Don't use capitol letters in the names of variables, functions, or
+              classes.  Use the _ character to separate words.  </h3><ul><p>
+                  The reason dlib uses this style is because it is the style used by the
+                  C++ standard library.  But more importantly, dlib currently provides
+                  an interface to users that has a consistent look and feel and it is
+                  important to continue to do so.   
+               </p><p>
+                     As for constants, they should usually contain all upper case letters 
+                     but all lowercase is ok sometimes.
+                  </p></ul></li><a name="4"></a><li><a name="Don't%20use%20manual%20resource%20management.%20%20Use%20RAII%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20instead."></a><h3> Don't use manual resource management.  Use RAII
+               instead.</h3><ul><p>
+                  You should not be calling new and delete in your own code.  You should instead
+                  be using objects like the std::vector, <a href="containers.html#scoped_ptr">scoped_ptr</a>,
+                  or any number of other objects that manage resources such as memory for you.  If you want
+                  an array use std::vector (or the checked <a href="containers.html#std_vector_c">std_vector_c</a>).
+                  If you want to make a lookup table use a <a href="containers.html#map">map</a>.  If you want
+                  a two dimensional array use <a href="linear_algebra.html#matrix">matrix</a> or 
+                  <a href="containers.html#array2d">array2d</a>.
+               </p><p>
+                  These container objects are examples of what is called RAII (Resource Acquisition Is Initialization)
+                  in C++.  It is essentially a name for the fact that, in C++, you can have totally automated and
+                  deterministic resource management by always associating resource acquisition with the construction
+                  of an object and resource release with the destruction of an object.  I say resource management 
+                  here rather than memory management
+                  because, unlike Java, RAII can be used for more than memory management.  For example, when
+                  you use a <a href="dlib/threads/threads_kernel_abstract.h.html#mutex">mutex</a> you first lock
+                  it, do something, and then you need to remember to unlock it.  The RAII way of doing this is
+                  to use the <a href="api.html#auto_mutex">auto_mutex</a> which will lock a mutex and automatically
+                  unlock it for you.   Or suppose you have made a TCP <a href="api.html#sockets">connection</a> 
+                  to another machine and you want to be certain the resources associated with that connection 
+                  are always released.  You can easily accomplish this with RAII by using the scoped_ptr as
+                  shown in <a href="sockstreambuf_ex.cpp.html">this</a> example program.
+               </p><p>
+                  RAII is a trivial technique to use.  All you have to do is not call new and delete and
+                  you will never have another memory leak.  Just use the appropriate <a href="containers.html">container</a>
+                  instead.  Finally, if you don't use RAII then your code is almost certainly not exception safe.   
+               </p></ul></li><a name="5"></a><li><a name="Don't%20use%20pointers%20"></a><h3>Don't use pointers </h3><ul><p>
+                  There are a number of reasons to not use pointers.  First, if you are using pointers then
+                  you are probably not using RAII.  Second, pointers are ambiguous.  When I see a pointer
+                  I don't know if it is a pointer to a single item, a pointer to nothing, or 
+                  a pointer to an array of who knows how many things.   On the other hand, when I see a 
+                  std::vector I know with certainty that I'm dealing with a kind of array.  Or if I see a 
+                  reference to something then I know I'm dealing with exactly one instance of some object.  
+               </p><p>
+                  Most importantly, it is impossible to validate the state of a pointer.  Consider two
+                  functions:  
+                  <pre class="code_box">
+double compute_sum_of_array_elements(const double* array, int array_size); 
+double compute_sum_of_array_elements(const std::vector&lt;double&gt;&amp; array); </pre>
+
+                  The first function is inherently unsafe.  If the user accidentally passes in an invalid pointer
+                  or sets the size argument incorrectly then their program may crash and this will turn into a 
+                  potentially hard to find bug.  This is because there is absolutely nothing you can do inside
+                  the first function to tell the difference between a valid pointer and size pair and an invalid
+                  pointer and size pair.  <b><i>Nothing</i></b>.   The second function has none of these difficulties.
+               </p><p>
+                  If you absolutely need pointer semantics then you can usually use a smart pointer like
+                  <a href="containers.html#scoped_ptr">scoped_ptr</a> or <a href="containers.html#shared_ptr">shared_ptr</a>.
+                  If that still isn't good enough for you and you <i>really</i> need to use a normal C style pointer
+                  then isolate your pointers inside a class or function so that they are contained in a small area of the code.  
+                  However, in practice the container classes in dlib and the STL are more than sufficient in nearly 
+                  every case where pointers would otherwise be used.
+               </p></ul></li><a name="6"></a><li><a name="Don't%20use%20#define%20for%20constants.%20%20%20"></a><h3> Don't use #define for constants.   </h3><ul><p>
+                  dlib is meant to be integrated into other people's projects.  Because of this everything
+                  in dlib is contained inside the dlib namespace to avoid naming conflicts with user's code.
+                  #defines don't respect namespaces at all.  For example, if you #define a constant called SIZE then it
+                  will cause a conflict with any piece of code <i>anywhere</i> that contains the identifier SIZE.  
+                  This means that #define based constants must be avoided and constants should be created using the
+                  const keyword instead.
+               </p></ul></li><a name="7"></a><li><a name="Don't%20use%20stack%20based%20arrays.%20%20%20"></a><h3>Don't use stack based arrays.   </h3><ul><p>
+                  A stack based array, or C style array, is an array declared like this:
+                  <pre class="code_box">int array[200];</pre>
+                  Most of my criticisms of pointers also apply to stack based arrays.  In particular, 
+                  if you are passing a stack based array to a function then that means you are probably
+                  using functions similar to the unsafe compute_sum_of_array_elements() example above.
+               </p><p>
+                  The only time it is OK to use this kind of array is when you use it for simple
+                  tasks and you don't start passing pointers to the array to other parts of your code.  You
+                  should also use a constant to store the array size and use that constant in your loops
+                  rather than hard coding the size in numerous places.   
+               </p><p>
+                  But even still, you should use a container class instead and preferably one with the ability to do range
+                  checking such as the  <a href="containers.html#std_vector_c">std_vector_c</a>.   </p><p>
+                     Consider the following two bits of code:
+<pre class="code_box">
+for (int i = 0; i &lt; array_size; ++i) 
+   my_c_array[i] = 4;
+
+for (int i = 0; i &lt; my_std_vector.size(); ++i)
+   my_std_vector[i] = 4;
+</pre>
+                  The second loop clearly doesn't overflow the bounds of the my_std_vector.   On the other 
+                  hand, just by looking at the code in the first loop, we can not tell if it overflows
+                  my_c_array.  We have to assume that array_size is the appropriate constant but we could be wrong.
+               </p><p>
+                  Buffer overflows are probably the most common kind of bug in C and C++ code.  These bugs also
+                  lead to serious exploitable security holes in software.  So please try to avoid stack based arrays.
+               </p></ul></li><a name="8"></a><li><a name="Use%20exceptions,%20but%20don't%20abuse%20them.%20"></a><h3> Use exceptions, but don't abuse them. </h3><ul><p>
+                   Exceptions are one of the great features of modern programming languages.  Some 
+                   people, however, consider that to be a contentious statement.   But if you accept 
+                   the notion that a software library should be hard to use wrong then it 
+                   becomes difficult to reject exceptions.  
+                  </p><p>
+                   Most of the complaints I hear about exceptions are actually complaints 
+                   about their <i>misuse</i> rather than objections to the basic idea.  
+                   So before I begin to defend the above
+                   paragraph I would like to lay out more clearly when it is appropriate to
+                   use exceptions and when it is not.   
+                  </p><p>
+                  There are two basic questions you should ask yourself when deciding whether to 
+                  throw an exception in response to some event.  The first is (1) "should this event
+                  occur in the normal use of my library component?"  The second question is (2) "if this event
+                  were to occur, is it likely that the user will want to place the code for dealing 
+                  with the event near the invocations of my library component?"
+                  </p><p>
+                     If your answers to the above two questions are "no" then you should probably
+                     throw an exception in response to the event.  On the other hand, if you answer
+                     "yes" to either of these questions then you should probably <i>not</i> throw an exception.
+                  </p><p>
+                  A good example of an event worth throwing exceptions for is running out of memory.  
+                  (1) It doesn't happen very often, and (2) when it does happen it is hardly ever the case that 
+                  you want to deal with the out of memory event right next to the place where you are 
+                  attempting to allocate memory.  
+               </p><p>
+                  Alternatively, an example of an event that shouldn't throw an exception comes to 
+                  us from the C++ I/O streams.  This part of the standard library allows
+                  you to read the contents of a file from disk.  When you hit the end of file they
+                  do not throw an exception.  This is appropriate because (1) you usually want to
+                  read a file in its entirety. So hitting EOF happens all the time.  Additionally, (2)
+                  when you hit EOF you usually want to break out of the loop you are in
+                  and continue immediately into the next block of code.
+               </p><p>
+                  Usually when someone tells me they don't like exceptions they give reasons like "they make 
+                  me put try/catch blocks all over the place and it makes the code hard to read."  Or "it makes
+                  it hard to understand the flow of a program with exceptions in it."   Invariably they
+                  have been working with bodies of software that disregard the above rules regarding questions
+                  1 and 2.  Indeed, when exceptions are used for flow control the results are horrifying.  Using
+                  exceptions for events that occur in the normal use of a software component, especially when
+                  the events need to be dealt with near where they happen result in a spaghetti-like mess
+                  of throw statements and try/catch blocks.  Clearly, exceptions should be used judiciously.  
+                  So please, take my advice regarding questions 1 and 2 to heart. 
+               </p><p>
+                  Now let's go back to my claim that exceptions are an important part of making
+                  a library that is hard to use wrong.  But first let's be honest about one thing,  
+                  many developers don't think very hard about error handling and they similarly aren't very
+                  careful about checking function return codes.  Moreover, even the most studious of
+                  us can easily forget to add these checks.  It is also easy to forget to add 
+                  appropriate exception catch blocks.
+               </p><p>
+                  So what is so great about exceptions then?  Well, let's imagine some error just occurred
+                  and it caused an exception to be thrown.   If you forgot to setup catch blocks to deal with
+                  the error then your program will be aborted.  Not exactly a great thing.  But you will, however,
+                  be able to easily find out what exception was thrown.  Additionally, exceptions typically contain a
+                  message telling you all about the error.  Moreover, 
+                  any debugger worth its
+                  salt will be able to show you a stack trace that lets you see exactly where the exception came from.
+                   The exception <i>forces</i> you, the user, to 
+                  be aware of this potential error and to add a catch block to deal with it. 
+                  This is where the "hard to use wrong" comes from. 
+               </p><p>
+                  Now let's imagine that we are using return codes to communicate errors to the user and the 
+                  same error occurs.  If you forgot to do all your return code checking then you will
+                  simply be unaware of the error.  Maybe your program will crash right away.  But more likely, it
+                  will continue to run for a while before crashing at some random place far away from the source
+                  of the error.  You and your debugger now get to spend a few hours of quality time 
+                  together trying to figure out what went wrong.  
+               </p><p>
+                  The above considerations are why I maintain that exceptions, when used properly, contribute to 
+                  the "hard to use wrong" factor of a library. There are also other reasons to use exceptions.
+                  They free the user from needing to clutter up code with lots of return code checking.  This makes
+                  code easier to read and let's you focus more on the algorithm you are trying to implement and less
+                  on the bookkeeping.  
+               </p><p>
+                  Finally, it is important to note that there is a place for return codes.  When you answer "no"
+                  to questions 1 and 2, I suggest using exceptions.  However, if you answer "yes" to even one
+                  of them then I would recommend pretty much anything other than throwing an exception.  In this
+                  case error codes are often an excellent idea.
+               </p><p>
+                  As an aside, it is also important that your exception classes inherit from 
+                  <a href="other.html#error">dlib::error</a> to maintain consistency with the rest of the library.
+               </p></ul></li><a name="9"></a><li><a name="Write%20portable%20code"></a><h3>Write portable code</h3><ul><li><b>Don't complicate the build process </b><ul><p>
+                        One of dlib's design goals is to not require any installation 
+                        process before it can be used.  A user should be able to copy 
+                        the dlib folder into their project and have it just work.  
+                     </p><p>
+                        In particular, using dlib in a project should not make it difficult to
+                        compile the project from the command line.  For example, all the 
+                        example programs provided with dlib can be compiled using a single 
+                        statement on the command line.  
+                     </p><p>
+                        Similarly, the user should be able to check the dlib folder into whatever
+                        version control system they use without running into any difficulties.  
+                        The user should then be able to check out copies of the code on any
+                        of the dlib supported platforms and have their project build without
+                        needing to mess with anything.  
+                     </p><p>
+                        It is also important to know that dlib is mostly a header-only library. 
+                        This is primarily a result of the heavy use of C++ templates.  Because of this, 
+                        in many cases, all that is needed to use the library is to
+                        add dlib into a compiler's include search path.  However, the most important
+                        reason you need to know this is so you don't hassle me about providing a
+                        "shared library" version of dlib. :)
+                     </p><p>
+                        This point deserves some explaining.  When you write a piece of
+                        software that links against a shared library you need two things.  First,
+                        you need the shared library object files and second you need the header files
+                        for the library itself so you can #include them in your application.  However,
+                        since nearly all the code in dlib is <i>in the header files</i> there isn't
+                        any point in distributing it as a shared library.  
+                     </p><p>
+                        There are also a lot of technical problems with C++ shared libraries in general. 
+                        You can read about shared libraries on 
+                        <a href="http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html">this page</a> 
+                        for more details.   If you still think C++ template libraries like dlib should be built as
+                        shared libraries then you should refer yourself to the following documents which
+                        have been submitted to the C++ standards committee:   
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2316.pdf">N2316: Modules in C++</a>, 
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1496.html">N1496: Draft Proposal for 
+Dynamic Libraries in C++</a>, and
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2425.html">N2425: Minimal Dynamic Library Support</a>.
+                     </p></ul></li><li><b>Don't make assumptions about how objects are laid out in memory. </b><ul><p>
+                         If you have been following the prohibition against messing around with
+                         pointers then this won't even be an issue for you.  Moreover, just about the only
+                         time this should even come up is when you are casting blocks of 
+                         memory into other types or dumping the contents of memory to an I/O channel.
+                         All of these things are highly non-portable so don't do them.
+                        </p><p>
+                           If you want a portable way to write the state of an object to an
+                           I/O channel then I recommend you use the <a href="other.html#serialize">serialization</a>
+                           capability in dlib.  If that doesn't suit your needs then do 
+                           something else, but whatever you do don't just dump the contents of memory.  
+                           Convert your data into some portable format and then output that.
+                        </p><p>
+                           As an example of something else you might do: suppose you have a bunch of integers 
+                           you want to write to disk.  Assuming all your integers are positive numbers representable 
+                           using 32 or fewer bits you could store all your numbers in 
+                           <a href="other.html#uint32">dlib::uint32</a> variables and then convert them
+                           into either big or little endian byte order and then write them to an output stream.  
+                           You could do this using code similar to the following:
+
+                           <pre class="code_box">
+dlib::<a href="other.html#byte_orderer">byte_orderer</a> bo;
+...
+bo.host_to_big(my_uint);
+my_out_stream.write((char*)&amp;my_uint, sizeof(my_uint));
+... </pre><p>
+                           There are three important things to understand about this process.  First, you need
+                           to pick variables that always have the same size on all platforms.  This means you
+                           can't use <i>any</i> of the built in C++ types like int, float, double, long, etc. All 
+                           of these types have different sizes depending on your platform and even compiler settings. 
+                           So you need to use something like dlib::uint32 to obtain a type of a known size.
+                           </p><p>
+                           Second, you need to convert each thing you write out into either big or little endian byte order.  
+                           The reason for this is, again, portability.  If you don't explicitly convert to one
+                           of these byte orders then you end up writing data out using whatever byte order
+                           is used by your current machine.  If you do this then only machines that have the same
+                           byte order as yours will be able to read in your data.  If you use the dlib::byte_orderer
+                           object this is easy.  It is very type safe.  In fact, you should have a hard time even getting
+                           it to compile if you use it wrong.
+                           </p><p>
+                           The third thing you should understand is that you need to write out each of your
+                           variables one at a time.  You can't write out an entire struct in a  
+                           single ostream.write() statement because the compiler is allowed to put any
+                           kind of padding it feels like between the fields in a struct.  
+                           </p><p>
+                           You may be aware that compilers usually provide #pragma directives that allow you 
+                           to explicitly control this padding.  However, if you want to submit code to dlib 
+                           you will not use this feature.  Not all compilers support it in the same way and, 
+                           more importantly, not all CPU architectures are even capable of running code that 
+                           has had the padding messed with.  This is because it can result in the CPU attempting
+                           to perform what is called an "unaligned load" which many CPUs (like the SPARC) are
+                           incapable of doing.
+                           </p><p>
+                              So in summary, convert your data into a known type with a fixed size, then convert
+                              into a specific byte order (like big endian), then write out each variable individually.
+                              Or you could just use <a href="other.html#serialize">serialize</a> and not worry about all
+                              this horrible stuff. :)
+                           </p></p></ul></li><li><b> All code that calls functions that aren't in dlib or the C++
+                     standard library must be isolated inside the API wrappers.</b><ul><p>
+                        If you want to contribute code to dlib which needs to use something that isn't 
+                        in the C++ standard then we need to introduce a new library component
+                        in the <a href="api.html">API wrappers</a> section.  The new component would
+                        provide whatever functionality you need.  This new component would have
+                        to provide at least POSIX and win32 implementations.  
+                     </p><p>
+                        It is also worth pointing out that <i>simple</i> wrappers around operating system 
+                        specific calls are usually a bad solution.  This is because there are
+                        invariably subtle, if not huge, differences between what is available on different 
+                        operating systems.
+                        So being truly portable takes a lot of work.  It involves reading everything
+                        you can find about all the APIs needed to implement the feature on each target platform.
+                        In many cases there will be important details that are undocumented and you will
+                        only be able to find out about them by searching the internet for other developers
+                        complaining about bugs in API functions X, Y, and Z.  All this stuff needs to be abstracted
+                        away to put a portable and simple interface in front of it.  So this is a task 
+                        that shouldn't be taken lightly.
+                     </p></ul></li></ul></li><a name="10"></a><li><a name="Library%20components%20should%20have%20regression%20tests"></a><h3>Library components should have regression tests</h3><ul><p>
+                     dlib has a <a href="other.html#dlib_testing_suite">regression test suite</a> located in 
+                     the dlib/test folder.  Whenever possible, library components should have tests
+                     associated with them.  GUI components get a pass since it isn't very easy to setup
+                     automatic tests for them but pretty much everything else should have some sort
+                     of test.
+                  </p></ul></li><a name="11"></a><li><a name="You%20must%20use%20the%20Boost%20Software%20License"></a><h3>You must use the Boost Software License</h3><ul><p>
+                     Having the library use more than one open source license is confusing
+                     so I ask that any code contributions be licensed under the Boost Software
+                     License.
+                  </p></ul></li></ul></td></tr></table></div></body></html>

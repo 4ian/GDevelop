@@ -1,0 +1,297 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - structural_assignment_trainer.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_STRUCTURAL_ASSiGNMENT_TRAINER_Hh_
+<font color='#0000FF'>#define</font> DLIB_STRUCTURAL_ASSiGNMENT_TRAINER_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='structural_assignment_trainer_abstract.h.html'>structural_assignment_trainer_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../optimization.h.html'>../optimization.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='structural_svm_assignment_problem.h.html'>structural_svm_assignment_problem.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='num_nonnegative_weights.h.html'>num_nonnegative_weights.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='structural_assignment_trainer'></a>structural_assignment_trainer</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> feature_extractor::lhs_element lhs_element;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> feature_extractor::rhs_element rhs_element;
+        <font color='#0000FF'>typedef</font> std::pair<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>lhs_element<font color='#5555FF'>&gt;</font>, std::vector<font color='#5555FF'>&lt;</font>rhs_element<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> sample_type;
+        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> label_type;
+        <font color='#0000FF'>typedef</font> assignment_function<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font> trained_function_type;
+
+        <b><a name='structural_assignment_trainer'></a>structural_assignment_trainer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>  
+        <b>{</b>
+            <font color='#BB00BB'>set_defaults</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>explicit</font> <b><a name='structural_assignment_trainer'></a>structural_assignment_trainer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> fe_
+        <font face='Lucida Console'>)</font> : fe<font face='Lucida Console'>(</font>fe_<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>set_defaults</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> <b><a name='get_feature_extractor'></a>get_feature_extractor</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> fe; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_num_threads'></a>set_num_threads</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            num_threads <font color='#5555FF'>=</font> num;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_threads'></a>get_num_threads</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> num_threads;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_epsilon'></a>set_epsilon</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> eps_
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>eps_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t void structural_assignment_trainer::set_epsilon()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps_ must be greater than 0</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps_: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> eps_ 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            eps <font color='#5555FF'>=</font> eps_;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_epsilon'></a>get_epsilon</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> eps; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_cache_size'></a>set_max_cache_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_size
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            max_cache_size <font color='#5555FF'>=</font> max_size;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_cache_size'></a>get_max_cache_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> max_cache_size; 
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_verbose'></a>be_verbose</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_quiet'></a>be_quiet</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_oca'></a>set_oca</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> oca<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            solver <font color='#5555FF'>=</font> item;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> oca <b><a name='get_oca'></a>get_oca</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> solver;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_c'></a>set_c</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> C_ 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>C_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t void structural_assignment_trainer::set_c()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t C_ must be greater than 0</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t C_:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C_ 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            C <font color='#5555FF'>=</font> C_;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_c'></a>get_c</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> C;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='forces_assignment'></a>forces_assignment</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> force_assignment; <b>}</b> 
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_forces_assignment'></a>set_forces_assignment</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>bool</u></font> new_value
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            force_assignment <font color='#5555FF'>=</font> new_value;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_loss_per_false_association'></a>set_loss_per_false_association</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> loss
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>loss <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>, 
+                "<font color='#CC0000'>\t void structural_assignment_trainer::set_loss_per_false_association(loss)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function </font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t loss: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> loss
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            loss_per_false_association <font color='#5555FF'>=</font> loss;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_loss_per_false_association'></a>get_loss_per_false_association</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> loss_per_false_association;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_loss_per_missed_association'></a>set_loss_per_missed_association</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> loss
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>loss <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>, 
+                "<font color='#CC0000'>\t void structural_assignment_trainer::set_loss_per_missed_association(loss)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function </font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t loss: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> loss
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            loss_per_missed_association <font color='#5555FF'>=</font> loss;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_loss_per_missed_association'></a>get_loss_per_missed_association</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> loss_per_missed_association;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='forces_last_weight_to_1'></a>forces_last_weight_to_1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> last_weight_1;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='force_last_weight_to_1'></a>force_last_weight_to_1</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>bool</u></font> should_last_weight_be_1
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            last_weight_1 <font color='#5555FF'>=</font> should_last_weight_be_1;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> assignment_function<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>  
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font><font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>force_assignment<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_forced_assignment_problem</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>, 
+                            "<font color='#CC0000'>\t assignment_function structural_assignment_trainer::train()</font>"
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_forced_assignment_problem(samples,labels): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_forced_assignment_problem</font><font face='Lucida Console'>(</font>samples,labels<font face='Lucida Console'>)</font>
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_assignment_problem(samples,labels):        </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_assignment_problem</font><font face='Lucida Console'>(</font>samples,labels<font face='Lucida Console'>)</font>
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_learning_problem(samples,labels):          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_learning_problem</font><font face='Lucida Console'>(</font>samples,labels<font face='Lucida Console'>)</font>
+                <font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_assignment_problem</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>,
+                            "<font color='#CC0000'>\t assignment_function structural_assignment_trainer::train()</font>"
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_assignment_problem(samples,labels): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_assignment_problem</font><font face='Lucida Console'>(</font>samples,labels<font face='Lucida Console'>)</font>
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_learning_problem(samples,labels):   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_learning_problem</font><font face='Lucida Console'>(</font>samples,labels<font face='Lucida Console'>)</font>
+                <font face='Lucida Console'>)</font>;
+            <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+
+
+            structural_svm_assignment_problem<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>prob</font><font face='Lucida Console'>(</font>samples,labels, fe, force_assignment, num_threads,
+                loss_per_false_association, loss_per_missed_association<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>verbose<font face='Lucida Console'>)</font>
+                prob.<font color='#BB00BB'>be_verbose</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            prob.<font color='#BB00BB'>set_c</font><font face='Lucida Console'>(</font>C<font face='Lucida Console'>)</font>;
+            prob.<font color='#BB00BB'>set_epsilon</font><font face='Lucida Console'>(</font>eps<font face='Lucida Console'>)</font>;
+            prob.<font color='#BB00BB'>set_max_cache_size</font><font face='Lucida Console'>(</font>max_cache_size<font face='Lucida Console'>)</font>;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> weights; 
+
+            <font color='#009900'>// Take the min here because we want to prevent the user from accidentally
+</font>            <font color='#009900'>// forcing the bias term to be non-negative.
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_nonneg <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>fe.<font color='#BB00BB'>num_features</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#BB00BB'>num_nonnegative_weights</font><font face='Lucida Console'>(</font>fe<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>last_weight_1<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>solver</font><font face='Lucida Console'>(</font>prob, weights, num_nonneg, fe.<font color='#BB00BB'>num_features</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#BB00BB'>solver</font><font face='Lucida Console'>(</font>prob, weights, num_nonneg<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> bias <font color='#5555FF'>=</font> <font color='#BB00BB'>weights</font><font face='Lucida Console'>(</font>weights.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> assignment_function<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>weights,<font color='#979000'>0</font>,weights.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>, bias,fe,force_assignment<font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>bool</u></font> force_assignment;
+        <font color='#0000FF'><u>double</u></font> C;
+        oca solver;
+        <font color='#0000FF'><u>double</u></font> eps;
+        <font color='#0000FF'><u>bool</u></font> verbose;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_cache_size;
+        <font color='#0000FF'><u>double</u></font> loss_per_false_association;
+        <font color='#0000FF'><u>double</u></font> loss_per_missed_association;
+        <font color='#0000FF'><u>bool</u></font> last_weight_1;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_defaults'></a>set_defaults</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            force_assignment <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            C <font color='#5555FF'>=</font> <font color='#979000'>100</font>;
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            eps <font color='#5555FF'>=</font> <font color='#979000'>0.01</font>;
+            num_threads <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+            max_cache_size <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+            loss_per_false_association <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            loss_per_missed_association <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            last_weight_1 <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        feature_extractor fe;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_STRUCTURAL_ASSiGNMENT_TRAINER_Hh_
+</font>
+
+
+
+
+</pre></body></html>

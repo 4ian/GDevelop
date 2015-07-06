@@ -59,6 +59,19 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .MarkAsAdvanced()
         .SetFunctionName("GetHeight").SetManipulatedType("number").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
+    obj.AddAction("SetMapSize",
+                   _("Resize the tilemap"),
+                   _("Change the size of the tilemap (number of tiles)."),
+                   _("Resize the tilemap to _PARAM1_x_PARAM2_ tiles"),
+                   _("Size"),
+                   "CppPlatform/Extensions/TileMapIcon24.png",
+                   "res/TileMapIcon16.png")
+        .AddParameter("objectList", _("Tile Map Object"), "TileMap", false)
+        .AddParameter("expression", _("Width (tiles count)"))
+        .AddParameter("expression", _("Height (tiles count)"))
+        .MarkAsSimple()
+        .SetFunctionName("SetMapSize").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+
     extension.AddCondition("SingleTileCollision",
                    _("Collision with one tile"),
                    _("Test if an object collides a specific tile."),

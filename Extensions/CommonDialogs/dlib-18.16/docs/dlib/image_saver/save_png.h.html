@@ -1,0 +1,165 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - save_png.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SAVE_PnG_Hh_
+<font color='#0000FF'>#define</font> DLIB_SAVE_PnG_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='save_png_abstract.h.html'>save_png_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='image_saver.h.html'>image_saver.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array2d.h.html'>../array2d.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_exp.h.html'>../matrix/matrix_exp.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_transforms/assign_image.h.html'>../image_transforms/assign_image.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>enum</font> <b><a name='png_type'></a>png_type</b>
+        <b>{</b>
+            png_type_rgb,
+            png_type_rgb_alpha,
+            png_type_gray,
+        <b>}</b>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='impl_save_png'></a>impl_save_png</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name,
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> row_pointers,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> width,
+            <font color='#0000FF'>const</font> png_type type,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> bit_depth
+        <font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='save_png'></a>save_png</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img_,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        const_image_view<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>img</font><font face='Lucida Console'>(</font>img_<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>img.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t save_png()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You can't save an empty image as a PNG</font>"
+            <font face='Lucida Console'>)</font>;
+
+
+<font color='#0000FF'>#ifndef</font> DLIB_PNG_SUPPORT
+            <font color='#009900'>/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                You are getting this error because you are trying to use save_png() 
+                but you haven't defined DLIB_PNG_SUPPORT.  You must do so to use
+                this function.   You must also make sure you set your build environment
+                to link against the libpng library.
+            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/</font>
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>image_type<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>row_pointers</font><font face='Lucida Console'>(</font>img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font>::pixel_type pixel_type;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>rgb_pixel,pixel_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> row_pointers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                row_pointers[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>img[i][<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+
+            impl::<font color='#BB00BB'>impl_save_png</font><font face='Lucida Console'>(</font>file_name, row_pointers, img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, impl::png_type_rgb, <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>rgb_alpha_pixel,pixel_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> row_pointers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                row_pointers[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>img[i][<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+
+            impl::<font color='#BB00BB'>impl_save_png</font><font face='Lucida Console'>(</font>file_name, row_pointers, img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, impl::png_type_rgb_alpha, <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pixel_traits<font color='#5555FF'>&lt;</font>pixel_type<font color='#5555FF'>&gt;</font>::hsi <font color='#5555FF'>|</font><font color='#5555FF'>|</font> pixel_traits<font color='#5555FF'>&lt;</font>pixel_type<font color='#5555FF'>&gt;</font>::rgb<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// convert from HSI to RGB (Or potentially RGB pixels that aren't laid out as R G B)
+</font>            array2d<font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font> temp_img;
+            <font color='#BB00BB'>assign_image</font><font face='Lucida Console'>(</font>temp_img, img_<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> row_pointers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                row_pointers[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>temp_img[i][<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+
+            impl::<font color='#BB00BB'>impl_save_png</font><font face='Lucida Console'>(</font>file_name, row_pointers, img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, impl::png_type_rgb, <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pixel_traits<font color='#5555FF'>&lt;</font>pixel_type<font color='#5555FF'>&gt;</font>::rgb_alpha<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// convert from RGBA pixels that aren't laid out as R G B A
+</font>            array2d<font color='#5555FF'>&lt;</font>rgb_alpha_pixel<font color='#5555FF'>&gt;</font> temp_img;
+            <font color='#BB00BB'>assign_image</font><font face='Lucida Console'>(</font>temp_img, img_<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> row_pointers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                row_pointers[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>temp_img[i][<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+
+            impl::<font color='#BB00BB'>impl_save_png</font><font face='Lucida Console'>(</font>file_name, row_pointers, img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, impl::png_type_rgb_alpha, <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#009900'>// this is supposed to be grayscale 
+</font>        <b>{</b>
+            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>pixel_traits<font color='#5555FF'>&lt;</font>pixel_type<font color='#5555FF'>&gt;</font>::grayscale, "<font color='#CC0000'>impossible condition detected</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pixel_traits<font color='#5555FF'>&lt;</font>pixel_type<font color='#5555FF'>&gt;</font>::is_unsigned <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>pixel_type<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> row_pointers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    row_pointers[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>img[i][<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+
+                impl::<font color='#BB00BB'>impl_save_png</font><font face='Lucida Console'>(</font>file_name, row_pointers, img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, impl::png_type_gray, <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pixel_traits<font color='#5555FF'>&lt;</font>pixel_type<font color='#5555FF'>&gt;</font>::is_unsigned <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>pixel_type<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> row_pointers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    row_pointers[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>img[i][<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+
+                impl::<font color='#BB00BB'>impl_save_png</font><font face='Lucida Console'>(</font>file_name, row_pointers, img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, impl::png_type_gray, <font color='#979000'>16</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// convert from whatever this is to 16bit grayscale 
+</font>                array2d<font color='#5555FF'>&lt;</font>dlib::uint16<font color='#5555FF'>&gt;</font> temp_img;
+                <font color='#BB00BB'>assign_image</font><font face='Lucida Console'>(</font>temp_img, img_<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> row_pointers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    row_pointers[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>temp_img[i][<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+
+                impl::<font color='#BB00BB'>impl_save_png</font><font face='Lucida Console'>(</font>file_name, row_pointers, img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, impl::png_type_gray, <font color='#979000'>16</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+
+<font color='#0000FF'>#endif</font>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> EXP 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='save_png'></a>save_png</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP::type<font color='#5555FF'>&gt;</font> temp;
+        <font color='#BB00BB'>assign_image</font><font face='Lucida Console'>(</font>temp, img<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>save_png</font><font face='Lucida Console'>(</font>temp, file_name<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='save_png.cpp.html'>save_png.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SAVE_PnG_Hh_
+</font>
+
+</pre></body></html>

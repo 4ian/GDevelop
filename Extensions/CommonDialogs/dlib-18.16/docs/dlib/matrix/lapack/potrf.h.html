@@ -1,0 +1,177 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - potrf.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_LAPACk_POTRF_Hh_
+<font color='#0000FF'>#define</font> DLIB_LAPACk_POTRF_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='fortran_id.h.html'>fortran_id.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>namespace</font> lapack
+    <b>{</b>
+        <font color='#0000FF'>namespace</font> binding
+        <b>{</b>
+            <font color='#0000FF'>extern</font> "<font color='#CC0000'>C</font>"
+            <b>{</b>
+                <font color='#0000FF'><u>void</u></font> <b><a name='DLIB_FORTRAN_ID'></a>DLIB_FORTRAN_ID</b><font face='Lucida Console'>(</font>dpotrf<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>uplo, integer <font color='#5555FF'>*</font>n, <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>a, 
+                                              integer<font color='#5555FF'>*</font> lda, integer <font color='#5555FF'>*</font>info<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'><u>void</u></font> <b><a name='DLIB_FORTRAN_ID'></a>DLIB_FORTRAN_ID</b><font face='Lucida Console'>(</font>spotrf<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>uplo, integer <font color='#5555FF'>*</font>n, <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>a, 
+                                              integer<font color='#5555FF'>*</font> lda, integer <font color='#5555FF'>*</font>info<font face='Lucida Console'>)</font>;
+
+            <b>}</b>
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>int</u></font> <b><a name='potrf'></a>potrf</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> uplo, integer n, <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>a, integer lda<font face='Lucida Console'>)</font>
+            <b>{</b>
+                integer info <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#BB00BB'>DLIB_FORTRAN_ID</font><font face='Lucida Console'>(</font>dpotrf<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>uplo, <font color='#5555FF'>&amp;</font>n, a, <font color='#5555FF'>&amp;</font>lda, <font color='#5555FF'>&amp;</font>info<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> info;
+            <b>}</b>
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>int</u></font> <b><a name='potrf'></a>potrf</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> uplo, integer n, <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>a, integer lda<font face='Lucida Console'>)</font>
+            <b>{</b>
+                integer info <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#BB00BB'>DLIB_FORTRAN_ID</font><font face='Lucida Console'>(</font>spotrf<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>uplo, <font color='#5555FF'>&amp;</font>n, a, <font color='#5555FF'>&amp;</font>lda, <font color='#5555FF'>&amp;</font>info<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> info;
+            <b>}</b>
+
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>/*  -- LAPACK routine (version 3.1) -- */</font>
+<font color='#009900'>/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */</font>
+<font color='#009900'>/*     November 2006 */</font>
+
+<font color='#009900'>/*     .. Scalar Arguments .. */</font>
+<font color='#009900'>/*     .. */</font>
+<font color='#009900'>/*     .. Array Arguments .. */</font>
+<font color='#009900'>/*     .. */</font>
+
+<font color='#009900'>/*  Purpose */</font>
+<font color='#009900'>/*  ======= */</font>
+
+<font color='#009900'>/*  DPOTRF computes the Cholesky factorization of a real symmetric */</font>
+<font color='#009900'>/*  positive definite matrix A. */</font>
+
+<font color='#009900'>/*  The factorization has the form */</font>
+<font color='#009900'>/*     A = U**T * U,  if UPLO = 'U', or */</font>
+<font color='#009900'>/*     A = L  * L**T,  if UPLO = 'L', */</font>
+<font color='#009900'>/*  where U is an upper triangular matrix and L is lower triangular. */</font>
+
+<font color='#009900'>/*  This is the block version of the algorithm, calling Level 3 BLAS. */</font>
+
+<font color='#009900'>/*  Arguments */</font>
+<font color='#009900'>/*  ========= */</font>
+
+<font color='#009900'>/*  UPLO    (input) CHARACTER*1 */</font>
+<font color='#009900'>/*          = 'U':  Upper triangle of A is stored; */</font>
+<font color='#009900'>/*          = 'L':  Lower triangle of A is stored. */</font>
+
+<font color='#009900'>/*  N       (input) INTEGER */</font>
+<font color='#009900'>/*          The order of the matrix A.  N &gt;= 0. */</font>
+
+<font color='#009900'>/*  A       (input/output) DOUBLE PRECISION array, dimension (LDA,N) */</font>
+<font color='#009900'>/*          On entry, the symmetric matrix A.  If UPLO = 'U', the leading */</font>
+<font color='#009900'>/*          N-by-N upper triangular part of A contains the upper */</font>
+<font color='#009900'>/*          triangular part of the matrix A, and the strictly lower */</font>
+<font color='#009900'>/*          triangular part of A is not referenced.  If UPLO = 'L', the */</font>
+<font color='#009900'>/*          leading N-by-N lower triangular part of A contains the lower */</font>
+<font color='#009900'>/*          triangular part of the matrix A, and the strictly upper */</font>
+<font color='#009900'>/*          triangular part of A is not referenced. */</font>
+
+<font color='#009900'>/*          On exit, if INFO = 0, the factor U or L from the Cholesky */</font>
+<font color='#009900'>/*          factorization A = U**T*U or A = L*L**T. */</font>
+
+<font color='#009900'>/*  LDA     (input) INTEGER */</font>
+<font color='#009900'>/*          The leading dimension of the array A.  LDA &gt;= max(1,N). */</font>
+
+<font color='#009900'>/*  INFO    (output) INTEGER */</font>
+<font color='#009900'>/*          = 0:  successful exit */</font>
+<font color='#009900'>/*          &lt; 0:  if INFO = -i, the i-th argument had an illegal value */</font>
+<font color='#009900'>/*          &gt; 0:  if INFO = i, the leading minor of order i is not */</font>
+<font color='#009900'>/*                positive definite, and the factorization could not be */</font>
+<font color='#009900'>/*                completed. */</font>
+
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T, 
+            <font color='#0000FF'><u>long</u></font> NR1,
+            <font color='#0000FF'><u>long</u></font> NC1, 
+            <font color='#0000FF'>typename</font> MM
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>int</u></font> <b><a name='potrf'></a>potrf</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>char</u></font> uplo,
+            matrix<font color='#5555FF'>&lt;</font>T,NR1,NC1,MM,column_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// compute the actual decomposition 
+</font>            <font color='#0000FF'><u>int</u></font> info <font color='#5555FF'>=</font> binding::<font color='#BB00BB'>potrf</font><font face='Lucida Console'>(</font>uplo, a.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>a</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, a.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// If it fails part way though the factorization then make sure
+</font>            <font color='#009900'>// the end of the matrix gets properly initialized with zeros.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>info <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>uplo <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>L</font>'<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>set_colm</font><font face='Lucida Console'>(</font>a, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font>info<font color='#5555FF'>-</font><font color='#979000'>1</font>, a.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>else</font>
+                    <font color='#BB00BB'>set_rowm</font><font face='Lucida Console'>(</font>a, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font>info<font color='#5555FF'>-</font><font color='#979000'>1</font>, a.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> info;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T, 
+            <font color='#0000FF'><u>long</u></font> NR1,
+            <font color='#0000FF'><u>long</u></font> NC1, 
+            <font color='#0000FF'>typename</font> MM
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>int</u></font> <b><a name='potrf'></a>potrf</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>char</u></font> uplo,
+            matrix<font color='#5555FF'>&lt;</font>T,NR1,NC1,MM,row_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// since we are working on a row major order matrix we need to ask
+</font>            <font color='#009900'>// LAPACK for the transpose of whatever the user asked for.
+</font>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>uplo <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>L</font>'<font face='Lucida Console'>)</font>
+                uplo <font color='#5555FF'>=</font> '<font color='#FF0000'>U</font>';
+            <font color='#0000FF'>else</font>
+                uplo <font color='#5555FF'>=</font> '<font color='#FF0000'>L</font>';
+
+            <font color='#009900'>// compute the actual decomposition 
+</font>            <font color='#0000FF'><u>int</u></font> info <font color='#5555FF'>=</font> binding::<font color='#BB00BB'>potrf</font><font face='Lucida Console'>(</font>uplo, a.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>a</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, a.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// If it fails part way though the factorization then make sure
+</font>            <font color='#009900'>// the end of the matrix gets properly initialized with zeros.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>info <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>uplo <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>U</font>'<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>set_colm</font><font face='Lucida Console'>(</font>a, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font>info<font color='#5555FF'>-</font><font color='#979000'>1</font>, a.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>else</font>
+                    <font color='#BB00BB'>set_rowm</font><font face='Lucida Console'>(</font>a, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font>info<font color='#5555FF'>-</font><font color='#979000'>1</font>, a.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> info;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <b>}</b>
+
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LAPACk_POTRF_Hh_
+</font>
+
+
+</pre></body></html>

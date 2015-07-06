@@ -1,0 +1,423 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - error.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_ERROr_ 
+<font color='#0000FF'>#define</font> DLIB_ERROr_ 
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>new<font color='#5555FF'>&gt;</font>          <font color='#009900'>// for std::bad_alloc
+</font><font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cassert<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>exception<font color='#5555FF'>&gt;</font>
+
+<font color='#009900'>// -------------------------------
+</font><font color='#009900'>// ------ exception classes ------
+</font><font color='#009900'>// -------------------------------
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>enum</font> <b><a name='error_type'></a>error_type</b>
+    <b>{</b>       
+        EPORT_IN_USE,  
+        ETIMEOUT,     
+        ECONNECTION, 
+        ELISTENER, 
+        ERESOLVE,     
+        EMONITOR,   
+        ECREATE_THREAD,    
+        ECREATE_MUTEX,    
+        ECREATE_SIGNALER,
+        EUNSPECIFIED,   
+        EGENERAL_TYPE1,
+        EGENERAL_TYPE2,  
+        EGENERAL_TYPE3,  
+        EINVALID_OPTION,
+        ETOO_FEW_ARGS,
+        ETOO_MANY_ARGS,
+        ESOCKET,
+        ETHREAD,
+        EGUI,
+        EFATAL,
+        EBROKEN_ASSERT,
+        EIMAGE_LOAD,
+        EDIR_CREATE,
+        EINCOMPATIBLE_OPTIONS,
+        EMISSING_REQUIRED_OPTION,
+        EINVALID_OPTION_ARG,
+        EMULTIPLE_OCCURANCES,
+        ECONFIG_READER,
+        EIMAGE_SAVE,
+        ECAST_TO_STRING,
+        ESTRING_CAST,
+        EUTF8_TO_UTF32,
+        EOPTION_PARSE
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// the base exception class
+</font>    <font color='#0000FF'>class</font> <b><a name='error'></a>error</b> : <font color='#0000FF'>public</font> std::exception
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is the base exception class for the dlib library.  i.e. all 
+                exceptions in this library inherit from this class.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <b><a name='error'></a>error</b><font face='Lucida Console'>(</font>
+            error_type t,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font>: info<font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>, type<font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #type == t
+                - #info == a
+        !*/</font>
+
+        <b><a name='error'></a>error</b><font face='Lucida Console'>(</font>
+            error_type t
+        <font face='Lucida Console'>)</font>: type<font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #type == t
+                - #info == ""
+        !*/</font>
+
+        <b><a name='error'></a>error</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font>: info<font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>, type<font face='Lucida Console'>(</font>EUNSPECIFIED<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #type == EUNSPECIFIED
+                - #info == a
+        !*/</font>
+
+        <b><a name='error'></a>error</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>: type<font face='Lucida Console'>(</font>EUNSPECIFIED<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #type == EUNSPECIFIED
+                - #info == ""
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='error'></a>error</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - does nothing
+        !*/</font>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> <b><a name='what'></a>what</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#0000FF'>throw</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            ensures
+                - if (info.size() != 0) then
+                    - returns info.c_str()
+                - else
+                    - returns type_to_string(type)
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>info.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> info.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>type_to_string</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> <b><a name='type_to_string'></a>type_to_string</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#0000FF'>throw</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            ensures
+                - returns a string that names the contents of the type member.
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EPORT_IN_USE<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>EPORT_IN_USE</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ETIMEOUT<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>ETIMEOUT</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ECONNECTION<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>ECONNECTION</font>"; 
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ELISTENER<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>ELISTENER</font>"; 
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ERESOLVE<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>ERESOLVE</font>";     
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EMONITOR<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>EMONITOR</font>";   
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ECREATE_THREAD<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>ECREATE_THREAD</font>";    
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ECREATE_MUTEX<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>ECREATE_MUTEX</font>";    
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ECREATE_SIGNALER<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>ECREATE_SIGNALER</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EUNSPECIFIED<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>EUNSPECIFIED</font>";   
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EGENERAL_TYPE1<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>EGENERAL_TYPE1</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EGENERAL_TYPE2<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>EGENERAL_TYPE2</font>";  
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EGENERAL_TYPE3<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>EGENERAL_TYPE3</font>";  
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EINVALID_OPTION<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>EINVALID_OPTION</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ETOO_FEW_ARGS<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>ETOO_FEW_ARGS</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ETOO_MANY_ARGS<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>ETOO_MANY_ARGS</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ESOCKET<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>ESOCKET</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ETHREAD<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>ETHREAD</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EGUI<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>EGUI</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EFATAL<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>EFATAL</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EBROKEN_ASSERT<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>EBROKEN_ASSERT</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EIMAGE_LOAD<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>EIMAGE_LOAD</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EDIR_CREATE<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>EDIR_CREATE</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EINCOMPATIBLE_OPTIONS<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>EINCOMPATIBLE_OPTIONS</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EMISSING_REQUIRED_OPTION<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>EMISSING_REQUIRED_OPTION</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EINVALID_OPTION_ARG<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>EINVALID_OPTION_ARG</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EMULTIPLE_OCCURANCES<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>EMULTIPLE_OCCURANCES</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ECONFIG_READER<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>ECONFIG_READER</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EIMAGE_SAVE<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>EIMAGE_SAVE</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ECAST_TO_STRING<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>ECAST_TO_STRING</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ESTRING_CAST<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>ESTRING_CAST</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EUTF8_TO_UTF32<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>EUTF8_TO_UTF32</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EOPTION_PARSE<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>EOPTION_PARSE</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>return</font> "<font color='#CC0000'>undefined error type</font>";
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> std::string info;  <font color='#009900'>// info about the error
+</font>        <font color='#0000FF'>const</font> error_type type; <font color='#009900'>// the type of the error
+</font>
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'>const</font> error<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> error<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='fatal_error'></a>fatal_error</b> : <font color='#0000FF'>public</font> error
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                As the name says, this object represents some kind of fatal error.  
+                That is, it represents an unrecoverable error and any program that
+                throws this exception is, by definition, buggy and needs to be fixed.
+
+                Note that a fatal_error exception can only be thrown once.  The second
+                time an application attempts to construct a fatal_error it will be 
+                immediately aborted and an error message will be printed to std::cerr. 
+                The reason for this is because the first fatal_error was apparently ignored
+                so the second fatal_error is going to make itself impossible to ignore 
+                by calling abort.  The lesson here is that you should not try to ignore 
+                fatal errors.
+
+                This is also the exception thrown by the DLIB_ASSERT and DLIB_CASSERT macros.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <b><a name='fatal_error'></a>fatal_error</b><font face='Lucida Console'>(</font>
+            error_type t,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>t,a<font face='Lucida Console'>)</font> <b>{</b><font color='#BB00BB'>check_for_previous_fatal_errors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;<b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #type == t
+                - #info == a
+        !*/</font>
+
+        <b><a name='fatal_error'></a>fatal_error</b><font face='Lucida Console'>(</font>
+            error_type t
+        <font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font> <b>{</b><font color='#BB00BB'>check_for_previous_fatal_errors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;<b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #type == t
+                - #info == ""
+        !*/</font>
+
+        <b><a name='fatal_error'></a>fatal_error</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>EFATAL,a<font face='Lucida Console'>)</font> <b>{</b><font color='#BB00BB'>check_for_previous_fatal_errors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;<b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #type == EFATAL
+                - #info == a
+        !*/</font>
+
+        <b><a name='fatal_error'></a>fatal_error</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>EFATAL<font face='Lucida Console'>)</font> <b>{</b><font color='#BB00BB'>check_for_previous_fatal_errors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;<b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #type == EFATAL
+                - #info == ""
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>static</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> <b><a name='message'></a>message</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>static</font> <font color='#0000FF'><u>char</u></font> buf[<font color='#979000'>2000</font>];
+            buf[<font color='#979000'>1999</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>\0</font>'; <font color='#009900'>// just to be extra safe
+</font>            <font color='#0000FF'>return</font> buf;
+        <b>}</b>
+
+        <font color='#0000FF'>static</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='dlib_fatal_error_terminate'></a>dlib_fatal_error_terminate</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::cerr <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n**************************** FATAL ERROR DETECTED ****************************</font>";
+            std::cerr <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>message</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+            std::cerr <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>******************************************************************************\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='check_for_previous_fatal_errors'></a>check_for_previous_fatal_errors</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> is_first_fatal_error <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_first_fatal_error <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::cerr <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\n ************************** FATAL ERROR DETECTED ************************** </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+                std::cerr <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> ************************** FATAL ERROR DETECTED ************************** </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+                std::cerr <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> ************************** FATAL ERROR DETECTED ************************** \n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+                std::cerr <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Two fatal errors have been detected, the first was inappropriately ignored. \n</font>"
+                          <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>To prevent further fatal errors from being ignored this application will be \n</font>"
+                          <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>terminated immediately and you should go fix this buggy program.\n\n</font>"
+                          <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>The error message from this fatal error was:\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+                <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+                <font color='#BB00BB'>assert</font><font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>abort</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// copy the message into the fixed message buffer so that it can be recalled by dlib_fatal_error_terminate
+</font>                <font color='#009900'>// if needed.
+</font>                <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> msg <font color='#5555FF'>=</font> <font color='#BB00BB'>message</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>2000</font><font color='#5555FF'>-</font><font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> i <font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>info.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    msg[i] <font color='#5555FF'>=</font> info[i];
+                msg[i] <font color='#5555FF'>=</font> '<font color='#FF0000'>\0</font>';
+
+                <font color='#009900'>// set this termination handler so that if the user doesn't catch this dlib::fatal_error that is being
+</font>                <font color='#009900'>// thrown then it will eventually be printed to standard error
+</font>                std::<font color='#BB00BB'>set_terminate</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>dlib_fatal_error_terminate<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            is_first_fatal_error <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>}</b>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='gui_error'></a>gui_error</b> : <font color='#0000FF'>public</font> error
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='gui_error'></a>gui_error</b><font face='Lucida Console'>(</font>
+            error_type t,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>t,a<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #type == t
+                - #info == a
+        !*/</font>
+
+        <b><a name='gui_error'></a>gui_error</b><font face='Lucida Console'>(</font>
+            error_type t
+        <font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #type == t
+                - #info == ""
+        !*/</font>
+
+        <b><a name='gui_error'></a>gui_error</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>EGUI,a<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #type == EGUI 
+                - #info == a
+        !*/</font>
+
+        <b><a name='gui_error'></a>gui_error</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>EGUI<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #type == EGUI
+                - #info == ""
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='socket_error'></a>socket_error</b> : <font color='#0000FF'>public</font> error
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='socket_error'></a>socket_error</b><font face='Lucida Console'>(</font>
+            error_type t,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>t,a<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #type == t
+                - #info == a
+        !*/</font>
+
+        <b><a name='socket_error'></a>socket_error</b><font face='Lucida Console'>(</font>
+            error_type t
+        <font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #type == t
+                - #info == ""
+        !*/</font>
+
+        <b><a name='socket_error'></a>socket_error</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>ESOCKET,a<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #type == ESOCKET
+                - #info == a
+        !*/</font>
+
+        <b><a name='socket_error'></a>socket_error</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>ESOCKET<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #type == ESOCKET
+                - #info == ""
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='thread_error'></a>thread_error</b> : <font color='#0000FF'>public</font> error
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='thread_error'></a>thread_error</b><font face='Lucida Console'>(</font>
+            error_type t,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>t,a<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #type == t
+                - #info == a
+        !*/</font>
+
+        <b><a name='thread_error'></a>thread_error</b><font face='Lucida Console'>(</font>
+            error_type t
+        <font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #type == t
+                - #info == ""
+        !*/</font>
+
+        <b><a name='thread_error'></a>thread_error</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>ETHREAD,a<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #type == ETHREAD
+                - #info == a
+        !*/</font>
+
+        <b><a name='thread_error'></a>thread_error</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>ETHREAD<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #type == ETHREAD
+                - #info == ""
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ERROr_
+</font>
+
+</pre></body></html>

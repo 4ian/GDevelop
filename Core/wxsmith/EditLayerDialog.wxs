@@ -18,7 +18,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="nameEdit" member="yes">
-							<size>129,21</size>
+							<size>189,-1</size>
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
@@ -55,9 +55,10 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxChoice" name="ID_CHOICE1" variable="cameraChoice" member="yes">
+											<content>
+												<item>00</item>
+											</content>
 											<selection>0</selection>
-											<size>37,21</size>
-											<handler function="OncameraChoiceSelect" entry="EVT_CHOICE" />
 										</object>
 										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
@@ -98,7 +99,6 @@
 													<object class="sizeritem">
 														<object class="wxCheckBox" name="ID_CHECKBOX2" variable="sizeCheck" member="yes">
 															<label>Custom size :</label>
-															<handler function="OnsizeCheckClick" entry="EVT_CHECKBOX" />
 														</object>
 														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 														<border>5</border>
@@ -106,9 +106,8 @@
 													</object>
 													<object class="sizeritem">
 														<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="cameraWidthEdit" member="yes">
-															<size>52,21</size>
+															<size>60,-1</size>
 															<enabled>0</enabled>
-															<handler function="OncameraWidthEditText" entry="EVT_TEXT" />
 														</object>
 														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 														<border>5</border>
@@ -124,9 +123,8 @@
 													</object>
 													<object class="sizeritem">
 														<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="cameraHeightEdit" member="yes">
-															<size>52,21</size>
+															<size>60,-1</size>
 															<enabled>0</enabled>
-															<handler function="OncameraHeightEditText" entry="EVT_TEXT" />
 														</object>
 														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 														<border>5</border>
@@ -162,9 +160,8 @@
 															<object class="sizeritem">
 																<object class="wxTextCtrl" name="ID_TEXTCTRL4" variable="viewportX1Edit" member="yes">
 																	<value>0</value>
-																	<size>35,21</size>
+																	<size>40,-1</size>
 																	<enabled>0</enabled>
-																	<handler function="OnviewportX1EditText" entry="EVT_TEXT" />
 																</object>
 																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																<border>5</border>
@@ -181,9 +178,8 @@
 															<object class="sizeritem">
 																<object class="wxTextCtrl" name="ID_TEXTCTRL5" variable="viewportY1Edit" member="yes">
 																	<value>0</value>
-																	<size>35,21</size>
+																	<size>40,-1</size>
 																	<enabled>0</enabled>
-																	<handler function="OnviewportX1EditText" entry="EVT_TEXT" />
 																</object>
 																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																<border>5</border>
@@ -200,9 +196,8 @@
 															<object class="sizeritem">
 																<object class="wxTextCtrl" name="ID_TEXTCTRL6" variable="viewportX2Edit" member="yes">
 																	<value>1</value>
-																	<size>35,21</size>
+																	<size>40,-1</size>
 																	<enabled>0</enabled>
-																	<handler function="OnviewportX1EditText" entry="EVT_TEXT" />
 																</object>
 																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																<border>5</border>
@@ -219,9 +214,8 @@
 															<object class="sizeritem">
 																<object class="wxTextCtrl" name="ID_TEXTCTRL7" variable="viewportY2Edit" member="yes">
 																	<value>1</value>
-																	<size>35,21</size>
+																	<size>40,-1</size>
 																	<enabled>0</enabled>
-																	<handler function="OnviewportX1EditText" entry="EVT_TEXT" />
 																</object>
 																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																<border>5</border>
@@ -240,6 +234,7 @@
 													<label>For example, a camera which takes the left side of the window would be defined with 0, 0, 0.5, 1.&#x0A;By default, a camera has a viewport which covers the entire window.</label>
 													<font>
 														<style>italic</style>
+														<sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
 													</font>
 													<style>wxALIGN_RIGHT</style>
 												</object>

@@ -1,0 +1,430 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - drectangle.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2015  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_DRECTANGLe_
+<font color='#0000FF'>#define</font> DLIB_DRECTANGLe_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='drectangle_abstract.h.html'>drectangle_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='rectangle.h.html'>rectangle.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>class</font> drectangle;
+    drectangle <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> scale 
+    <font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='drectangle'></a>drectangle</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='drectangle'></a>drectangle</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> : l<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, t<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, r<font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>, b<font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <b><a name='drectangle'></a>drectangle</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> l_,
+            <font color='#0000FF'><u>double</u></font> t_,
+            <font color='#0000FF'><u>double</u></font> r_,
+            <font color='#0000FF'><u>double</u></font> b_
+        <font face='Lucida Console'>)</font> :
+            l<font face='Lucida Console'>(</font>l_<font face='Lucida Console'>)</font>,
+            t<font face='Lucida Console'>(</font>t_<font face='Lucida Console'>)</font>,
+            r<font face='Lucida Console'>(</font>r_<font face='Lucida Console'>)</font>,
+            b<font face='Lucida Console'>(</font>b_<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <b><a name='drectangle'></a>drectangle</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> :
+            l<font face='Lucida Console'>(</font>p.x<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+            t<font face='Lucida Console'>(</font>p.y<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+            r<font face='Lucida Console'>(</font>p.x<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+            b<font face='Lucida Console'>(</font>p.y<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <b><a name='drectangle'></a>drectangle</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p1,
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font>U,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p2
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font><font color='#0000FF'>this</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>drectangle</font><font face='Lucida Console'>(</font>p1<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>drectangle</font><font face='Lucida Console'>(</font>p2<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <b><a name='drectangle'></a>drectangle</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> : l<font face='Lucida Console'>(</font>rect.left<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, 
+            t<font face='Lucida Console'>(</font>rect.top<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+            r<font face='Lucida Console'>(</font>rect.right<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+            b<font face='Lucida Console'>(</font>rect.bottom<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <b><a name='operator'></a>operator</b> <b><a name='rectangle'></a>rectangle</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>std::<font color='#BB00BB'>floor</font><font face='Lucida Console'>(</font>l<font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>, 
+                             <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>std::<font color='#BB00BB'>floor</font><font face='Lucida Console'>(</font>t<font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>,
+                             <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>std::<font color='#BB00BB'>floor</font><font face='Lucida Console'>(</font>r<font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>,
+                             <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>std::<font color='#BB00BB'>floor</font><font face='Lucida Console'>(</font>b<font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='left'></a>left</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>   <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> l; <b>}</b>
+        <font color='#0000FF'><u>double</u></font> <b><a name='top'></a>top</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>    <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> t; <b>}</b>
+        <font color='#0000FF'><u>double</u></font> <b><a name='right'></a>right</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>  <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> r; <b>}</b>
+        <font color='#0000FF'><u>double</u></font> <b><a name='bottom'></a>bottom</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> b; <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> <b><a name='left'></a>left</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>   <b>{</b> <font color='#0000FF'>return</font> l; <b>}</b>
+        <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> <b><a name='top'></a>top</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>    <b>{</b> <font color='#0000FF'>return</font> t; <b>}</b>
+        <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> <b><a name='right'></a>right</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>  <b>{</b> <font color='#0000FF'>return</font> r; <b>}</b>
+        <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> <b><a name='bottom'></a>bottom</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> b; <b>}</b>
+
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='tl_corner'></a>tl_corner</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='bl_corner'></a>bl_corner</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b> 
+
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='tr_corner'></a>tr_corner</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='br_corner'></a>br_corner</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='width'></a>width</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> r <font color='#5555FF'>-</font> l <font color='#5555FF'>+</font> <font color='#979000'>1</font>; 
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='height'></a>height</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> b <font color='#5555FF'>-</font> t <font color='#5555FF'>+</font> <font color='#979000'>1</font>; 
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='area'></a>area</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_empty'></a>is_empty</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>t <font color='#5555FF'>&gt;</font> b <font color='#5555FF'>|</font><font color='#5555FF'>|</font> l <font color='#5555FF'>&gt;</font> r<font face='Lucida Console'>)</font>; <b>}</b>
+
+        drectangle <b><a name='operator'></a>operator</b> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rhs.<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> rhs;
+
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>drectangle</font> <font face='Lucida Console'>(</font>
+                std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>l,rhs.l<font face='Lucida Console'>)</font>,
+                std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>t,rhs.t<font face='Lucida Console'>)</font>,
+                std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>r,rhs.r<font face='Lucida Console'>)</font>,
+                std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>b,rhs.b<font face='Lucida Console'>)</font>
+                <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        drectangle <b><a name='intersect'></a>intersect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>drectangle</font> <font face='Lucida Console'>(</font>
+                std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>l,rhs.l<font face='Lucida Console'>)</font>,
+                std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>t,rhs.t<font face='Lucida Console'>)</font>,
+                std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>r,rhs.r<font face='Lucida Console'>)</font>,
+                std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>b,rhs.b<font face='Lucida Console'>)</font>
+                <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='contains'></a>contains</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> l <font color='#5555FF'>|</font><font color='#5555FF'>|</font> p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> r <font color='#5555FF'>|</font><font color='#5555FF'>|</font> p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> t <font color='#5555FF'>|</font><font color='#5555FF'>|</font> p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> b<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='contains'></a>contains</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>l <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                r <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                t <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                b <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        drectangle<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> scale
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font><font color='#0000FF'>this</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>*</font>scale;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        drectangle<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> scale
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font><font color='#0000FF'>this</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#979000'>1.0</font><font color='#5555FF'>/</font>scale<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        drectangle<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font><font color='#0000FF'>this</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>drectangle</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'><u>double</u></font> l;
+        <font color='#0000FF'><u>double</u></font> t;
+        <font color='#0000FF'><u>double</u></font> r;
+        <font color='#0000FF'><u>double</u></font> b;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>; 
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>; 
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>; 
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing an object of type drectangle</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        drectangle<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,in<font face='Lucida Console'>)</font>; 
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,in<font face='Lucida Console'>)</font>; 
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,in<font face='Lucida Console'>)</font>; 
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,in<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing an object of type drectangle</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> std::ostream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        std::ostream<font color='#5555FF'>&amp;</font> out, 
+        <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> item 
+    <font face='Lucida Console'>)</font>   
+    <b>{</b>
+        out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>[(</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>, </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>) (</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>, </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>)]</font>";
+        <font color='#0000FF'>return</font> out;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> std::istream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in, 
+        drectangle<font color='#5555FF'>&amp;</font> item 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// ignore any whitespace
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\t</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\r</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>'<font face='Lucida Console'>)</font>
+            in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// now eat the leading '[' character
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>[</font>'<font face='Lucida Console'>)</font>
+        <b>{</b>
+            in.<font color='#BB00BB'>setstate</font><font face='Lucida Console'>(</font>in.<font color='#BB00BB'>rdstate</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> std::ios::failbit<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> in;
+        <b>}</b>
+
+        dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> p1, p2;
+        in <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> p1;
+        in <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> p2;
+        item <font color='#5555FF'>=</font> <font color='#BB00BB'>drectangle</font><font face='Lucida Console'>(</font>p1<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>drectangle</font><font face='Lucida Console'>(</font>p2<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// ignore any whitespace
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\t</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\r</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>'<font face='Lucida Console'>)</font>
+            in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// now eat the trailing ']' character
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>]</font>'<font face='Lucida Console'>)</font>
+        <b>{</b>
+            in.<font color='#BB00BB'>setstate</font><font face='Lucida Console'>(</font>in.<font color='#BB00BB'>rdstate</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> std::ios::failbit<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>return</font> in;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='center'></a>center</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> rect
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                    rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> temp<font color='#5555FF'>/</font><font color='#979000'>2.0</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='dcenter'></a>dcenter</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> rect
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>center</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> drectangle <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> scale 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>rect.<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> width <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>scale;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> height <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>scale;
+            <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> p <font color='#5555FF'>=</font> <font color='#BB00BB'>center</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>drectangle</font><font face='Lucida Console'>(</font>p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>width<font color='#5555FF'>/</font><font color='#979000'>2</font>, p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>height<font color='#5555FF'>/</font><font color='#979000'>2</font>, p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>width<font color='#5555FF'>/</font><font color='#979000'>2</font>, p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>height<font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> rect;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> drectangle <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> scale,
+        <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> rect
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> rect<font color='#5555FF'>*</font>scale;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> drectangle <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> scale
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> rect<font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#979000'>1.0</font><font color='#5555FF'>/</font>scale<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> drectangle <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> r,
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> r <font color='#5555FF'>+</font> <font color='#BB00BB'>drectangle</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> drectangle <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p,
+        <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> r <font color='#5555FF'>+</font> <font color='#BB00BB'>drectangle</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> drectangle <b><a name='translate_rect'></a>translate_rect</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        drectangle result;
+        result.<font color='#BB00BB'>top</font>    <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>    <font color='#5555FF'>+</font> p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        result.<font color='#BB00BB'>bottom</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        result.<font color='#BB00BB'>left</font>   <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>   <font color='#5555FF'>+</font> p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        result.<font color='#BB00BB'>right</font>  <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>  <font color='#5555FF'>+</font> p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> result;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> drectangle <b><a name='intersect'></a>intersect</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>double</u></font> <b><a name='area'></a>area</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> a
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>inline</font> drectangle <b><a name='centered_drect'></a>centered_drect</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p,
+        <font color='#0000FF'><u>double</u></font> width,
+        <font color='#0000FF'><u>double</u></font> height
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        width<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+        height<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>drectangle</font><font face='Lucida Console'>(</font>p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>width<font color='#5555FF'>/</font><font color='#979000'>2</font>, p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>height<font color='#5555FF'>/</font><font color='#979000'>2</font>, p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>width<font color='#5555FF'>/</font><font color='#979000'>2</font>, p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>height<font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> drectangle <b><a name='shrink_rect'></a>shrink_rect</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'><u>double</u></font> num 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>drectangle</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>num, rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>num, rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>num, rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>num<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> drectangle <b><a name='grow_rect'></a>grow_rect</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'><u>double</u></font> num 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>shrink_rect</font><font face='Lucida Console'>(</font>rect, <font color='#5555FF'>-</font>num<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> drectangle <b><a name='shrink_rect'></a>shrink_rect</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'><u>double</u></font> width,
+        <font color='#0000FF'><u>double</u></font> height
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>drectangle</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>width, rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>height, rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>width, rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>height<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> drectangle <b><a name='grow_rect'></a>grow_rect</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> drectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'><u>double</u></font> width,
+        <font color='#0000FF'><u>double</u></font> height
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>shrink_rect</font><font face='Lucida Console'>(</font>rect, <font color='#5555FF'>-</font>width, <font color='#5555FF'>-</font>height<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_DRECTANGLe_
+</font>
+
+</pre></body></html>

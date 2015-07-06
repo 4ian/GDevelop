@@ -1,0 +1,368 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bridge_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font>
+
+<font color='#009900'>/*
+    This is an example showing how to use the bridge object from from the 
+    dlib C++ Library to send messages via TCP/IP.
+
+    In particular, this example will walk you through four progressively
+    more complex use cases of the bridge object.  Note that this example
+    program assumes you are already familiar with the pipe object and at
+    least the contents of the <a href="pipe_ex_2.cpp.html">pipe_ex_2.cpp</a> example program.
+*/</font>
+
+
+<font color='#009900'>// =========== Example program output ===========
+</font><font color='#009900'>/*
+     ---- Running example 1 ---- 
+    dequeued value: 1
+    dequeued value: 2
+    dequeued value: 3
+
+     ---- Running example 2 ---- 
+    dequeued value: 1
+    dequeued value: 2
+    dequeued value: 3
+
+     ---- Running example 3 ---- 
+    dequeued int:    1
+    dequeued int:    2
+    dequeued struct: 3   some string
+
+     ---- Running example 4 ---- 
+    bridge 1 status: is_connected: true
+    bridge 1 status: foreign_ip:   127.0.0.1
+    bridge 1 status: foreign_port: 43156
+    bridge 2 status: is_connected: true
+    bridge 2 status: foreign_ip:   127.0.0.1
+    bridge 2 status: foreign_port: 12345
+    dequeued int:    1
+    dequeued int:    2
+    dequeued struct: 3   some string
+    bridge 1 status: is_connected: false
+    bridge 1 status: foreign_ip:   127.0.0.1
+    bridge 1 status: foreign_port: 12345
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>bridge.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>type_safe_union.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='run_example_1'></a>run_example_1</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'><u>void</u></font> <b><a name='run_example_2'></a>run_example_2</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'><u>void</u></font> <b><a name='run_example_3'></a>run_example_3</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'><u>void</u></font> <b><a name='run_example_4'></a>run_example_4</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#BB00BB'>run_example_1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>run_example_2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>run_example_3</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>run_example_4</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='run_example_1'></a>run_example_1</b><font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n ---- Running example 1 ---- </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>/*
+        The idea of the bridge is basically to allow two different dlib::pipe objects
+        to be connected together via a TCP connection.  This is best illustrated by
+        the following short example.  In it we create two pipes, in and out.  When
+        an object is enqueued into the out pipe it will be automatically sent 
+        through a TCP connection and once received at the other end it will be 
+        inserted into the in pipe.
+    */</font>
+    dlib::pipe<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>out</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// This bridge will listen on port 12345 for an incoming TCP connection.  Then
+</font>    <font color='#009900'>// it will read data from that connection and put it into the in pipe.
+</font>    bridge <font color='#BB00BB'>b2</font><font face='Lucida Console'>(</font><font color='#BB00BB'>listen_on_port</font><font face='Lucida Console'>(</font><font color='#979000'>12345</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// This bridge will initiate a TCP connection and then start dequeuing 
+</font>    <font color='#009900'>// objects from out and transmitting them over the connection.
+</font>    bridge <font color='#BB00BB'>b1</font><font face='Lucida Console'>(</font><font color='#BB00BB'>connect_to_ip_and_port</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1</font>", <font color='#979000'>12345</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>transmit</font><font face='Lucida Console'>(</font>out<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// As an aside, in a real program, each of these bridges and pipes would be in a 
+</font>    <font color='#009900'>// separate application.  But to make this example self contained they are both 
+</font>    <font color='#009900'>// right here.
+</font>
+
+
+    <font color='#009900'>// Now let's put some things into the out pipe
+</font>    <font color='#0000FF'><u>int</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font>;
+
+    value <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+    out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font>;
+
+    value <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+    out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// Now those 3 ints can be dequeued from the in pipe.  They will show up
+</font>    <font color='#009900'>// in the same order they were inserted into the out pipe.
+</font>    in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dequeued value: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> value <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dequeued value: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> value <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dequeued value: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> value <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='run_example_2'></a>run_example_2</b><font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n ---- Running example 2 ---- </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>/*
+        This example makes a simple echo server on port 12345.  When an object
+        is inserted into the out pipe it will be sent over a TCP connection, get 
+        put into the echo pipe and then immediately read out of the echo pipe and
+        sent back over the TCP connection where it will finally be placed into the in
+        pipe.
+    */</font>
+
+    dlib::pipe<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>out</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>echo</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Just like TCP connections, a bridge can send data both directions.  The directionality
+</font>    <font color='#009900'>// of a pipe is indicated by the receive() and transmit() type decorations.  Also, the order
+</font>    <font color='#009900'>// they are listed doesn't matter.
+</font>    bridge <font color='#BB00BB'>echo_bridge</font><font face='Lucida Console'>(</font><font color='#BB00BB'>listen_on_port</font><font face='Lucida Console'>(</font><font color='#979000'>12345</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>echo<font face='Lucida Console'>)</font>, <font color='#BB00BB'>transmit</font><font face='Lucida Console'>(</font>echo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Note that you can also specify the ip and port as a string by using connect_to().
+</font>    bridge <font color='#BB00BB'>b1</font><font face='Lucida Console'>(</font><font color='#BB00BB'>connect_to</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1:12345</font>"<font face='Lucida Console'>)</font>, <font color='#BB00BB'>transmit</font><font face='Lucida Console'>(</font>out<font face='Lucida Console'>)</font>, <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+    <font color='#0000FF'><u>int</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font>;
+
+    value <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+    out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font>;
+
+    value <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+    out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font>;
+
+
+    in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dequeued value: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> value <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dequeued value: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> value <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dequeued value: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> value <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>struct</font> <b><a name='my_example_object'></a>my_example_object</b>
+<b>{</b>
+    <font color='#009900'>/*
+        All objects passing through a dlib::bridge must be serializable.  This
+        means there must exist global functions called serialize() and deserialize()
+        which can convert an object into a bit stream and then reverse the process.
+
+        This example object illustrates how this is done.
+    */</font>
+
+    <font color='#0000FF'><u>int</u></font> value;
+    std::string str;
+<b>}</b>;
+
+<font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> my_example_object<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>/*
+        serialize() just needs to write the state of item to the output stream.
+        You can do this however you like.  Below, I'm using the serialize functions
+        for int and std::string which come with dlib.  But again, you can do whatever
+        you want here.
+    */</font>
+    dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.value, out<font face='Lucida Console'>)</font>;
+    dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.str, out<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>my_example_object<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>/*
+        deserialize() is just the inverse of serialize().  Again, you can do
+        whatever you want here so long as it correctly reconstructs item.  This
+        also means that deserialize() must always consume as many bytes as serialize()
+        generates.
+    */</font>
+    dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.value, in<font face='Lucida Console'>)</font>;
+    dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.str, in<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='run_example_3'></a>run_example_3</b><font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n ---- Running example 3 ---- </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>/*
+        In this example we will just send ints and my_example_object objects
+        over a TCP connection.  Since we are sending more than one type of
+        object through a pipe we will need to use the type_safe_union.
+    */</font>
+
+    <font color='#0000FF'>typedef</font> type_safe_union<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font>, my_example_object<font color='#5555FF'>&gt;</font> tsu_type;
+
+    dlib::pipe<font color='#5555FF'>&lt;</font>tsu_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>out</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Note that we don't have to start the listening bridge first.  If b2
+</font>    <font color='#009900'>// fails to make a connection it will just keep trying until successful.
+</font>    bridge <font color='#BB00BB'>b2</font><font face='Lucida Console'>(</font><font color='#BB00BB'>connect_to</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1:12345</font>"<font face='Lucida Console'>)</font>, <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// We don't have to configure a bridge in it's constructor.  If it's 
+</font>    <font color='#009900'>// more convenient we can do so by calling reconfigure() instead.
+</font>    bridge b1;
+    b1.<font color='#BB00BB'>reconfigure</font><font face='Lucida Console'>(</font><font color='#BB00BB'>listen_on_port</font><font face='Lucida Console'>(</font><font color='#979000'>12345</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>transmit</font><font face='Lucida Console'>(</font>out<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    tsu_type msg;
+
+    msg <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+
+    msg <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+    out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+
+    msg.get<font color='#5555FF'>&lt;</font>my_example_object<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.value <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+    msg.get<font color='#5555FF'>&lt;</font>my_example_object<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.str <font color='#5555FF'>=</font> "<font color='#CC0000'>some string</font>";
+    out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// dequeue the three objects we sent and print them on the screen.
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>msg.contains<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dequeued int:    </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> msg.get<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>msg.contains<font color='#5555FF'>&lt;</font>my_example_object<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dequeued struct: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> msg.get<font color='#5555FF'>&lt;</font>my_example_object<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.value <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   </font>" 
+                                       <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> msg.get<font color='#5555FF'>&lt;</font>my_example_object<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.str <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <b>}</b>
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='run_example_4'></a>run_example_4</b><font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n ---- Running example 4 ---- </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>/*
+        This final example is the same as example 3 except we will also now be getting 
+        status messages from the bridges.  These bridge_status messages tell us the 
+        state of the TCP connection associated with a bridge.  Is it connected or not?  
+        Who it is connected to?
+
+        The way you get these status messages is by ensuring that your receive pipe is 
+        capable of storing bridge_status objects.  If it is then the bridge will 
+        automatically insert bridge_status messages into your receive pipe whenever 
+        there is a status change. 
+
+        There are only two kinds of status changes.  The establishment of a connection 
+        or the closing of a connection.   Also, a connection which closes due to you 
+        calling clear(), reconfigure(), or destructing a bridge does not generate a 
+        status message since, in this case, you already know about it and just want 
+        the bridge to destroy itself as quickly as possible.
+    */</font>
+
+
+    <font color='#0000FF'>typedef</font> type_safe_union<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font>, my_example_object, bridge_status<font color='#5555FF'>&gt;</font> tsu_type;
+
+    dlib::pipe<font color='#5555FF'>&lt;</font>tsu_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>out</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+    dlib::pipe<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>b1_status</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// setup both bridges to have receive pipes capable of holding bridge_status messages.
+</font>    bridge <font color='#BB00BB'>b1</font><font face='Lucida Console'>(</font><font color='#BB00BB'>listen_on_port</font><font face='Lucida Console'>(</font><font color='#979000'>12345</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>transmit</font><font face='Lucida Console'>(</font>out<font face='Lucida Console'>)</font>, <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>b1_status<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// Note that we can also use a hostname with connect_to() instead of supplying an IP address.
+</font>    bridge <font color='#BB00BB'>b2</font><font face='Lucida Console'>(</font><font color='#BB00BB'>connect_to</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>localhost:12345</font>"<font face='Lucida Console'>)</font>, <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    tsu_type msg;
+    bridge_status bs;
+
+    <font color='#009900'>// Once a connection is established it will generate a status message from each bridge. 
+</font>    <font color='#009900'>// Let's get those and print them.  
+</font>    b1_status.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>bs<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>bridge 1 status: is_connected: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> boolalpha <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bs.is_connected <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>bridge 1 status: foreign_ip:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bs.foreign_ip <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>bridge 1 status: foreign_port: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bs.foreign_port <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+    bs <font color='#5555FF'>=</font> msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>bridge 2 status: is_connected: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bs.is_connected <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>bridge 2 status: foreign_ip:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bs.foreign_ip <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>bridge 2 status: foreign_port: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bs.foreign_port <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+
+    msg <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+
+    msg <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+    out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+
+    msg.get<font color='#5555FF'>&lt;</font>my_example_object<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.value <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+    msg.get<font color='#5555FF'>&lt;</font>my_example_object<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.str <font color='#5555FF'>=</font> "<font color='#CC0000'>some string</font>";
+    out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// Read the 3 things we sent over the connection.
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>msg.contains<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dequeued int:    </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> msg.get<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>msg.contains<font color='#5555FF'>&lt;</font>my_example_object<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dequeued struct: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> msg.get<font color='#5555FF'>&lt;</font>my_example_object<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.value <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   </font>" 
+                                       <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> msg.get<font color='#5555FF'>&lt;</font>my_example_object<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.str <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#009900'>// cause bridge 1 to shutdown completely.  This will close the connection and
+</font>    <font color='#009900'>// therefore bridge 2 will generate a status message indicating the connection
+</font>    <font color='#009900'>// just closed.
+</font>    b1.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+    bs <font color='#5555FF'>=</font> msg.get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>bridge 1 status: is_connected: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bs.is_connected <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>bridge 1 status: foreign_ip:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bs.foreign_ip <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>bridge 1 status: foreign_port: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bs.foreign_port <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

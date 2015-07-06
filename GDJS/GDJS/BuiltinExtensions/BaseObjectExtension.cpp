@@ -111,85 +111,65 @@ BaseObjectExtension::BaseObjectExtension()
     GetAllConditions()["PickNearest"].SetFunctionName("gdjs.evtTools.object.pickNearestObject");
 
 
-    {
-        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
-        {
-        public:
-            virtual gd::String GenerateCode(gd::Instruction &, gd::EventsCodeGenerator &, gd::EventsCodeGenerationContext &)
+    GetAllActions()["MoveObjects"].codeExtraInformation
+        .SetCustomCodeGenerator([](gd::Instruction &, gd::EventsCodeGenerator &, gd::EventsCodeGenerationContext &) {
+            return "runtimeScene.updateObjectsForces();";
+        });
+
+    objectActions["MettreXY"].codeExtraInformation
+        .SetCustomCodeGenerator([](gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) -> gd::String {
+            gd::String outputCode;
+
+            std::vector<gd::String> realObjects = codeGenerator.ExpandObjectsName(instruction.GetParameter(0).GetPlainString(), context);
+            for (unsigned int i = 0;i<realObjects.size();++i)
             {
-                return "runtimeScene.updateObjectsForces();";
-            };
-        };
-        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
+                context.SetCurrentObject(realObjects[i]);
+                context.ObjectsListNeeded(realObjects[i]);
 
-        GetAllActions()["MoveObjects"].codeExtraInformation
-            .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
-    }
+                gd::String newX, newY;
 
-    {
-        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
-        {
-        public:
-            virtual gd::String GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
-            {
-                gd::String outputCode;
-
-                std::vector<gd::String> realObjects = codeGenerator.ExpandObjectsName(instruction.GetParameter(0).GetPlainString(), context);
-                for (unsigned int i = 0;i<realObjects.size();++i)
+                gd::String expression1Code;
                 {
-                    context.SetCurrentObject(realObjects[i]);
-                    context.ObjectsListNeeded(realObjects[i]);
-
-                    gd::String newX, newY;
-
-                    gd::String expression1Code;
-                    {
-                        gd::CallbacksForGeneratingExpressionCode callbacks(expression1Code, codeGenerator, context);
-                        gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
-                        if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expression1Code.empty())
-                            expression1Code = "0";
-                    }
-
-                    gd::String expression2Code;
-                    {
-                        gd::CallbacksForGeneratingExpressionCode callbacks(expression2Code, codeGenerator, context);
-                        gd::ExpressionParser parser(instruction.GetParameters()[4].GetPlainString());
-                        if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expression2Code.empty())
-                            expression2Code = "0";
-                    }
-
-                    gd::String op1 = instruction.GetParameter(1).GetPlainString();
-                    if ( op1 == "=" || op1.empty() )
-                        newX = expression1Code;
-                    else if ( op1 == "/" || op1 == "*" || op1 == "-" || op1 == "+" )
-                        newX = codeGenerator.GetObjectListName(realObjects[i], context)+"[i].getX() "+op1 + expression1Code;
-                    else
-                        return "";
-                    gd::String op2 = instruction.GetParameter(3).GetPlainString();
-                    if ( op2 == "=" || op2.empty() )
-                        newY = expression2Code;
-                    else if ( op2 == "/" || op2 == "*" || op2 == "-" || op2 == "+" )
-                        newY = codeGenerator.GetObjectListName(realObjects[i], context)+"[i].getY() "+op2 + expression2Code;
-                    else
-                        return "";
-
-                    gd::String call = codeGenerator.GetObjectListName(realObjects[i], context)+"[i].setPosition("+newX+","+newY+")";
-
-                    outputCode += "for(var i = 0, len = "+codeGenerator.GetObjectListName(realObjects[i], context)+".length ;i < len;++i) {\n";
-                    outputCode += "    "+call+";\n";
-                    outputCode += "}\n";
-
-                    context.SetNoCurrentObject();
+                    gd::CallbacksForGeneratingExpressionCode callbacks(expression1Code, codeGenerator, context);
+                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expression1Code.empty())
+                        expression1Code = "0";
                 }
 
-                return outputCode;
-            };
-        };
-        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
+                gd::String expression2Code;
+                {
+                    gd::CallbacksForGeneratingExpressionCode callbacks(expression2Code, codeGenerator, context);
+                    gd::ExpressionParser parser(instruction.GetParameters()[4].GetPlainString());
+                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expression2Code.empty())
+                        expression2Code = "0";
+                }
 
-        objectActions["MettreXY"].codeExtraInformation
-            .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
-    }
+                gd::String op1 = instruction.GetParameter(1).GetPlainString();
+                if ( op1 == "=" || op1.empty() )
+                    newX = expression1Code;
+                else if ( op1 == "/" || op1 == "*" || op1 == "-" || op1 == "+" )
+                    newX = codeGenerator.GetObjectListName(realObjects[i], context)+"[i].getX() "+op1 + expression1Code;
+                else
+                    return "";
+                gd::String op2 = instruction.GetParameter(3).GetPlainString();
+                if ( op2 == "=" || op2.empty() )
+                    newY = expression2Code;
+                else if ( op2 == "/" || op2 == "*" || op2 == "-" || op2 == "+" )
+                    newY = codeGenerator.GetObjectListName(realObjects[i], context)+"[i].getY() "+op2 + expression2Code;
+                else
+                    return "";
+
+                gd::String call = codeGenerator.GetObjectListName(realObjects[i], context)+"[i].setPosition("+newX+","+newY+")";
+
+                outputCode += "for(var i = 0, len = "+codeGenerator.GetObjectListName(realObjects[i], context)+".length ;i < len;++i) {\n";
+                outputCode += "    "+call+";\n";
+                outputCode += "}\n";
+
+                context.SetNoCurrentObject();
+            }
+
+            return outputCode;
+        });
 
     StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
 /*

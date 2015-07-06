@@ -1,0 +1,654 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - matrix_trsm.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MATRiX_TRSM_Hh_
+<font color='#0000FF'>#define</font> DLIB_MATRiX_TRSM_Hh_
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='lapack/fortran_id.h.html'>lapack/fortran_id.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='cblas_constants.h.html'>cblas_constants.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>namespace</font> blas_bindings
+    <b>{</b>
+
+        <font color='#0000FF'>extern</font> "<font color='#CC0000'>C</font>"
+        <b>{</b>
+            <font color='#0000FF'><u>void</u></font> <b><a name='cblas_strsm'></a>cblas_strsm</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_ORDER Order, <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_SIDE Side,
+                             <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_UPLO Uplo, <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_TRANSPOSE TransA,
+                             <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_DIAG Diag, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> M, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> N,
+                             <font color='#0000FF'>const</font> <font color='#0000FF'><u>float</u></font> alpha, <font color='#0000FF'>const</font> <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>A, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> lda,
+                             <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>B, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> ldb<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='cblas_dtrsm'></a>cblas_dtrsm</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_ORDER Order, <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_SIDE Side,
+                             <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_UPLO Uplo, <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_TRANSPOSE TransA,
+                             <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_DIAG Diag, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> M, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> N,
+                             <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> alpha, <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>A, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> lda,
+                             <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>B, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> ldb<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>/*  Purpose */</font>
+<font color='#009900'>/*  ======= */</font>
+
+<font color='#009900'>/*  DTRSM  solves one of the matrix equations */</font>
+
+<font color='#009900'>/*     op( A )*X = alpha*B,   or   X*op( A ) = alpha*B, */</font>
+
+<font color='#009900'>/*  where alpha is a scalar, X and B are m by n matrices, A is a unit, or */</font>
+<font color='#009900'>/*  non-unit,  upper or lower triangular matrix  and  op( A )  is one  of */</font>
+
+<font color='#009900'>/*     op( A ) = A   or   op( A ) = A'. */</font>
+
+<font color='#009900'>/*  The matrix X is overwritten on B. */</font>
+
+<font color='#009900'>/*  Arguments */</font>
+<font color='#009900'>/*  ========== */</font>
+
+<font color='#009900'>/*  SIDE   - CHARACTER*1. */</font>
+<font color='#009900'>/*           On entry, SIDE specifies whether op( A ) appears on the left */</font>
+<font color='#009900'>/*           or right of X as follows: */</font>
+
+<font color='#009900'>/*              SIDE = 'L' or 'l'   op( A )*X = alpha*B. */</font>
+
+<font color='#009900'>/*              SIDE = 'R' or 'r'   X*op( A ) = alpha*B. */</font>
+
+<font color='#009900'>/*           Unchanged on exit. */</font>
+
+<font color='#009900'>/*  UPLO   - CHARACTER*1. */</font>
+<font color='#009900'>/*           On entry, UPLO specifies whether the matrix A is an upper or */</font>
+<font color='#009900'>/*           lower triangular matrix as follows: */</font>
+
+<font color='#009900'>/*              UPLO = 'U' or 'u'   A is an upper triangular matrix. */</font>
+
+<font color='#009900'>/*              UPLO = 'L' or 'l'   A is a lower triangular matrix. */</font>
+
+<font color='#009900'>/*           Unchanged on exit. */</font>
+
+<font color='#009900'>/*  TRANSA - CHARACTER*1. */</font>
+<font color='#009900'>/*           On entry, TRANSA specifies the form of op( A ) to be used in */</font>
+<font color='#009900'>/*           the matrix multiplication as follows: */</font>
+
+<font color='#009900'>/*              TRANSA = 'N' or 'n'   op( A ) = A. */</font>
+
+<font color='#009900'>/*              TRANSA = 'T' or 't'   op( A ) = A'. */</font>
+
+<font color='#009900'>/*              TRANSA = 'C' or 'c'   op( A ) = A'. */</font>
+
+<font color='#009900'>/*           Unchanged on exit. */</font>
+
+<font color='#009900'>/*  DIAG   - CHARACTER*1. */</font>
+<font color='#009900'>/*           On entry, DIAG specifies whether or not A is unit triangular */</font>
+<font color='#009900'>/*           as follows: */</font>
+
+<font color='#009900'>/*              DIAG = 'U' or 'u'   A is assumed to be unit triangular. */</font>
+
+<font color='#009900'>/*              DIAG = 'N' or 'n'   A is not assumed to be unit */</font>
+<font color='#009900'>/*                                  triangular. */</font>
+
+<font color='#009900'>/*           Unchanged on exit. */</font>
+
+<font color='#009900'>/*  M      - INTEGER. */</font>
+<font color='#009900'>/*           On entry, M specifies the number of rows of B. M must be at */</font>
+<font color='#009900'>/*           least zero. */</font>
+<font color='#009900'>/*           Unchanged on exit. */</font>
+
+<font color='#009900'>/*  N      - INTEGER. */</font>
+<font color='#009900'>/*           On entry, N specifies the number of columns of B.  N must be */</font>
+<font color='#009900'>/*           at least zero. */</font>
+<font color='#009900'>/*           Unchanged on exit. */</font>
+
+<font color='#009900'>/*  ALPHA  - DOUBLE PRECISION. */</font>
+<font color='#009900'>/*           On entry,  ALPHA specifies the scalar  alpha. When  alpha is */</font>
+<font color='#009900'>/*           zero then  A is not referenced and  B need not be set before */</font>
+<font color='#009900'>/*           entry. */</font>
+<font color='#009900'>/*           Unchanged on exit. */</font>
+
+<font color='#009900'>/*  A      - DOUBLE PRECISION array of DIMENSION ( LDA, k ), where k is m */</font>
+<font color='#009900'>/*           when  SIDE = 'L' or 'l'  and is  n  when  SIDE = 'R' or 'r'. */</font>
+<font color='#009900'>/*           Before entry  with  UPLO = 'U' or 'u',  the  leading  k by k */</font>
+<font color='#009900'>/*           upper triangular part of the array  A must contain the upper */</font>
+<font color='#009900'>/*           triangular matrix  and the strictly lower triangular part of */</font>
+<font color='#009900'>/*           A is not referenced. */</font>
+<font color='#009900'>/*           Before entry  with  UPLO = 'L' or 'l',  the  leading  k by k */</font>
+<font color='#009900'>/*           lower triangular part of the array  A must contain the lower */</font>
+<font color='#009900'>/*           triangular matrix  and the strictly upper triangular part of */</font>
+<font color='#009900'>/*           A is not referenced. */</font>
+<font color='#009900'>/*           Note that when  DIAG = 'U' or 'u',  the diagonal elements of */</font>
+<font color='#009900'>/*           A  are not referenced either,  but are assumed to be  unity. */</font>
+<font color='#009900'>/*           Unchanged on exit. */</font>
+
+<font color='#009900'>/*  LDA    - INTEGER. */</font>
+<font color='#009900'>/*           On entry, LDA specifies the first dimension of A as declared */</font>
+<font color='#009900'>/*           in the calling (sub) program.  When  SIDE = 'L' or 'l'  then */</font>
+<font color='#009900'>/*           LDA  must be at least  max( 1, m ),  when  SIDE = 'R' or 'r' */</font>
+<font color='#009900'>/*           then LDA must be at least max( 1, n ). */</font>
+<font color='#009900'>/*           Unchanged on exit. */</font>
+
+<font color='#009900'>/*  B      - DOUBLE PRECISION array of DIMENSION ( LDB, n ). */</font>
+<font color='#009900'>/*           Before entry,  the leading  m by n part of the array  B must */</font>
+<font color='#009900'>/*           contain  the  right-hand  side  matrix  B,  and  on exit  is */</font>
+<font color='#009900'>/*           overwritten by the solution matrix  X. */</font>
+
+<font color='#009900'>/*  LDB    - INTEGER. */</font>
+<font color='#009900'>/*           On entry, LDB specifies the first dimension of B as declared */</font>
+<font color='#009900'>/*           in  the  calling  (sub)  program.   LDB  must  be  at  least */</font>
+<font color='#009900'>/*           max( 1, m ). */</font>
+<font color='#009900'>/*           Unchanged on exit. */</font>
+
+
+<font color='#009900'>/*  Level 3 Blas routine. */</font>
+
+
+<font color='#009900'>/*  -- Written on 8-February-1989. */</font>
+<font color='#009900'>/*     Jack Dongarra, Argonne National Laboratory. */</font>
+<font color='#009900'>/*     Iain Duff, AERE Harwell. */</font>
+<font color='#009900'>/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */</font>
+<font color='#009900'>/*     Sven Hammarling, Numerical Algorithms Group Ltd. */</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='local_trsm'></a>local_trsm</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_ORDER Order,
+            <font color='#0000FF'>enum</font> CBLAS_SIDE Side,
+            <font color='#0000FF'>enum</font> CBLAS_UPLO Uplo, 
+            <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_TRANSPOSE TransA,
+            <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_DIAG Diag, 
+            <font color='#0000FF'><u>long</u></font> m, 
+            <font color='#0000FF'><u>long</u></font> n, 
+            T alpha, 
+            <font color='#0000FF'>const</font> T <font color='#5555FF'>*</font>a, 
+            <font color='#0000FF'><u>long</u></font> lda, 
+            T <font color='#5555FF'>*</font>b, 
+            <font color='#0000FF'><u>long</u></font> ldb
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            This is a copy of the dtrsm routine from the netlib.org BLAS which was run though
+            f2c and converted into this form for use when a BLAS library is not available.
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>Order <font color='#5555FF'>=</font><font color='#5555FF'>=</font> CblasRowMajor<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// since row major ordering looks like transposition to FORTRAN we need to flip a
+</font>                <font color='#009900'>// few things.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>Side <font color='#5555FF'>=</font><font color='#5555FF'>=</font> CblasLeft<font face='Lucida Console'>)</font>
+                    Side <font color='#5555FF'>=</font> CblasRight;
+                <font color='#0000FF'>else</font>
+                    Side <font color='#5555FF'>=</font> CblasLeft;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>Uplo <font color='#5555FF'>=</font><font color='#5555FF'>=</font> CblasUpper<font face='Lucida Console'>)</font>
+                    Uplo <font color='#5555FF'>=</font> CblasLower;
+                <font color='#0000FF'>else</font>
+                    Uplo <font color='#5555FF'>=</font> CblasUpper;
+
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>m,n<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>/* System generated locals */</font>
+            <font color='#0000FF'><u>long</u></font> a_dim1, a_offset, b_dim1, b_offset, i__1, i__2, i__3;
+
+            <font color='#009900'>/* Local variables */</font>
+            <font color='#0000FF'><u>long</u></font> i__, j, k, info;
+            T temp;
+            <font color='#0000FF'><u>bool</u></font> lside;
+            <font color='#0000FF'><u>long</u></font> nrowa;
+            <font color='#0000FF'><u>bool</u></font> upper;
+            <font color='#0000FF'><u>bool</u></font> nounit;
+
+            <font color='#009900'>/* Parameter adjustments */</font>
+            a_dim1 <font color='#5555FF'>=</font> lda;
+            a_offset <font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>+</font> a_dim1;
+            a <font color='#5555FF'>-</font><font color='#5555FF'>=</font> a_offset;
+            b_dim1 <font color='#5555FF'>=</font> ldb;
+            b_offset <font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>+</font> b_dim1;
+            b <font color='#5555FF'>-</font><font color='#5555FF'>=</font> b_offset;
+
+            <font color='#009900'>/* Function Body */</font>
+            lside <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>Side <font color='#5555FF'>=</font><font color='#5555FF'>=</font> CblasLeft<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lside<font face='Lucida Console'>)</font> 
+            <b>{</b>
+                nrowa <font color='#5555FF'>=</font> m;
+            <b>}</b> <font color='#0000FF'>else</font> 
+            <b>{</b>
+                nrowa <font color='#5555FF'>=</font> n;
+            <b>}</b>
+            nounit <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>Diag <font color='#5555FF'>=</font><font color='#5555FF'>=</font> CblasNonUnit<font face='Lucida Console'>)</font>; 
+            upper <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>Uplo <font color='#5555FF'>=</font><font color='#5555FF'>=</font> CblasUpper<font face='Lucida Console'>)</font>; 
+
+            info <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> lside <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font> <font face='Lucida Console'>(</font>Side <font color='#5555FF'>=</font><font color='#5555FF'>=</font> CblasRight<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+                info <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> upper <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>Uplo <font color='#5555FF'>=</font><font color='#5555FF'>=</font> CblasLower<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font> <b>{</b>
+                info <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+            <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>TransA <font color='#5555FF'>=</font><font color='#5555FF'>=</font> CblasNoTrans<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                       <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>TransA <font color='#5555FF'>=</font><font color='#5555FF'>=</font> CblasTrans<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                       <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>TransA <font color='#5555FF'>=</font><font color='#5555FF'>=</font> CblasConjTrans<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>  <b>{</b>
+                info <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+            <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>Diag <font color='#5555FF'>=</font><font color='#5555FF'>=</font> CblasUnit<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                       <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>Diag <font color='#5555FF'>=</font><font color='#5555FF'>=</font> CblasNonUnit<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font> <b>{</b>
+                info <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+            <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>m <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+                info <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+            <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+                info <font color='#5555FF'>=</font> <font color='#979000'>6</font>;
+            <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lda <font color='#5555FF'>&lt;</font> std::max<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,nrowa<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+                info <font color='#5555FF'>=</font> <font color='#979000'>9</font>;
+            <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ldb <font color='#5555FF'>&lt;</font> std::max<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+                info <font color='#5555FF'>=</font> <font color='#979000'>11</font>;
+            <b>}</b>
+            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> info <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>, "<font color='#CC0000'>Invalid inputs given to local_trsm</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>/*     Quick return if possible. */</font>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>m <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> n <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+                <font color='#0000FF'>return</font>;
+            <b>}</b>
+
+            <font color='#009900'>/*     And when  alpha.eq.zero. */</font>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0.</font><font face='Lucida Console'>)</font> <b>{</b>
+                i__1 <font color='#5555FF'>=</font> n;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> <font color='#979000'>1</font>; j <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__1; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font> <b>{</b>
+                    i__2 <font color='#5555FF'>=</font> m;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i__ <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i__ <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__2; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i__<font face='Lucida Console'>)</font> <b>{</b>
+                        b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>=</font> <font color='#979000'>0.</font>;
+                        <font color='#009900'>/* L10: */</font>
+                    <b>}</b>
+                    <font color='#009900'>/* L20: */</font>
+                <b>}</b>
+                <font color='#0000FF'>return</font>;
+            <b>}</b>
+
+            <font color='#009900'>/*     Start the operations. */</font>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lside<font face='Lucida Console'>)</font> <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>TransA <font color='#5555FF'>=</font><font color='#5555FF'>=</font> CblasNoTrans<font face='Lucida Console'>)</font> <b>{</b>
+
+                    <font color='#009900'>/*           Form  B := alpha*inv( A )*B. */</font>
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>upper<font face='Lucida Console'>)</font> <b>{</b>
+                        i__1 <font color='#5555FF'>=</font> n;
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> <font color='#979000'>1</font>; j <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__1; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font> <b>{</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>alpha <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1.</font><font face='Lucida Console'>)</font> <b>{</b>
+                                i__2 <font color='#5555FF'>=</font> m;
+                                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i__ <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i__ <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__2; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i__<font face='Lucida Console'>)</font> <b>{</b>
+                                    b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>=</font> alpha <font color='#5555FF'>*</font> b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1]
+                                        ;
+                                    <font color='#009900'>/* L30: */</font>
+                                <b>}</b>
+                            <b>}</b>
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>=</font> m; k <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>k<font face='Lucida Console'>)</font> <b>{</b>
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>b[k <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0.</font><font face='Lucida Console'>)</font> <b>{</b>
+                                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nounit<font face='Lucida Console'>)</font> <b>{</b>
+                                        b[k <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>/</font><font color='#5555FF'>=</font> a[k <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> a_dim1];
+                                    <b>}</b>
+                                    i__2 <font color='#5555FF'>=</font> k <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+                                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i__ <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i__ <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__2; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i__<font face='Lucida Console'>)</font> <b>{</b>
+                                        b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>-</font><font color='#5555FF'>=</font> b[k <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>*</font> a[
+                                            i__ <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> a_dim1];
+                                        <font color='#009900'>/* L40: */</font>
+                                    <b>}</b>
+                                <b>}</b>
+                                <font color='#009900'>/* L50: */</font>
+                            <b>}</b>
+                            <font color='#009900'>/* L60: */</font>
+                        <b>}</b>
+                    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+                        i__1 <font color='#5555FF'>=</font> n;
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> <font color='#979000'>1</font>; j <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__1; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font> <b>{</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>alpha <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1.</font><font face='Lucida Console'>)</font> <b>{</b>
+                                i__2 <font color='#5555FF'>=</font> m;
+                                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i__ <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i__ <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__2; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i__<font face='Lucida Console'>)</font> <b>{</b>
+                                    b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>=</font> alpha <font color='#5555FF'>*</font> b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1]
+                                        ;
+                                    <font color='#009900'>/* L70: */</font>
+                                <b>}</b>
+                            <b>}</b>
+                            i__2 <font color='#5555FF'>=</font> m;
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>=</font> <font color='#979000'>1</font>; k <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__2; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font> <b>{</b>
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>b[k <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0.</font><font face='Lucida Console'>)</font> <b>{</b>
+                                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nounit<font face='Lucida Console'>)</font> <b>{</b>
+                                        b[k <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>/</font><font color='#5555FF'>=</font> a[k <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> a_dim1];
+                                    <b>}</b>
+                                    i__3 <font color='#5555FF'>=</font> m;
+                                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i__ <font color='#5555FF'>=</font> k <font color='#5555FF'>+</font> <font color='#979000'>1</font>; i__ <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__3; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i__<font face='Lucida Console'>)</font> <b>{</b>
+                                        b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>-</font><font color='#5555FF'>=</font> b[k <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>*</font> a[
+                                            i__ <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> a_dim1];
+                                        <font color='#009900'>/* L80: */</font>
+                                    <b>}</b>
+                                <b>}</b>
+                                <font color='#009900'>/* L90: */</font>
+                            <b>}</b>
+                            <font color='#009900'>/* L100: */</font>
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+
+                    <font color='#009900'>/*           Form  B := alpha*inv( A' )*B. */</font>
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>upper<font face='Lucida Console'>)</font> <b>{</b>
+                        i__1 <font color='#5555FF'>=</font> n;
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> <font color='#979000'>1</font>; j <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__1; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font> <b>{</b>
+                            i__2 <font color='#5555FF'>=</font> m;
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i__ <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i__ <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__2; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i__<font face='Lucida Console'>)</font> <b>{</b>
+                                temp <font color='#5555FF'>=</font> alpha <font color='#5555FF'>*</font> b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1];
+                                i__3 <font color='#5555FF'>=</font> i__ <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+                                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>=</font> <font color='#979000'>1</font>; k <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__3; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font> <b>{</b>
+                                    temp <font color='#5555FF'>-</font><font color='#5555FF'>=</font> a[k <font color='#5555FF'>+</font> i__ <font color='#5555FF'>*</font> a_dim1] <font color='#5555FF'>*</font> b[k <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1];
+                                    <font color='#009900'>/* L110: */</font>
+                                <b>}</b>
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nounit<font face='Lucida Console'>)</font> <b>{</b>
+                                    temp <font color='#5555FF'>/</font><font color='#5555FF'>=</font> a[i__ <font color='#5555FF'>+</font> i__ <font color='#5555FF'>*</font> a_dim1];
+                                <b>}</b>
+                                b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>=</font> temp;
+                                <font color='#009900'>/* L120: */</font>
+                            <b>}</b>
+                            <font color='#009900'>/* L130: */</font>
+                        <b>}</b>
+                    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+                        i__1 <font color='#5555FF'>=</font> n;
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> <font color='#979000'>1</font>; j <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__1; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font> <b>{</b>
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i__ <font color='#5555FF'>=</font> m; i__ <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>i__<font face='Lucida Console'>)</font> <b>{</b>
+                                temp <font color='#5555FF'>=</font> alpha <font color='#5555FF'>*</font> b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1];
+                                i__2 <font color='#5555FF'>=</font> m;
+                                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>=</font> i__ <font color='#5555FF'>+</font> <font color='#979000'>1</font>; k <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__2; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font> <b>{</b>
+                                    temp <font color='#5555FF'>-</font><font color='#5555FF'>=</font> a[k <font color='#5555FF'>+</font> i__ <font color='#5555FF'>*</font> a_dim1] <font color='#5555FF'>*</font> b[k <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1];
+                                    <font color='#009900'>/* L140: */</font>
+                                <b>}</b>
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nounit<font face='Lucida Console'>)</font> <b>{</b>
+                                    temp <font color='#5555FF'>/</font><font color='#5555FF'>=</font> a[i__ <font color='#5555FF'>+</font> i__ <font color='#5555FF'>*</font> a_dim1];
+                                <b>}</b>
+                                b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>=</font> temp;
+                                <font color='#009900'>/* L150: */</font>
+                            <b>}</b>
+                            <font color='#009900'>/* L160: */</font>
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>TransA <font color='#5555FF'>=</font><font color='#5555FF'>=</font> CblasNoTrans<font face='Lucida Console'>)</font> <b>{</b>
+
+                    <font color='#009900'>/*           Form  B := alpha*B*inv( A ). */</font>
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>upper<font face='Lucida Console'>)</font> <b>{</b>
+                        i__1 <font color='#5555FF'>=</font> n;
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> <font color='#979000'>1</font>; j <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__1; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font> <b>{</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>alpha <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1.</font><font face='Lucida Console'>)</font> <b>{</b>
+                                i__2 <font color='#5555FF'>=</font> m;
+                                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i__ <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i__ <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__2; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i__<font face='Lucida Console'>)</font> <b>{</b>
+                                    b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>=</font> alpha <font color='#5555FF'>*</font> b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1]
+                                        ;
+                                    <font color='#009900'>/* L170: */</font>
+                                <b>}</b>
+                            <b>}</b>
+                            i__2 <font color='#5555FF'>=</font> j <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>=</font> <font color='#979000'>1</font>; k <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__2; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font> <b>{</b>
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a[k <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> a_dim1] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0.</font><font face='Lucida Console'>)</font> <b>{</b>
+                                    i__3 <font color='#5555FF'>=</font> m;
+                                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i__ <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i__ <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__3; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i__<font face='Lucida Console'>)</font> <b>{</b>
+                                        b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>-</font><font color='#5555FF'>=</font> a[k <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> a_dim1] <font color='#5555FF'>*</font> b[
+                                            i__ <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> b_dim1];
+                                        <font color='#009900'>/* L180: */</font>
+                                    <b>}</b>
+                                <b>}</b>
+                                <font color='#009900'>/* L190: */</font>
+                            <b>}</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nounit<font face='Lucida Console'>)</font> <b>{</b>
+                                temp <font color='#5555FF'>=</font> <font color='#979000'>1.</font> <font color='#5555FF'>/</font> a[j <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> a_dim1];
+                                i__2 <font color='#5555FF'>=</font> m;
+                                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i__ <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i__ <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__2; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i__<font face='Lucida Console'>)</font> <b>{</b>
+                                    b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>=</font> temp <font color='#5555FF'>*</font> b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1];
+                                    <font color='#009900'>/* L200: */</font>
+                                <b>}</b>
+                            <b>}</b>
+                            <font color='#009900'>/* L210: */</font>
+                        <b>}</b>
+                    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> n; j <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>j<font face='Lucida Console'>)</font> <b>{</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>alpha <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1.</font><font face='Lucida Console'>)</font> <b>{</b>
+                                i__1 <font color='#5555FF'>=</font> m;
+                                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i__ <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i__ <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__1; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i__<font face='Lucida Console'>)</font> <b>{</b>
+                                    b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>=</font> alpha <font color='#5555FF'>*</font> b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1]
+                                        ;
+                                    <font color='#009900'>/* L220: */</font>
+                                <b>}</b>
+                            <b>}</b>
+                            i__1 <font color='#5555FF'>=</font> n;
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>=</font> j <font color='#5555FF'>+</font> <font color='#979000'>1</font>; k <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__1; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font> <b>{</b>
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a[k <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> a_dim1] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0.</font><font face='Lucida Console'>)</font> <b>{</b>
+                                    i__2 <font color='#5555FF'>=</font> m;
+                                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i__ <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i__ <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__2; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i__<font face='Lucida Console'>)</font> <b>{</b>
+                                        b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>-</font><font color='#5555FF'>=</font> a[k <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> a_dim1] <font color='#5555FF'>*</font> b[
+                                            i__ <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> b_dim1];
+                                        <font color='#009900'>/* L230: */</font>
+                                    <b>}</b>
+                                <b>}</b>
+                                <font color='#009900'>/* L240: */</font>
+                            <b>}</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nounit<font face='Lucida Console'>)</font> <b>{</b>
+                                temp <font color='#5555FF'>=</font> <font color='#979000'>1.</font> <font color='#5555FF'>/</font> a[j <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> a_dim1];
+                                i__1 <font color='#5555FF'>=</font> m;
+                                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i__ <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i__ <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__1; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i__<font face='Lucida Console'>)</font> <b>{</b>
+                                    b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>=</font> temp <font color='#5555FF'>*</font> b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1];
+                                    <font color='#009900'>/* L250: */</font>
+                                <b>}</b>
+                            <b>}</b>
+                            <font color='#009900'>/* L260: */</font>
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+
+                    <font color='#009900'>/*           Form  B := alpha*B*inv( A' ). */</font>
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>upper<font face='Lucida Console'>)</font> <b>{</b>
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>=</font> n; k <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>k<font face='Lucida Console'>)</font> <b>{</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nounit<font face='Lucida Console'>)</font> <b>{</b>
+                                temp <font color='#5555FF'>=</font> <font color='#979000'>1.</font> <font color='#5555FF'>/</font> a[k <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> a_dim1];
+                                i__1 <font color='#5555FF'>=</font> m;
+                                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i__ <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i__ <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__1; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i__<font face='Lucida Console'>)</font> <b>{</b>
+                                    b[i__ <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>=</font> temp <font color='#5555FF'>*</font> b[i__ <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> b_dim1];
+                                    <font color='#009900'>/* L270: */</font>
+                                <b>}</b>
+                            <b>}</b>
+                            i__1 <font color='#5555FF'>=</font> k <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> <font color='#979000'>1</font>; j <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__1; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font> <b>{</b>
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a[j <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> a_dim1] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0.</font><font face='Lucida Console'>)</font> <b>{</b>
+                                    temp <font color='#5555FF'>=</font> a[j <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> a_dim1];
+                                    i__2 <font color='#5555FF'>=</font> m;
+                                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i__ <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i__ <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__2; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i__<font face='Lucida Console'>)</font> <b>{</b>
+                                        b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>-</font><font color='#5555FF'>=</font> temp <font color='#5555FF'>*</font> b[i__ <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> 
+                                            b_dim1];
+                                        <font color='#009900'>/* L280: */</font>
+                                    <b>}</b>
+                                <b>}</b>
+                                <font color='#009900'>/* L290: */</font>
+                            <b>}</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>alpha <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1.</font><font face='Lucida Console'>)</font> <b>{</b>
+                                i__1 <font color='#5555FF'>=</font> m;
+                                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i__ <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i__ <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__1; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i__<font face='Lucida Console'>)</font> <b>{</b>
+                                    b[i__ <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>=</font> alpha <font color='#5555FF'>*</font> b[i__ <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> b_dim1]
+                                        ;
+                                    <font color='#009900'>/* L300: */</font>
+                                <b>}</b>
+                            <b>}</b>
+                            <font color='#009900'>/* L310: */</font>
+                        <b>}</b>
+                    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+                        i__1 <font color='#5555FF'>=</font> n;
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>=</font> <font color='#979000'>1</font>; k <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__1; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font> <b>{</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nounit<font face='Lucida Console'>)</font> <b>{</b>
+                                temp <font color='#5555FF'>=</font> <font color='#979000'>1.</font> <font color='#5555FF'>/</font> a[k <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> a_dim1];
+                                i__2 <font color='#5555FF'>=</font> m;
+                                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i__ <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i__ <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__2; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i__<font face='Lucida Console'>)</font> <b>{</b>
+                                    b[i__ <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>=</font> temp <font color='#5555FF'>*</font> b[i__ <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> b_dim1];
+                                    <font color='#009900'>/* L320: */</font>
+                                <b>}</b>
+                            <b>}</b>
+                            i__2 <font color='#5555FF'>=</font> n;
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> k <font color='#5555FF'>+</font> <font color='#979000'>1</font>; j <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__2; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font> <b>{</b>
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a[j <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> a_dim1] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0.</font><font face='Lucida Console'>)</font> <b>{</b>
+                                    temp <font color='#5555FF'>=</font> a[j <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> a_dim1];
+                                    i__3 <font color='#5555FF'>=</font> m;
+                                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i__ <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i__ <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__3; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i__<font face='Lucida Console'>)</font> <b>{</b>
+                                        b[i__ <font color='#5555FF'>+</font> j <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>-</font><font color='#5555FF'>=</font> temp <font color='#5555FF'>*</font> b[i__ <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> 
+                                            b_dim1];
+                                        <font color='#009900'>/* L330: */</font>
+                                    <b>}</b>
+                                <b>}</b>
+                                <font color='#009900'>/* L340: */</font>
+                            <b>}</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>alpha <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1.</font><font face='Lucida Console'>)</font> <b>{</b>
+                                i__2 <font color='#5555FF'>=</font> m;
+                                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i__ <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i__ <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i__2; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i__<font face='Lucida Console'>)</font> <b>{</b>
+                                    b[i__ <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> b_dim1] <font color='#5555FF'>=</font> alpha <font color='#5555FF'>*</font> b[i__ <font color='#5555FF'>+</font> k <font color='#5555FF'>*</font> b_dim1]
+                                        ;
+                                    <font color='#009900'>/* L350: */</font>
+                                <b>}</b>
+                            <b>}</b>
+                            <font color='#009900'>/* L360: */</font>
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b> 
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='cblas_trsm'></a>cblas_trsm</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_ORDER Order, <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_SIDE Side,
+                               <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_UPLO Uplo, <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_TRANSPOSE TransA,
+                               <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_DIAG Diag, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> M, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> N,
+                               <font color='#0000FF'>const</font> <font color='#0000FF'><u>float</u></font> alpha, <font color='#0000FF'>const</font> <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>A, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> lda,
+                               <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>B, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> ldb<font face='Lucida Console'>)</font>
+        <b>{</b>
+<font color='#0000FF'>#ifdef</font> DLIB_USE_BLAS
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>M <font color='#5555FF'>&gt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>cblas_strsm</font><font face='Lucida Console'>(</font>Order, Side, Uplo, TransA, Diag, M, N, alpha, A, lda, B, ldb<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font>;
+            <b>}</b>
+<font color='#0000FF'>#endif</font>
+            <font color='#BB00BB'>local_trsm</font><font face='Lucida Console'>(</font>Order, Side, Uplo, TransA, Diag, M, N, alpha, A, lda, B, ldb<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='cblas_trsm'></a>cblas_trsm</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_ORDER Order, <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_SIDE Side,
+                               <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_UPLO Uplo, <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_TRANSPOSE TransA,
+                               <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_DIAG Diag, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> M, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> N,
+                               <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> alpha, <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>A, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> lda,
+                               <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>B, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> ldb<font face='Lucida Console'>)</font>
+        <b>{</b>
+<font color='#0000FF'>#ifdef</font> DLIB_USE_BLAS
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>M <font color='#5555FF'>&gt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>cblas_dtrsm</font><font face='Lucida Console'>(</font>Order, Side, Uplo, TransA, Diag, M, N, alpha, A, lda, B, ldb<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font>;
+            <b>}</b>
+<font color='#0000FF'>#endif</font>
+            <font color='#BB00BB'>local_trsm</font><font face='Lucida Console'>(</font>Order, Side, Uplo, TransA, Diag, M, N, alpha, A, lda, B, ldb<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='cblas_trsm'></a>cblas_trsm</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_ORDER Order, <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_SIDE Side,
+                               <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_UPLO Uplo, <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_TRANSPOSE TransA,
+                               <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_DIAG Diag, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> M, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> N,
+                               <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> alpha, <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>A, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> lda,
+                               <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>B, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> ldb<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>local_trsm</font><font face='Lucida Console'>(</font>Order, Side, Uplo, TransA, Diag, M, N, alpha, A, lda, B, ldb<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'><u>long</u></font> NR1, <font color='#0000FF'><u>long</u></font> NR2,
+            <font color='#0000FF'><u>long</u></font> NC1, <font color='#0000FF'><u>long</u></font> NC2,
+            <font color='#0000FF'>typename</font> MM
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='triangular_solver'></a>triangular_solver</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_SIDE Side,
+            <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_UPLO Uplo, 
+            <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_TRANSPOSE TransA,
+            <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_DIAG Diag,
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>T,NR1,NC1,MM,row_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A,
+            <font color='#0000FF'>const</font> T alpha,
+            matrix<font color='#5555FF'>&lt;</font>T,NR2,NC2,MM,row_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> B
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>cblas_trsm</font><font face='Lucida Console'>(</font>CblasRowMajor, Side,  Uplo, TransA, Diag, B.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, B.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                       alpha, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>A</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, A.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>B</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, B.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'><u>long</u></font> NR1, <font color='#0000FF'><u>long</u></font> NR2,
+            <font color='#0000FF'><u>long</u></font> NC1, <font color='#0000FF'><u>long</u></font> NC2,
+            <font color='#0000FF'>typename</font> MM
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='triangular_solver'></a>triangular_solver</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_SIDE Side,
+            <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_UPLO Uplo, 
+            <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_TRANSPOSE TransA,
+            <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_DIAG Diag,
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>T,NR1,NC1,MM,column_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A,
+            <font color='#0000FF'>const</font> T alpha,
+            matrix<font color='#5555FF'>&lt;</font>T,NR2,NC2,MM,column_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> B
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>cblas_trsm</font><font face='Lucida Console'>(</font>CblasColMajor, Side,  Uplo, TransA, Diag, B.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, B.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                       alpha, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>A</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>B</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, B.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'><u>long</u></font> NR1, <font color='#0000FF'><u>long</u></font> NR2,
+            <font color='#0000FF'><u>long</u></font> NC1, <font color='#0000FF'><u>long</u></font> NC2,
+            <font color='#0000FF'>typename</font> MM
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='triangular_solver'></a>triangular_solver</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_SIDE Side,
+            <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_UPLO Uplo, 
+            <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_TRANSPOSE TransA,
+            <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_DIAG Diag,
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>T,NR1,NC1,MM,column_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A,
+            matrix<font color='#5555FF'>&lt;</font>T,NR2,NC2,MM,column_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> B,
+            <font color='#0000FF'><u>long</u></font> rows_of_B
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> T alpha <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#BB00BB'>cblas_trsm</font><font face='Lucida Console'>(</font>CblasColMajor, Side,  Uplo, TransA, Diag, rows_of_B, B.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                       alpha, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>A</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>B</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, B.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'><u>long</u></font> NR1, <font color='#0000FF'><u>long</u></font> NR2,
+            <font color='#0000FF'><u>long</u></font> NC1, <font color='#0000FF'><u>long</u></font> NC2,
+            <font color='#0000FF'>typename</font> MM,
+            <font color='#0000FF'>typename</font> layout
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='triangular_solver'></a>triangular_solver</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_SIDE Side,
+            <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_UPLO Uplo, 
+            <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_TRANSPOSE TransA,
+            <font color='#0000FF'>const</font> <font color='#0000FF'>enum</font> CBLAS_DIAG Diag,
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>T,NR1,NC1,MM,layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A,
+            matrix<font color='#5555FF'>&lt;</font>T,NR2,NC2,MM,layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> B
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> T alpha <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#BB00BB'>triangular_solver</font><font face='Lucida Console'>(</font>Side, Uplo, TransA, Diag, A, alpha, B<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MATRiX_TRSM_Hh_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,140 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sqlite_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font>
+<font color='#009900'>/*
+    This example gives a quick overview of dlib's C++ API for the popular SQLite library.
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>sqlite.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>matrix.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>bool</u></font> <b><a name='table_exists'></a>table_exists</b> <font face='Lucida Console'>(</font>
+    database<font color='#5555FF'>&amp;</font> db,
+    <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> tablename
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// Sometimes you want to just run a query that returns one thing.  In this case, we
+</font>    <font color='#009900'>// want to see how many tables are in our database with the given tablename.  The only
+</font>    <font color='#009900'>// possible outcomes are 1 or 0 and we can do this by looking in the special
+</font>    <font color='#009900'>// sqlite_master table that records such database metadata.  For these kinds of "one
+</font>    <font color='#009900'>// result" queries we can use the query_int() method which executes a SQL statement
+</font>    <font color='#009900'>// against a database and returns the result as an int.
+</font>    <font color='#0000FF'>return</font> <font color='#BB00BB'>query_int</font><font face='Lucida Console'>(</font>db, "<font color='#CC0000'>select count(*) from sqlite_master where name = '</font>"<font color='#5555FF'>+</font>tablename<font color='#5555FF'>+</font>"<font color='#CC0000'>'</font>"<font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>1</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>try</font>
+<b>{</b>
+    <font color='#009900'>// Open the SQLite database in the stuff.db file (or create an empty database in
+</font>    <font color='#009900'>// stuff.db if it doesn't exist).
+</font>    database <font color='#BB00BB'>db</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>stuff.db</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Create a people table that records a person's name, age, and their "data".
+</font>    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>table_exists</font><font face='Lucida Console'>(</font>db,"<font color='#CC0000'>people</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        db.<font color='#BB00BB'>exec</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>create table people (name, age, data)</font>"<font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// Now let's add some data to this table.  We can do this by making a statement object
+</font>    <font color='#009900'>// as shown.  Here we use the special ? character to indicate bindable arguments and
+</font>    <font color='#009900'>// below we will use st.bind() statements to populate those fields with values.  
+</font>    statement <font color='#BB00BB'>st</font><font face='Lucida Console'>(</font>db, "<font color='#CC0000'>insert into people VALUES(?,?,?)</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// The data for Davis
+</font>    string name <font color='#5555FF'>=</font> "<font color='#CC0000'>Davis</font>";
+    <font color='#0000FF'><u>int</u></font> age <font color='#5555FF'>=</font> <font color='#979000'>32</font>;
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> m <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>; <font color='#009900'>// some random "data" for Davis
+</font>
+    <font color='#009900'>// You can bind any of the built in scalar types (e.g. int, float) or std::string and
+</font>    <font color='#009900'>// they will go into the table as the appropriate SQL types (e.g. INT, TEXT).  If you
+</font>    <font color='#009900'>// try to bind any other object it will be saved as a binary blob if the type has an
+</font>    <font color='#009900'>// appropriate void serialize(const T&amp;, std::ostream&amp;) function defined for it.  The
+</font>    <font color='#009900'>// matrix has such a serialize function (as do most dlib types) so the bind below saves
+</font>    <font color='#009900'>// the matrix as a binary blob.
+</font>    st.<font color='#BB00BB'>bind</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, name<font face='Lucida Console'>)</font>;
+    st.<font color='#BB00BB'>bind</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>, age<font face='Lucida Console'>)</font>;
+    st.<font color='#BB00BB'>bind</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>, m<font face='Lucida Console'>)</font>; 
+    st.<font color='#BB00BB'>exec</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#009900'>// execute the SQL statement.  This does the insert.
+</font>
+
+    <font color='#009900'>// We can reuse the statement to add more data to the database.  In fact, if you have a
+</font>    <font color='#009900'>// bunch of statements to execute it is fastest if you reuse them in this manner. 
+</font>    name <font color='#5555FF'>=</font> "<font color='#CC0000'>John</font>";
+    age <font color='#5555FF'>=</font> <font color='#979000'>82</font>;
+    m <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>; 
+    st.<font color='#BB00BB'>bind</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, name<font face='Lucida Console'>)</font>;
+    st.<font color='#BB00BB'>bind</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>, age<font face='Lucida Console'>)</font>;
+    st.<font color='#BB00BB'>bind</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>, m<font face='Lucida Console'>)</font>; 
+    st.<font color='#BB00BB'>exec</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    
+
+
+    <font color='#009900'>// Now lets print out all the rows in the people table.
+</font>    statement <font color='#BB00BB'>st2</font><font face='Lucida Console'>(</font>db, "<font color='#CC0000'>select * from people</font>"<font face='Lucida Console'>)</font>;
+    st2.<font color='#BB00BB'>exec</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// Loop over all the rows obtained by executing the statement with .exec().
+</font>    <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>st2.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        string name;
+        <font color='#0000FF'><u>int</u></font> age;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> m;
+        <font color='#009900'>// Analogously to bind, we can grab the columns straight into C++ types.  Here the
+</font>        <font color='#009900'>// matrix is automatically deserialized by calling its deserialize() routine.
+</font>        st2.<font color='#BB00BB'>get_column</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, name<font face='Lucida Console'>)</font>;
+        st2.<font color='#BB00BB'>get_column</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, age<font face='Lucida Console'>)</font>;
+        st2.<font color='#BB00BB'>get_column</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>, m<font face='Lucida Console'>)</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> name <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> age <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> m <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+
+
+    <font color='#009900'>// Finally, if you want to make a bunch of atomic changes to a database then you should
+</font>    <font color='#009900'>// do so inside a transaction.  Here, either all the database modifications that occur
+</font>    <font color='#009900'>// between the creation of my_trans and the invocation of my_trans.commit() will appear
+</font>    <font color='#009900'>// in the database or none of them will.  This way, if an exception or other error
+</font>    <font color='#009900'>// happens halfway though your transaction you won't be left with your database in an
+</font>    <font color='#009900'>// inconsistent state.  
+</font>    <font color='#009900'>// 
+</font>    <font color='#009900'>// Additionally, if you are going to do a large amount of inserts or updates then it is
+</font>    <font color='#009900'>// much faster to group them into a transaction.  
+</font>    transaction <font color='#BB00BB'>my_trans</font><font face='Lucida Console'>(</font>db<font face='Lucida Console'>)</font>;
+
+    name <font color='#5555FF'>=</font> "<font color='#CC0000'>Dude</font>";
+    age <font color='#5555FF'>=</font> <font color='#979000'>49</font>;
+    m <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>; 
+    st.<font color='#BB00BB'>bind</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, name<font face='Lucida Console'>)</font>;
+    st.<font color='#BB00BB'>bind</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>, age<font face='Lucida Console'>)</font>;
+    st.<font color='#BB00BB'>bind</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>, m<font face='Lucida Console'>)</font>; 
+    st.<font color='#BB00BB'>exec</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    name <font color='#5555FF'>=</font> "<font color='#CC0000'>Bob</font>";
+    age <font color='#5555FF'>=</font> <font color='#979000'>29</font>;
+    m <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>; 
+    st.<font color='#BB00BB'>bind</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, name<font face='Lucida Console'>)</font>;
+    st.<font color='#BB00BB'>bind</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>, age<font face='Lucida Console'>)</font>;
+    st.<font color='#BB00BB'>bind</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>, m<font face='Lucida Console'>)</font>; 
+    st.<font color='#BB00BB'>exec</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// If you comment out this line then you will see that these inserts do not take place.
+</font>    <font color='#009900'>// Specifically, what happens is that when my_trans is destructed it rolls back the
+</font>    <font color='#009900'>// entire transaction unless commit() has been called.
+</font>    my_trans.<font color='#BB00BB'>commit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+<b>}</b>
+<font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+<b>{</b>
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+
+</pre></body></html>

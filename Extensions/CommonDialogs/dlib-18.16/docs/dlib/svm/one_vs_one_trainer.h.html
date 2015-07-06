@@ -1,0 +1,252 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - one_vs_one_trainer.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_ONE_VS_ONE_TRAiNER_Hh_
+<font color='#0000FF'>#define</font> DLIB_ONE_VS_ONE_TRAiNER_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='one_vs_one_trainer_abstract.h.html'>one_vs_one_trainer_abstract.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='one_vs_one_decision_function.h.html'>one_vs_one_decision_function.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../unordered_pair.h.html'>../unordered_pair.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='multiclass_tools.h.html'>multiclass_tools.h</a>"
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../any.h.html'>../any.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>map<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>set<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads.h.html'>../threads.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> any_trainer,
+        <font color='#0000FF'>typename</font> label_type_ <font color='#5555FF'>=</font> <font color='#0000FF'><u>double</u></font>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='one_vs_one_trainer'></a>one_vs_one_trainer</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> label_type_ label_type;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> any_trainer::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> any_trainer::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> any_trainer::mem_manager_type mem_manager_type;
+
+        <font color='#0000FF'>typedef</font> one_vs_one_decision_function<font color='#5555FF'>&lt;</font>one_vs_one_trainer<font color='#5555FF'>&gt;</font> trained_function_type;
+
+        <b><a name='one_vs_one_trainer'></a>one_vs_one_trainer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> : 
+            verbose<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+            num_threads<font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_trainer'></a>set_trainer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> any_trainer<font color='#5555FF'>&amp;</font> trainer
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            default_trainer <font color='#5555FF'>=</font> trainer;
+            trainers.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_trainer'></a>set_trainer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> any_trainer<font color='#5555FF'>&amp;</font> trainer,
+            <font color='#0000FF'>const</font> label_type<font color='#5555FF'>&amp;</font> l1,
+            <font color='#0000FF'>const</font> label_type<font color='#5555FF'>&amp;</font> l2
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            trainers[<font color='#BB00BB'>make_unordered_pair</font><font face='Lucida Console'>(</font>l1,l2<font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font> trainer;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_verbose'></a>be_verbose</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_quiet'></a>be_quiet</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_num_threads'></a>set_num_threads</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            num_threads <font color='#5555FF'>=</font> num;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_threads'></a>get_num_threads</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> num_threads;
+        <b>}</b>
+
+        <font color='#0000FF'>struct</font> <b><a name='invalid_label'></a>invalid_label</b> : <font color='#0000FF'>public</font> dlib::error 
+        <b>{</b> 
+            <b><a name='invalid_label'></a>invalid_label</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> msg, <font color='#0000FF'>const</font> label_type<font color='#5555FF'>&amp;</font> l1_, <font color='#0000FF'>const</font> label_type<font color='#5555FF'>&amp;</font> l2_
+                <font face='Lucida Console'>)</font> : dlib::error<font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>, l1<font face='Lucida Console'>(</font>l1_<font face='Lucida Console'>)</font>, l2<font face='Lucida Console'>(</font>l2_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>;
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='invalid_label'></a>invalid_label</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            label_type l1, l2;
+        <b>}</b>;
+
+        trained_function_type <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> all_samples,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> all_labels
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_learning_problem</font><font face='Lucida Console'>(</font>all_samples,all_labels<font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\t trained_function_type one_vs_one_trainer::train(all_samples,all_labels)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t all_samples.size():     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> all_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t all_labels.size():      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> all_labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font> distinct_labels <font color='#5555FF'>=</font> <font color='#BB00BB'>select_all_distinct_labels</font><font face='Lucida Console'>(</font>all_labels<font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// fill pairs with all the pairs of labels.  
+</font>            std::vector<font color='#5555FF'>&lt;</font>unordered_pair<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> pairs;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> distinct_labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> i<font color='#5555FF'>+</font><font color='#979000'>1</font>; j <font color='#5555FF'>&lt;</font> distinct_labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    pairs.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>unordered_pair<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>distinct_labels[i], distinct_labels[j]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// make sure we have a trainer for this pair
+</font>                    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> binary_function_table::const_iterator itr <font color='#5555FF'>=</font> trainers.<font color='#BB00BB'>find</font><font face='Lucida Console'>(</font>pairs.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>itr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> trainers.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> default_trainer.<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        std::ostringstream sout;
+                        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>In one_vs_one_trainer, no trainer registered for the (</font>" 
+                             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> pairs.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.first <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>, </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> pairs.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.second <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>) label pair.</font>";
+                        <font color='#0000FF'>throw</font> <font color='#BB00BB'>invalid_label</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, pairs.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.first, pairs.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.second<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+
+
+            <font color='#009900'>// Now train on all the label pairs.  
+</font>            parallel_for_helper <font color='#BB00BB'>helper</font><font face='Lucida Console'>(</font>all_samples,all_labels,default_trainer,trainers,verbose,pairs<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font>num_threads, <font color='#979000'>0</font>, pairs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, helper, <font color='#979000'>500</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>helper.error_message.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>binary trainer threw while training one vs. one classifier.  Error was: </font>" <font color='#5555FF'>+</font> helper.error_message<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>trained_function_type</font><font face='Lucida Console'>(</font>helper.dfs<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>typedef</font> std::map<font color='#5555FF'>&lt;</font>unordered_pair<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font>, any_trainer<font color='#5555FF'>&gt;</font> binary_function_table;
+
+        <font color='#0000FF'>struct</font> <b><a name='parallel_for_helper'></a>parallel_for_helper</b>
+        <b>{</b>
+            <b><a name='parallel_for_helper'></a>parallel_for_helper</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> all_samples_,
+                <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> all_labels_,
+                <font color='#0000FF'>const</font> any_trainer<font color='#5555FF'>&amp;</font> default_trainer_,
+                <font color='#0000FF'>const</font> binary_function_table<font color='#5555FF'>&amp;</font> trainers_,
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> verbose_,
+                <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>unordered_pair<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> pairs_
+            <font face='Lucida Console'>)</font> : 
+                all_samples<font face='Lucida Console'>(</font>all_samples_<font face='Lucida Console'>)</font>,
+                all_labels<font face='Lucida Console'>(</font>all_labels_<font face='Lucida Console'>)</font>,
+                default_trainer<font face='Lucida Console'>(</font>default_trainer_<font face='Lucida Console'>)</font>,
+                trainers<font face='Lucida Console'>(</font>trainers_<font face='Lucida Console'>)</font>, 
+                verbose<font face='Lucida Console'>(</font>verbose_<font face='Lucida Console'>)</font>,
+                pairs<font face='Lucida Console'>(</font>pairs_<font face='Lucida Console'>)</font>
+            <b>{</b><b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+            <b>{</b>
+                <font color='#0000FF'>try</font>
+                <b>{</b>
+                    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samples;
+                    std::vector<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font> labels;
+
+                    <font color='#0000FF'>const</font> unordered_pair<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font> p <font color='#5555FF'>=</font> pairs[i];
+
+                    <font color='#009900'>// pick out the samples corresponding to these two classes
+</font>                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> all_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>all_labels[k] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p.first<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>all_samples[k]<font face='Lucida Console'>)</font>;
+                            labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>all_labels[k] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p.second<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>all_samples[k]<font face='Lucida Console'>)</font>;
+                            labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>verbose<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>class_mutex<font face='Lucida Console'>)</font>;
+                        std::cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Training classifier for </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> p.first <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> vs. </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> p.second <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+                    <b>}</b>
+
+                    any_trainer trainer;
+                    <font color='#009900'>// now train a binary classifier using the samples we selected
+</font>                    <b>{</b> auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>class_mutex<font face='Lucida Console'>)</font>; 
+                    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> binary_function_table::const_iterator itr <font color='#5555FF'>=</font> trainers.<font color='#BB00BB'>find</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>itr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> trainers.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        trainer <font color='#5555FF'>=</font> itr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+                    <font color='#0000FF'>else</font> 
+                        trainer <font color='#5555FF'>=</font> default_trainer;
+                    <b>}</b>
+
+                    any_decision_function<font color='#5555FF'>&lt;</font>sample_type,scalar_type<font color='#5555FF'>&gt;</font> binary_df <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+                    auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>class_mutex<font face='Lucida Console'>)</font>;
+                    dfs[p] <font color='#5555FF'>=</font> binary_df;
+                <b>}</b>
+                <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>class_mutex<font face='Lucida Console'>)</font>;
+                    error_message <font color='#5555FF'>=</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>mutable</font> <font color='#0000FF'>typename</font> trained_function_type::binary_function_table dfs;
+            mutex class_mutex;
+            <font color='#0000FF'>mutable</font> std::string error_message;
+
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> all_samples;
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> all_labels;
+            <font color='#0000FF'>const</font> any_trainer<font color='#5555FF'>&amp;</font> default_trainer;
+            <font color='#0000FF'>const</font> binary_function_table<font color='#5555FF'>&amp;</font> trainers;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> verbose;
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>unordered_pair<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> pairs;
+        <b>}</b>;
+
+        
+        any_trainer default_trainer;
+        binary_function_table trainers;
+        <font color='#0000FF'><u>bool</u></font> verbose;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ONE_VS_ONE_TRAiNER_Hh_
+</font>
+
+</pre></body></html>

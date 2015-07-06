@@ -1,0 +1,569 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bsp.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>bsp.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>threads.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>pipe.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>matrix.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.bsp</font>"<font face='Lucida Console'>)</font>;
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> funct<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='callfunct_helper'></a>callfunct_helper</b>
+    <b>{</b>
+        <b><a name='callfunct_helper'></a>callfunct_helper</b> <font face='Lucida Console'>(</font>
+            funct f_,
+            <font color='#0000FF'><u>int</u></font> port_,
+            <font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&amp;</font> error_occurred_
+        <font face='Lucida Console'>)</font> :f<font face='Lucida Console'>(</font>f_<font face='Lucida Console'>)</font>, port<font face='Lucida Console'>(</font>port_<font face='Lucida Console'>)</font>, error_occurred<font face='Lucida Console'>(</font>error_occurred_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        funct f;
+        <font color='#0000FF'><u>int</u></font> port;
+        <font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&amp;</font> error_occurred;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                <font color='#BB00BB'>bsp_listen</font><font face='Lucida Console'>(</font>port, f<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>error calling bsp_listen(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                error_occurred <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> funct<font color='#5555FF'>&gt;</font>
+    callfunct_helper<font color='#5555FF'>&lt;</font>funct<font color='#5555FF'>&gt;</font> <b><a name='callfunct'></a>callfunct</b><font face='Lucida Console'>(</font>funct f, <font color='#0000FF'><u>int</u></font> port, <font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&amp;</font> error_occurred<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> callfunct_helper<font color='#5555FF'>&lt;</font>funct<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>f,port,error_occurred<font face='Lucida Console'>)</font>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> funct<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='callfunct_helper_pn'></a>callfunct_helper_pn</b>
+    <b>{</b>
+        <b><a name='callfunct_helper_pn'></a>callfunct_helper_pn</b> <font face='Lucida Console'>(</font>
+            funct f_,
+            <font color='#0000FF'><u>int</u></font> port_,
+            <font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&amp;</font> error_occurred_,
+            dlib::pipe<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> port_pipe_
+        <font face='Lucida Console'>)</font> :f<font face='Lucida Console'>(</font>f_<font face='Lucida Console'>)</font>, port<font face='Lucida Console'>(</font>port_<font face='Lucida Console'>)</font>, error_occurred<font face='Lucida Console'>(</font>error_occurred_<font face='Lucida Console'>)</font>, port_pipe<font face='Lucida Console'>(</font>port_pipe_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        funct f;
+        <font color='#0000FF'><u>int</u></font> port;
+        <font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&amp;</font> error_occurred;
+        dlib::pipe<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> port_pipe;
+
+        <font color='#0000FF'>struct</font> <b><a name='helper'></a>helper</b>
+        <b>{</b>
+            <b><a name='helper'></a>helper</b> <font face='Lucida Console'>(</font>
+                dlib::pipe<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> port_pipe_
+            <font face='Lucida Console'>)</font> : port_pipe<font face='Lucida Console'>(</font>port_pipe_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            dlib::pipe<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> port_pipe;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> p<font face='Lucida Console'>)</font> <b>{</b> port_pipe.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>; <b>}</b>
+        <b>}</b>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                <font color='#BB00BB'>bsp_listen_dynamic_port</font><font face='Lucida Console'>(</font>port, <font color='#BB00BB'>helper</font><font face='Lucida Console'>(</font>port_pipe<font face='Lucida Console'>)</font>, f<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>error calling bsp_listen_dynamic_port(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                error_occurred <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> funct<font color='#5555FF'>&gt;</font>
+    callfunct_helper_pn<font color='#5555FF'>&lt;</font>funct<font color='#5555FF'>&gt;</font> <b><a name='callfunct'></a>callfunct</b><font face='Lucida Console'>(</font>funct f, <font color='#0000FF'><u>int</u></font> port, <font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&amp;</font> error_occurred, dlib::pipe<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> port_pipe<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> callfunct_helper_pn<font color='#5555FF'>&lt;</font>funct<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>f,port,error_occurred,port_pipe<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='sum_array_driver'></a>sum_array_driver</b> <font face='Lucida Console'>(</font>
+        bsp_context<font color='#5555FF'>&amp;</font> obj,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> v,
+        <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> result
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        obj.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font>v<font face='Lucida Console'>)</font>;
+
+        result <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>int</u></font> val;
+        <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>try_receive</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            result <font color='#5555FF'>+</font><font color='#5555FF'>=</font> val;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='sum_array_other'></a>sum_array_other</b> <font face='Lucida Console'>(</font>
+        bsp_context<font color='#5555FF'>&amp;</font> obj
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> v;
+        obj.<font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>v<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>int</u></font> sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> v.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> v[i];
+
+        obj.<font color='#BB00BB'>send</font><font face='Lucida Console'>(</font>sum, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+
+    <b>}</b>
+
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='dotest1'></a>dotest1</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>start dotest1()</font>";
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>bool</u></font> error_occurred <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>{</b>
+            thread_function <font color='#BB00BB'>t1</font><font face='Lucida Console'>(</font><font color='#BB00BB'>callfunct</font><font face='Lucida Console'>(</font>sum_array_other, <font color='#979000'>12345</font>, error_occurred<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            thread_function <font color='#BB00BB'>t2</font><font face='Lucida Console'>(</font><font color='#BB00BB'>callfunct</font><font face='Lucida Console'>(</font>sum_array_other, <font color='#979000'>12346</font>, error_occurred<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            thread_function <font color='#BB00BB'>t3</font><font face='Lucida Console'>(</font><font color='#BB00BB'>callfunct</font><font face='Lucida Console'>(</font>sum_array_other, <font color='#979000'>12347</font>, error_occurred<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> v;
+            <font color='#0000FF'><u>int</u></font> true_value <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                v.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                true_value <font color='#5555FF'>+</font><font color='#5555FF'>=</font> i;
+            <b>}</b>
+
+            <font color='#009900'>// wait a little bit for the threads to start up
+</font>            dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>200</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                <font color='#0000FF'><u>int</u></font> result;
+                std::vector<font color='#5555FF'>&lt;</font>network_address<font color='#5555FF'>&gt;</font> hosts;
+                hosts.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1:12345</font>"<font face='Lucida Console'>)</font>;
+                hosts.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>localhost:12346</font>"<font face='Lucida Console'>)</font>;
+                hosts.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1:12347</font>"<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>bsp_connect</font><font face='Lucida Console'>(</font>hosts, sum_array_driver, dlib::<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font>v<font face='Lucida Console'>)</font>, dlib::<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font>result<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>result: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> result;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>should be: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>3</font><font color='#5555FF'>*</font>true_value; 
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>result <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font color='#5555FF'>*</font>true_value<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>error during bsp_context: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>error_occurred <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> id<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test2_job'></a>test2_job</b><font face='Lucida Console'>(</font>bsp_context<font color='#5555FF'>&amp;</font> obj<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> id<font face='Lucida Console'>)</font>
+            dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> id<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='dotest2'></a>dotest2</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>start dotest2()</font>";
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>bool</u></font> error_occurred <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>{</b>
+            thread_function <font color='#BB00BB'>t1</font><font face='Lucida Console'>(</font><font color='#BB00BB'>callfunct</font><font face='Lucida Console'>(</font>test2_job<font color='#5555FF'>&lt;</font>id<font color='#5555FF'>&gt;</font>, <font color='#979000'>12345</font>, error_occurred<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            thread_function <font color='#BB00BB'>t2</font><font face='Lucida Console'>(</font><font color='#BB00BB'>callfunct</font><font face='Lucida Console'>(</font>test2_job<font color='#5555FF'>&lt;</font>id<font color='#5555FF'>&gt;</font>, <font color='#979000'>12346</font>, error_occurred<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            thread_function <font color='#BB00BB'>t3</font><font face='Lucida Console'>(</font><font color='#BB00BB'>callfunct</font><font face='Lucida Console'>(</font>test2_job<font color='#5555FF'>&lt;</font>id<font color='#5555FF'>&gt;</font>, <font color='#979000'>12347</font>, error_occurred<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// wait a little bit for the threads to start up
+</font>            dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>200</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                std::vector<font color='#5555FF'>&lt;</font>network_address<font color='#5555FF'>&gt;</font> hosts;
+                hosts.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1:12345</font>"<font face='Lucida Console'>)</font>;
+                hosts.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1:12346</font>"<font face='Lucida Console'>)</font>;
+                hosts.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1:12347</font>"<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>bsp_connect</font><font face='Lucida Console'>(</font>hosts, test2_job<font color='#5555FF'>&lt;</font>id<font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>error during bsp_context: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <b>}</b>
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>error_occurred <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test3_job_driver'></a>test3_job_driver</b><font face='Lucida Console'>(</font>bsp_context<font color='#5555FF'>&amp;</font> obj, <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> result<font face='Lucida Console'>)</font>
+    <b>{</b>
+
+        obj.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>int</u></font> accum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>int</u></font> temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>try_receive</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            accum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> temp;
+
+        <font color='#009900'>// send to node 1 so it can sum everything
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            obj.<font color='#BB00BB'>send</font><font face='Lucida Console'>(</font>accum, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>try_receive</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            accum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> temp;
+
+        <font color='#009900'>// Now hop the accum values along the nodes until the value from node 1 gets to
+</font>        <font color='#009900'>// node 0.
+</font>        obj.<font color='#BB00BB'>send</font><font face='Lucida Console'>(</font>accum, <font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>obj.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>accum<font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>send</font><font face='Lucida Console'>(</font>accum, <font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>obj.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>accum<font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>send</font><font face='Lucida Console'>(</font>accum, <font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>obj.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>accum<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// this whole block is a noop since it doesn't end up doing anything.
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> <font color='#979000'>100</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>k: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> k;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>4</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                obj.<font color='#BB00BB'>send</font><font face='Lucida Console'>(</font>accum, <font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>obj.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                obj.<font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>accum<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>TERMINATE</font>";
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            result <font color='#5555FF'>=</font> accum;
+    <b>}</b>
+
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='test3_job'></a>test3_job</b><font face='Lucida Console'>(</font>bsp_context<font color='#5555FF'>&amp;</font> obj<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>int</u></font> junk;
+        <font color='#BB00BB'>test3_job_driver</font><font face='Lucida Console'>(</font>obj, junk<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='dotest3'></a>dotest3</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>start dotest3()</font>";
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>bool</u></font> error_occurred <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>{</b>
+            dlib::pipe<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>ports</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            thread_function <font color='#BB00BB'>t1</font><font face='Lucida Console'>(</font><font color='#BB00BB'>callfunct</font><font face='Lucida Console'>(</font>test3_job, <font color='#979000'>12345</font>, error_occurred, ports<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            thread_function <font color='#BB00BB'>t2</font><font face='Lucida Console'>(</font><font color='#BB00BB'>callfunct</font><font face='Lucida Console'>(</font>test3_job, <font color='#979000'>0</font>, error_occurred, ports<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            thread_function <font color='#BB00BB'>t3</font><font face='Lucida Console'>(</font><font color='#BB00BB'>callfunct</font><font face='Lucida Console'>(</font>test3_job, <font color='#979000'>12347</font>, error_occurred, ports<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                std::vector<font color='#5555FF'>&lt;</font>network_address<font color='#5555FF'>&gt;</font> hosts;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port;
+                ports.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>port<font face='Lucida Console'>)</font>; hosts.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>network_address</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1</font>",port<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>PORT: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> port;
+                ports.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>port<font face='Lucida Console'>)</font>; hosts.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>network_address</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1</font>",port<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>PORT: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> port;
+                ports.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>port<font face='Lucida Console'>)</font>; hosts.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>network_address</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1</font>",port<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>PORT: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> port;
+                <font color='#0000FF'><u>int</u></font> result <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> expected <font color='#5555FF'>=</font>  <font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>2</font><font color='#5555FF'>+</font><font color='#979000'>3</font> <font color='#5555FF'>+</font> <font color='#979000'>0</font><font color='#5555FF'>+</font><font color='#979000'>2</font><font color='#5555FF'>+</font><font color='#979000'>3</font> <font color='#5555FF'>+</font> <font color='#979000'>0</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>3</font> <font color='#5555FF'>+</font> <font color='#979000'>0</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>2</font>;
+                <font color='#BB00BB'>bsp_connect</font><font face='Lucida Console'>(</font>hosts, test3_job_driver, dlib::<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font>result<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>result: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> result;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>should be: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> expected;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>result <font color='#5555FF'>=</font><font color='#5555FF'>=</font> expected<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>error during bsp_context: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <b>}</b>
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>error_occurred <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test4_job_driver'></a>test4_job_driver</b><font face='Lucida Console'>(</font>bsp_context<font color='#5555FF'>&amp;</font> obj, <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> result<font face='Lucida Console'>)</font>
+    <b>{</b>
+
+        obj.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>int</u></font> accum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>int</u></font> temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>try_receive</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            accum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> temp;
+
+        <font color='#009900'>// send to node 1 so it can sum everything
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            obj.<font color='#BB00BB'>send</font><font face='Lucida Console'>(</font>accum, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>try_receive</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            accum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> temp;
+
+        <font color='#009900'>// Now hop the accum values along the nodes until the value from node 1 gets to
+</font>        <font color='#009900'>// node 0.
+</font>        obj.<font color='#BB00BB'>send</font><font face='Lucida Console'>(</font>accum, <font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>obj.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>accum<font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>send</font><font face='Lucida Console'>(</font>accum, <font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>obj.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>accum<font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>send</font><font face='Lucida Console'>(</font>accum, <font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>obj.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>accum<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// this whole block is a noop since it doesn't end up doing anything.
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> <font color='#979000'>40</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>k: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> k;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>4</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                obj.<font color='#BB00BB'>send</font><font face='Lucida Console'>(</font>accum, <font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>obj.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                obj.<font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>accum<font face='Lucida Console'>)</font>;
+
+                obj.<font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>TERMINATE</font>";
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            result <font color='#5555FF'>=</font> accum;
+    <b>}</b>
+
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='test4_job'></a>test4_job</b><font face='Lucida Console'>(</font>bsp_context<font color='#5555FF'>&amp;</font> obj<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>int</u></font> junk;
+        <font color='#BB00BB'>test4_job_driver</font><font face='Lucida Console'>(</font>obj, junk<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='dotest4'></a>dotest4</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>start dotest4()</font>";
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>bool</u></font> error_occurred <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>{</b>
+            dlib::pipe<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>ports</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            thread_function <font color='#BB00BB'>t1</font><font face='Lucida Console'>(</font><font color='#BB00BB'>callfunct</font><font face='Lucida Console'>(</font>test4_job, <font color='#979000'>0</font>, error_occurred, ports<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            thread_function <font color='#BB00BB'>t2</font><font face='Lucida Console'>(</font><font color='#BB00BB'>callfunct</font><font face='Lucida Console'>(</font>test4_job, <font color='#979000'>0</font>, error_occurred, ports<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            thread_function <font color='#BB00BB'>t3</font><font face='Lucida Console'>(</font><font color='#BB00BB'>callfunct</font><font face='Lucida Console'>(</font>test4_job, <font color='#979000'>0</font>, error_occurred, ports<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                std::vector<font color='#5555FF'>&lt;</font>network_address<font color='#5555FF'>&gt;</font> hosts;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port;
+                ports.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>port<font face='Lucida Console'>)</font>; hosts.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>network_address</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1</font>",port<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>PORT: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> port;
+                ports.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>port<font face='Lucida Console'>)</font>; hosts.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>network_address</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1</font>",port<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>PORT: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> port;
+                ports.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>port<font face='Lucida Console'>)</font>; hosts.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>network_address</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1</font>",port<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>PORT: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> port;
+                <font color='#0000FF'><u>int</u></font> result <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> expected <font color='#5555FF'>=</font>  <font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>2</font><font color='#5555FF'>+</font><font color='#979000'>3</font> <font color='#5555FF'>+</font> <font color='#979000'>0</font><font color='#5555FF'>+</font><font color='#979000'>2</font><font color='#5555FF'>+</font><font color='#979000'>3</font> <font color='#5555FF'>+</font> <font color='#979000'>0</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>3</font> <font color='#5555FF'>+</font> <font color='#979000'>0</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>2</font>;
+                <font color='#BB00BB'>bsp_connect</font><font face='Lucida Console'>(</font>hosts, test4_job_driver, dlib::<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font>result<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>result: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> result;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>should be: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> expected;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>result <font color='#5555FF'>=</font><font color='#5555FF'>=</font> expected<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>error during bsp_context: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <b>}</b>
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>error_occurred <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test5_job'></a>test5_job</b><font face='Lucida Console'>(</font>
+        bsp_context<font color='#5555FF'>&amp;</font> ,
+        <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> val
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        val <font color='#5555FF'>=</font> <font color='#979000'>25</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='dotest5'></a>dotest5</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>start dotest5()</font>";
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        std::vector<font color='#5555FF'>&lt;</font>network_address<font color='#5555FF'>&gt;</font> hosts;
+        <font color='#0000FF'><u>int</u></font> val <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>bsp_connect</font><font face='Lucida Console'>(</font>hosts, test5_job, dlib::<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>25</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='f'></a>f</b> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>double</u></font> x<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>x<font color='#5555FF'>-</font><font color='#979000'>2.0</font>, <font color='#979000'>2.0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='bsp_job_node_0'></a>bsp_job_node_0</b> <font face='Lucida Console'>(</font>
+        bsp_context<font color='#5555FF'>&amp;</font> context,
+        <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> min_value,
+        <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> optimal_x
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>double</u></font> left <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>100</font>;
+        <font color='#0000FF'><u>double</u></font> right <font color='#5555FF'>=</font> <font color='#979000'>100</font>;
+
+        min_value <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>double</u></font> interval_width <font color='#5555FF'>=</font> std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>right<font color='#5555FF'>-</font>left<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// This is doing a BSP based grid search for the minimum of f().  Here we 
+</font>        <font color='#009900'>// do 100 iterations where we keep shrinking the grid size.
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>100</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            context.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font>left<font face='Lucida Console'>)</font>;
+            context.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font>right<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>1</font>; k <font color='#5555FF'>&lt;</font> context.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> val;
+                context.<font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val.second <font color='#5555FF'>&lt;</font> min_value<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    min_value <font color='#5555FF'>=</font> val.second;
+                    optimal_x <font color='#5555FF'>=</font> val.first;
+                <b>}</b>
+            <b>}</b>
+
+            interval_width <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>0.5</font>;
+            left  <font color='#5555FF'>=</font> optimal_x <font color='#5555FF'>-</font> interval_width<font color='#5555FF'>/</font><font color='#979000'>2</font>;
+            right <font color='#5555FF'>=</font> optimal_x <font color='#5555FF'>+</font> interval_width<font color='#5555FF'>/</font><font color='#979000'>2</font>;
+        <b>}</b>
+    <b>}</b>
+
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='bsp_job_other_nodes'></a>bsp_job_other_nodes</b> <font face='Lucida Console'>(</font>
+        bsp_context<font color='#5555FF'>&amp;</font> context
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>double</u></font> left, right;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>context.<font color='#BB00BB'>try_receive</font><font face='Lucida Console'>(</font>left<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            context.<font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>right<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> l <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>context.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>context.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1.0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> r <font color='#5555FF'>=</font> context.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>    <font color='#5555FF'>/</font><font face='Lucida Console'>(</font>context.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1.0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> width <font color='#5555FF'>=</font> right<font color='#5555FF'>-</font>left;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> values_to_check <font color='#5555FF'>=</font> <font color='#BB00BB'>linspace</font><font face='Lucida Console'>(</font>left <font color='#5555FF'>+</font>l<font color='#5555FF'>*</font>width, left <font color='#5555FF'>+</font> r<font color='#5555FF'>*</font>width, <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>double</u></font> best_x <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'><u>double</u></font> best_val <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> values_to_check.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>double</u></font> temp <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font><font color='#BB00BB'>values_to_check</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&lt;</font> best_val<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    best_val <font color='#5555FF'>=</font> temp;
+                    best_x <font color='#5555FF'>=</font> <font color='#BB00BB'>values_to_check</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            context.<font color='#BB00BB'>send</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>best_x, best_val<font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='dotest6'></a>dotest6</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>start dotest6()</font>";
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>bool</u></font> error_occurred <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>{</b>
+            dlib::pipe<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>ports</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            thread_function <font color='#BB00BB'>t1</font><font face='Lucida Console'>(</font><font color='#BB00BB'>callfunct</font><font face='Lucida Console'>(</font>bsp_job_other_nodes, <font color='#979000'>0</font>, error_occurred, ports<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            thread_function <font color='#BB00BB'>t2</font><font face='Lucida Console'>(</font><font color='#BB00BB'>callfunct</font><font face='Lucida Console'>(</font>bsp_job_other_nodes, <font color='#979000'>0</font>, error_occurred, ports<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            thread_function <font color='#BB00BB'>t3</font><font face='Lucida Console'>(</font><font color='#BB00BB'>callfunct</font><font face='Lucida Console'>(</font>bsp_job_other_nodes, <font color='#979000'>0</font>, error_occurred, ports<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                std::vector<font color='#5555FF'>&lt;</font>network_address<font color='#5555FF'>&gt;</font> hosts;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port;
+                ports.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>port<font face='Lucida Console'>)</font>; hosts.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>network_address</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1</font>",port<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>PORT: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> port;
+                ports.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>port<font face='Lucida Console'>)</font>; hosts.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>network_address</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1</font>",port<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>PORT: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> port;
+                ports.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>port<font face='Lucida Console'>)</font>; hosts.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>network_address</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1</font>",port<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>PORT: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> port;
+                <font color='#0000FF'><u>double</u></font> min_value <font color='#5555FF'>=</font> <font color='#979000'>10</font>, optimal_x <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#BB00BB'>bsp_connect</font><font face='Lucida Console'>(</font>hosts, bsp_job_node_0, dlib::<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font>min_value<font face='Lucida Console'>)</font>, dlib::<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font>optimal_x<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>min_value: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> min_value;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>optimal_x: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> optimal_x;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>min_value <font color='#5555FF'>-</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>14</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>optimal_x <font color='#5555FF'>-</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>14</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>error during bsp_context: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <b>}</b>
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>error_occurred <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='bsp_tester'></a>bsp_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+
+    <font color='#0000FF'>public</font>:
+        <b><a name='bsp_tester'></a>bsp_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_bsp</font>",
+                    "<font color='#CC0000'>Runs tests on the BSP components.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>dotest1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                dotest2<font color='#5555FF'>&lt;</font><font color='#979000'>0</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                dotest2<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                dotest2<font color='#5555FF'>&lt;</font><font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>dotest3</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>dotest4</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>dotest5</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>dotest6</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b> a;
+
+<b>}</b>
+
+
+</pre></body></html>

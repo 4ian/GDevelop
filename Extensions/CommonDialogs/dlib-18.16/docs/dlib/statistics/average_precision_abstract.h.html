@@ -1,0 +1,70 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - average_precision_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_AVERAGE_PREcISION_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_AVERAGE_PREcISION_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='average_precision'></a>average_precision</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font>,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> items,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> missing_relevant_items <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - Interprets items as a list of relevant and non-relevant items in a response
+              from an information retrieval system.  In particular, items with a true value
+              are relevant and false items are non-relevant.  This function then returns
+              the average precision of the ranking of the given items.  For, example, the
+              ranking [true, true, true, true, false] would have an average precision of 1.
+              On the other hand, the ranking of [true false false true] would have an
+              average precision of 0.75 (because the first true has a precision of 1 and
+              the second true has a precision of 0.5, giving an average of 0.75).
+            - As a special case, if item contains no true elements then the average
+              precision is considered to be 1.
+            - Note that we use the interpolated precision.  That is, the interpolated
+              precision at a recall value r is set to the maximum precision obtained at any
+              higher recall value.  Or in other words, we interpolate the precision/recall
+              curve so that precision is monotonically decreasing.  Therefore, the average
+              precision value returned by this function is the area under this interpolated
+              precision/recall curve.
+            - This function will add in missing_relevant_items number of items with a
+              precision of zero into the average value returned.  For example, the average
+              precision of the ranking [true, true] if there are 2 missing relevant items
+              is 0.5.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T, 
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='average_precision'></a>average_precision</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font>T,<font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font>,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> items,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> missing_relevant_items <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - this function is equivalent to copying the bool values from items into a
+              std::vector&lt;bool&gt; and then calling the above average_precision() routine on
+              it and returning the result. 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_AVERAGE_PREcISION_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

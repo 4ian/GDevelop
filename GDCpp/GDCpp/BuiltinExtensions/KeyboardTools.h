@@ -13,6 +13,7 @@
 class RuntimeScene;
 
 bool IsKeyPressed(RuntimeScene & scene, gd::String key);
+bool WasKeyReleased(RuntimeScene & scene, gd::String key);
 bool AnyKeyIsPressed(RuntimeScene & scene);
 gd::String LastPressedKey(RuntimeScene & scene);
 

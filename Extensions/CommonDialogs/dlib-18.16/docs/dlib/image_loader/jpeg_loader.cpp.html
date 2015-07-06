@@ -1,0 +1,168 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jpeg_loader.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net), Nils Labugt
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_JPEG_LOADER_CPp_
+<font color='#0000FF'>#define</font> DLIB_JPEG_LOADER_CPp_
+
+<font color='#009900'>// only do anything with this file if DLIB_JPEG_SUPPORT is defined
+</font><font color='#0000FF'>#ifdef</font> DLIB_JPEG_SUPPORT
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array2d.h.html'>../array2d.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../dir_nav.h.html'>../dir_nav.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeg_loader.h.html'>jpeg_loader.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>stdio.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#ifdef</font> DLIB_JPEG_STATIC
+#   include "<font color='#CC0000'>../external/libjpeg/jpeglib.h</font>"
+<font color='#0000FF'>#else</font>
+#   include <font color='#5555FF'>&lt;</font>jpeglib.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>setjmp.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    jpeg_loader::
+    <b><a name='jpeg_loader'></a>jpeg_loader</b><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> filename <font face='Lucida Console'>)</font> : height_<font face='Lucida Console'>(</font> <font color='#979000'>0</font> <font face='Lucida Console'>)</font>, width_<font face='Lucida Console'>(</font> <font color='#979000'>0</font> <font face='Lucida Console'>)</font>, output_components_<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>read_image</font><font face='Lucida Console'>(</font> filename <font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    jpeg_loader::
+    <b><a name='jpeg_loader'></a>jpeg_loader</b><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename <font face='Lucida Console'>)</font> : height_<font face='Lucida Console'>(</font> <font color='#979000'>0</font> <font face='Lucida Console'>)</font>, width_<font face='Lucida Console'>(</font> <font color='#979000'>0</font> <font face='Lucida Console'>)</font>, output_components_<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>read_image</font><font face='Lucida Console'>(</font> filename.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    jpeg_loader::
+    <b><a name='jpeg_loader'></a>jpeg_loader</b><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> dlib::file<font color='#5555FF'>&amp;</font> f <font face='Lucida Console'>)</font> : height_<font face='Lucida Console'>(</font> <font color='#979000'>0</font> <font face='Lucida Console'>)</font>, width_<font face='Lucida Console'>(</font> <font color='#979000'>0</font> <font face='Lucida Console'>)</font>, output_components_<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>read_image</font><font face='Lucida Console'>(</font> f.<font color='#BB00BB'>full_name</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> jpeg_loader::<b><a name='is_gray'></a>is_gray</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>output_components_ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> jpeg_loader::<b><a name='is_rgb'></a>is_rgb</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>output_components_ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='jpeg_loader_error_mgr'></a>jpeg_loader_error_mgr</b> 
+    <b>{</b>
+        jpeg_error_mgr pub;    <font color='#009900'>/* "public" fields */</font>
+        jmp_buf setjmp_buffer;  <font color='#009900'>/* for return to caller */</font>
+    <b>}</b>;
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='jpeg_loader_error_exit'></a>jpeg_loader_error_exit</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>/* cinfo-&gt;err really points to a jpeg_loader_error_mgr struct, so coerce pointer */</font>
+        jpeg_loader_error_mgr<font color='#5555FF'>*</font> myerr <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>jpeg_loader_error_mgr<font color='#5555FF'>*</font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err;
+
+        <font color='#009900'>/* Return control to the setjmp point */</font>
+        <font color='#BB00BB'>longjmp</font><font face='Lucida Console'>(</font>myerr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>setjmp_buffer, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> jpeg_loader::<b><a name='read_image'></a>read_image</b><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> filename <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> filename <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>jpeg_loader: invalid filename, it is NULL</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        FILE <font color='#5555FF'>*</font>fp <font color='#5555FF'>=</font> <font color='#BB00BB'>fopen</font><font face='Lucida Console'>(</font> filename, "<font color='#CC0000'>rb</font>" <font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#5555FF'>!</font>fp <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>string</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>jpeg_loader: unable to open file </font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> filename<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        jpeg_decompress_struct cinfo;
+        jpeg_loader_error_mgr jerr;
+
+        cinfo.err <font color='#5555FF'>=</font> <font color='#BB00BB'>jpeg_std_error</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>jerr.pub<font face='Lucida Console'>)</font>;
+
+        jerr.pub.error_exit <font color='#5555FF'>=</font> jpeg_loader_error_exit;
+
+        <font color='#009900'>/* Establish the setjmp return context for my_error_exit to use. */</font>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>setjmp</font><font face='Lucida Console'>(</font>jerr.setjmp_buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#009900'>/* If we get here, the JPEG code has signaled an error.
+             * We need to clean up the JPEG object, close the input file, and return.
+             */</font>
+            <font color='#BB00BB'>jpeg_destroy_decompress</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>fclose</font><font face='Lucida Console'>(</font>fp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>string</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>jpeg_loader: error while reading </font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> filename<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        <font color='#BB00BB'>jpeg_create_decompress</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>jpeg_stdio_src</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo, fp<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>jpeg_read_header</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo, TRUE<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>jpeg_start_decompress</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo<font face='Lucida Console'>)</font>;
+
+        height_ <font color='#5555FF'>=</font> cinfo.output_height;
+        width_ <font color='#5555FF'>=</font> cinfo.output_width;
+        output_components_ <font color='#5555FF'>=</font> cinfo.output_components;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>output_components_ <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+            output_components_ <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>fclose</font><font face='Lucida Console'>(</font> fp <font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>jpeg_destroy_decompress</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo<font face='Lucida Console'>)</font>;
+            std::ostringstream sout;
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>jpeg_loader: Unsupported number of colors (</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> output_components_ <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>) in file </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> filename;
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font> rows;
+        rows.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>height_<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// size the image buffer
+</font>        data.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>height_<font color='#5555FF'>*</font>width_<font color='#5555FF'>*</font>output_components_<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// setup pointers to each row
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> rows.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            rows[i] <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>data[i<font color='#5555FF'>*</font>width_<font color='#5555FF'>*</font>output_components_];
+
+        <font color='#009900'>// read the data into the buffer
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>cinfo.output_scanline <font color='#5555FF'>&lt;</font> cinfo.output_height<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>jpeg_read_scanlines</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo, <font color='#5555FF'>&amp;</font>rows[cinfo.output_scanline], <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#BB00BB'>jpeg_finish_decompress</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>jpeg_destroy_decompress</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cinfo<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>fclose</font><font face='Lucida Console'>(</font> fp <font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_JPEG_SUPPORT
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_JPEG_LOADER_CPp_
+</font>
+
+
+</pre></body></html>

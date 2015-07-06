@@ -5,7 +5,7 @@ Copyright (c) 2010-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "PathAutomatismEditor.h"
 
 //(*InternalHeaders(PathAutomatismEditor)
@@ -225,7 +225,7 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, gd::Project & game_
 	FlexGridSizer9 = new wxFlexGridSizer(0, 2, 0, 0);
 	angleOffsetEdit = new wxTextCtrl(this, ID_TEXTCTRL2, _("0"), wxDefaultPosition, wxSize(45,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
 	FlexGridSizer9->Add(angleOffsetEdit, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText4 = new wxStaticText(this, ID_STATICTEXT5, _("°"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	StaticText4 = new wxStaticText(this, ID_STATICTEXT5, _("ï¿½"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	FlexGridSizer9->Add(StaticText4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer8->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer7->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -307,7 +307,7 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, gd::Project & game_
     advanceAddMenu.Append(addAfterBt);
     advanceAddMenu.Append(addBeforeBt);
 
-	previewPnlState.offset == sf::Vector2f(0, 0);
+	previewPnlState.offset = sf::Vector2f(0, 0);
 	previewPnlState.state = NOTHING;
 	previewPnlState.selectedPoint = -1;
 	previewPnlState.backgroundBitmap = NULL;

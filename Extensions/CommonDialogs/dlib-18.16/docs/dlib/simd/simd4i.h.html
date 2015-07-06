@@ -1,0 +1,414 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - simd4i.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_sIMD4I_Hh_
+<font color='#0000FF'>#define</font> DLIB_sIMD4I_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='simd_check.h.html'>simd_check.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_SSE2
+    <font color='#0000FF'>class</font> <b><a name='simd4i'></a>simd4i</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> int32 type;
+
+        <font color='#0000FF'>inline</font> <b><a name='simd4i'></a>simd4i</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#0000FF'>inline</font> <b><a name='simd4i'></a>simd4i</b><font face='Lucida Console'>(</font>int32 f<font face='Lucida Console'>)</font> <b>{</b> x <font color='#5555FF'>=</font> <font color='#BB00BB'>_mm_set1_epi32</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>inline</font> <b><a name='simd4i'></a>simd4i</b><font face='Lucida Console'>(</font>int32 r0, int32 r1, int32 r2, int32 r3<font face='Lucida Console'>)</font> <b>{</b> x <font color='#5555FF'>=</font> <font color='#BB00BB'>_mm_setr_epi32</font><font face='Lucida Console'>(</font>r0,r1,r2,r3<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>inline</font> <b><a name='simd4i'></a>simd4i</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> __m128i<font color='#5555FF'>&amp;</font> val<font face='Lucida Console'>)</font>:x<font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>inline</font> simd4i<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> __m128i<font color='#5555FF'>&amp;</font> val<font face='Lucida Console'>)</font>
+        <b>{</b>
+            x <font color='#5555FF'>=</font> val;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <b><a name='operator'></a>operator</b> <b><a name='__m128i'></a>__m128i</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> x; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='load_aligned'></a>load_aligned</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> type<font color='#5555FF'>*</font> ptr<font face='Lucida Console'>)</font>  <b>{</b> x <font color='#5555FF'>=</font> <font color='#BB00BB'>_mm_load_si128</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> __m128i<font color='#5555FF'>*</font><font face='Lucida Console'>)</font>ptr<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='store_aligned'></a>store_aligned</b><font face='Lucida Console'>(</font>type<font color='#5555FF'>*</font> ptr<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#BB00BB'>_mm_store_si128</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>__m128i<font color='#5555FF'>*</font><font face='Lucida Console'>)</font>ptr, x<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='load'></a>load</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> type<font color='#5555FF'>*</font> ptr<font face='Lucida Console'>)</font>          <b>{</b> x <font color='#5555FF'>=</font> <font color='#BB00BB'>_mm_loadu_si128</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> __m128i<font color='#5555FF'>*</font><font face='Lucida Console'>)</font>ptr<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='store'></a>store</b><font face='Lucida Console'>(</font>type<font color='#5555FF'>*</font> ptr<font face='Lucida Console'>)</font>         <font color='#0000FF'>const</font> <b>{</b> <font color='#BB00BB'>_mm_storeu_si128</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>__m128i<font color='#5555FF'>*</font><font face='Lucida Console'>)</font>ptr, x<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> <b><a name='size'></a>size</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>4</font>; <b>}</b>
+        <font color='#0000FF'>inline</font> int32 <b><a name='operator'></a>operator</b>[]<font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> idx<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            int32 temp[<font color='#979000'>4</font>];
+            <font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> temp[idx];
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        __m128i x;
+    <b>}</b>;
+<font color='#0000FF'>#else</font>
+
+    <font color='#0000FF'>class</font> <b><a name='simd4i'></a>simd4i</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> int32 type;
+
+        <font color='#0000FF'>inline</font> <b><a name='simd4i'></a>simd4i</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#0000FF'>inline</font> <b><a name='simd4i'></a>simd4i</b><font face='Lucida Console'>(</font>int32 f<font face='Lucida Console'>)</font> <b>{</b> x[<font color='#979000'>0</font>]<font color='#5555FF'>=</font>f; x[<font color='#979000'>1</font>]<font color='#5555FF'>=</font>f; x[<font color='#979000'>2</font>]<font color='#5555FF'>=</font>f; x[<font color='#979000'>3</font>]<font color='#5555FF'>=</font>f; <b>}</b>
+        <font color='#0000FF'>inline</font> <b><a name='simd4i'></a>simd4i</b><font face='Lucida Console'>(</font>int32 r0, int32 r1, int32 r2, int32 r3<font face='Lucida Console'>)</font> <b>{</b> x[<font color='#979000'>0</font>]<font color='#5555FF'>=</font>r0; x[<font color='#979000'>1</font>]<font color='#5555FF'>=</font>r1; x[<font color='#979000'>2</font>]<font color='#5555FF'>=</font>r2; x[<font color='#979000'>3</font>]<font color='#5555FF'>=</font>r3;<b>}</b>
+
+        <font color='#0000FF'>struct</font> <b><a name='rawarray'></a>rawarray</b>
+        <b>{</b>
+            int32 a[<font color='#979000'>4</font>];
+        <b>}</b>;
+        <font color='#0000FF'>inline</font> <b><a name='simd4i'></a>simd4i</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> rawarray<font color='#5555FF'>&amp;</font> a<font face='Lucida Console'>)</font> <b>{</b> x[<font color='#979000'>0</font>]<font color='#5555FF'>=</font>a.a[<font color='#979000'>0</font>]; x[<font color='#979000'>1</font>]<font color='#5555FF'>=</font>a.a[<font color='#979000'>1</font>]; x[<font color='#979000'>2</font>]<font color='#5555FF'>=</font>a.a[<font color='#979000'>2</font>]; x[<font color='#979000'>3</font>]<font color='#5555FF'>=</font>a.a[<font color='#979000'>3</font>]; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='load_aligned'></a>load_aligned</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> type<font color='#5555FF'>*</font> ptr<font face='Lucida Console'>)</font>
+        <b>{</b>
+            x[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> ptr[<font color='#979000'>0</font>];
+            x[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> ptr[<font color='#979000'>1</font>];
+            x[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> ptr[<font color='#979000'>2</font>];
+            x[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> ptr[<font color='#979000'>3</font>];
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='store_aligned'></a>store_aligned</b><font face='Lucida Console'>(</font>type<font color='#5555FF'>*</font> ptr<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            ptr[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> x[<font color='#979000'>0</font>];
+            ptr[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> x[<font color='#979000'>1</font>];
+            ptr[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> x[<font color='#979000'>2</font>];
+            ptr[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> x[<font color='#979000'>3</font>];
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='load'></a>load</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> type<font color='#5555FF'>*</font> ptr<font face='Lucida Console'>)</font>
+        <b>{</b>
+            x[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> ptr[<font color='#979000'>0</font>];
+            x[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> ptr[<font color='#979000'>1</font>];
+            x[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> ptr[<font color='#979000'>2</font>];
+            x[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> ptr[<font color='#979000'>3</font>];
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='store'></a>store</b><font face='Lucida Console'>(</font>type<font color='#5555FF'>*</font> ptr<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            ptr[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> x[<font color='#979000'>0</font>];
+            ptr[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> x[<font color='#979000'>1</font>];
+            ptr[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> x[<font color='#979000'>2</font>];
+            ptr[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> x[<font color='#979000'>3</font>];
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> <b><a name='size'></a>size</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>4</font>; <b>}</b>
+        <font color='#0000FF'>inline</font> int32 <b><a name='operator'></a>operator</b>[]<font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> idx<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> x[idx]; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        int32 x[<font color='#979000'>4</font>];
+    <b>}</b>;
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> std::ostream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font face='Lucida Console'>(</font>std::ostream<font color='#5555FF'>&amp;</font> out, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font>
+    <b>{</b>
+        int32 temp[<font color='#979000'>4</font>];
+        item.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+        out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>(</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp[<font color='#979000'>0</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>, </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp[<font color='#979000'>1</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>, </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp[<font color='#979000'>2</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>, </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp[<font color='#979000'>3</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>)</font>";
+        <font color='#0000FF'>return</font> out;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd4i <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_SSE2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm_add_epi32</font><font face='Lucida Console'>(</font>lhs, rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>lhs[<font color='#979000'>0</font>]<font color='#5555FF'>+</font>rhs[<font color='#979000'>0</font>],
+                      lhs[<font color='#979000'>1</font>]<font color='#5555FF'>+</font>rhs[<font color='#979000'>1</font>],
+                      lhs[<font color='#979000'>2</font>]<font color='#5555FF'>+</font>rhs[<font color='#979000'>2</font>],
+                      lhs[<font color='#979000'>3</font>]<font color='#5555FF'>+</font>rhs[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+    <font color='#0000FF'>inline</font> simd4i<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> <font color='#0000FF'>return</font> lhs <font color='#5555FF'>=</font> lhs <font color='#5555FF'>+</font> rhs; <font color='#0000FF'>return</font> lhs;<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd4i <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_SSE2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm_sub_epi32</font><font face='Lucida Console'>(</font>lhs, rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>lhs[<font color='#979000'>0</font>]<font color='#5555FF'>-</font>rhs[<font color='#979000'>0</font>],
+                      lhs[<font color='#979000'>1</font>]<font color='#5555FF'>-</font>rhs[<font color='#979000'>1</font>],
+                      lhs[<font color='#979000'>2</font>]<font color='#5555FF'>-</font>rhs[<font color='#979000'>2</font>],
+                      lhs[<font color='#979000'>3</font>]<font color='#5555FF'>-</font>rhs[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+    <font color='#0000FF'>inline</font> simd4i<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> <font color='#0000FF'>return</font> lhs <font color='#5555FF'>=</font> lhs <font color='#5555FF'>-</font> rhs; <font color='#0000FF'>return</font> lhs;<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd4i <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_SSE41
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm_mullo_epi32</font><font face='Lucida Console'>(</font>lhs, rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#elif</font> defined<font face='Lucida Console'>(</font>DLIB_HAVE_SSE2<font face='Lucida Console'>)</font>
+        int32 _lhs[<font color='#979000'>4</font>]; lhs.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>_lhs<font face='Lucida Console'>)</font>;
+        int32 _rhs[<font color='#979000'>4</font>]; rhs.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>_rhs<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>_lhs[<font color='#979000'>0</font>]<font color='#5555FF'>*</font>_rhs[<font color='#979000'>0</font>],
+                      _lhs[<font color='#979000'>1</font>]<font color='#5555FF'>*</font>_rhs[<font color='#979000'>1</font>],
+                      _lhs[<font color='#979000'>2</font>]<font color='#5555FF'>*</font>_rhs[<font color='#979000'>2</font>],
+                      _lhs[<font color='#979000'>3</font>]<font color='#5555FF'>*</font>_rhs[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>lhs[<font color='#979000'>0</font>]<font color='#5555FF'>*</font>rhs[<font color='#979000'>0</font>],
+                      lhs[<font color='#979000'>1</font>]<font color='#5555FF'>*</font>rhs[<font color='#979000'>1</font>],
+                      lhs[<font color='#979000'>2</font>]<font color='#5555FF'>*</font>rhs[<font color='#979000'>2</font>],
+                      lhs[<font color='#979000'>3</font>]<font color='#5555FF'>*</font>rhs[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+    <font color='#0000FF'>inline</font> simd4i<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> <font color='#0000FF'>return</font> lhs <font color='#5555FF'>=</font> lhs <font color='#5555FF'>*</font> rhs; <font color='#0000FF'>return</font> lhs;<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd4i <b><a name='operator'></a>operator</b><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_SSE2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm_and_si128</font><font face='Lucida Console'>(</font>lhs, rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>lhs[<font color='#979000'>0</font>]<font color='#5555FF'>&amp;</font>rhs[<font color='#979000'>0</font>],
+                      lhs[<font color='#979000'>1</font>]<font color='#5555FF'>&amp;</font>rhs[<font color='#979000'>1</font>],
+                      lhs[<font color='#979000'>2</font>]<font color='#5555FF'>&amp;</font>rhs[<font color='#979000'>2</font>],
+                      lhs[<font color='#979000'>3</font>]<font color='#5555FF'>&amp;</font>rhs[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+    <font color='#0000FF'>inline</font> simd4i<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> <font color='#0000FF'>return</font> lhs <font color='#5555FF'>=</font> lhs <font color='#5555FF'>&amp;</font> rhs; <font color='#0000FF'>return</font> lhs;<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd4i <b><a name='operator'></a>operator</b><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_SSE2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm_or_si128</font><font face='Lucida Console'>(</font>lhs, rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>lhs[<font color='#979000'>0</font>]<font color='#5555FF'>|</font>rhs[<font color='#979000'>0</font>],
+                      lhs[<font color='#979000'>1</font>]<font color='#5555FF'>|</font>rhs[<font color='#979000'>1</font>],
+                      lhs[<font color='#979000'>2</font>]<font color='#5555FF'>|</font>rhs[<font color='#979000'>2</font>],
+                      lhs[<font color='#979000'>3</font>]<font color='#5555FF'>|</font>rhs[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+    <font color='#0000FF'>inline</font> simd4i<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>|</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> <font color='#0000FF'>return</font> lhs <font color='#5555FF'>=</font> lhs <font color='#5555FF'>|</font> rhs; <font color='#0000FF'>return</font> lhs;<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd4i <b><a name='operator'></a>operator</b>^ <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_SSE2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm_xor_si128</font><font face='Lucida Console'>(</font>lhs, rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>lhs[<font color='#979000'>0</font>]^rhs[<font color='#979000'>0</font>],
+                      lhs[<font color='#979000'>1</font>]^rhs[<font color='#979000'>1</font>],
+                      lhs[<font color='#979000'>2</font>]^rhs[<font color='#979000'>2</font>],
+                      lhs[<font color='#979000'>3</font>]^rhs[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+    <font color='#0000FF'>inline</font> simd4i<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>^<font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> <font color='#0000FF'>return</font> lhs <font color='#5555FF'>=</font> lhs ^ rhs; <font color='#0000FF'>return</font> lhs;<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd4i <b><a name='operator'></a>operator</b>~ <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> lhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_SSE2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm_xor_si128</font><font face='Lucida Console'>(</font>lhs, <font color='#BB00BB'>_mm_set1_epi32</font><font face='Lucida Console'>(</font><font color='#979000'>0xFFFFFFFF</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>~lhs[<font color='#979000'>0</font>],
+                      ~lhs[<font color='#979000'>1</font>],
+                      ~lhs[<font color='#979000'>2</font>],
+                      ~lhs[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd4i <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_SSE2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm_sll_epi32</font><font face='Lucida Console'>(</font>lhs,<font color='#BB00BB'>_mm_cvtsi32_si128</font><font face='Lucida Console'>(</font>rhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>lhs[<font color='#979000'>0</font>]<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>rhs,
+                      lhs[<font color='#979000'>1</font>]<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>rhs,
+                      lhs[<font color='#979000'>2</font>]<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>rhs,
+                      lhs[<font color='#979000'>3</font>]<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>rhs<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+    <font color='#0000FF'>inline</font> simd4i<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> <font color='#0000FF'>return</font> lhs <font color='#5555FF'>=</font> lhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs; <font color='#0000FF'>return</font> lhs;<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd4i <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_SSE2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm_sra_epi32</font><font face='Lucida Console'>(</font>lhs,<font color='#BB00BB'>_mm_cvtsi32_si128</font><font face='Lucida Console'>(</font>rhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>lhs[<font color='#979000'>0</font>]<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font>rhs,
+                      lhs[<font color='#979000'>1</font>]<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font>rhs,
+                      lhs[<font color='#979000'>2</font>]<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font>rhs,
+                      lhs[<font color='#979000'>3</font>]<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font>rhs<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+    <font color='#0000FF'>inline</font> simd4i<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> <font color='#0000FF'>return</font> lhs <font color='#5555FF'>=</font> lhs <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> rhs; <font color='#0000FF'>return</font> lhs;<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd4i <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_SSE2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm_cmpeq_epi32</font><font face='Lucida Console'>(</font>lhs, rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>lhs[<font color='#979000'>0</font>]<font color='#5555FF'>=</font><font color='#5555FF'>=</font>rhs[<font color='#979000'>0</font>] ? <font color='#979000'>0xFFFFFFFF</font> : <font color='#979000'>0</font>,
+                      lhs[<font color='#979000'>1</font>]<font color='#5555FF'>=</font><font color='#5555FF'>=</font>rhs[<font color='#979000'>1</font>] ? <font color='#979000'>0xFFFFFFFF</font> : <font color='#979000'>0</font>,
+                      lhs[<font color='#979000'>2</font>]<font color='#5555FF'>=</font><font color='#5555FF'>=</font>rhs[<font color='#979000'>2</font>] ? <font color='#979000'>0xFFFFFFFF</font> : <font color='#979000'>0</font>,
+                      lhs[<font color='#979000'>3</font>]<font color='#5555FF'>=</font><font color='#5555FF'>=</font>rhs[<font color='#979000'>3</font>] ? <font color='#979000'>0xFFFFFFFF</font> : <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd4i <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_SSE2
+        <font color='#0000FF'>return</font> ~<font face='Lucida Console'>(</font>lhs<font color='#5555FF'>=</font><font color='#5555FF'>=</font>rhs<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>lhs[<font color='#979000'>0</font>]<font color='#5555FF'>!</font><font color='#5555FF'>=</font>rhs[<font color='#979000'>0</font>] ? <font color='#979000'>0xFFFFFFFF</font> : <font color='#979000'>0</font>,
+                      lhs[<font color='#979000'>1</font>]<font color='#5555FF'>!</font><font color='#5555FF'>=</font>rhs[<font color='#979000'>1</font>] ? <font color='#979000'>0xFFFFFFFF</font> : <font color='#979000'>0</font>,
+                      lhs[<font color='#979000'>2</font>]<font color='#5555FF'>!</font><font color='#5555FF'>=</font>rhs[<font color='#979000'>2</font>] ? <font color='#979000'>0xFFFFFFFF</font> : <font color='#979000'>0</font>,
+                      lhs[<font color='#979000'>3</font>]<font color='#5555FF'>!</font><font color='#5555FF'>=</font>rhs[<font color='#979000'>3</font>] ? <font color='#979000'>0xFFFFFFFF</font> : <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd4i <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_SSE2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm_cmplt_epi32</font><font face='Lucida Console'>(</font>lhs, rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>lhs[<font color='#979000'>0</font>]<font color='#5555FF'>&lt;</font>rhs[<font color='#979000'>0</font>] ? <font color='#979000'>0xFFFFFFFF</font> : <font color='#979000'>0</font>,
+                      lhs[<font color='#979000'>1</font>]<font color='#5555FF'>&lt;</font>rhs[<font color='#979000'>1</font>] ? <font color='#979000'>0xFFFFFFFF</font> : <font color='#979000'>0</font>,
+                      lhs[<font color='#979000'>2</font>]<font color='#5555FF'>&lt;</font>rhs[<font color='#979000'>2</font>] ? <font color='#979000'>0xFFFFFFFF</font> : <font color='#979000'>0</font>,
+                      lhs[<font color='#979000'>3</font>]<font color='#5555FF'>&lt;</font>rhs[<font color='#979000'>3</font>] ? <font color='#979000'>0xFFFFFFFF</font> : <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd4i <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#0000FF'>return</font> rhs <font color='#5555FF'>&lt;</font> lhs;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd4i <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_SSE2
+        <font color='#0000FF'>return</font> ~<font face='Lucida Console'>(</font>lhs <font color='#5555FF'>&gt;</font> rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>lhs[<font color='#979000'>0</font>]<font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font>rhs[<font color='#979000'>0</font>] ? <font color='#979000'>0xFFFFFFFF</font> : <font color='#979000'>0</font>,
+                      lhs[<font color='#979000'>1</font>]<font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font>rhs[<font color='#979000'>1</font>] ? <font color='#979000'>0xFFFFFFFF</font> : <font color='#979000'>0</font>,
+                      lhs[<font color='#979000'>2</font>]<font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font>rhs[<font color='#979000'>2</font>] ? <font color='#979000'>0xFFFFFFFF</font> : <font color='#979000'>0</font>,
+                      lhs[<font color='#979000'>3</font>]<font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font>rhs[<font color='#979000'>3</font>] ? <font color='#979000'>0xFFFFFFFF</font> : <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd4i <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#0000FF'>return</font> rhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> lhs;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd4i <b><a name='min'></a>min</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_SSE41
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm_min_epi32</font><font face='Lucida Console'>(</font>lhs, rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#elif</font> defined<font face='Lucida Console'>(</font>DLIB_HAVE_SSE2<font face='Lucida Console'>)</font>
+        int32 _lhs[<font color='#979000'>4</font>]; lhs.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>_lhs<font face='Lucida Console'>)</font>;
+        int32 _rhs[<font color='#979000'>4</font>]; rhs.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>_rhs<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>_lhs[<font color='#979000'>0</font>],_rhs[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>,
+                      std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>_lhs[<font color='#979000'>1</font>],_rhs[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font>,
+                      std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>_lhs[<font color='#979000'>2</font>],_rhs[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font>,
+                      std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>_lhs[<font color='#979000'>3</font>],_rhs[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>lhs[<font color='#979000'>0</font>],rhs[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>,
+                      std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>lhs[<font color='#979000'>1</font>],rhs[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font>,
+                      std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>lhs[<font color='#979000'>2</font>],rhs[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font>,
+                      std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>lhs[<font color='#979000'>3</font>],rhs[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd4i <b><a name='max'></a>max</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_SSE41
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm_max_epi32</font><font face='Lucida Console'>(</font>lhs, rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#elif</font> defined<font face='Lucida Console'>(</font>DLIB_HAVE_SSE2<font face='Lucida Console'>)</font>
+        int32 _lhs[<font color='#979000'>4</font>]; lhs.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>_lhs<font face='Lucida Console'>)</font>;
+        int32 _rhs[<font color='#979000'>4</font>]; rhs.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>_rhs<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>_lhs[<font color='#979000'>0</font>],_rhs[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>,
+                      std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>_lhs[<font color='#979000'>1</font>],_rhs[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font>,
+                      std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>_lhs[<font color='#979000'>2</font>],_rhs[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font>,
+                      std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>_lhs[<font color='#979000'>3</font>],_rhs[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>lhs[<font color='#979000'>0</font>],rhs[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>,
+                      std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>lhs[<font color='#979000'>1</font>],rhs[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font>,
+                      std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>lhs[<font color='#979000'>2</font>],rhs[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font>,
+                      std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>lhs[<font color='#979000'>3</font>],rhs[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> int32 <b><a name='sum'></a>sum</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font>
+    <b>{</b>
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_SSE3
+        simd4i temp <font color='#5555FF'>=</font> <font color='#BB00BB'>_mm_hadd_epi32</font><font face='Lucida Console'>(</font>item,item<font face='Lucida Console'>)</font>;
+        temp <font color='#5555FF'>=</font> <font color='#BB00BB'>_mm_hadd_epi32</font><font face='Lucida Console'>(</font>temp,temp<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm_cvtsi128_si32</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#elif</font> defined<font face='Lucida Console'>(</font>DLIB_HAVE_SSE2<font face='Lucida Console'>)</font>
+        int32 temp[<font color='#979000'>4</font>];
+        item.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> temp[<font color='#979000'>0</font>]<font color='#5555FF'>+</font>temp[<font color='#979000'>1</font>]<font color='#5555FF'>+</font>temp[<font color='#979000'>2</font>]<font color='#5555FF'>+</font>temp[<font color='#979000'>3</font>];
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> item[<font color='#979000'>0</font>]<font color='#5555FF'>+</font>item[<font color='#979000'>1</font>]<font color='#5555FF'>+</font>item[<font color='#979000'>2</font>]<font color='#5555FF'>+</font>item[<font color='#979000'>3</font>];
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// perform cmp ? a : b
+</font>    <font color='#0000FF'>inline</font> simd4i <b><a name='select'></a>select</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> cmp, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font>
+    <b>{</b>
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_SSE41
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm_blendv_epi8</font><font face='Lucida Console'>(</font>b,a,cmp<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#elif</font> defined<font face='Lucida Console'>(</font>DLIB_HAVE_SSE2<font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cmp<font color='#5555FF'>&amp;</font>a<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font color='#BB00BB'>_mm_andnot_si128</font><font face='Lucida Console'>(</font>cmp,b<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cmp<font color='#5555FF'>&amp;</font>a<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>~cmp<font color='#5555FF'>&amp;</font>b<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_sIMD4I_Hh_
+</font>
+
+</pre></body></html>

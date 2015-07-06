@@ -1,0 +1,190 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - cross_validate_sequence_segmenter.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_CROSS_VALIDATE_SEQUENCE_sEGMENTER_Hh_
+<font color='#0000FF'>#define</font> DLIB_CROSS_VALIDATE_SEQUENCE_sEGMENTER_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='cross_validate_sequence_segmenter_abstract.h.html'>cross_validate_sequence_segmenter_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sequence_segmenter.h.html'>sequence_segmenter.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> sequence_segmenter_type,
+            <font color='#0000FF'>typename</font> sequence_type 
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> <b><a name='raw_metrics_test_sequence_segmenter'></a>raw_metrics_test_sequence_segmenter</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sequence_segmenter_type<font color='#5555FF'>&amp;</font> segmenter,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sequence_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> segments 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> truth;
+            std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> pred;
+
+            <font color='#0000FF'><u>double</u></font> true_hits <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'><u>double</u></font> total_detections <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'><u>double</u></font> total_true_segments <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                segmenter.<font color='#BB00BB'>segment_sequence</font><font face='Lucida Console'>(</font>samples[i], pred<font face='Lucida Console'>)</font>;
+                truth <font color='#5555FF'>=</font> segments[i];
+                <font color='#009900'>// sort the segments so they will be in the same orders
+</font>                std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>truth.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, truth.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>pred.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, pred.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                total_true_segments <font color='#5555FF'>+</font><font color='#5555FF'>=</font> truth.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                total_detections <font color='#5555FF'>+</font><font color='#5555FF'>=</font> pred.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j<font color='#5555FF'>=</font><font color='#979000'>0</font>,k<font color='#5555FF'>=</font><font color='#979000'>0</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>&lt;</font> pred.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> k <font color='#5555FF'>&lt;</font> truth.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pred[j].first <font color='#5555FF'>=</font><font color='#5555FF'>=</font> truth[k].first <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                        pred[j].second <font color='#5555FF'>=</font><font color='#5555FF'>=</font> truth[k].second<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>true_hits;
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j;
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pred[j].first <font color='#5555FF'>&lt;</font> truth[k].first<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> res;
+            res <font color='#5555FF'>=</font> total_detections, total_true_segments, true_hits;
+            <font color='#0000FF'>return</font> res;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sequence_segmenter_type,
+        <font color='#0000FF'>typename</font> sequence_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> <b><a name='test_sequence_segmenter'></a>test_sequence_segmenter</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> sequence_segmenter_type<font color='#5555FF'>&amp;</font> segmenter,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sequence_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> segments 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>is_sequence_segmentation_problem</font><font face='Lucida Console'>(</font>samples, segments<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+                    "<font color='#CC0000'>\tmatrix test_sequence_segmenter()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_sequence_segmentation_problem(samples, segments): </font>" 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_sequence_segmentation_problem</font><font face='Lucida Console'>(</font>samples, segments<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> metrics <font color='#5555FF'>=</font> impl::<font color='#BB00BB'>raw_metrics_test_sequence_segmenter</font><font face='Lucida Console'>(</font>segmenter, samples, segments<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> total_detections    <font color='#5555FF'>=</font> <font color='#BB00BB'>metrics</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> total_true_segments <font color='#5555FF'>=</font> <font color='#BB00BB'>metrics</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> true_hits           <font color='#5555FF'>=</font> <font color='#BB00BB'>metrics</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> precision <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>total_detections   <font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> ? <font color='#979000'>1</font> : true_hits<font color='#5555FF'>/</font>total_detections;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> recall    <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>total_true_segments<font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> ? <font color='#979000'>1</font> : true_hits<font color='#5555FF'>/</font>total_true_segments;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> f1        <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>precision<font color='#5555FF'>+</font>recall   <font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> ? <font color='#979000'>0</font> : <font color='#979000'>2</font><font color='#5555FF'>*</font>precision<font color='#5555FF'>*</font>recall<font color='#5555FF'>/</font><font face='Lucida Console'>(</font>precision<font color='#5555FF'>+</font>recall<font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> res;
+        res <font color='#5555FF'>=</font> precision, recall, f1;
+        <font color='#0000FF'>return</font> res;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type,
+        <font color='#0000FF'>typename</font> sequence_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> <b><a name='cross_validate_sequence_segmenter'></a>cross_validate_sequence_segmenter</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sequence_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> segments,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> folds
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>is_sequence_segmentation_problem</font><font face='Lucida Console'>(</font>samples, segments<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    <font color='#979000'>1</font> <font color='#5555FF'>&lt;</font> folds <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> folds <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                    "<font color='#CC0000'>\tmatrix cross_validate_sequence_segmenter()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t folds:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> folds 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_sequence_segmentation_problem(samples, segments): </font>" 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_sequence_segmentation_problem</font><font face='Lucida Console'>(</font>samples, segments<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_in_test <font color='#5555FF'>=</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>folds;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_in_train <font color='#5555FF'>=</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> num_in_test;
+
+        std::vector<font color='#5555FF'>&lt;</font>sequence_type<font color='#5555FF'>&gt;</font> x_test, x_train;
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> y_test, y_train;
+
+        <font color='#0000FF'><u>long</u></font> next_test_idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> metrics;
+        metrics <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> folds; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            x_test.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            y_test.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            x_train.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            y_train.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// load up the test samples
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> cnt <font color='#5555FF'>=</font> <font color='#979000'>0</font>; cnt <font color='#5555FF'>&lt;</font> num_in_test; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>cnt<font face='Lucida Console'>)</font>
+            <b>{</b>
+                x_test.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>samples[next_test_idx]<font face='Lucida Console'>)</font>;
+                y_test.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>segments[next_test_idx]<font face='Lucida Console'>)</font>;
+                next_test_idx <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>next_test_idx <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>// load up the training samples
+</font>            <font color='#0000FF'><u>long</u></font> next <font color='#5555FF'>=</font> next_test_idx;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> cnt <font color='#5555FF'>=</font> <font color='#979000'>0</font>; cnt <font color='#5555FF'>&lt;</font> num_in_train; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>cnt<font face='Lucida Console'>)</font>
+            <b>{</b>
+                x_train.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>samples[next]<font face='Lucida Console'>)</font>;
+                y_train.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>segments[next]<font face='Lucida Console'>)</font>;
+                next <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>next <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+            metrics <font color='#5555FF'>+</font><font color='#5555FF'>=</font> impl::<font color='#BB00BB'>raw_metrics_test_sequence_segmenter</font><font face='Lucida Console'>(</font>trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>x_train,y_train<font face='Lucida Console'>)</font>, x_test, y_test<font face='Lucida Console'>)</font>;
+        <b>}</b> <font color='#009900'>// for (long i = 0; i &lt; folds; ++i)
+</font>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> total_detections    <font color='#5555FF'>=</font> <font color='#BB00BB'>metrics</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> total_true_segments <font color='#5555FF'>=</font> <font color='#BB00BB'>metrics</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> true_hits           <font color='#5555FF'>=</font> <font color='#BB00BB'>metrics</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> precision <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>total_detections   <font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> ? <font color='#979000'>1</font> : true_hits<font color='#5555FF'>/</font>total_detections;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> recall    <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>total_true_segments<font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> ? <font color='#979000'>1</font> : true_hits<font color='#5555FF'>/</font>total_true_segments;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> f1        <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>precision<font color='#5555FF'>+</font>recall   <font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> ? <font color='#979000'>0</font> : <font color='#979000'>2</font><font color='#5555FF'>*</font>precision<font color='#5555FF'>*</font>recall<font color='#5555FF'>/</font><font face='Lucida Console'>(</font>precision<font color='#5555FF'>+</font>recall<font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> res;
+        res <font color='#5555FF'>=</font> precision, recall, f1;
+        <font color='#0000FF'>return</font> res;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CROSS_VALIDATE_SEQUENCE_sEGMENTER_Hh_
+</font>
+
+
+</pre></body></html>

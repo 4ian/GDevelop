@@ -1,0 +1,164 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - svr_linear_trainer.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>matrix.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>statistics.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm.h<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.svr_linear_trainer</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, <font color='#979000'>0</font>, <font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample_type;
+    <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font>, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> sparse_sample_type;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='sinc'></a>sinc</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> x<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>x;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> scalar_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test1'></a>test1</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample_type;
+
+        <font color='#0000FF'>typedef</font> radial_basis_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> kernel_type;
+
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samples;
+        std::vector<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font> targets;
+
+        <font color='#009900'>// The first thing we do is pick a few training points from the sinc() function.
+</font>        sample_type <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>scalar_type x <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font>; x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>; x <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x;
+
+            samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+            targets.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sinc</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1.1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#BB00BB'>randomize_samples</font><font face='Lucida Console'>(</font>samples, targets<font face='Lucida Console'>)</font>;
+
+        empirical_kernel_map<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> ekm;
+        ekm.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_type</font><font face='Lucida Console'>(</font><font color='#979000'>0.1</font><font face='Lucida Console'>)</font>, samples<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            samples[i] <font color='#5555FF'>=</font> ekm.<font color='#BB00BB'>project</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font>;
+
+        svr_linear_trainer<font color='#5555FF'>&lt;</font>linear_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> linear_trainer;
+        linear_trainer.<font color='#BB00BB'>set_epsilon</font><font face='Lucida Console'>(</font><font color='#979000'>0.0001</font><font face='Lucida Console'>)</font>;
+        linear_trainer.<font color='#BB00BB'>set_c</font><font face='Lucida Console'>(</font><font color='#979000'>30</font><font face='Lucida Console'>)</font>;
+        linear_trainer.<font color='#BB00BB'>set_epsilon_insensitivity</font><font face='Lucida Console'>(</font><font color='#979000'>0.001</font><font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> res <font color='#5555FF'>=</font> <font color='#BB00BB'>cross_validate_regression_trainer</font><font face='Lucida Console'>(</font>linear_trainer, samples, targets, <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>MSE and R-Squared: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> res;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0.99</font><font face='Lucida Console'>)</font>;
+
+        dlib::rand rnd;
+
+        samples.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        targets.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        std::vector<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font> noisefree_targets;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>scalar_type x <font color='#5555FF'>=</font> <font color='#979000'>0</font>; x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>5</font>; x <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>0.1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x;
+            samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>matrix_cast<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>linpiece</font><font face='Lucida Console'>(</font>m, <font color='#BB00BB'>linspace</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>5</font>,<font color='#979000'>20</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            targets.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>x<font color='#5555FF'>*</font>x <font color='#5555FF'>+</font> rnd.<font color='#BB00BB'>get_random_gaussian</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            noisefree_targets.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>x<font color='#5555FF'>*</font>x<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        linear_trainer.<font color='#BB00BB'>set_learns_nonnegative_weights</font><font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        linear_trainer.<font color='#BB00BB'>set_epsilon_insensitivity</font><font face='Lucida Console'>(</font><font color='#979000'>1.0</font><font face='Lucida Console'>)</font>;
+        decision_function<font color='#5555FF'>&lt;</font>linear_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> df2 <font color='#5555FF'>=</font> linear_trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>samples, targets<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        res <font color='#5555FF'>=</font> <font color='#BB00BB'>test_regression_function</font><font face='Lucida Console'>(</font>df2, samples, noisefree_targets<font face='Lucida Console'>)</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>MSE and R-Squared: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> res;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0.15</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0.98</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>df2.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>df2.<font color='#BB00BB'>basis_vectors</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        linear_trainer.<font color='#BB00BB'>force_last_weight_to_1</font><font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        df2 <font color='#5555FF'>=</font> linear_trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>samples, targets<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>df2.<font color='#BB00BB'>basis_vectors</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>samples[<font color='#979000'>0</font>].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>14</font><font face='Lucida Console'>)</font>;
+
+        res <font color='#5555FF'>=</font> <font color='#BB00BB'>test_regression_function</font><font face='Lucida Console'>(</font>df2, samples, noisefree_targets<font face='Lucida Console'>)</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>MSE and R-Squared: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> res;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0.20</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0.98</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// convert into sparse vectors and try it out
+</font>        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, scalar_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> sparse_samp;
+        std::vector<font color='#5555FF'>&lt;</font>sparse_samp<font color='#5555FF'>&gt;</font> ssamples;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            sparse_samp s;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> samples[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                s.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>j,samples[i]<font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            ssamples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        svr_linear_trainer<font color='#5555FF'>&lt;</font>sparse_linear_kernel<font color='#5555FF'>&lt;</font>sparse_samp<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> strainer;
+        strainer.<font color='#BB00BB'>set_learns_nonnegative_weights</font><font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        strainer.<font color='#BB00BB'>set_epsilon_insensitivity</font><font face='Lucida Console'>(</font><font color='#979000'>1.0</font><font face='Lucida Console'>)</font>;
+        strainer.<font color='#BB00BB'>set_c</font><font face='Lucida Console'>(</font><font color='#979000'>30</font><font face='Lucida Console'>)</font>;
+        decision_function<font color='#5555FF'>&lt;</font>sparse_linear_kernel<font color='#5555FF'>&lt;</font>sparse_samp<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> df;
+        df <font color='#5555FF'>=</font> strainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>ssamples, targets<font face='Lucida Console'>)</font>;
+        res <font color='#5555FF'>=</font> <font color='#BB00BB'>test_regression_function</font><font face='Lucida Console'>(</font>df, ssamples, noisefree_targets<font face='Lucida Console'>)</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>MSE and R-Squared: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> res;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0.15</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0.98</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>df2.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sparse_to_dense</font><font face='Lucida Console'>(</font>df2.<font color='#BB00BB'>basis_vectors</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='tester_svr_linear_trainer'></a>tester_svr_linear_trainer</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='tester_svr_linear_trainer'></a>tester_svr_linear_trainer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_svr_linear_trainer</font>",
+                    "<font color='#CC0000'>Runs tests on the svr_linear_trainer.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>TEST double</font>";
+            test1<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>TEST float</font>";
+            test1<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> a;
+
+<b>}</b>
+
+
+
+
+</pre></body></html>

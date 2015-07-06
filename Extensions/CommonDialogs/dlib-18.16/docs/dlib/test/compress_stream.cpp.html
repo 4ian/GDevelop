@@ -1,0 +1,309 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - compress_stream.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>compress_stream.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.compress_stream</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> cs
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='compress_stream_kernel_test'></a>compress_stream_kernel_test</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> seed
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - cs is an implementation of compress_stream/compress_stream_kernel_abstract.h            
+              the alphabet_size for cc is 256
+        ensures
+            - runs tests on cs for compliance with the specs 
+    !*/</font>
+    <b>{</b>        
+
+
+        <font color='#BB00BB'>srand</font><font face='Lucida Console'>(</font>seed<font face='Lucida Console'>)</font>;
+
+        cs test;
+
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>1</font>;
+
+        <font color='#0000FF'><u>int</u></font> count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            istringstream sin;
+            ostringstream sout;
+            string buffer;
+            buffer.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font><font color='#979000'>10000</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// fill sin with a bunch of random data in the range 0 to 63
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>char</u></font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0x3f</font><font face='Lucida Console'>)</font>;
+                buffer.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>buffer<font face='Lucida Console'>)</font>;
+            string old_buffer <font color='#5555FF'>=</font> buffer;
+
+            test.<font color='#BB00BB'>compress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+            buffer <font color='#5555FF'>=</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// corrput the data in buffer
+</font>            buffer[buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>]<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>buffer<font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>bool</u></font> detected_error <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>try</font> <b>{</b>
+                test.<font color='#BB00BB'>decompress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+            <b>}</b> <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font> <font color='#0000FF'>typename</font> cs::decompression_error e <font face='Lucida Console'>)</font>
+            <b>{</b>
+                detected_error <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+            <b>}</b>
+            
+
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>detected_error <font color='#5555FF'>|</font><font color='#5555FF'>|</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> old_buffer,<font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+
+        <b>}</b> <font color='#009900'>/**/</font>
+
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>2</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            istringstream sin;
+            ostringstream sout;
+
+            string buffer;
+
+            buffer.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// make sure a single char can be compressed and decompressed
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>256</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+                sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>char</u></font> ch <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                buffer <font color='#5555FF'>=</font> ch;
+                sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>buffer<font face='Lucida Console'>)</font>;
+
+                test.<font color='#BB00BB'>compress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+
+                sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+                test.<font color='#BB00BB'>decompress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> buffer<font face='Lucida Console'>)</font>;                   
+            <b>}</b>
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// make sure you can compress a single char, then append a new
+</font>            <font color='#009900'>// compressed single char.  and make sure you can decode the
+</font>            <font color='#009900'>// two streams.  Just to make sure the decoder doesn't leave 
+</font>            <font color='#009900'>// extra bytes behind or eat more than it should.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>500</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+                sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+                sout.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>char</u></font> ch <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>256</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>char</u></font> ch2 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>256</font><font face='Lucida Console'>)</font>;
+
+                buffer <font color='#5555FF'>=</font> ch;
+                sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>buffer<font face='Lucida Console'>)</font>;
+
+
+
+                test.<font color='#BB00BB'>compress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+
+
+
+
+                buffer <font color='#5555FF'>=</font> ch2;
+                sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>buffer<font face='Lucida Console'>)</font>;
+                test.<font color='#BB00BB'>compress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+
+                sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+                test.<font color='#BB00BB'>decompress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+                buffer <font color='#5555FF'>=</font> ch;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> buffer<font face='Lucida Console'>)</font>;
+
+
+
+
+                sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+                test.<font color='#BB00BB'>decompress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+                buffer <font color='#5555FF'>=</font> ch2;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> buffer<font face='Lucida Console'>)</font>;
+
+
+            <b>}</b>
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// make sure you can compress and decompress the empty string
+</font>            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>compress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>decompress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'></font>",sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+
+
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            buffer <font color='#5555FF'>=</font> "<font color='#CC0000'></font>";
+
+            buffer.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font><font color='#979000'>20000</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// fill buffer with a bunch of random data in the range 0 to 63
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>20000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>char</u></font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0x3f</font><font face='Lucida Console'>)</font>;
+                buffer.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>buffer<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>compress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>decompress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> buffer<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>3</font>;
+
+        <font color='#009900'>// this block will try to compress a bunch of 'a' chars
+</font>        <b>{</b>
+
+            istringstream sin;
+            ostringstream sout;
+
+            string buffer;
+
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            buffer <font color='#5555FF'>=</font> "<font color='#CC0000'></font>";
+
+            buffer.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font><font color='#979000'>50000</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// fill buffer with a bunch of 'a' chars
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>50000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>char</u></font> temp <font color='#5555FF'>=</font> '<font color='#FF0000'>a</font>';
+                buffer.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>buffer<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>compress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>decompress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> buffer<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>4</font>;
+
+    <b>}</b>
+
+
+
+
+
+
+    <font color='#0000FF'>class</font> <b><a name='compress_stream_tester'></a>compress_stream_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='compress_stream_tester'></a>compress_stream_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_compress_stream</font>",
+                    "<font color='#CC0000'>Runs tests on the compress_stream component.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> seed <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>time</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>using seed: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> seed;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_1a</font>";
+            compress_stream_kernel_test<font color='#5555FF'>&lt;</font>compress_stream::kernel_1a<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>seed<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_1b</font>";
+            compress_stream_kernel_test<font color='#5555FF'>&lt;</font>compress_stream::kernel_1b<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>seed<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_1c</font>";
+            compress_stream_kernel_test<font color='#5555FF'>&lt;</font>compress_stream::kernel_1c<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>seed<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_1da</font>";
+            compress_stream_kernel_test<font color='#5555FF'>&lt;</font>compress_stream::kernel_1da<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>seed<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_1db</font>";
+            compress_stream_kernel_test<font color='#5555FF'>&lt;</font>compress_stream::kernel_1db<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>seed<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_1ea</font>";
+            compress_stream_kernel_test<font color='#5555FF'>&lt;</font>compress_stream::kernel_1ea<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>seed<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_1eb</font>";
+            compress_stream_kernel_test<font color='#5555FF'>&lt;</font>compress_stream::kernel_1eb<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>seed<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_1ec</font>";
+            compress_stream_kernel_test<font color='#5555FF'>&lt;</font>compress_stream::kernel_1ec<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>seed<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_2a</font>";
+            compress_stream_kernel_test<font color='#5555FF'>&lt;</font>compress_stream::kernel_2a<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>seed<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_3a</font>";
+            compress_stream_kernel_test<font color='#5555FF'>&lt;</font>compress_stream::kernel_3a<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>seed<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_3b</font>";
+            compress_stream_kernel_test<font color='#5555FF'>&lt;</font>compress_stream::kernel_3b<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>seed<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> a;
+
+<b>}</b>
+
+
+</pre></body></html>

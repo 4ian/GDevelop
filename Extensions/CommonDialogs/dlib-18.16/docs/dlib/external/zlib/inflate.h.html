@@ -1,0 +1,125 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - inflate.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/* inflate.h -- internal inflate state definition
+ * Copyright (C) 1995-2009 Mark Adler
+ * For conditions of distribution and use, see copyright notice in zlib.h
+ */</font>
+
+<font color='#009900'>/* WARNING: this file should *not* be used by applications. It is
+   part of the implementation of the compression library and is
+   subject to change. Applications should only use zlib.h.
+ */</font>
+
+<font color='#009900'>/* define NO_GZIP when compiling if you want to disable gzip header and
+   trailer decoding by inflate().  NO_GZIP would be used to avoid linking in
+   the crc code when it is not needed.  For shared libraries, gzip decoding
+   should be left enabled. */</font>
+<font color='#0000FF'>#ifndef</font> NO_GZIP
+#  define GUNZIP
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* Possible inflate modes between inflate() calls */</font>
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>enum</font> <b>{</b>
+    HEAD,       <font color='#009900'>/* i: waiting for magic header */</font>
+    FLAGS,      <font color='#009900'>/* i: waiting for method and flags (gzip) */</font>
+    TIME,       <font color='#009900'>/* i: waiting for modification time (gzip) */</font>
+    OS,         <font color='#009900'>/* i: waiting for extra flags and operating system (gzip) */</font>
+    EXLEN,      <font color='#009900'>/* i: waiting for extra length (gzip) */</font>
+    EXTRA,      <font color='#009900'>/* i: waiting for extra bytes (gzip) */</font>
+    NAME,       <font color='#009900'>/* i: waiting for end of file name (gzip) */</font>
+    COMMENT,    <font color='#009900'>/* i: waiting for end of comment (gzip) */</font>
+    HCRC,       <font color='#009900'>/* i: waiting for header crc (gzip) */</font>
+    DICTID,     <font color='#009900'>/* i: waiting for dictionary check value */</font>
+    DICT,       <font color='#009900'>/* waiting for inflateSetDictionary() call */</font>
+        TYPE,       <font color='#009900'>/* i: waiting for type bits, including last-flag bit */</font>
+        TYPEDO,     <font color='#009900'>/* i: same, but skip check to exit inflate on new block */</font>
+        STORED,     <font color='#009900'>/* i: waiting for stored size (length and complement) */</font>
+        COPY_,      <font color='#009900'>/* i/o: same as COPY below, but only first time in */</font>
+        COPY,       <font color='#009900'>/* i/o: waiting for input or output to copy stored block */</font>
+        TABLE,      <font color='#009900'>/* i: waiting for dynamic block table lengths */</font>
+        LENLENS,    <font color='#009900'>/* i: waiting for code length code lengths */</font>
+        CODELENS,   <font color='#009900'>/* i: waiting for length/lit and distance code lengths */</font>
+            LEN_,       <font color='#009900'>/* i: same as LEN below, but only first time in */</font>
+            LEN,        <font color='#009900'>/* i: waiting for length/lit/eob code */</font>
+            LENEXT,     <font color='#009900'>/* i: waiting for length extra bits */</font>
+            DIST,       <font color='#009900'>/* i: waiting for distance code */</font>
+            DISTEXT,    <font color='#009900'>/* i: waiting for distance extra bits */</font>
+            MATCH,      <font color='#009900'>/* o: waiting for output space to copy string */</font>
+            LIT,        <font color='#009900'>/* o: waiting for output space to write literal */</font>
+    CHECK,      <font color='#009900'>/* i: waiting for 32-bit check value */</font>
+    LENGTH,     <font color='#009900'>/* i: waiting for 32-bit length (gzip) */</font>
+    DONE,       <font color='#009900'>/* finished check, done -- remain here until reset */</font>
+    BAD,        <font color='#009900'>/* got a data error -- remain here until reset */</font>
+    MEM,        <font color='#009900'>/* got an inflate() memory error -- remain here until reset */</font>
+    SYNC        <font color='#009900'>/* looking for synchronization bytes to restart inflate() */</font>
+<b>}</b> inflate_mode;
+
+<font color='#009900'>/*
+    State transitions between above modes -
+
+    (most modes can go to BAD or MEM on error -- not shown for clarity)
+
+    Process header:
+        HEAD -&gt; (gzip) or (zlib) or (raw)
+        (gzip) -&gt; FLAGS -&gt; TIME -&gt; OS -&gt; EXLEN -&gt; EXTRA -&gt; NAME -&gt; COMMENT -&gt;
+                  HCRC -&gt; TYPE
+        (zlib) -&gt; DICTID or TYPE
+        DICTID -&gt; DICT -&gt; TYPE
+        (raw) -&gt; TYPEDO
+    Read deflate blocks:
+            TYPE -&gt; TYPEDO -&gt; STORED or TABLE or LEN_ or CHECK
+            STORED -&gt; COPY_ -&gt; COPY -&gt; TYPE
+            TABLE -&gt; LENLENS -&gt; CODELENS -&gt; LEN_
+            LEN_ -&gt; LEN
+    Read deflate codes in fixed or dynamic block:
+                LEN -&gt; LENEXT or LIT or TYPE
+                LENEXT -&gt; DIST -&gt; DISTEXT -&gt; MATCH -&gt; LEN
+                LIT -&gt; LEN
+    Process trailer:
+        CHECK -&gt; LENGTH -&gt; DONE
+ */</font>
+
+<font color='#009900'>/* state maintained between inflate() calls.  Approximately 10K bytes. */</font>
+<font color='#0000FF'>struct</font> <b><a name='inflate_state'></a>inflate_state</b> <b>{</b>
+    inflate_mode mode;          <font color='#009900'>/* current inflate mode */</font>
+    <font color='#0000FF'><u>int</u></font> last;                   <font color='#009900'>/* true if processing last block */</font>
+    <font color='#0000FF'><u>int</u></font> wrap;                   <font color='#009900'>/* bit 0 true for zlib, bit 1 true for gzip */</font>
+    <font color='#0000FF'><u>int</u></font> havedict;               <font color='#009900'>/* true if dictionary provided */</font>
+    <font color='#0000FF'><u>int</u></font> flags;                  <font color='#009900'>/* gzip header method and flags (0 if zlib) */</font>
+    <font color='#0000FF'><u>unsigned</u></font> dmax;              <font color='#009900'>/* zlib header max distance (INFLATE_STRICT) */</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> check;        <font color='#009900'>/* protected copy of check value */</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total;        <font color='#009900'>/* protected copy of output count */</font>
+    gz_headerp head;            <font color='#009900'>/* where to save gzip header information */</font>
+        <font color='#009900'>/* sliding window */</font>
+    <font color='#0000FF'><u>unsigned</u></font> wbits;             <font color='#009900'>/* log base 2 of requested window size */</font>
+    <font color='#0000FF'><u>unsigned</u></font> wsize;             <font color='#009900'>/* window size or zero if not using window */</font>
+    <font color='#0000FF'><u>unsigned</u></font> whave;             <font color='#009900'>/* valid bytes in the window */</font>
+    <font color='#0000FF'><u>unsigned</u></font> wnext;             <font color='#009900'>/* window write index */</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> FAR <font color='#5555FF'>*</font>window;  <font color='#009900'>/* allocated sliding window, if needed */</font>
+        <font color='#009900'>/* bit accumulator */</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> hold;         <font color='#009900'>/* input bit accumulator */</font>
+    <font color='#0000FF'><u>unsigned</u></font> bits;              <font color='#009900'>/* number of bits in "in" */</font>
+        <font color='#009900'>/* for string and stored block copying */</font>
+    <font color='#0000FF'><u>unsigned</u></font> length;            <font color='#009900'>/* literal or length of data to copy */</font>
+    <font color='#0000FF'><u>unsigned</u></font> offset;            <font color='#009900'>/* distance back to copy string from */</font>
+        <font color='#009900'>/* for table and code decoding */</font>
+    <font color='#0000FF'><u>unsigned</u></font> extra;             <font color='#009900'>/* extra bits needed */</font>
+        <font color='#009900'>/* fixed and dynamic code tables */</font>
+    code <font color='#0000FF'>const</font> FAR <font color='#5555FF'>*</font>lencode;    <font color='#009900'>/* starting table for length/literal codes */</font>
+    code <font color='#0000FF'>const</font> FAR <font color='#5555FF'>*</font>distcode;   <font color='#009900'>/* starting table for distance codes */</font>
+    <font color='#0000FF'><u>unsigned</u></font> lenbits;           <font color='#009900'>/* index bits for lencode */</font>
+    <font color='#0000FF'><u>unsigned</u></font> distbits;          <font color='#009900'>/* index bits for distcode */</font>
+        <font color='#009900'>/* dynamic table building */</font>
+    <font color='#0000FF'><u>unsigned</u></font> ncode;             <font color='#009900'>/* number of code length code lengths */</font>
+    <font color='#0000FF'><u>unsigned</u></font> nlen;              <font color='#009900'>/* number of length code lengths */</font>
+    <font color='#0000FF'><u>unsigned</u></font> ndist;             <font color='#009900'>/* number of distance code lengths */</font>
+    <font color='#0000FF'><u>unsigned</u></font> have;              <font color='#009900'>/* number of code lengths in lens[] */</font>
+    code FAR <font color='#5555FF'>*</font>next;             <font color='#009900'>/* next available space in codes[] */</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> lens[<font color='#979000'>320</font>];   <font color='#009900'>/* temporary storage for code lengths */</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> work[<font color='#979000'>288</font>];   <font color='#009900'>/* work area for code table building */</font>
+    code codes[ENOUGH];         <font color='#009900'>/* space for code tables */</font>
+    <font color='#0000FF'><u>int</u></font> sane;                   <font color='#009900'>/* if false, allow invalid distance too far */</font>
+    <font color='#0000FF'><u>int</u></font> back;                   <font color='#009900'>/* bits back of last unprocessed length/lit */</font>
+    <font color='#0000FF'><u>unsigned</u></font> was;               <font color='#009900'>/* initial length of match */</font>
+<b>}</b>;
+
+</pre></body></html>

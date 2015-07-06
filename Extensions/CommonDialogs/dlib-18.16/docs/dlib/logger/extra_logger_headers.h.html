@@ -1,0 +1,44 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - extra_logger_headers.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_EXTRA_LOGGER_HEADERs_
+<font color='#0000FF'>#define</font> DLIB_EXTRA_LOGGER_HEADERs_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='logger_kernel_abstract.h.html'>logger_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='logger_kernel_1.h.html'>logger_kernel_1.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='print_datetime_logger_header'></a>print_datetime_logger_header</b> <font face='Lucida Console'>(</font>
+        std::ostream<font color='#5555FF'>&amp;</font> out,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> logger_name,
+        <font color='#0000FF'>const</font> log_level<font color='#5555FF'>&amp;</font> l,
+        <font color='#0000FF'>const</font> uint64 thread_id
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is not called more than once at a time (i.e. is not called from multiple
+              threads at the same time).
+        ensures
+            - let DATE be the current date and time (e.g. Thu Aug 31 16:41:52 2006).  
+            - prints a string to out in the form:  "l.name (DATE) [thread_id] logger_name:"
+    !*/</font>
+
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='extra_logger_headers.cpp.html'>extra_logger_headers.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_EXTRA_LOGGER_HEADERs_
+</font>
+
+</pre></body></html>

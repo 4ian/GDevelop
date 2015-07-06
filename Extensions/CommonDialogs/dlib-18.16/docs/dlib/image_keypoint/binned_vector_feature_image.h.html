@@ -1,0 +1,436 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - binned_vector_feature_image.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_BINNED_VECTOR_IMAGE_FEATUrES_Hh_
+<font color='#0000FF'>#define</font> DLIB_BINNED_VECTOR_IMAGE_FEATUrES_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../lsh/projection_hash.h.html'>../lsh/projection_hash.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='binned_vector_feature_image_abstract.h.html'>binned_vector_feature_image_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>typename</font> hash_function_type_ <font color='#5555FF'>=</font> projection_hash
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='binned_vector_feature_image'></a>binned_vector_feature_image</b> : noncopyable
+    <b>{</b>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> feature_extractor feature_extractor_type;
+        <font color='#0000FF'>typedef</font> hash_function_type_ hash_function_type;
+
+        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> descriptor_type;
+
+        <b><a name='binned_vector_feature_image'></a>binned_vector_feature_image</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_hash'></a>set_hash</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> hash_function_type<font color='#5555FF'>&amp;</font> hash_
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> hash_function_type<font color='#5555FF'>&amp;</font> <b><a name='get_hash'></a>get_hash</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='copy_configuration'></a>copy_configuration</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='copy_configuration'></a>copy_configuration</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> binned_vector_feature_image<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='load'></a>load</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_dimensions'></a>get_num_dimensions</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> descriptor_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> row,
+            <font color='#0000FF'><u>long</u></font> col
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> rectangle <b><a name='get_block_rect'></a>get_block_rect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> row,
+            <font color='#0000FF'><u>long</u></font> col
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> point <b><a name='image_to_feat_space'></a>image_to_feat_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> rectangle <b><a name='image_to_feat_space'></a>image_to_feat_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> point <b><a name='feat_to_image_space'></a>feat_to_image_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> rectangle <b><a name='feat_to_image_space'></a>feat_to_image_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> binned_vector_feature_image<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+            std::ostream<font color='#5555FF'>&amp;</font> out
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+            binned_vector_feature_image<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+            std::istream<font color='#5555FF'>&amp;</font> in 
+        <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        array2d<font color='#5555FF'>&lt;</font>descriptor_type<font color='#5555FF'>&gt;</font> feats;
+        feature_extractor fe;
+        hash_function_type phash;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> binned_vector_feature_image<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>int</u></font> version <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>version, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.feats, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.fe, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.phash, out<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        binned_vector_feature_image<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>int</u></font> version <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>version, in<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>version <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unexpected version found while deserializing dlib::binned_vector_feature_image</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.feats, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.fe, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.phash, in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                        binned_vector_feature_image member functions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>typename</font> hash_function_type
+        <font color='#5555FF'>&gt;</font>
+    binned_vector_feature_image<font color='#5555FF'>&lt;</font>feature_extractor,hash_function_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='binned_vector_feature_image'></a>binned_vector_feature_image</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>  
+    <b>{</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>typename</font> hash_function_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> binned_vector_feature_image<font color='#5555FF'>&lt;</font>feature_extractor,hash_function_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        fe.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        phash <font color='#5555FF'>=</font> <font color='#BB00BB'>hash_function_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        feats.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>typename</font> hash_function_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> binned_vector_feature_image<font color='#5555FF'>&lt;</font>feature_extractor,hash_function_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='set_hash'></a>set_hash</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> hash_function_type<font color='#5555FF'>&amp;</font> hash_
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        phash <font color='#5555FF'>=</font> hash_;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>typename</font> hash_function_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> hash_function_type<font color='#5555FF'>&amp;</font> binned_vector_feature_image<font color='#5555FF'>&lt;</font>feature_extractor,hash_function_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_hash'></a>get_hash</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> phash;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>typename</font> hash_function_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> binned_vector_feature_image<font color='#5555FF'>&lt;</font>feature_extractor,hash_function_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='copy_configuration'></a>copy_configuration</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        fe.<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>typename</font> hash_function_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> binned_vector_feature_image<font color='#5555FF'>&lt;</font>feature_extractor,hash_function_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='copy_configuration'></a>copy_configuration</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> binned_vector_feature_image<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        fe.<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>item.fe<font face='Lucida Console'>)</font>;
+        phash <font color='#5555FF'>=</font> item.phash;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>typename</font> hash_function_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> binned_vector_feature_image<font color='#5555FF'>&lt;</font>feature_extractor,hash_function_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='load'></a>load</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        fe.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>fe.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            feats.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>fe.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, fe.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> feats.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> feats.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    feats[r][c].<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    feats[r][c].<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>fe.<font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> feature_extractor::descriptor_type<font color='#5555FF'>&amp;</font> des <font color='#5555FF'>=</font> <font color='#BB00BB'>fe</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> <font color='#BB00BB'>phash</font><font face='Lucida Console'>(</font>des<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> offset <font color='#5555FF'>=</font> idx<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>fe.<font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> des.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        feats[r][c].<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>offset <font color='#5555FF'>+</font> i, <font color='#BB00BB'>des</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    feats[r][c].<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>offset <font color='#5555FF'>+</font> des.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>1.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            feats.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        fe.<font color='#BB00BB'>unload</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>typename</font> hash_function_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> binned_vector_feature_image<font color='#5555FF'>&lt;</font>feature_extractor,hash_function_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> feats.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>typename</font> hash_function_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>long</u></font> binned_vector_feature_image<font color='#5555FF'>&lt;</font>feature_extractor,hash_function_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> feats.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>typename</font> hash_function_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>long</u></font> binned_vector_feature_image<font color='#5555FF'>&lt;</font>feature_extractor,hash_function_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> feats.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>typename</font> hash_function_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>long</u></font> binned_vector_feature_image<font color='#5555FF'>&lt;</font>feature_extractor,hash_function_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_num_dimensions'></a>get_num_dimensions</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> phash.<font color='#BB00BB'>num_hash_bins</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>fe.<font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>typename</font> hash_function_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> binned_vector_feature_image<font color='#5555FF'>&lt;</font>feature_extractor,hash_function_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>long</u></font> row,
+        <font color='#0000FF'><u>long</u></font> col
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> row <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> row <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> col <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> col <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\t descriptor_type binned_vector_feature_image::operator(row,col)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t row:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> row
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t col:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> col 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> feats[row][col];
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>typename</font> hash_function_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> rectangle binned_vector_feature_image<font color='#5555FF'>&lt;</font>feature_extractor,hash_function_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_block_rect'></a>get_block_rect</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>long</u></font> row,
+        <font color='#0000FF'><u>long</u></font> col
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> fe.<font color='#BB00BB'>get_block_rect</font><font face='Lucida Console'>(</font>row,col<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>typename</font> hash_function_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> point binned_vector_feature_image<font color='#5555FF'>&lt;</font>feature_extractor,hash_function_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='image_to_feat_space'></a>image_to_feat_space</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> fe.<font color='#BB00BB'>image_to_feat_space</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>typename</font> hash_function_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> rectangle binned_vector_feature_image<font color='#5555FF'>&lt;</font>feature_extractor,hash_function_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='image_to_feat_space'></a>image_to_feat_space</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> fe.<font color='#BB00BB'>image_to_feat_space</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>typename</font> hash_function_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> point binned_vector_feature_image<font color='#5555FF'>&lt;</font>feature_extractor,hash_function_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='feat_to_image_space'></a>feat_to_image_space</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> fe.<font color='#BB00BB'>feat_to_image_space</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>typename</font> hash_function_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> rectangle binned_vector_feature_image<font color='#5555FF'>&lt;</font>feature_extractor,hash_function_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='feat_to_image_space'></a>feat_to_image_space</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b>
+        <font color='#0000FF'>return</font> fe.<font color='#BB00BB'>feat_to_image_space</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BINNED_VECTOR_IMAGE_FEATUrES_Hh_
+</font>
+
+
+</pre></body></html>

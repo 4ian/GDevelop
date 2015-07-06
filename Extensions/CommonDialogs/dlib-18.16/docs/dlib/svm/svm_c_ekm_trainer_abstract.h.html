@@ -1,0 +1,387 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - svm_c_ekm_trainer_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SVM_C_EKm_TRAINER_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_SVM_C_EKm_TRAINER_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='function_abstract.h.html'>function_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel_abstract.h.html'>kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='empirical_kernel_map_abstract.h.html'>empirical_kernel_map_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm_c_linear_trainer_abstract.h.html'>svm_c_linear_trainer_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='svm_c_ekm_trainer'></a>svm_c_ekm_trainer</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON K 
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a tool for training the C formulation of 
+                a support vector machine.   It is implemented using the empirical_kernel_map
+                to kernelize the svm_c_linear_trainer.  This makes it a very fast algorithm
+                capable of learning from very large datasets.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> K kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> trained_function_type;
+
+        <b><a name='svm_c_ekm_trainer'></a>svm_c_ekm_trainer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object is properly initialized and ready to be used
+                  to train a support vector machine.
+                - #get_oca() == oca() (i.e. an instance of oca with default parameters) 
+                - #get_c_class1() == 1
+                - #get_c_class2() == 1
+                - #get_epsilon() == 0.001
+                - #basis_loaded() == false
+                - #get_initial_basis_size() == 10
+                - #get_basis_size_increment() == 50 
+                - #get_max_basis_size() == 300
+                - this object will not be verbose unless be_verbose() is called
+                - #get_max_iterations() == 10000
+        !*/</font>
+
+        <font color='#0000FF'>explicit</font> <b><a name='svm_c_ekm_trainer'></a>svm_c_ekm_trainer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scalar_type<font color='#5555FF'>&amp;</font> C 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - C &gt; 0
+            ensures
+                - This object is properly initialized and ready to be used
+                  to train a support vector machine.
+                - #get_oca() == oca() (i.e. an instance of oca with default parameters) 
+                - #get_c_class1() == C
+                - #get_c_class2() == C
+                - #get_epsilon() == 0.001
+                - #basis_loaded() == false
+                - #get_initial_basis_size() == 10
+                - #get_basis_size_increment() == 50
+                - #get_max_basis_size() == 300
+                - this object will not be verbose unless be_verbose() is called
+                - #get_max_iterations() == 10000
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_epsilon'></a>set_epsilon</b> <font face='Lucida Console'>(</font>
+            scalar_type eps
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - eps &gt; 0
+            ensures
+                - #get_epsilon() == eps 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_epsilon'></a>get_epsilon</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the error epsilon that determines when training should stop.
+                  Smaller values may result in a more accurate solution but take longer 
+                  to execute.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_iterations'></a>set_max_iterations</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_max_iterations() == max_iter
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_iterations'></a>get_max_iterations</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the maximum number of iterations the SVM optimizer is allowed to
+                  run before it is required to stop and return a result.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_verbose'></a>be_verbose</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object will print status messages to standard out so that a 
+                  user can observe the progress of the algorithm.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_very_verbose'></a>be_very_verbose</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object will print a lot of status messages to standard out so that a 
+                  user can observe the progress of the algorithm.  In addition to the
+                  few status messages normal verbosity produces this setting also causes
+                  the underlying svm_c_linear_trainer to be verbose.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_quiet'></a>be_quiet</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object will not print anything to standard out
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_oca'></a>set_oca</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> oca<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_oca() == item 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> oca <b><a name='get_oca'></a>get_oca</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a copy of the optimizer used to solve the SVM problem.  
+        !*/</font>
+
+        <font color='#0000FF'>const</font> kernel_type <b><a name='get_kernel'></a>get_kernel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a copy of the kernel function in use by this object
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_kernel'></a>set_kernel</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_kernel() == k 
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_basis'></a>set_basis</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> basis_samples
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - T must be a dlib::matrix type or something convertible to a matrix via mat()
+                  (e.g. a std::vector)
+                - is_vector(basis_samples) == true
+                - basis_samples.size() &gt; 0
+                - get_kernel() must be capable of operating on the elements of basis_samples.  That is,
+                  expressions such as get_kernel()(basis_samples(0), basis_samples(0)) should make sense.
+            ensures
+                - #basis_loaded() == true
+                - training will be carried out in the span of the given basis_samples
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='basis_loaded'></a>basis_loaded</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if this object has been loaded with user supplied basis vectors and false otherwise.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear_basis'></a>clear_basis</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #basis_loaded() == false
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_basis_size'></a>get_max_basis_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the maximum number of basis vectors this object is allowed
+                  to use.  This parameter only matters when the user has not supplied 
+                  a basis via set_basis().
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_basis_size'></a>set_max_basis_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_basis_size
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - max_basis_size &gt; 0
+            ensures
+                - #get_max_basis_size() == max_basis_size 
+                - if (get_initial_basis_size() &gt; max_basis_size) then
+                    - #get_initial_basis_size() == max_basis_size
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_initial_basis_size'></a>get_initial_basis_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - If the user does not supply a basis via set_basis() then this object
+                  will generate one automatically.  It does this by starting with
+                  a small basis of size N and repeatedly adds basis vectors to it
+                  until a stopping condition is reached.  This function returns that
+                  initial size N.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_initial_basis_size'></a>set_initial_basis_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> initial_basis_size
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - initial_basis_size &gt; 0
+            ensures
+                - #get_initial_basis_size() == initial_basis_size
+                - if (initial_basis_size &gt; get_max_basis_size()) then
+                    - #get_max_basis_size() == initial_basis_size
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_basis_size_increment'></a>get_basis_size_increment</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - If the user does not supply a basis via set_basis() then this object
+                  will generate one automatically.  It does this by starting with a small 
+                  basis and repeatedly adds sets of N basis vectors to it until a stopping 
+                  condition is reached.  This function returns that increment size N.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_basis_size_increment'></a>set_basis_size_increment</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> basis_size_increment
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - basis_size_increment &gt; 0
+            ensures
+                - #get_basis_size_increment() == basis_size_increment
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_c'></a>set_c</b> <font face='Lucida Console'>(</font>
+            scalar_type C 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - C &gt; 0
+            ensures
+                - #get_c_class1() == C 
+                - #get_c_class2() == C 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_c_class1'></a>get_c_class1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the SVM regularization parameter for the +1 class.  
+                  It is the parameter that determines the trade off between
+                  trying to fit the +1 training data exactly or allowing more errors 
+                  but hopefully improving the generalization ability of the 
+                  resulting classifier.  Larger values encourage exact fitting 
+                  while smaller values of C may encourage better generalization. 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_c_class2'></a>get_c_class2</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the SVM regularization parameter for the -1 class.  
+                  It is the parameter that determines the trade off between
+                  trying to fit the -1 training data exactly or allowing more errors 
+                  but hopefully improving the generalization ability of the 
+                  resulting classifier.  Larger values encourage exact fitting 
+                  while smaller values of C may encourage better generalization. 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_c_class1'></a>set_c_class1</b> <font face='Lucida Console'>(</font>
+            scalar_type C
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - C &gt; 0
+            ensures
+                - #get_c_class1() == C
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_c_class2'></a>set_c_class2</b> <font face='Lucida Console'>(</font>
+            scalar_type C
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - C &gt; 0
+            ensures
+                - #get_c_class2() == C
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_binary_classification_problem(x,y) == true
+                - x == a matrix or something convertible to a matrix via mat().
+                  Also, x should contain sample_type objects.
+                - y == a matrix or something convertible to a matrix via mat().
+                  Also, y should contain scalar_type objects.
+            ensures
+                - trains a C support vector classifier given the training samples in x and 
+                  labels in y.  
+                - if (basis_loaded()) then
+                    - training will be carried out in the span of the user supplied basis vectors
+                - else
+                    - this object will attempt to automatically select an appropriate basis
+
+                - returns a decision function F with the following properties:
+                    - if (new_x is a sample predicted have +1 label) then
+                        - F(new_x) &gt;= 0
+                    - else
+                        - F(new_x) &lt; 0
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y,
+            scalar_type<font color='#5555FF'>&amp;</font> svm_objective
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_binary_classification_problem(x,y) == true
+                - x == a matrix or something convertible to a matrix via mat().
+                  Also, x should contain sample_type objects.
+                - y == a matrix or something convertible to a matrix via mat().
+                  Also, y should contain scalar_type objects.
+            ensures
+                - trains a C support vector classifier given the training samples in x and 
+                  labels in y.  
+                - if (basis_loaded()) then
+                    - training will be carried out in the span of the user supplied basis vectors
+                - else
+                    - this object will attempt to automatically select an appropriate basis
+
+                - #svm_objective == the final value of the SVM objective function
+                - returns a decision function F with the following properties:
+                    - if (new_x is a sample predicted have +1 label) then
+                        - F(new_x) &gt;= 0
+                    - else
+                        - F(new_x) &lt; 0
+        !*/</font>
+
+    <b>}</b>; 
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SVM_C_EKm_TRAINER_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

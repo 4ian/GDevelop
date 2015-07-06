@@ -52,8 +52,10 @@ PhysicsAutomatism::~PhysicsAutomatism()
 #if defined(GD_IDE_ONLY)
 void PhysicsAutomatism::EditAutomatism( wxWindow* parent, gd::Project & project_, gd::Layout * layout_, gd::MainFrameWrapper & mainFrameWrapper_ )
 {
+#if !defined(GD_NO_WX_GUI)
     PhysicsAutomatismEditor editor(parent, project_, layout_, *this, mainFrameWrapper_);
     editor.ShowModal();
+#endif
 }
 #endif
 

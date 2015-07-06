@@ -59,6 +59,11 @@ bool GD_API MouseButtonPressed(RuntimeScene & scene, const gd::String & button)
     return scene.GetInputManager().IsMouseButtonPressed(button);
 }
 
+bool GD_API MouseButtonReleased(RuntimeScene & scene, const gd::String & button)
+{
+    return scene.GetInputManager().IsMouseButtonReleased(button);
+}
+
 int GD_API GetMouseWheelDelta(RuntimeScene & scene)
 {
     return scene.GetInputManager().GetMouseWheelDelta();

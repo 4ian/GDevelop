@@ -165,7 +165,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	wxFlexGridSizer* FlexGridSizer6;
 	wxFlexGridSizer* FlexGridSizer1;
 
-	Create(parent, wxID_ANY, _("Edition of a Sprite object"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Edit the Sprite object"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
 	mgr = new wxAuiManager(this, wxAUI_MGR_DEFAULT);
 	centerPanel = new wxPanel(this, ID_PANEL1, wxPoint(107,155), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -177,7 +177,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	toolbarPanel = new wxPanel(centerPanel, ID_PANEL6, wxDefaultPosition, wxSize(-1,25), wxTAB_TRAVERSAL, _T("ID_PANEL6"));
 	AuiManager1 = new wxAuiManager(toolbarPanel, wxAUI_MGR_DEFAULT);
 	toolbar = new wxAuiToolBar(toolbarPanel, ID_AUITOOLBAR1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	toolbar->AddTool(ID_MASKITEM, _("Edit the collision masks ( Hit boxes )"), gd::CommonBitmapManager::Get()->maskEdit16, wxNullBitmap, wxITEM_CHECK, _("Edit the collision masks ( Hit boxes )"), wxEmptyString, NULL);
+	toolbar->AddTool(ID_MASKITEM, _("Edit the collision masks (hitbox)"), gd::CommonBitmapManager::Get()->maskEdit16, wxNullBitmap, wxITEM_CHECK, _("Edit the collision masks (hitbox)"), wxEmptyString, NULL);
 	toolbar->AddTool(ID_POINTSITEM, _("Edit the image\'s point"), gd::CommonBitmapManager::Get()->pointEdit16, wxNullBitmap, wxITEM_CHECK, _("Edit the image\'s point"), wxEmptyString, NULL);
 	toolbar->AddSeparator();
 	toolbar->AddTool(ID_AUITOOLBARITEM4, _("Preview"), gd::SkinHelper::GetIcon("preview", 16), wxNullBitmap, wxITEM_NORMAL, _("Preview"), wxEmptyString, NULL);
@@ -1307,13 +1307,15 @@ void SpriteObjectEditor::OnpointsListItemActivated(wxListEvent& event)
             imagePanel->Refresh();
             imagePanel->Update();
             return;
+        } else {
+        	for (unsigned int i = 0;i<sprites.size();++i) sprites[i]->SetDefaultCenterPoint(false);
         }
     }
 
     Point & point = sprites[0]->GetPoint(pointName);
 
-    gd::String x_str = wxGetTextFromUser(_("Enter the X position of the point ( regarding the image )."), "Position X du point",ToString(point.GetX()));
-    gd::String y_str = wxGetTextFromUser(_("Enter the Y position of the point ( regarding the image )."), "Position Y du point",ToString(point.GetY()));
+    gd::String x_str = wxGetTextFromUser(_("Enter the X position of the point (relative to the image)."), "X position of the point",ToString(point.GetX()));
+    gd::String y_str = wxGetTextFromUser(_("Enter the Y position of the point (relative to the image)."), "Y position of the point",ToString(point.GetY()));
 
     point.SetX(x_str.ToInt());
     point.SetY(y_str.ToInt());

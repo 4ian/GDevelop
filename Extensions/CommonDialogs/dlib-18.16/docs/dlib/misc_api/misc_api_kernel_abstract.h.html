@@ -1,0 +1,153 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - misc_api_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2004  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_MISC_API_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_MISC_API_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>/*!
+        GENERAL COMMENTS
+            This file just contains miscellaneous api functions
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='sleep'></a>sleep</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> milliseconds
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - causes the calling thread to sleep for the given number of 
+              milliseconds.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    std::string <b><a name='get_current_dir'></a>get_current_dir</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - if (no errors occur) then
+                - returns the path to the current working directory
+            - else
+                - returns ""
+        throws
+            - std::bad_alloc
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='set_current_dir_error'></a>set_current_dir_error</b> : <font color='#0000FF'>public</font> error;
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='set_current_dir'></a>set_current_dir</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> new_dir
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - sets the current working directory to new_dir
+        throws
+            - std::bad_alloc
+            - set_current_dir_error
+              This exception is thrown if there is an error when attempting
+              to change the current working directory.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='locally_change_current_dir'></a>locally_change_current_dir</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a RAII tool for safely switching the current directory
+                to a new directory and then automatically switching back to the original
+                directory upon this object's destruction.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>explicit</font> <b><a name='locally_change_current_dir'></a>locally_change_current_dir</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> new_dir
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - calls set_current_dir(new_dir)
+                - #old_dir() == The value of get_current_dir() prior to switching to new_dir.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='old_dir'></a>old_dir</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the directory we switch back to once this object is destructed.
+        !*/</font>
+
+        ~<b><a name='locally_change_current_dir'></a>locally_change_current_dir</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - calls set_current_dir(old_dir())
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='dir_create_error'></a>dir_create_error</b> : <font color='#0000FF'>public</font> error <b>{</b> 
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>const</font> std::string name
+    <b>}</b>; 
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='create_directory'></a>create_directory</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> dir
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - if (dir does not already exist) then
+                - creates the given directory.
+            - else
+                - the call to create_directory() has no effect.
+        throws
+            - dir_create_error
+                This exception is thrown if we were unable to create the requested
+                directory and it didn't already exist.  The type member of the exception 
+                will bet set to EDIR_CREATE and the name member will be set to dir.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='timestamper'></a>timestamper</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a timer that is capable of returning 
+                timestamps.
+
+                Note that the time is measured in microseconds but you are not 
+                guaranteed to have that level of resolution.  The actual resolution
+                is implementation dependent.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        uint64 <b><a name='get_timestamp'></a>get_timestamp</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a timestamp that measures the time in microseconds since an 
+                  arbitrary point in the past.  Note that this arbitrary point remains
+                  the same between all calls to get_timestamp().
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MISC_API_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

@@ -54,7 +54,7 @@ public:
      * \brief Return the type of the instruction.
      * \return The type of the instruction
      */
-    gd::String GetType() const { return type; }
+    const gd::String & GetType() const { return type; }
 
     /**
      * \brief Change the instruction type
@@ -152,10 +152,3 @@ private:
 }
 
 #endif // INSTRUCTION_H
-
-
-
-
-
-
-

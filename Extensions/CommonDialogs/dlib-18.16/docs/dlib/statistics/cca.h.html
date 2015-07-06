@@ -1,0 +1,189 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - cca.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_CCA_hh_
+<font color='#0000FF'>#define</font> DLIB_CCA_hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='cca_abstract.h.html'>cca_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sparse_vector.h.html'>../sparse_vector.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='random_subset_selector.h.html'>random_subset_selector.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T::type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='compute_correlations'></a>compute_correlations</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> L,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> R
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> L.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> R.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> L.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> R.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+            "<font color='#CC0000'>\t matrix compute_correlations()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t L.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> L.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t R.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> R.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t L.nr():   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> L.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t R.nr():   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> R.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type type;
+        matrix<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font> A, B, C;
+        A <font color='#5555FF'>=</font> <font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>R<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>L<font face='Lucida Console'>)</font>;
+        B <font color='#5555FF'>=</font> <font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>L<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>L<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        C <font color='#5555FF'>=</font> <font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>R<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>R<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        A <font color='#5555FF'>=</font> <font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font>A , <font color='#BB00BB'>reciprocal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font>B,C<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> A;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> matrix_type, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='impl_cca'></a>impl_cca</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_type<font color='#5555FF'>&amp;</font> L,
+        <font color='#0000FF'>const</font> matrix_type<font color='#5555FF'>&amp;</font> R,
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> Ltrans,
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> Rtrans,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_correlations,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> extra_rank,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> q,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_output_correlations,
+        <font color='#0000FF'><u>double</u></font> regularization
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> Ul, Vl;
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> Ur, Vr;
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> U, V;
+        matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> Dr, Dl, D;
+
+
+        <font color='#009900'>// Note that we add a few more singular vectors in because it helps improve the
+</font>        <font color='#009900'>// final results if we run this part with a little higher rank than the final SVD.
+</font>        <font color='#BB00BB'>svd_fast</font><font face='Lucida Console'>(</font>L, Ul, Dl, Vl, num_correlations<font color='#5555FF'>+</font>extra_rank, q<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>svd_fast</font><font face='Lucida Console'>(</font>R, Ur, Dr, Vr, num_correlations<font color='#5555FF'>+</font>extra_rank, q<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Zero out singular values that are essentially zero so they don't cause numerical
+</font>        <font color='#009900'>// difficulties in the code below.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> eps <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>Dr<font face='Lucida Console'>)</font>,<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>Dl<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>100</font>;
+        Dl <font color='#5555FF'>=</font> <font color='#BB00BB'>round_zeros</font><font face='Lucida Console'>(</font>Dl<font color='#5555FF'>+</font>regularization,eps<font face='Lucida Console'>)</font>;
+        Dr <font color='#5555FF'>=</font> <font color='#BB00BB'>round_zeros</font><font face='Lucida Console'>(</font>Dr<font color='#5555FF'>+</font>regularization,eps<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// This matrix is really small so we can do a normal full SVD on it.  Note that we
+</font>        <font color='#009900'>// also throw away the columns of Ul and Ur corresponding to zero singular values.
+</font>        <font color='#BB00BB'>svd3</font><font face='Lucida Console'>(</font><font color='#BB00BB'>diagm</font><font face='Lucida Console'>(</font>Dl<font color='#5555FF'>&gt;</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>tmp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>Ul<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>Ur<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>diagm</font><font face='Lucida Console'>(</font>Dr<font color='#5555FF'>&gt;</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, U, D, V<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now throw away extra columns of the transformations.  We do this in a way
+</font>        <font color='#009900'>// that keeps the directions that have the highest correlations.
+</font>        matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> temp <font color='#5555FF'>=</font> D;
+        <font color='#BB00BB'>rsort_columns</font><font face='Lucida Console'>(</font>U, temp<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>rsort_columns</font><font face='Lucida Console'>(</font>V, D<font face='Lucida Console'>)</font>;
+        U <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>U, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, num_output_correlations<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        V <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>V, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, num_output_correlations<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        D <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>D, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, num_output_correlations<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        Ltrans <font color='#5555FF'>=</font> Vl<font color='#5555FF'>*</font><font color='#BB00BB'>inv</font><font face='Lucida Console'>(</font><font color='#BB00BB'>diagm</font><font face='Lucida Console'>(</font>Dl<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>U;
+        Rtrans <font color='#5555FF'>=</font> Vr<font color='#5555FF'>*</font><font color='#BB00BB'>inv</font><font face='Lucida Console'>(</font><font color='#BB00BB'>diagm</font><font face='Lucida Console'>(</font>Dr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>V;
+
+        <font color='#009900'>// Note that the D matrix contains the correlation values for the transformed
+</font>        <font color='#009900'>// vectors.  However, when the L and R matrices have rank higher than
+</font>        <font color='#009900'>// num_correlations+extra_rank then the values in D become only approximate.
+</font>        <font color='#0000FF'>return</font> D; 
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='cca'></a>cca</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> L,
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> R,
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> Ltrans,
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> Rtrans,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_correlations,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> extra_rank <font color='#5555FF'>=</font> <font color='#979000'>5</font>,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> q <font color='#5555FF'>=</font> <font color='#979000'>2</font>,
+        <font color='#0000FF'><u>double</u></font> regularization <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> num_correlations <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> L.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> R.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> L.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> R.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            regularization <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>, 
+            "<font color='#CC0000'>\t matrix cca()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_correlations: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_correlations 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t regularization:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> regularization 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t L.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> L.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t R.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> R.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t L.nr():   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> L.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t R.nr():   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> R.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>using</font> std::min;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>num_correlations, <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>R.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>L.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, R.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>impl_cca</font><font face='Lucida Console'>(</font>L,R,Ltrans, Rtrans, num_correlations, extra_rank, q, n, regularization<font face='Lucida Console'>)</font>; 
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> sparse_vector_type, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='cca'></a>cca</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sparse_vector_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> L,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sparse_vector_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> R,
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> Ltrans,
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> Rtrans,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_correlations,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> extra_rank <font color='#5555FF'>=</font> <font color='#979000'>5</font>,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> q <font color='#5555FF'>=</font> <font color='#979000'>2</font>,
+        <font color='#0000FF'><u>double</u></font> regularization <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> num_correlations <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> L.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> R.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                     <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>L<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>R<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     regularization <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>, 
+            "<font color='#CC0000'>\t matrix cca()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_correlations: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_correlations 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t regularization:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> regularization 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t L.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> L.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t R.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> R.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_index_plus_one(L):   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>L<font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_index_plus_one(R):   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>R<font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>using</font> std::min;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>L<font face='Lucida Console'>)</font>, <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>R<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_output_correlations <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>num_correlations, std::min<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>R.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>impl_cca</font><font face='Lucida Console'>(</font>L,R,Ltrans, Rtrans, num_correlations, extra_rank, q, num_output_correlations, regularization<font face='Lucida Console'>)</font>; 
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> sparse_vector_type, <font color='#0000FF'>typename</font> Rand_type, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='cca'></a>cca</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> random_subset_selector<font color='#5555FF'>&lt;</font>sparse_vector_type,Rand_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> L,
+        <font color='#0000FF'>const</font> random_subset_selector<font color='#5555FF'>&lt;</font>sparse_vector_type,Rand_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> R,
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> Ltrans,
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> Rtrans,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_correlations,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> extra_rank <font color='#5555FF'>=</font> <font color='#979000'>5</font>,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> q <font color='#5555FF'>=</font> <font color='#979000'>2</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>cca</font><font face='Lucida Console'>(</font>L.<font color='#BB00BB'>to_std_vector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, R.<font color='#BB00BB'>to_std_vector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, Ltrans, Rtrans, num_correlations, extra_rank, q<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CCA_hh_
+</font>
+
+
+</pre></body></html>

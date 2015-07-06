@@ -209,7 +209,7 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     if (editingAction) invertBox->Show(false);
     RefreshList();
     Center();
-    SetSize(800, 600);
+    SetSize(-1, 600);
 }
 
 InstructionSelectorDialog::~InstructionSelectorDialog()
@@ -509,7 +509,7 @@ void InstructionSelectorDialog::OnOkBtClick(wxCommandEvent& event)
         if ( ParaFac.at(i)->IsShown() && !ParaFac.at(i)->GetValue())
             Param.push_back(gd::Expression("")); //Optional parameter not filled stay empty.
         else
-            Param.push_back(gd::Expression(ParaEdit.at(i)->GetValue()));
+            Param.push_back(gd::Expression(gd::String(ParaEdit.at(i)->GetValue())));
     }
 
     isInverted = editingAction ? false : invertedCheck->GetValue();

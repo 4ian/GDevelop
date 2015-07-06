@@ -1,0 +1,617 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - kcentroid.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_KCENTROId_
+<font color='#0000FF'>#define</font> DLIB_KCENTROId_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kcentroid_abstract.h.html'>kcentroid_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='function.h.html'>function.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../std_allocator.h.html'>../std_allocator.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='kcentroid'></a>kcentroid</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            This object represents a weighted sum of sample points in a kernel induced
+            feature space.  It can be used to kernelize any algorithm that requires only
+            the ability to perform vector addition, subtraction, scalar multiplication,
+            and inner products.  It uses the sparsification technique described in the 
+            paper The Kernel Recursive Least Squares Algorithm by Yaakov Engel.
+
+            To understand the code it would also be useful to consult page 114 of the book 
+            Kernel Methods for Pattern Analysis by Taylor and Cristianini as well as page 554 
+            (particularly equation 18.31) of the book Learning with Kernels by Scholkopf and 
+            Smola.  Everything you really need to know is in the Engel paper.  But the other 
+            books help give more perspective on the issues involved.
+
+
+            INITIAL VALUE
+                - min_strength == 0
+                - min_vect_idx == 0
+                - K_inv.size() == 0
+                - K.size() == 0
+                - dictionary.size() == 0
+                - bias == 0
+                - bias_is_stale == false
+
+            CONVENTION
+                - max_dictionary_size() == my_max_dictionary_size
+                - get_kernel() == kernel
+
+                - K.nr() == dictionary.size()
+                - K.nc() == dictionary.size()
+                - for all valid r,c:
+                    - K(r,c) == kernel(dictionary[r], dictionary[c])
+                - K_inv == inv(K)
+
+                - if (dictionary.size() == my_max_dictionary_size &amp;&amp; my_remove_oldest_first == false) then
+                    - for all valid 0 &lt; i &lt; dictionary.size():
+                        - Let STRENGTHS[i] == the delta you would get for dictionary[i] (i.e. Approximately 
+                          Linearly Dependent value) if you removed dictionary[i] from this object and then 
+                          tried to add it back in.
+                        - min_strength == the minimum value from STRENGTHS
+                        - min_vect_idx == the index of the element in STRENGTHS with the smallest value
+
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mem_manager_type;
+
+        <b><a name='kcentroid'></a>kcentroid</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> : 
+            my_remove_oldest_first<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+            my_tolerance<font face='Lucida Console'>(</font><font color='#979000'>0.001</font><font face='Lucida Console'>)</font>,
+            my_max_dictionary_size<font face='Lucida Console'>(</font><font color='#979000'>1000000</font><font face='Lucida Console'>)</font>,
+            bias<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            bias_is_stale<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>clear_dictionary</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>explicit</font> <b><a name='kcentroid'></a>kcentroid</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> kernel_, 
+            scalar_type tolerance_ <font color='#5555FF'>=</font> <font color='#979000'>0.001</font>,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_dictionary_size_ <font color='#5555FF'>=</font> <font color='#979000'>1000000</font>,
+            <font color='#0000FF'><u>bool</u></font> remove_oldest_first_ <font color='#5555FF'>=</font> <font color='#979000'>false</font> 
+        <font face='Lucida Console'>)</font> : 
+            my_remove_oldest_first<font face='Lucida Console'>(</font>remove_oldest_first_<font face='Lucida Console'>)</font>,
+            kernel<font face='Lucida Console'>(</font>kernel_<font face='Lucida Console'>)</font>, 
+            my_tolerance<font face='Lucida Console'>(</font>tolerance_<font face='Lucida Console'>)</font>,
+            my_max_dictionary_size<font face='Lucida Console'>(</font>max_dictionary_size_<font face='Lucida Console'>)</font>,
+            bias<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            bias_is_stale<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>tolerance_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> max_dictionary_size_ <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font>,
+                "<font color='#CC0000'>\tkcentroid::kcentroid()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You have to give a positive tolerance</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this:                 </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t tolerance_:           </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> tolerance_ 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_dictionary_size_: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> max_dictionary_size_ 
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>clear_dictionary</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        scalar_type <b><a name='tolerance'></a>tolerance</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> my_tolerance;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='max_dictionary_size'></a>max_dictionary_size</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> my_max_dictionary_size;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='remove_oldest_first'></a>remove_oldest_first</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> my_remove_oldest_first;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> <b><a name='get_kernel'></a>get_kernel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> kernel;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear_dictionary'></a>clear_dictionary</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            dictionary.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            alpha.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            min_strength <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            min_vect_idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            K_inv.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            K.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            samples_seen <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            bias <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            bias_is_stale <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kcentroid<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>x.<font color='#BB00BB'>get_kernel</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>get_kernel</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\tscalar_type kcentroid::operator()(const kcentroid&amp; x)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can only compare two kcentroid objects if they use the same kernel</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// make sure the bias terms are up to date
+</font>            <font color='#BB00BB'>refresh_bias</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            x.<font color='#BB00BB'>refresh_bias</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            scalar_type temp <font color='#5555FF'>=</font> x.bias <font color='#5555FF'>+</font> bias <font color='#5555FF'>-</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#BB00BB'>inner_product</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        scalar_type <b><a name='inner_product'></a>inner_product</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            scalar_type temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>; 
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> alpha[i]<font color='#5555FF'>*</font><font color='#BB00BB'>kernel</font><font face='Lucida Console'>(</font>dictionary[i], x<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+        scalar_type <b><a name='inner_product'></a>inner_product</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kcentroid<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>x.<font color='#BB00BB'>get_kernel</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>get_kernel</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\tscalar_type kcentroid::inner_product(const kcentroid&amp; x)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can only compare two kcentroid objects if they use the same kernel</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            scalar_type temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>; 
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> x.alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> alpha[i]<font color='#5555FF'>*</font>x.alpha[j]<font color='#5555FF'>*</font><font color='#BB00BB'>kernel</font><font face='Lucida Console'>(</font>dictionary[i], x.dictionary[j]<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+        scalar_type <b><a name='squared_norm'></a>squared_norm</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#BB00BB'>refresh_bias</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> bias;
+        <b>}</b>
+
+        scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure the bias terms are up to date
+</font>            <font color='#BB00BB'>refresh_bias</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> scalar_type kxx <font color='#5555FF'>=</font> <font color='#BB00BB'>kernel</font><font face='Lucida Console'>(</font>x,x<font face='Lucida Console'>)</font>;
+
+            scalar_type temp <font color='#5555FF'>=</font> kxx <font color='#5555FF'>+</font> bias <font color='#5555FF'>-</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#BB00BB'>inner_product</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        scalar_type <b><a name='samples_trained'></a>samples_trained</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> samples_seen;
+        <b>}</b>
+
+        scalar_type <b><a name='test_and_train'></a>test_and_train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>samples_seen;
+            <font color='#0000FF'>const</font> scalar_type xscale <font color='#5555FF'>=</font> <font color='#979000'>1</font><font color='#5555FF'>/</font>samples_seen;
+            <font color='#0000FF'>const</font> scalar_type cscale <font color='#5555FF'>=</font> <font color='#979000'>1</font><font color='#5555FF'>-</font>xscale;
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>train_and_maybe_test</font><font face='Lucida Console'>(</font>x,cscale,xscale,<font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>samples_seen;
+            <font color='#0000FF'>const</font> scalar_type xscale <font color='#5555FF'>=</font> <font color='#979000'>1</font><font color='#5555FF'>/</font>samples_seen;
+            <font color='#0000FF'>const</font> scalar_type cscale <font color='#5555FF'>=</font> <font color='#979000'>1</font><font color='#5555FF'>-</font>xscale;
+            <font color='#BB00BB'>train_and_maybe_test</font><font face='Lucida Console'>(</font>x,cscale,xscale,<font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        scalar_type <b><a name='test_and_train'></a>test_and_train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x,
+            scalar_type cscale,
+            scalar_type xscale
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>samples_seen;
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>train_and_maybe_test</font><font face='Lucida Console'>(</font>x,cscale,xscale,<font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='scale_by'></a>scale_by</b> <font face='Lucida Console'>(</font>
+            scalar_type cscale
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                alpha[i] <font color='#5555FF'>=</font> cscale<font color='#5555FF'>*</font>alpha[i];
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x,
+            scalar_type cscale,
+            scalar_type xscale
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>samples_seen;
+            <font color='#BB00BB'>train_and_maybe_test</font><font face='Lucida Console'>(</font>x,cscale,xscale,<font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            kcentroid<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>min_strength, item.min_strength<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>min_vect_idx, item.min_vect_idx<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>my_remove_oldest_first, item.my_remove_oldest_first<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>kernel, item.kernel<font face='Lucida Console'>)</font>;
+            dictionary.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.dictionary<font face='Lucida Console'>)</font>;
+            alpha.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.alpha<font face='Lucida Console'>)</font>;
+            K_inv.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.K_inv<font face='Lucida Console'>)</font>;
+            K.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.K<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>my_tolerance, item.my_tolerance<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>samples_seen, item.samples_seen<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>bias, item.bias<font face='Lucida Console'>)</font>;
+            a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.a<font face='Lucida Console'>)</font>;
+            k.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.k<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>bias_is_stale, item.bias_is_stale<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>my_max_dictionary_size, item.my_max_dictionary_size<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='dictionary_size'></a>dictionary_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> dictionary.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> kcentroid<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.min_strength, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.min_vect_idx, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.my_remove_oldest_first, out<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.kernel, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.dictionary, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.alpha, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.K_inv, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.K, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.my_tolerance, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.samples_seen, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.bias, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.bias_is_stale, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.my_max_dictionary_size, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>kcentroid<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.min_strength, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.min_vect_idx, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.my_remove_oldest_first, in<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.kernel, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.dictionary, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.alpha, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.K_inv, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.K, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.my_tolerance, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.samples_seen, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.bias, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.bias_is_stale, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.my_max_dictionary_size, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        distance_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='get_distance_function'></a>get_distance_function</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#BB00BB'>refresh_bias</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> distance_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font>,
+                                                  bias, 
+                                                  kernel, 
+                                                  <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>dictionary<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='refresh_bias'></a>refresh_bias</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bias_is_stale<font face='Lucida Console'>)</font>
+            <b>{</b>
+                bias_is_stale <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <font color='#009900'>// recompute the bias term
+</font>                bias <font color='#5555FF'>=</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        scalar_type <b><a name='train_and_maybe_test'></a>train_and_maybe_test</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x,
+            scalar_type cscale,
+            scalar_type xscale,
+            <font color='#0000FF'><u>bool</u></font> do_test
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            scalar_type test_result <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>const</font> scalar_type kx <font color='#5555FF'>=</font> <font color='#BB00BB'>kernel</font><font face='Lucida Console'>(</font>x,x<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// just ignore this sample if it is the zero vector (or really close to being zero)
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>kx<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> std::numeric_limits<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// set initial state since this is the first training example we have seen
+</font>
+                    K_inv.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>K_inv</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font><font color='#5555FF'>/</font>kx;
+                    K.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>K</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> kx;
+
+                    alpha.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>xscale<font face='Lucida Console'>)</font>;
+                    dictionary.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// the distance from an empty kcentroid and the zero vector is zero by definition.
+</font>                    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// fill in k
+</font>                k.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> k.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>k</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>kernel</font><font face='Lucida Console'>(</font>x,dictionary[r]<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>do_test<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>refresh_bias</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    test_result <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>kx <font color='#5555FF'>+</font> bias <font color='#5555FF'>-</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>k<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#009900'>// compute the error we would have if we approximated the new x sample
+</font>                <font color='#009900'>// with the dictionary.  That is, do the ALD test from the KRLS paper.
+</font>                a <font color='#5555FF'>=</font> K_inv<font color='#5555FF'>*</font>k;
+                scalar_type delta <font color='#5555FF'>=</font> kx <font color='#5555FF'>-</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>a;
+
+                <font color='#009900'>// if this new vector isn't approximately linearly dependent on the vectors
+</font>                <font color='#009900'>// in our dictionary.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>delta <font color='#5555FF'>&gt;</font> min_strength <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> delta <font color='#5555FF'>&gt;</font> my_tolerance<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'><u>bool</u></font> need_to_update_min_strength <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dictionary.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> my_max_dictionary_size<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#009900'>// We need to remove one of the old members of the dictionary before
+</font>                        <font color='#009900'>// we proceed with adding a new one.  
+</font>                        <font color='#0000FF'><u>long</u></font> idx_to_remove;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>my_remove_oldest_first<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#009900'>// remove the oldest one
+</font>                            idx_to_remove <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            <font color='#009900'>// if we have never computed the min_strength then we should compute it 
+</font>                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>min_strength <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                                <font color='#BB00BB'>recompute_min_strength</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                            <font color='#009900'>// select the dictionary vector that is most linearly dependent for removal
+</font>                            idx_to_remove <font color='#5555FF'>=</font> min_vect_idx;
+                            need_to_update_min_strength <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                        <b>}</b>
+
+                        <font color='#BB00BB'>remove_dictionary_vector</font><font face='Lucida Console'>(</font>idx_to_remove<font face='Lucida Console'>)</font>;
+
+                        <font color='#009900'>// recompute these guys since they were computed with the old
+</font>                        <font color='#009900'>// kernel matrix
+</font>                        k <font color='#5555FF'>=</font> <font color='#BB00BB'>remove_row</font><font face='Lucida Console'>(</font>k,idx_to_remove<font face='Lucida Console'>)</font>;
+                        a <font color='#5555FF'>=</font> K_inv<font color='#5555FF'>*</font>k;
+                        delta <font color='#5555FF'>=</font> kx <font color='#5555FF'>-</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>a;
+                    <b>}</b>
+
+                    <font color='#009900'>// add x to the dictionary
+</font>                    dictionary.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+
+
+                    <font color='#009900'>// update K_inv by computing the new one in the temp matrix (equation 3.14)
+</font>                    matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>K_inv.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font>, K_inv.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#009900'>// update the middle part of the matrix
+</font>                    <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>temp, <font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>K_inv<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> K_inv <font color='#5555FF'>+</font> a<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>delta;
+                    <font color='#009900'>// update the right column of the matrix
+</font>                    <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>temp, <font color='#979000'>0</font>, K_inv.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,K_inv.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>a<font color='#5555FF'>/</font>delta;
+                    <font color='#009900'>// update the bottom row of the matrix
+</font>                    <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>temp, K_inv.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>, K_inv.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>a<font color='#5555FF'>/</font>delta<font face='Lucida Console'>)</font>;
+                    <font color='#009900'>// update the bottom right corner of the matrix
+</font>                    <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>K_inv.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, K_inv.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font><font color='#5555FF'>/</font>delta;
+                    <font color='#009900'>// put temp into K_inv
+</font>                    temp.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>K_inv<font face='Lucida Console'>)</font>;
+
+
+
+                    <font color='#009900'>// update K (the kernel matrix)
+</font>                    temp.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>K.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font>, K.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>temp, <font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>K<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> K;
+                    <font color='#009900'>// update the right column of the matrix
+</font>                    <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>temp, <font color='#979000'>0</font>, K.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,K.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> k;
+                    <font color='#009900'>// update the bottom row of the matrix
+</font>                    <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>temp, K.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>, K.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>K.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, K.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> kx;
+                    <font color='#009900'>// put temp into K
+</font>                    temp.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>K<font face='Lucida Console'>)</font>;
+
+
+                    <font color='#009900'>// now update the alpha vector 
+</font>                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        alpha[i] <font color='#5555FF'>*</font><font color='#5555FF'>=</font> cscale;
+                    <b>}</b>
+                    alpha.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>xscale<font face='Lucida Console'>)</font>;
+
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>need_to_update_min_strength<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#009900'>// now we have to recompute the min_strength in this case
+</font>                        <font color='#BB00BB'>recompute_min_strength</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// update the alpha vector so that this new sample has been added into
+</font>                    <font color='#009900'>// the mean vector we are accumulating
+</font>                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        alpha[i] <font color='#5555FF'>=</font> cscale<font color='#5555FF'>*</font>alpha[i] <font color='#5555FF'>+</font> xscale<font color='#5555FF'>*</font><font color='#BB00BB'>a</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+            bias_is_stale <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            
+            <font color='#0000FF'>return</font> test_result;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='remove_dictionary_vector'></a>remove_dictionary_vector</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> i
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= i &lt; dictionary.size()
+            ensures
+                - #dictionary.size() == dictionary.size() - 1
+                - #alpha.size() == alpha.size() - 1
+                - updates the K_inv matrix so that it is still a proper inverse of the
+                  kernel matrix
+                - also removes the necessary row and column from the K matrix
+                - uses the this-&gt;a variable so after this function runs that variable
+                  will contain a different value.  
+        !*/</font>
+        <b>{</b>
+            <font color='#009900'>// remove the dictionary vector 
+</font>            dictionary.<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font>dictionary.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// remove the i'th vector from the inverse kernel matrix.  This formula is basically
+</font>            <font color='#009900'>// just the reverse of the way K_inv is updated by equation 3.14 during normal training.
+</font>            K_inv <font color='#5555FF'>=</font> <font color='#BB00BB'>removerc</font><font face='Lucida Console'>(</font>K_inv,i,i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>remove_row</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>K_inv,i<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#BB00BB'>K_inv</font><font face='Lucida Console'>(</font>i,i<font face='Lucida Console'>)</font>,i<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>remove_col</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>K_inv,i<font face='Lucida Console'>)</font>,i<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now compute the updated alpha values to take account that we just removed one of 
+</font>            <font color='#009900'>// our dictionary vectors
+</font>            a <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>K_inv<font color='#5555FF'>*</font><font color='#BB00BB'>remove_row</font><font face='Lucida Console'>(</font>K,i<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now copy over the new alpha values
+</font>            alpha.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+            <b>{</b>
+                alpha[k] <font color='#5555FF'>=</font> <font color='#BB00BB'>a</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>// update the K matrix as well
+</font>            K <font color='#5555FF'>=</font> <font color='#BB00BB'>removerc</font><font face='Lucida Console'>(</font>K,i,i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='recompute_min_strength'></a>recompute_min_strength</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            ensures
+                - recomputes the min_strength and min_vect_idx values
+                  so that they are correct with respect to the CONVENTION
+                - uses the this-&gt;a variable so after this function runs that variable
+                  will contain a different value.  
+        !*/</font>
+        <b>{</b>
+            min_strength <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// here we loop over each dictionary vector and compute what its delta would be if
+</font>            <font color='#009900'>// we were to remove it from the dictionary and then try to add it back in.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dictionary.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// compute a = K_inv*k but where dictionary vector i has been removed
+</font>                a <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>removerc</font><font face='Lucida Console'>(</font>K_inv,i,i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>remove_row</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>K_inv,i<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#BB00BB'>K_inv</font><font face='Lucida Console'>(</font>i,i<font face='Lucida Console'>)</font>,i<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>remove_col</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>K_inv,i<font face='Lucida Console'>)</font>,i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font>
+                    <font face='Lucida Console'>(</font><font color='#BB00BB'>remove_row</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>K,i<font face='Lucida Console'>)</font>,i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                scalar_type delta <font color='#5555FF'>=</font> <font color='#BB00BB'>K</font><font face='Lucida Console'>(</font>i,i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>remove_row</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>K,i<font face='Lucida Console'>)</font>,i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>a;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>delta <font color='#5555FF'>&lt;</font> min_strength<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    min_strength <font color='#5555FF'>=</font> delta;
+                    min_vect_idx <font color='#5555FF'>=</font> i;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+
+
+        <font color='#0000FF'>typedef</font> std_allocator<font color='#5555FF'>&lt;</font>sample_type, mem_manager_type<font color='#5555FF'>&gt;</font> alloc_sample_type;
+        <font color='#0000FF'>typedef</font> std_allocator<font color='#5555FF'>&lt;</font>scalar_type, mem_manager_type<font color='#5555FF'>&gt;</font> alloc_scalar_type;
+        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>sample_type,alloc_sample_type<font color='#5555FF'>&gt;</font> dictionary_vector_type;
+        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>scalar_type,alloc_scalar_type<font color='#5555FF'>&gt;</font> alpha_vector_type;
+
+
+        scalar_type min_strength;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> min_vect_idx;
+        <font color='#0000FF'><u>bool</u></font> my_remove_oldest_first;
+
+        kernel_type kernel;
+        dictionary_vector_type dictionary;
+        alpha_vector_type alpha;
+
+        matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type<font color='#5555FF'>&gt;</font> K_inv;
+        matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type<font color='#5555FF'>&gt;</font> K;
+
+        scalar_type my_tolerance;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> my_max_dictionary_size;
+        scalar_type samples_seen;
+        <font color='#0000FF'>mutable</font> scalar_type bias;
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>bool</u></font> bias_is_stale;
+
+
+        <font color='#009900'>// temp variables here just so we don't have to reconstruct them over and over.  Thus, 
+</font>        <font color='#009900'>// they aren't really part of the state of this object.
+</font>        matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font> a;
+        matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font> k;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font>
+    <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_KCENTROId_
+</font>
+
+</pre></body></html>

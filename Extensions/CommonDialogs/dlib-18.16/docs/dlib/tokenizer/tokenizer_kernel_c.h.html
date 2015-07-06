@@ -1,0 +1,170 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - tokenizer_kernel_c.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_TOKENIZER_KERNEl_C_
+<font color='#0000FF'>#define</font> DLIB_TOKENIZER_KERNEl_C_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tokenizer_kernel_abstract.h.html'>tokenizer_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='tokenizer_kernel_c'></a>tokenizer_kernel_c</b> : <font color='#0000FF'>public</font> tokenizer
+    <b>{</b>
+        
+        <font color='#0000FF'>public</font>:
+            std::istream<font color='#5555FF'>&amp;</font> <b><a name='get_stream'></a>get_stream</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='get_token'></a>get_token</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> type,
+                std::string<font color='#5555FF'>&amp;</font> token
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_identifier_token'></a>set_identifier_token</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> head,
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> body
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>int</u></font> <b><a name='peek_type'></a>peek_type</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='peek_token'></a>peek_token</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        tokenizer_kernel_c<font color='#5555FF'>&lt;</font>tokenizer<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        tokenizer_kernel_c<font color='#5555FF'>&lt;</font>tokenizer<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>  
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> tokenizer_kernel_c<font color='#5555FF'>&lt;</font>tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='set_identifier_token'></a>set_identifier_token</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> head,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> body
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> head.<font color='#BB00BB'>find_first_of</font><font face='Lucida Console'>(</font>"<font color='#CC0000'> \r\t\n0123456789</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> string::npos <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                body.<font color='#BB00BB'>find_first_of</font><font face='Lucida Console'>(</font>"<font color='#CC0000'> \r\t\n</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> string::npos ,
+            "<font color='#CC0000'>\tvoid tokenizer::set_identifier_token()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tyou can't define the IDENTIFIER token this way.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\thead: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> head
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tbody: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> body
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        tokenizer::<font color='#BB00BB'>set_identifier_token</font><font face='Lucida Console'>(</font>head,body<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    std::istream<font color='#5555FF'>&amp;</font> tokenizer_kernel_c<font color='#5555FF'>&lt;</font>tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_stream'></a>get_stream</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>stream_is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\tstd::istream&amp; tokenizer::get_stream()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tyou must set a stream for this object before you can get it</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#0000FF'>return</font> tokenizer::<font color='#BB00BB'>get_stream</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>int</u></font> tokenizer_kernel_c<font color='#5555FF'>&lt;</font>tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='peek_type'></a>peek_type</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>stream_is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\tint tokenizer::peek_type()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tyou must set a stream for this object before you peek at what it contains</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#0000FF'>return</font> tokenizer::<font color='#BB00BB'>peek_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> tokenizer_kernel_c<font color='#5555FF'>&lt;</font>tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='peek_token'></a>peek_token</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>stream_is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\tint tokenizer::peek_token()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tyou must set a stream for this object before you peek at what it contains</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#0000FF'>return</font> tokenizer::<font color='#BB00BB'>peek_token</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> tokenizer_kernel_c<font color='#5555FF'>&lt;</font>tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_token'></a>get_token</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> type,
+        std::string<font color='#5555FF'>&amp;</font> token
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>stream_is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\tvoid tokenizer::get_token()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tyou must set a stream for this object before you can get tokens from it.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        tokenizer::<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_TOKENIZER_KERNEl_C_
+</font>
+
+
+</pre></body></html>

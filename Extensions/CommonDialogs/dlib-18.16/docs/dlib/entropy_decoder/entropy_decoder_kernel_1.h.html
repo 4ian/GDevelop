@@ -1,0 +1,135 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - entropy_decoder_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_ENTROPY_DECODER_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_ENTROPY_DECODER_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='entropy_decoder_kernel_abstract.h.html'>entropy_decoder_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iosfwd<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='entropy_decoder_kernel_1'></a>entropy_decoder_kernel_1</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            GENERAL NOTES
+                this decoder is implemented using arithmetic coding
+
+            INITIAL VALUE
+                in       == 0
+                buf_used == 0
+                buf      == 0
+                initial_low      == 0x00000001  (slightly more than zero)
+                initial_high     == 0xffffffff  (slightly less than one, 0.99999999976717)
+                target   == 0x00000000  (zero)
+                low      == initial_low
+                high     == initial_high
+                r        == 0
+
+            CONVENTION
+                if (in != 0)
+                    *in       == get_stream()
+                    true      == stream_is_set()
+                    streambuf == in-&gt;rdbuf()
+                else
+                    false   == stream_is_set()
+
+                buf      == used to hold fractional byte values which are fed to target.  
+                buf_used == the number of low order bits in buf that are currently 
+                            in use
+                low      == the low end of the range used for arithmetic encoding.
+                            this number is used as a 32bit fixed point real number. 
+                            the point is fixed just before the first bit, so it is
+                            always in the range [0,1)
+
+                            low is also never allowed to be zero to avoid overflow
+                            in the calculation (high-low+1)/total.
+
+                high     == the high end of the range - 1 used for arithmetic encoding.
+                            this number is used as a 32bit fixed point real number. 
+                            the point is fixed just before the first bit, so when we
+                            interpret high as a real number then it is always in the
+                            range [0,1)
+
+                            the range for arithmetic encoding is always 
+                            [low,high + 0.9999999...)   the 0.9999999... is why
+                            high == real upper range - 1
+
+                target  ==  32 bits of the fraction produced from an arithmetic encoder.
+                            this number is used as a 32bit fixed point real number. 
+                            the point is fixed just before the first bit, so it is
+                            always in the range [0,1)      
+
+                r       ==  the value (high-low+1)/total from the last call to 
+                            get_target() or 0 if get_target_called() should be false
+
+                get_target_called() == (r != 0)
+
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='entropy_decoder_kernel_1'></a>entropy_decoder_kernel_1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='entropy_decoder_kernel_1'></a>entropy_decoder_kernel_1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_stream'></a>set_stream</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='stream_is_set'></a>stream_is_set</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        std::istream<font color='#5555FF'>&amp;</font> <b><a name='get_stream'></a>get_stream</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='decode'></a>decode</b> <font face='Lucida Console'>(</font>
+            uint32 low_count,
+            uint32 high_count
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='get_target_called'></a>get_target_called</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        uint32 <b><a name='get_target'></a>get_target</b> <font face='Lucida Console'>(</font>
+            uint32 total
+        <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='entropy_decoder_kernel_1'></a>entropy_decoder_kernel_1</b><font face='Lucida Console'>(</font>entropy_decoder_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        entropy_decoder_kernel_1<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>entropy_decoder_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+        <font color='#009900'>// data members
+</font>        <font color='#0000FF'>const</font> uint32 initial_low;
+        <font color='#0000FF'>const</font> uint32 initial_high;
+        std::istream<font color='#5555FF'>*</font> in;
+        uint32 low;
+        uint32 high;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> buf; 
+        uint32 buf_used; 
+        uint32 target;
+        uint32 r;
+        std::streambuf<font color='#5555FF'>*</font> streambuf;
+
+    <b>}</b>;   
+
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='entropy_decoder_kernel_1.cpp.html'>entropy_decoder_kernel_1.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ENTROPY_DECODER_KERNEl_1_
+</font>
+
+</pre></body></html>

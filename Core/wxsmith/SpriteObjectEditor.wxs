@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="SpriteObjectEditor">
-		<title>Edition of a Sprite object</title>
+		<title>Edit the Sprite object</title>
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX</style>
 		<object class="wxAuiManager" variable="mgr" member="yes">
@@ -27,11 +27,11 @@
 													<object class="AuiToolBarItem">
 														<object class="wxAuiToolBarItem" name="ID_MASKITEM" variable="maskItem_" member="yes">
 															<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;maskEdit16" />
-															<shorthelp>Edit the collision masks ( Hit boxes )</shorthelp>
+															<shorthelp>Edit the collision masks (hitbox)</shorthelp>
 															<itemkind>Check</itemkind>
 															<handler function="OnMaskEditClick" entry="EVT_TOOL" />
 														</object>
-														<label>Edit the collision masks ( Hit boxes )</label>
+														<label>Edit the collision masks (hitbox)</label>
 													</object>
 													<object class="AuiToolBarItem">
 														<object class="wxAuiToolBarItem" name="ID_POINTSITEM" variable="pointsItem_" member="yes">

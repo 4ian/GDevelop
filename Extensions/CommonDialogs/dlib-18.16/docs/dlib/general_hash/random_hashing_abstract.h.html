@@ -1,0 +1,61 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - random_hashing_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_RANDOM_HAsHING_ABSTRACT_Hh_ 
+<font color='#0000FF'>#ifdef</font> DLIB_RANDOM_HAsHING_ABSTRACT_Hh_ 
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='random_hashing_abstract.h.html'>random_hashing_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='murmur_hash3.h.html'>murmur_hash3.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='uniform_random_hash'></a>uniform_random_hash</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> uint64<font color='#5555FF'>&amp;</font> k1,
+        <font color='#0000FF'>const</font> uint64<font color='#5555FF'>&amp;</font> k2,
+        <font color='#0000FF'>const</font> uint64<font color='#5555FF'>&amp;</font> k3
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - This function uses hashing to generate uniform random values in the range [0,1).
+            - To define this function precisely, assume we have an arbitrary sequence of
+              input triplets.  Then calling uniform_random_hash() on each of them should
+              result in a sequence of double values that look like numbers sampled
+              independently and uniformly at random from the interval [0,1).  This is true
+              even if there is some simple pattern in the inputs.  For example, (0,0,0),
+              (1,0,0), (2,0,0), (3,0,0), etc.
+            - This function is deterministic.  That is, the same output is always returned
+              when given the same input.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='gaussian_random_hash'></a>gaussian_random_hash</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> uint64<font color='#5555FF'>&amp;</font> k1,
+        <font color='#0000FF'>const</font> uint64<font color='#5555FF'>&amp;</font> k2,
+        <font color='#0000FF'>const</font> uint64<font color='#5555FF'>&amp;</font> k3
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - This function uses hashing to generate Gaussian distributed random values
+              with mean 0 and variance 1.  
+            - To define this function precisely, assume we have an arbitrary sequence of
+              input triplets.  Then calling gaussian_random_hash() on each of them should
+              result in a sequence of double values that look like numbers sampled
+              independently from a standard normal distribution.  This is true even if
+              there is some simple pattern in the inputs.  For example, (0,0,0), (1,0,0),
+              (2,0,0), (3,0,0), etc.
+            - This function is deterministic.  That is, the same output is always returned
+              when given the same input.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_RANDOM_HAsHING_ABSTRACT_Hh_
+</font>
+
+</pre></body></html>

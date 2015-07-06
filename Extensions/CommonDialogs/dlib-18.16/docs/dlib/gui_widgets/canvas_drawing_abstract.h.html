@@ -1,0 +1,367 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - canvas_drawing_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net), and Nils Labugt
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_GUI_CANVAS_DRAWINg_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_GUI_CANVAS_DRAWINg_ABSTRACT_ 
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../gui_core.h.html'>../gui_core.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> pixel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_line'></a>draw_line</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p1,
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p2,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>infinity,<font color='#5555FF'>-</font>infinity,infinity,infinity<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - pixel_traits&lt;pixel_type&gt; is defined
+        ensures
+            - draws the part of the line from p1 to p1 that overlaps with
+              the canvas and area onto the canvas.  
+            - Uses the given pixel color.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> pixel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_rectangle'></a>draw_rectangle</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        rectangle rect,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>infinity,<font color='#5555FF'>-</font>infinity,infinity,infinity<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - pixel_traits&lt;pixel_type&gt; is defined
+        ensures
+            - Draws the part of the rectangle that overlaps with
+              the canvas and area onto the canvas.  
+            - Uses the given pixel color.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> pixel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_circle'></a>draw_circle</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> center_point,
+        <font color='#0000FF'><u>double</u></font> radius,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>infinity,<font color='#5555FF'>-</font>infinity,infinity,infinity<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - pixel_traits&lt;pixel_type&gt; is defined
+        ensures
+            - draws the part of the circle centered at center_point with the given radius 
+              that overlaps with the canvas and area onto the canvas.  
+            - Uses the given pixel color.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> pixel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_pixel'></a>draw_pixel</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - pixel_traits&lt;pixel_type&gt; is defined
+        ensures
+            - if (c.contains(p)) then
+                - sets the pixel in c that represents the point p to the 
+                  given pixel color.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> pixel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_solid_circle'></a>draw_solid_circle</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> center_point,
+        <font color='#0000FF'><u>double</u></font> radius,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>infinity,<font color='#5555FF'>-</font>infinity,infinity,infinity<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - pixel_traits&lt;pixel_type&gt; is defined
+        ensures
+            - draws the part of the solid circle centered at center_point with the given 
+              radius that overlaps with the canvas and area onto the canvas.  
+              ("solid" means that the interior is also filled in with the given
+              pixel color)
+            - Uses the given pixel color.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> pixel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_solid_convex_polygon'></a>draw_solid_convex_polygon</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>point<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> polygon,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>infinity,<font color='#5555FF'>-</font>infinity,infinity,infinity<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - pixel_traits&lt;pixel_type&gt; is defined
+        ensures
+            - Interprets the given std::vector polygon object as defining a convex polygon
+              shape.  In particular, the polygon is given by taking the points and drawing
+              lines between them.  That is, imagine drawing a line connecting polygon[i]
+              and polygon[(i+1)%polygon.size()], for all valid i, and then filling in the
+              interior of the polygon.  That is what this function does.
+            - When drawing the polygon, only the part of the polygon which overlaps both
+              the given canvas and area rectangle is drawn.
+            - Uses the given pixel color to draw the polygon.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_button_down'></a>draw_button_down</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> btn,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> alpha <font color='#5555FF'>=</font> <font color='#979000'>255</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt;= alpha &lt;= 255
+        ensures
+            - draws the border of a button onto canvas c:
+                - the border will be that of a button that is depressed
+                - only the part of the border that overlaps with the canvas object
+                  will be drawn.
+                - the border will be for the button whose area is defined by the
+                  rectangle btn.
+            - performs alpha blending such that the button is drawn with full opacity 
+              when alpha is 255 and fully transparent when alpha is 0.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_sunken_rectangle'></a>draw_sunken_rectangle</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> border,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> alpha <font color='#5555FF'>=</font> <font color='#979000'>255</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt;= alpha &lt;= 255
+        ensures
+            - draws a sunken rectangle around the given border.
+              (This is the type of border used for text_fields and
+              check_boxes and the like).
+            - performs alpha blending such that the rectangle is drawn with full opacity 
+              when alpha is 255 and fully transparent when alpha is 0.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_button_up'></a>draw_button_up</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> btn,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> alpha <font color='#5555FF'>=</font> <font color='#979000'>255</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt;= alpha &lt;= 255
+        ensures
+            - draws the border of a button onto canvas c:
+                - the border will be that of a button that is NOT depressed
+                - only the part of the border that overlaps with the canvas object
+                  will be drawn.
+                - the border will be for the button whose area is defined by the
+                  rectangle btn.
+            - performs alpha blending such that the button is drawn with full opacity 
+              when alpha is 255 and fully transparent when alpha is 0.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> pixel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_checkered'></a>draw_checkered</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel1,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel2
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - pixel_traits&lt;pixel_type&gt; is defined
+        ensures
+            - fills the area on the given canvas defined by the rectangle area with a checkers 
+              board pattern where every other pixel gets assigned either pixel1 or pixel2.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_image'></a>draw_image</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p,
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> image,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>infinity,<font color='#5555FF'>-</font>infinity,infinity,infinity<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_type == an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits&lt;typename image_type::type&gt; is defined
+        ensures
+            - draws the given image object onto the canvas such that the upper left corner of the
+              image will appear at the point p in the canvas's window.  (note that the
+              upper left corner of the image is assumed to be the pixel image[0][0] and the
+              lower right corner of the image is assumed to be image[image.nr()-1][image.nc()-1])
+            - only draws the part of the image that overlaps with the area rectangle
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_image'></a>draw_image</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>infinity,<font color='#5555FF'>-</font>infinity,infinity,infinity<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_type == an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits&lt;typename image_type::type&gt; is defined
+        ensures
+            - draws the given image object onto the canvas such that the upper left corner
+              of the image will appear at the point rect.tl_corner() in the canvas's window
+              and the lower right corner of the image will appear at rect.br_corner() in
+              the canvas's window.  (note that the upper left corner of the image is
+              assumed to be the pixel image[0][0] and the lower right corner of the image
+              is assumed to be image[image.nr()-1][image.nc()-1])
+            - only draws the part of the image that overlaps with the area rectangle
+            - Uses nearest neighbor interpolation when the given rect isn't the same size
+              as the input image.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> pixel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='fill_rect'></a>fill_rect</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - pixel_traits&lt;pixel_type&gt; is defined
+        ensures
+            - fills the area defined by rect in the given canvas with the given pixel color.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> pixel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='fill_rect_with_vertical_gradient'></a>fill_rect_with_vertical_gradient</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel_top,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel_bottom,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>infinity,<font color='#5555FF'>-</font>infinity,infinity,infinity<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - pixel_traits&lt;pixel_type&gt; is defined
+        ensures
+            - fills the rectangle defined by rect in the given canvas with the given colors.  
+              The top of the area will have the pixel_top color and will slowly fade 
+              towards the pixel_bottom color towards the bottom of rect.
+            - only draws the part of the image that overlaps with the area rectangle
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> pixel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='fill_gradient_rounded'></a>fill_gradient_rounded</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> radius,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> top_color,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> bottom_color,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>infinity,<font color='#5555FF'>-</font>infinity,infinity,infinity<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - pixel_traits&lt;pixel_type&gt; is defined
+        ensures
+            - Fills the region defined by rect in the given canvas with the given colors.  
+              The top of the region will have the top_color color and will slowly fade 
+              towards the bottom_color color towards the bottom of rect.
+            - The drawn rectangle will have rounded corners and with the amount of 
+            - rounding given by the radius argument.
+            - only the part of this object that overlaps with area and the canvas
+              will be drawn on the canvas
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> pixel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_rounded_rectangle'></a>draw_rounded_rectangle</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'><u>unsigned</u></font> radius,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> color,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>infinity,<font color='#5555FF'>-</font>infinity,infinity,infinity<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - pixel_traits&lt;pixel_type&gt; is defined
+        ensures
+            - Draws the part of the rectangle that overlaps with
+              the canvas onto the canvas.  
+            - The drawn rectangle will have rounded corners and with the amount of 
+              rounding given by the radius argument.
+            - Uses the given pixel color.
+            - only draws the part of the image that overlaps with the area rectangle
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_GUI_CANVAS_DRAWINg_ABSTRACT_
+</font>
+
+</pre></body></html>

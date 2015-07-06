@@ -1,0 +1,363 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html xmlns:gcse="googleCustomSearch"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="shortcut icon" href="dlib-icon.ico"><meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I="><meta name="google-site-verification" content="DGSSJMKDomaDaDTIRJ8jDkv0YMx9Cz7OESbXHjjr6Jw"><title>dlib C++ Library
+   - How to compile</title><script language="JavaScript">
+
+// ---------------------------------------------
+// --- Name:    Easy DHTML Treeview           --
+// --- Author:  D.D. de Kerf                  --
+// --- Version: 0.2          Date: 13-6-2001  --
+// ---------------------------------------------
+function Toggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "minus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "plus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+function BigToggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigminus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigplus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+</script><style type="text/css">
+   body {margin:0px;}
+   pre {margin:0px;}
+
+   ul.tree  li { list-style: none;  margin-left:10px;} 
+   ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
+   ul.tree  li ul { margin-left:10px; padding:0px; }
+
+   li#term { list-style: none; }
+
+   div.component {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      padding: 0.7em;
+   }
+
+   div.question {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      margin-bottom: 90%;
+      padding: 0.7em;
+   }
+
+   div.function {
+      background-color:white; 
+      border: 2px solid rgb(102,102,255); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.class {
+      background-color:white; 
+      border: 2px solid rgb(255,102,102); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.extension {
+      background-color:#FDFDFD; 
+      border: 1px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.0em;
+      padding: 0.7em;
+   }
+
+   div.logb {
+      text-align:left;
+      padding: 0.0em;
+      float: left;
+      background-color:#c0c0c0; 
+      border: double ; 
+      margin: 0.5em;
+   }
+
+   div.name {
+      float: left;
+   }
+   div.line1 {
+      float:left;
+      width:100%;
+      background-color:#dfdfdf; 
+   }
+   div.line2 {
+      float:left;
+      width:100%;
+   }
+   div.inc {
+      float: right;
+   }
+
+
+   .code_box
+   {
+      color: black;
+      margin: 1em 0.25in;
+      padding: 0.5em;
+      background: rgb(240,240,240);
+      border-top: black dotted 1px;
+      border-left: black dotted 1px;
+      border-right: black solid 2px;
+      border-bottom: black solid 2px;
+   }
+
+
+
+   .bdotted {border-bottom: 1px dotted}
+   .bdashed {border-bottom: 1px dashed}
+   .bsolid {border-bottom: 1px solid}
+   .bdouble {border-bottom: 1px double}
+   .bgroove {border-bottom: 1px groove}
+   .bridge {border-bottom: 1px ridge}
+   .binset {border-bottom: 1px inset}
+   .boutset {border-bottom: 1px outset}
+
+   div.row1 {
+      background-color:#dfdfdf; 
+   }
+   div.row2 {
+      background-color:#f2f2f2; 
+   }
+
+   div.typedefs {
+      margin-left: 1.5em;
+      margin-top: 0.2em;
+      border: 1px dotted;
+      width: 52em;
+   }
+
+   div.tdn {
+      width: 10em;
+   }
+
+   .fullhr {
+      clear: both;
+   }
+
+   body {
+      text-align: center;
+   }
+
+   div.entire_page_header {
+      width:62.5em;  
+      text-align: left;
+      margin-top: 0.4em;
+      margin-left: auto;
+      margin-right: auto;
+   }
+   div.entire_page {
+      width:62.5em;  
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      clear:both;
+   }
+</style></head><body bgcolor="#EDF3EE"><a name="top"></a><div class="entire_page_header"><a href="http://dlib.net"><img src="dlib-logo.png"></a></div><div class="entire_page"><table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px"><tr height="100%"><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="145" height="100%"><tr><td VALIGN="TOP"><b>The Library</b><ul class="tree"><li><a href="algorithms.html">Algorithms</a></li><li><a href="api.html">API Wrappers</a></li><li><a href="bayes.html">Bayesian Nets</a></li><li><a href="compression.html">Compression</a></li><li><a href="containers.html">Containers</a></li><li><a href="graph_tools.html">Graph Tools</a></li><li><a href="imaging.html">Image Processing</a></li><li><a href="linear_algebra.html">Linear Algebra</a></li><li><a href="ml.html">Machine Learning</a></li><li><a href="metaprogramming.html">Metaprogramming</a></li><li><a href="other.html">Miscellaneous</a></li><li><a href="network.html">Networking</a></li><li><a href="optimization.html">Optimization</a></li><li><a href="parsing.html">Parsing</a></li></ul><br><b>Help/Info</b><ul class="tree"><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: C++</u></font></a><ul style="display:none;"><li><a href="3d_point_cloud_ex.cpp.html">3D_Point_Cloud</a></li><li><a href="assignment_learning_ex.cpp.html">Assignment_Learning</a></li><li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li><li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li><li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li><li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li><li><a href="bridge_ex.cpp.html">Bridge</a></li><li><a href="bsp_ex.cpp.html">BSP</a></li><li><a href="svm_c_ex.cpp.html">C-Support_Vector_Machine</a></li><li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li><li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li><li><a href="config_reader_ex.cpp.html">Config_File_Reader</a></li><li><a href="custom_trainer_ex.cpp.html">Custom_Trainers</a></li><li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li><li><a href="empirical_kernel_map_ex.cpp.html">Empirical_Kernel_Map</a></li><li><a href="face_detection_ex.cpp.html">Face_Detection</a></li><li><a href="face_landmark_detection_ex.cpp.html">Face_Landmark_Detection</a></li><li><a href="fhog_ex.cpp.html">FHOG_Feature_Extraction</a></li><li><a href="fhog_object_detector_ex.cpp.html">FHOG_Object_Detection</a></li><li><a href="graph_labeling_ex.cpp.html">Graph_Labeling</a></li><li><a href="gui_api_ex.cpp.html">GUI</a></li><li><a href="hough_transform_ex.cpp.html">Hough_Transform</a></li><li><a href="server_http_ex.cpp.html">HTTP_Server</a></li><li><a href="image_ex.cpp.html">Image</a></li><li><a href="iosockstream_ex.cpp.html">IO Socket Streams</a></li><li><a href="server_iostream_ex.cpp.html">IO Streams Server</a></li><li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li><li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li><li><a href="krr_regression_ex.cpp.html">Kernel_Ridge_Regression</a></li><li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li><li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li><li><a href="krr_classification_ex.cpp.html">KRR_Classification</a></li><li><a href="learning_to_track_ex.cpp.html">Learning_to_Track</a></li><li><a href="max_cost_assignment_ex.cpp.html">Linear_Assignment_Problems</a></li><li><a href="linear_manifold_regularizer_ex.cpp.html">Linear_Manifold_Regularizer</a></li><li><a href="mpc_ex.cpp.html">Linear_Model_Predictive_Control</a></li><li><a href="logger_ex.cpp.html">Logger</a></li><li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li><li><a href="logger_custom_output_ex.cpp.html">Logger_Custom_Output</a></li><li><a href="matrix_ex.cpp.html">Matrix</a></li><li><a href="matrix_expressions_ex.cpp.html">Matrix_Expressions</a></li><li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li><li><a href="model_selection_ex.cpp.html">Model_Selection</a></li><li><a href="multiclass_classification_ex.cpp.html">Multiclass_Classification</a></li><li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li><li><a href="mlp_ex.cpp.html">Neural_Network</a></li><li><a href="least_squares_ex.cpp.html">Non-Linear Least Squares</a></li><li><a href="svm_ex.cpp.html">Nu-Support_Vector_Machine</a></li><li><a href="integrate_function_adapt_simp_ex.cpp.html">Numerical_Integration</a></li><li><a href="object_detector_ex.cpp.html">Object_Detector</a></li><li><a href="object_detector_advanced_ex.cpp.html">Object_Detector_Advanced</a></li><li><a href="one_class_classifiers_ex.cpp.html">One_Class_Classifiers</a></li><li><a href="svm_pegasos_ex.cpp.html">Online_SVM</a></li><li><a href="optimization_ex.cpp.html">Optimization</a></li><li><a href="parallel_for_ex.cpp.html">Parallel_For_Loops</a></li><li><a href="pipe_ex.cpp.html">Pipe</a></li><li><a href="pipe_ex_2.cpp.html">Pipe_2</a></li><li><a href="quantum_computing_ex.cpp.html">Quantum_Computing</a></li><li><a href="queue_ex.cpp.html">Queue</a></li><li><a href="rank_features_ex.cpp.html">Rank_Features</a></li><li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li><li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li><li><a href="running_stats_ex.cpp.html">Running_Stats</a></li><li><a href="sequence_labeler_ex.cpp.html">Sequence_Labeling</a></li><li><a href="sequence_segmenter_ex.cpp.html">Sequence_Segmentation</a></li><li><a href="sockets_ex.cpp.html">Sockets</a></li><li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li><li><a href="svm_sparse_ex.cpp.html">Sparse_Vectors</a></li><li><a href="sqlite_ex.cpp.html">SQLite</a></li><li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li><li><a href="svm_struct_ex.cpp.html">Structural_Support_Vector_Machines</a></li><li><a href="svr_ex.cpp.html">Support_Vector_Regression</a></li><li><a href="surf_ex.cpp.html">SURF</a></li><li><a href="svm_rank_ex.cpp.html">SVM-Rank</a></li><li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li><li><a href="threads_ex.cpp.html">Threads</a></li><li><a href="thread_function_ex.cpp.html">Thread_Function</a></li><li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li><li><a href="timer_ex.cpp.html">Timer</a></li><li><a href="train_object_detector.cpp.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor_ex.cpp.html">Train_Shape_Predictor</a></li><li><a href="using_custom_kernels_ex.cpp.html">Using_Custom_Kernels</a></li><li><a href="video_tracking_ex.cpp.html">Video_Object_Tracking</a></li><li><a href="webcam_face_pose_ex.cpp.html">Webcam_Face_Pose_Estimation</a></li><li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: Python</u></font></a><ul style="display:none;"><li><a href="face_detector.py.html">Face_Detector</a></li><li><a href="face_landmark_detection.py.html">Face_Landmark_Detection</a></li><li><a href="find_candidate_object_locations.py.html">find_candidate_object_locations</a></li><li><a href="max_cost_assignment.py.html">Linear_Assignment_Problems</a></li><li><a href="sequence_segmenter.py.html">Sequence_Segmenter</a></li><li><a href="svm_struct.py.html">Structural_Support_Vector_Machines</a></li><li><a href="svm_rank.py.html">SVM-Rank</a></li><li><a href="train_object_detector.py.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor.py.html">Train_Shape_Predictor</a></li><li><a href="correlation_tracker.py.html">Video_Object_Tracking</a></li></ul></li><li><a href="faq.html">FAQ</a></li><li><a href="index.html">Home</a></li><li><a href="compile.html">How to compile</a></li><li><a href="howto_contribute.html">How to contribute</a></li><li><a href="term_index.html">Index</a></li><li><a href="intro.html">Introduction</a></li><li><a href="license.html">License</a></li><li><a href="python/index.html">Python API</a></li><li><a href="books.html">Suggested Books</a></li></ul><br><b>Current Release</b><ul class="tree"><li><a href="change_log.html">Change Log</a></li><li><a href="release_notes.html">Release Notes</a></li><li>Version: 18.16</li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"><br><br><br><br><br><br><br><br><br>
+      Last Modified:<br>Mar 24, 2015<br><br></td></tr></table></td><td VALIGN="TOP" width="100%" style="border: 1px solid rgb(102,102,102);"><center><h1>How to compile</h1></center><br><br><a name="Compiling%20on%20Any%20Operating%20System%20Using%20CMake"></a><h2>Compiling on Any Operating System Using CMake</h2>
+        The best way to compile a program that uses dlib is to use <a href="http://www.cmake.org">CMake</a>.  For
+        example, the following commands will compile the example programs on any operating
+        system:
+<pre class="code_box">
+cd examples
+mkdir build
+cd build
+cmake ..
+cmake --build . --config Release
+</pre>
+Note that you also need to have a C++ compiler installed on your system.  There are free C++ compilers
+for most operating systems.  For example, Visual Studio Express is free on Windows and GCC is free and
+works well on Mac OS X and Linux systems.  If you have multiple compilers/IDEs installed then you can
+tell CMake which one you want it to use via the -G option.
+<p>
+   The <a href="examples/CMakeLists.txt.html">examples/CMakeLists.txt</a> file tells CMake how to build
+   the examples.  You can create your own projects by starting with this file and editing it however you like.
+   You can also perform additional configuration of a cmake project using the cmake-gui or ccmake tool.  For example,
+   if you are using dlib's face detector then you should turn on either SSE4 or AVX instructions since this
+   makes it run much faster (also see <a href="faq.html#Whyisdlibslow">this FAQ</a>). 
+</p><p>
+   Finally, note that when using Visual Studio, CMake will by default generate a 32bit executable.  
+   This means the programs you compile will only be able to use 2GB of RAM.  To avoid this, you need
+   to tell CMake to generate a 64bit executable.  You do this by using a command like 
+   <pre class="code_box">cmake -G "Visual Studio 10 2010 Win64" ..</pre> instead of <pre class="code_box">cmake ..</pre>  
+   You can see the list of valid arguments to <tt>-G</tt> by running <tt>cmake</tt> with no options. 
+</p><br><br><br><a name="Compiling%20Without%20CMake"></a><h2>Compiling Without CMake</h2><p>
+           In most cases, to use this library all you have to do is extract it somewhere, make
+           sure the folder <i>containing</i> the dlib folder is in your include path, and
+           finally add <a href="dlib/all/source.cpp.html">dlib/all/source.cpp</a> to your
+           project.  It is worth noting that most of dlib is "header-only" which means that, in
+           many cases, you don't actually have to build dlib/all/source.cpp into your
+           application.  So if you don't get linker errors when you exclude dlib/all/source.cpp
+           from your project then you don't need it.
+        </p><p>
+            An example makefile that uses this library can be found here: <a href="dlib/test/makefile">dlib/test/makefile</a>.  It is the makefile used to build
+            the regression test suite for this library.  
+        </p><p>
+           Again, note that you should <b><i>not</i></b> add the dlib folder itself to your compiler's include path.  
+           Doing so will cause the
+           build to fail because of name collisions (e.g. dlib/string.h with string.h from the standard library).  
+           Instead you should add the folder that contains the dlib folder to your include search path and then use 
+           include statements of the form <tt>#include &lt;dlib/queue.h&gt;</tt>.  This will ensure that everything 
+           builds correctly.
+        </p><p>
+           Note also that if you want to work with jpeg/png files using dlib then you will
+           need to link your program with libjpeg and/or libpng.  You also need to tell dlib 
+           about this by defining the DLIB_JPEG_SUPPORT and DLIB_PNG_SUPPORT preprocessor directives.
+           How you "link to libjpeg/libpng" varies from platform to platform.  On UNIX machines you
+           usually just add a -ljpeg or -lpng switch to your compiler (after installing the libraries).
+           On windows it's less well defined.  So dlib comes with a copy of these libraries in the dlib/external
+           folder so that you can statically compile them into your application if no system wide version 
+           is available on your machine.  If all this talk about linking is confusing to you then
+           just use CMake.  It will set this all up for you.
+        </p><p>
+           Dlib is also capable of using any optimized BLAS or LAPACK libraries that are
+           installed on your system.  Linking to these libraries will make many things run
+           faster.  To do this you define the DLIB_USE_BLAS and/or DLIB_USE_LAPACK preprocessor
+           directives and then link your program with whatever BLAS or LAPACK libraries you
+           have.  If you use CMake it will set this up automatically.
+        </p><a name="Compiling%20on%20Linux%20From%20Command%20Line"></a><h3>Compiling on Linux From Command Line</h3>
+        From within the examples folder, you can compile nearly all of the examples with a single command like so:
+<pre class="code_box">
+g++ -O3 -I.. ../dlib/all/source.cpp -lpthread -lX11 example_program_name.cpp
+</pre>
+        Note that not all examples require this much work.  For example, the svm_ex.cpp example
+        can be compiled with just:
+<pre class="code_box">
+g++ -O3 -I.. svm_ex.cpp
+</pre>
+
+On non-Linux systems like Solaris, you might have to link to other libraries.  For example, I have seen systems
+where it was also necessary to supply -lnsl or -lsocket options to g++.  Additionally, the X11 development
+library isn't installed on Ubuntu by default.  So if you require it and are using Ubuntu you can install
+it by typing:
+<pre class="code_box">
+sudo apt-get install libx11-dev
+</pre><a name="Compiling%20on%20Windows%20Using%20GCC"></a><h3>Compiling on Windows Using GCC</h3><p>
+            The commands for gcc on windows are the same as above but you may also have to link 
+            (via the -l option) to the following libraries: gdi32, comctl32, user32, winmm, ws2_32, or imm32.
+            However, it's worth pointing out that Visual Studio Express is free and a much better choice for
+            windows development than gcc.
+        </p><a name="Compiling%20on%20Windows%20Using%20Visual%20Studio"></a><h3>Compiling on Windows Using Visual Studio</h3><p>
+           All you need to do is create an empty console project. Then add dlib/all/source.cpp to it and add the
+           folder containing the dlib folder to the #include search path.  Then you can compile any example program 
+           by adding it to your project.  
+        </p><p>
+           Again, note that dlib will only be able to work with jpeg and png files if you link
+           in libjpeg and libpng.  In Visual Studio, the easiest way to do this is to add all the
+           source files in the dlib/external folder into your project and also define the
+           DLIB_PNG_SUPPORT and DLIB_JPEG_SUPPORT preprocessor directives.  If you don't know
+           how to configure Visual Studio then you should use CMake as shown above since it will
+           take care of everything automatically.
+        </p><center><a name="Preprocessor%20Directives"></a><h1>Preprocessor Directives</h1></center><p>
+            There are a few preprocessor directives you can supply during the build process
+            to cause the library to build in various optional ways.  By default, the
+            library will always do something reasonable, but they are listed here in the
+            event that you need to use them.
+         </p><a name="ENABLE_ASSERTS"></a><a name="#define%20ENABLE_ASSERTS"></a><h3>#define ENABLE_ASSERTS</h3><p>
+           Defining this directive causes all the <a href="metaprogramming.html#DLIB_ASSERT">DLIB_ASSERT</a> macros to
+           be active.  If you are using Visual Studio or CMake then ENABLE_ASSERTS will be automatically enabled
+           for you when you compile in debug mode.  However, if you are using a different build system then you
+           might have to manually enable it if you want to turn the asserts on.
+        </p><a name="DLIB_ISO_CPP_ONLY"></a><a name="#define%20DLIB_ISO_CPP_ONLY"></a><h3>#define DLIB_ISO_CPP_ONLY</h3><p>
+           This is a #define directive that you can set to cause the library to exclude all non ISO C++ code (The things in the <a href="api.html">API wrappers</a> section and any objects that depend on those wrappers).
+           This is useful if you are trying to build on a system that isn't fully supported by the library or if you 
+           just decide you don't want any of that stuff compiled into your program for your own reasons.
+        </p><a name="DLIB_NO_GUI_SUPPORT"></a><a name="#define%20DLIB_NO_GUI_SUPPORT"></a><h3>#define DLIB_NO_GUI_SUPPORT</h3><p>
+           This is just like the DLIB_ISO_CPP_ONLY option except that it excludes only the GUI part of the library.
+           An example of when you might want to use this would be if you don't need GUI support and you are building
+           on a UNIX platform that doesn't have the X11 headers installed.
+        </p><a name="NO_MAKEFILE"></a><a name="#define%20NO_MAKEFILE"></a><h3>#define NO_MAKEFILE</h3><p>
+           This preprocessor directive causes the dlib headers to pull in all the 
+           code that would normally be built in dlib/all/source.cpp.  Thus if you #define NO_MAKEFILE you won't 
+           have to add dlib/all/source.cpp to your project.  The <i>only</i> time this is useful is when your 
+           project consists of a single translation unit (i.e. a single cpp file).  In this instance NO_MAKEFILE
+           allows you to easily build your project on the command line by saying something like <tt>g++ -DNO_MAKEFILE
+           project.cpp</tt>.  But again, this is only for single cpp file projects.  If you use NO_MAKEFILE with projects 
+           that contain more than one cpp file you will get linker errors about multiply defined symbols.
+        </p><p>
+           Also note that if you use this macro then the <a href="metaprogramming.html#DLIB_STACK_TRACE">stack trace</a>
+           functionality in the library will be disabled.   
+        </p><a name="DLIB_THREAD_POOL_TIMEOUT"></a><a name="#define%20DLIB_THREAD_POOL_TIMEOUT%20&lt;time-in-milliseconds&gt;"></a><h3>#define DLIB_THREAD_POOL_TIMEOUT &lt;time-in-milliseconds&gt;</h3><p>
+           If you use dlib to create your threads then you receive the benefit of the dlib dynamic thread pool (Note that the 
+           dlib::<a href="api.html#thread_pool">thread_pool</a> object is something else unrelated to this so don't confuse
+           the two).  This pool 
+           enables dlib to spawn new threads very rapidly since it draws threads back out of its thread pool when 
+           the pool isn't empty. 
+        </p><p>
+           Thus, when a thread that was created by dlib ends it actually goes back into the dlib thread pool
+           and waits DLIB_THREAD_POOL_TIMEOUT milliseconds before totally terminating and releasing its resources back
+           to the operating system.  The default timeout used by this library is 30,000 milliseconds (30 seconds).  You
+           may however change this to whatever you like by defining DLIB_THREAD_POOL_TIMEOUT to some new value.  
+        </p></td></tr></table></div></body></html>

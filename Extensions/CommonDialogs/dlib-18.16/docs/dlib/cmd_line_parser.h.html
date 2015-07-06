@@ -1,0 +1,87 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - cmd_line_parser.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_CMD_LINE_PARSEr_
+<font color='#0000FF'>#define</font> DLIB_CMD_LINE_PARSEr_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='cmd_line_parser/cmd_line_parser_kernel_1.h.html'>cmd_line_parser/cmd_line_parser_kernel_1.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='cmd_line_parser/cmd_line_parser_kernel_c.h.html'>cmd_line_parser/cmd_line_parser_kernel_c.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='cmd_line_parser/cmd_line_parser_print_1.h.html'>cmd_line_parser/cmd_line_parser_print_1.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='cmd_line_parser/cmd_line_parser_check_1.h.html'>cmd_line_parser/cmd_line_parser_check_1.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='cmd_line_parser/cmd_line_parser_check_c.h.html'>cmd_line_parser/cmd_line_parser_check_c.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='cmd_line_parser/get_option.h.html'>cmd_line_parser/get_option.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='map.h.html'>map.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sequence.h.html'>sequence.h</a>"
+
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='impl_cmd_line_parser'></a>impl_cmd_line_parser</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            This class is basically just a big templated typedef for building 
+            a complete command line parser type out of all the parts it needs.
+        !*/</font>
+
+        <b><a name='impl_cmd_line_parser'></a>impl_cmd_line_parser</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sequence<font color='#5555FF'>&lt;</font>std::basic_string<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::kernel_2a sequence_2a;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sequence<font color='#5555FF'>&lt;</font>std::basic_string<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font>::kernel_2a psequence_2a;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> map<font color='#5555FF'>&lt;</font>std::basic_string<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font>::kernel_1a map_1a_string;
+
+    <font color='#0000FF'>public</font>:
+        
+        <font color='#0000FF'>typedef</font> cmd_line_parser_kernel_1<font color='#5555FF'>&lt;</font>charT,map_1a_string,sequence_2a,psequence_2a<font color='#5555FF'>&gt;</font> kernel_1a;
+        <font color='#0000FF'>typedef</font> cmd_line_parser_kernel_c<font color='#5555FF'>&lt;</font>kernel_1a<font color='#5555FF'>&gt;</font> kernel_1a_c;
+        <font color='#0000FF'>typedef</font> cmd_line_parser_print_1<font color='#5555FF'>&lt;</font>kernel_1a_c<font color='#5555FF'>&gt;</font> print_1a_c;
+        <font color='#0000FF'>typedef</font> cmd_line_parser_check_c<font color='#5555FF'>&lt;</font>cmd_line_parser_check_1<font color='#5555FF'>&lt;</font>print_1a_c<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> check_1a_c;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='cmd_line_parser'></a>cmd_line_parser</b> : <font color='#0000FF'>public</font> impl_cmd_line_parser<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font>::check_1a_c
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#009900'>// These typedefs are here for backwards compatibility with previous versions of dlib.
+</font>        <font color='#0000FF'>typedef</font> cmd_line_parser kernel_1a;
+        <font color='#0000FF'>typedef</font> cmd_line_parser kernel_1a_c;
+        <font color='#0000FF'>typedef</font> cmd_line_parser print_1a;
+        <font color='#0000FF'>typedef</font> cmd_line_parser print_1a_c;
+        <font color='#0000FF'>typedef</font> cmd_line_parser check_1a;
+        <font color='#0000FF'>typedef</font> cmd_line_parser check_1a_c;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        cmd_line_parser<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        cmd_line_parser<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b> 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>typedef</font> cmd_line_parser<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> command_line_parser;
+    <font color='#0000FF'>typedef</font> cmd_line_parser<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>wchar_t</u></font><font color='#5555FF'>&gt;</font> wcommand_line_parser;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CMD_LINE_PARSEr_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,220 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - find_k_nearest_neighbors_lsh.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_FIND_K_NEAREST_NEIGHBOrS_LSH_Hh_
+<font color='#0000FF'>#define</font> DLIB_FIND_K_NEAREST_NEIGHBOrS_LSH_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='find_k_nearest_neighbors_lsh_abstract.h.html'>find_k_nearest_neighbors_lsh_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads.h.html'>../threads.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../lsh/hashes.h.html'>../lsh/hashes.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>queue<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sample_pair.h.html'>sample_pair.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='edge_list_graphs.h.html'>edge_list_graphs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>struct</font> <b><a name='compare_sample_pair_with_distance'></a>compare_sample_pair_with_distance</b> 
+        <b>{</b>
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> sample_pair<font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> sample_pair<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b> 
+                <font color='#0000FF'>return</font> a.<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> vector_type,
+            <font color='#0000FF'>typename</font> hash_function_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='hash_block'></a>hash_block</b>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='hash_block'></a>hash_block</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples_,
+                <font color='#0000FF'>const</font> hash_function_type<font color='#5555FF'>&amp;</font> hash_funct_,
+                std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> hash_function_type::result_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hashes_
+            <font face='Lucida Console'>)</font> : 
+                samples<font face='Lucida Console'>(</font>samples_<font face='Lucida Console'>)</font>,
+                hash_funct<font face='Lucida Console'>(</font>hash_funct_<font face='Lucida Console'>)</font>,
+                hashes<font face='Lucida Console'>(</font>hashes_<font face='Lucida Console'>)</font>
+            <b>{</b><b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                hashes[i] <font color='#5555FF'>=</font> <font color='#BB00BB'>hash_funct</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples;
+            <font color='#0000FF'>const</font> hash_function_type<font color='#5555FF'>&amp;</font> hash_funct;
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> hash_function_type::result_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hashes;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> vector_type,
+            <font color='#0000FF'>typename</font> distance_function_type,
+            <font color='#0000FF'>typename</font> hash_function_type,
+            <font color='#0000FF'>typename</font> alloc
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='scan_find_k_nearest_neighbors_lsh'></a>scan_find_k_nearest_neighbors_lsh</b>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='scan_find_k_nearest_neighbors_lsh'></a>scan_find_k_nearest_neighbors_lsh</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples_,
+                <font color='#0000FF'>const</font> distance_function_type<font color='#5555FF'>&amp;</font> dist_funct_,
+                <font color='#0000FF'>const</font> hash_function_type<font color='#5555FF'>&amp;</font> hash_funct_,
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k_,
+                std::vector<font color='#5555FF'>&lt;</font>sample_pair, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> edges_,
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k_oversample_,
+                <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> hash_function_type::result_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hashes_
+            <font face='Lucida Console'>)</font> :
+                samples<font face='Lucida Console'>(</font>samples_<font face='Lucida Console'>)</font>,
+                dist_funct<font face='Lucida Console'>(</font>dist_funct_<font face='Lucida Console'>)</font>,
+                hash_funct<font face='Lucida Console'>(</font>hash_funct_<font face='Lucida Console'>)</font>,
+                k<font face='Lucida Console'>(</font>k_<font face='Lucida Console'>)</font>,
+                edges<font face='Lucida Console'>(</font>edges_<font face='Lucida Console'>)</font>,
+                k_oversample<font face='Lucida Console'>(</font>k_oversample_<font face='Lucida Console'>)</font>,
+                hashes<font face='Lucida Console'>(</font>hashes_<font face='Lucida Console'>)</font>
+            <b>{</b>
+                edges.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                edges.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>k<font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            mutex m;
+            <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples;
+            <font color='#0000FF'>const</font> distance_function_type<font color='#5555FF'>&amp;</font> dist_funct;
+            <font color='#0000FF'>const</font> hash_function_type<font color='#5555FF'>&amp;</font> hash_funct;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k;
+            std::vector<font color='#5555FF'>&lt;</font>sample_pair, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> edges;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k_oversample;
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> hash_function_type::result_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hashes;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k_hash <font color='#5555FF'>=</font> k<font color='#5555FF'>*</font>k_oversample;
+
+                std::priority_queue<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> best_hashes;
+                std::priority_queue<font color='#5555FF'>&lt;</font>sample_pair, std::vector<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font>, dlib::impl::compare_sample_pair_with_distance<font color='#5555FF'>&gt;</font> best_samples;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> worst_distance <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#009900'>// scan over the hashes and find the best matches for hashes[i]
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> hashes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> j<font face='Lucida Console'>)</font> 
+                        <font color='#0000FF'>continue</font>;
+
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> dist <font color='#5555FF'>=</font> hash_funct.<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font>hashes[i], hashes[j]<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dist <font color='#5555FF'>&lt;</font> worst_distance <font color='#5555FF'>|</font><font color='#5555FF'>|</font> best_hashes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> k_hash<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>best_hashes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> k_hash<font face='Lucida Console'>)</font>
+                            best_hashes.<font color='#BB00BB'>pop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        best_hashes.<font color='#BB00BB'>push</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>dist, j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        worst_distance <font color='#5555FF'>=</font> best_hashes.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.first;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#009900'>// Now figure out which of the best_hashes are actually the k best matches
+</font>                <font color='#009900'>// according to dist_funct()
+</font>                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>best_hashes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> best_hashes.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.second;
+                    best_hashes.<font color='#BB00BB'>pop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> dist <font color='#5555FF'>=</font> <font color='#BB00BB'>dist_funct</font><font face='Lucida Console'>(</font>samples[i], samples[j]<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dist <font color='#5555FF'>&lt;</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>best_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> k<font face='Lucida Console'>)</font>
+                            best_samples.<font color='#BB00BB'>pop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        best_samples.<font color='#BB00BB'>push</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font>i,j,dist<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#009900'>// Finally, now put the k best matches according to dist_funct() into edges
+</font>                auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>best_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    edges.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>best_samples.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    best_samples.<font color='#BB00BB'>pop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type,
+        <font color='#0000FF'>typename</font> hash_function_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='hash_samples'></a>hash_samples</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> hash_function_type<font color='#5555FF'>&amp;</font> hash_funct,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> hash_function_type::result_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hashes
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        hashes.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> impl::hash_block<font color='#5555FF'>&lt;</font>vector_type,hash_function_type<font color='#5555FF'>&gt;</font> block_type;
+        block_type <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>samples, hash_funct, hashes<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font>num_threads, <font color='#979000'>0</font>, samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, temp<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type,
+        <font color='#0000FF'>typename</font> distance_function_type,
+        <font color='#0000FF'>typename</font> hash_function_type,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_k_nearest_neighbors_lsh'></a>find_k_nearest_neighbors_lsh</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> distance_function_type<font color='#5555FF'>&amp;</font> dist_funct,
+        <font color='#0000FF'>const</font> hash_function_type<font color='#5555FF'>&amp;</font> hash_funct,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+        std::vector<font color='#5555FF'>&lt;</font>sample_pair, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> edges,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k_oversample <font color='#5555FF'>=</font> <font color='#979000'>20</font> 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>k <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> k_oversample <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void find_k_nearest_neighbors_lsh()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t samples.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t k:              </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> k 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t k_oversample:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> k_oversample 
+            <font face='Lucida Console'>)</font>;
+
+        edges.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> hash_function_type::result_type hash_type;
+        std::vector<font color='#5555FF'>&lt;</font>hash_type<font color='#5555FF'>&gt;</font> hashes;
+        <font color='#BB00BB'>hash_samples</font><font face='Lucida Console'>(</font>samples, hash_funct, num_threads, hashes<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> impl::scan_find_k_nearest_neighbors_lsh<font color='#5555FF'>&lt;</font>vector_type, distance_function_type,hash_function_type,alloc<font color='#5555FF'>&gt;</font> scan_type;
+        scan_type <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>samples, dist_funct, hash_funct, k, edges, k_oversample, hashes<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font>num_threads, <font color='#979000'>0</font>, hashes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, temp<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>remove_duplicate_edges</font><font face='Lucida Console'>(</font>edges<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_FIND_K_NEAREST_NEIGHBOrS_LSH_Hh_
+</font>
+
+
+</pre></body></html>

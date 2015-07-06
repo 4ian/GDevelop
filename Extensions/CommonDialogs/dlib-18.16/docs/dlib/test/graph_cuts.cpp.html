@@ -1,0 +1,1220 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - graph_cuts.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>graph_cuts.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>graph_utils.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>directed_graph.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>graph.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>rand.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>hash.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_transforms.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.graph_cuts</font>"<font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='dense_potts_problem'></a>dense_potts_problem</b> 
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>double</u></font> value_type;
+    <font color='#0000FF'>private</font>:
+
+        matrix<font color='#5555FF'>&lt;</font>value_type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> factors1;
+        matrix<font color='#5555FF'>&lt;</font>value_type<font color='#5555FF'>&gt;</font> factors2;
+        matrix<font color='#5555FF'>&lt;</font>node_label,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> labels;
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='dense_potts_problem'></a>dense_potts_problem</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_nodes,
+            dlib::rand<font color='#5555FF'>&amp;</font> rnd
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            factors1 <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>7</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font>num_nodes, <font color='#979000'>1</font>, rnd<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+            factors2 <font color='#5555FF'>=</font> <font color='#BB00BB'>make_symmetric</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font>num_nodes, num_nodes, rnd<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+            labels.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>num_nodes<font face='Lucida Console'>)</font>;
+            labels <font color='#5555FF'>=</font> FREE_NODE;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_nodes'></a>number_of_nodes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> factors1.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_neighbors'></a>number_of_neighbors</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <font color='#009900'>// idx
+</font>        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>; <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_neighbor_idx'></a>get_neighbor_idx</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> node_id1,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> node_id2
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>node_id2 <font color='#5555FF'>&lt;</font> node_id1<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> node_id2;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> node_id2<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_neighbor'></a>get_neighbor</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> node_id,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>node_id <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>idx <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font>node_id<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>&lt;</font> node_id<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> idx;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> idx<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_label'></a>set_label</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> idx,
+            node_label value
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>labels</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> value;
+        <b>}</b>
+
+        node_label <b><a name='get_label'></a>get_label</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>labels</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        value_type <b><a name='factor_value'></a>factor_value</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>idx <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>factors1</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        value_type <b><a name='factor_value_disagreement'></a>factor_value_disagreement</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx1, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx2<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>idx1 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> idx2<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>idx1 <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>idx2 <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_neighbor_idx</font><font face='Lucida Console'>(</font>idx1,idx2<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font>idx1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_neighbor_idx</font><font face='Lucida Console'>(</font>idx2,idx1<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font>idx2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>factors2</font><font face='Lucida Console'>(</font>idx1, idx2<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='image_potts_problem'></a>image_potts_problem</b> 
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>double</u></font> value_type;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_number_of_neighbors <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+    <font color='#0000FF'>private</font>:
+
+        matrix<font color='#5555FF'>&lt;</font>value_type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> factors1;
+        matrix<font color='#5555FF'>&lt;</font>value_type<font color='#5555FF'>&gt;</font> factors2;
+        matrix<font color='#5555FF'>&lt;</font>node_label,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> labels;
+        <font color='#0000FF'><u>long</u></font> nr;
+        <font color='#0000FF'><u>long</u></font> nc;
+        rectangle rect, inner_rect;
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>long</u></font> count;
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='image_potts_problem'></a>image_potts_problem</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> nr_,
+            <font color='#0000FF'><u>long</u></font> nc_,
+            dlib::rand<font color='#5555FF'>&amp;</font> rnd
+        <font face='Lucida Console'>)</font> : nr<font face='Lucida Console'>(</font>nr_<font face='Lucida Console'>)</font>, nc<font face='Lucida Console'>(</font>nc_<font face='Lucida Console'>)</font>
+        <b>{</b>
+            rect <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,nc<font color='#5555FF'>-</font><font color='#979000'>1</font>,nr<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            inner_rect <font color='#5555FF'>=</font> <font color='#BB00BB'>shrink_rect</font><font face='Lucida Console'>(</font>rect,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_nodes <font color='#5555FF'>=</font> nr<font color='#5555FF'>*</font>nc;
+            factors1 <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>7</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font>num_nodes, <font color='#979000'>1</font>, rnd<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            factors2 <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font>num_nodes, <font color='#979000'>4</font>, rnd<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0.5</font>;
+
+            <font color='#009900'>//factors1 = 0;
+</font>            <font color='#009900'>//set_rowm(factors1, range(0, factors1.nr()/2)) = -1;
+</font>
+            labels.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>num_nodes<font face='Lucida Console'>)</font>;
+            labels <font color='#5555FF'>=</font> FREE_NODE;
+
+            count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        ~<b><a name='image_potts_problem'></a>image_potts_problem</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>interface calls: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> count;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>labels hash: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>murmur_hash3_128bit</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font><font color='#BB00BB'>labels</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#BB00BB'>labels</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>.first;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_nodes'></a>number_of_nodes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> factors1.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_neighbors'></a>number_of_neighbors</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p <font color='#5555FF'>=</font> <font color='#BB00BB'>get_loc</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>inner_rect.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>4</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p <font color='#5555FF'>=</font><font color='#5555FF'>=</font> rect.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                     p <font color='#5555FF'>=</font><font color='#5555FF'>=</font> rect.<font color='#BB00BB'>bl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                     p <font color='#5555FF'>=</font><font color='#5555FF'>=</font> rect.<font color='#BB00BB'>tr_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                     p <font color='#5555FF'>=</font><font color='#5555FF'>=</font> rect.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>2</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>3</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_neighbor_idx'></a>get_neighbor_idx</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> node_id1,
+            <font color='#0000FF'><u>long</u></font> node_id2
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p <font color='#5555FF'>=</font> <font color='#BB00BB'>get_loc</font><font face='Lucida Console'>(</font>node_id1<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>long</u></font> ret <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p <font color='#5555FF'>+</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>node_id2<font color='#5555FF'>-</font>node_id1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> ret;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ret;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p <font color='#5555FF'>-</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>node_id2<font color='#5555FF'>-</font>node_id1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> ret;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ret;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p <font color='#5555FF'>+</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>node_id2<font color='#5555FF'>-</font>node_id1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> nc<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> ret;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ret;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> ret;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_neighbor'></a>get_neighbor</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> node_id,
+            <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p <font color='#5555FF'>=</font> <font color='#BB00BB'>get_loc</font><font face='Lucida Console'>(</font>node_id<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p <font color='#5555FF'>+</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> node_id<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+                <font color='#5555FF'>-</font><font color='#5555FF'>-</font>idx;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p <font color='#5555FF'>-</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> node_id<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                <font color='#5555FF'>-</font><font color='#5555FF'>-</font>idx;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p <font color='#5555FF'>+</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> node_id<font color='#5555FF'>+</font>nc;
+                <font color='#5555FF'>-</font><font color='#5555FF'>-</font>idx;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> node_id<font color='#5555FF'>-</font>nc;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_label'></a>set_label</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> idx,
+            node_label value
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+            <font color='#BB00BB'>labels</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> value;
+        <b>}</b>
+
+        node_label <b><a name='get_label'></a>get_label</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>labels</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        value_type <b><a name='factor_value'></a>factor_value</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>idx <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>factors1</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        value_type <b><a name='factor_value_disagreement'></a>factor_value_disagreement</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx1, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx2<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>idx1 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> idx2<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>idx1 <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>idx2 <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// make this function symmetric
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idx1 <font color='#5555FF'>&gt;</font> idx2<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>idx1,idx2<font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_neighbor</font><font face='Lucida Console'>(</font>idx1, <font color='#BB00BB'>get_neighbor_idx</font><font face='Lucida Console'>(</font>idx1, idx2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> idx2<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_neighbor</font><font face='Lucida Console'>(</font>idx2, <font color='#BB00BB'>get_neighbor_idx</font><font face='Lucida Console'>(</font>idx2, idx1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> idx1<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// the neighbor relationship better be symmetric
+</font>            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_neighbor_idx</font><font face='Lucida Console'>(</font>idx1,idx2<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font>idx1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_neighbor_idx</font><font face='Lucida Console'>(</font>idx2,idx1<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font>idx2<font face='Lucida Console'>)</font>,
+                         "<font color='#CC0000'>\n idx1: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx1  <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                         "<font color='#CC0000'>\n idx2: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx2  <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                         "<font color='#CC0000'>\n get_neighbor_idx(idx2,idx1): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_neighbor_idx</font><font face='Lucida Console'>(</font>idx2,idx1<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                         "<font color='#CC0000'>\n number_of_neighbors(idx2): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font>idx2<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                         "<font color='#CC0000'>\n nr: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> nr <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> 
+                         "<font color='#CC0000'>\n nc: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> nc 
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>factors2</font><font face='Lucida Console'>(</font>idx1, <font color='#BB00BB'>get_neighbor_idx</font><font face='Lucida Console'>(</font>idx1,idx2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        point <b><a name='get_loc'></a>get_loc</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>idx<font color='#5555FF'>%</font>nc, idx<font color='#5555FF'>/</font>nc<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> potts_model<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='brute_force_potts_model'></a>brute_force_potts_model</b> <font face='Lucida Console'>(</font>
+        potts_model<font color='#5555FF'>&amp;</font> g
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        potts_model <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font><font color='#979000'>2.0</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>m.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>double</u></font> best_score <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> m.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> T <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>j;
+                T <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font>i<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>T <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    m.<font color='#BB00BB'>set_label</font><font face='Lucida Console'>(</font>j,SINK_CUT<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    m.<font color='#BB00BB'>set_label</font><font face='Lucida Console'>(</font>j,SOURCE_CUT<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+            <font color='#0000FF'><u>double</u></font> score <font color='#5555FF'>=</font> <font color='#BB00BB'>potts_model_score</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>score <font color='#5555FF'>&gt;</font> best_score<font face='Lucida Console'>)</font>
+            <b>{</b>
+                best_score <font color='#5555FF'>=</font> score;
+                g <font color='#5555FF'>=</font> m;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> graph_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='brute_force_potts_model_on_graph'></a>brute_force_potts_model_on_graph</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> graph_type<font color='#5555FF'>&amp;</font> g,
+        std::vector<font color='#5555FF'>&lt;</font>node_label<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels_
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::vector<font color='#5555FF'>&lt;</font>node_label<font color='#5555FF'>&gt;</font> labels;
+        labels.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font><font color='#979000'>2.0</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>double</u></font> best_score <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> T <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>j;
+                T <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font>i<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>T <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    labels[j] <font color='#5555FF'>=</font> SINK_CUT;
+                <font color='#0000FF'>else</font>
+                    labels[j] <font color='#5555FF'>=</font> SOURCE_CUT;
+            <b>}</b>
+
+
+            <font color='#0000FF'><u>double</u></font> score <font color='#5555FF'>=</font> <font color='#BB00BB'>potts_model_score</font><font face='Lucida Console'>(</font>g,labels<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>score <font color='#5555FF'>&gt;</font> best_score<font face='Lucida Console'>)</font>
+            <b>{</b>
+                best_score <font color='#5555FF'>=</font> score;
+                labels_ <font color='#5555FF'>=</font> labels;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> graph_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='make_random_undirected_graph'></a>make_random_undirected_graph</b><font face='Lucida Console'>(</font>
+        dlib::rand<font color='#5555FF'>&amp;</font> rnd,
+        graph_type<font color='#5555FF'>&amp;</font> g
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> graph_type::edge_type edge_weight_type;
+        g.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> num_nodes <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>8</font>;
+        g.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font>num_nodes<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> num_edges <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>num_nodes<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>num_nodes<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font color='#5555FF'>*</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// add the right number of randomly selected edges
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>&lt;</font> num_edges<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> j <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> g.<font color='#BB00BB'>has_edge</font><font face='Lucida Console'>(</font>i, j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+                g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>i, j<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g, i, j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>edge_weight_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>edge_weight_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_gaussian</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>200</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_graph_potts_model'></a>test_graph_potts_model</b><font face='Lucida Console'>(</font>
+        dlib::rand<font color='#5555FF'>&amp;</font> rnd
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        <font color='#0000FF'><u>double</u></font> brute_force_score;
+        <font color='#0000FF'><u>double</u></font> graph_cut_score;
+
+        graph<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::kernel_1a_c temp;
+        <font color='#BB00BB'>make_random_undirected_graph</font><font face='Lucida Console'>(</font>rnd,temp<font face='Lucida Console'>)</font>;
+
+        <b>{</b>
+            std::vector<font color='#5555FF'>&lt;</font>node_label<font color='#5555FF'>&gt;</font> labels;
+
+            <font color='#BB00BB'>brute_force_potts_model_on_graph</font><font face='Lucida Console'>(</font>temp, labels<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> temp.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>node </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>labels[i];
+            <b>}</b>
+
+            brute_force_score <font color='#5555FF'>=</font> <font color='#BB00BB'>potts_model_score</font><font face='Lucida Console'>(</font>temp, labels<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>brute force score: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> brute_force_score;
+        <b>}</b>
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>******************</font>";
+
+        <b>{</b>
+            std::vector<font color='#5555FF'>&lt;</font>node_label<font color='#5555FF'>&gt;</font> labels;
+            <font color='#BB00BB'>find_max_factor_graph_potts</font><font face='Lucida Console'>(</font>temp, labels<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> temp.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>node </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>labels[i];
+            <b>}</b>
+            graph_cut_score <font color='#5555FF'>=</font> <font color='#BB00BB'>potts_model_score</font><font face='Lucida Console'>(</font>temp, labels<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>graph cut score: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> graph_cut_score;
+        <b>}</b>
+
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>graph_cut_score <font color='#5555FF'>=</font><font color='#5555FF'>=</font> brute_force_score, std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>graph_cut_score <font color='#5555FF'>-</font> brute_force_score<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>##################</font>";
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>##################</font>";
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>##################</font>";
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> potts_prob<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='impl_test_potts_model'></a>impl_test_potts_model</b> <font face='Lucida Console'>(</font>
+        potts_prob<font color='#5555FF'>&amp;</font> p
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        <font color='#0000FF'><u>double</u></font> brute_force_score;
+        <font color='#0000FF'><u>double</u></font> graph_cut_score;
+
+        <b>{</b>
+            potts_prob <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>brute_force_potts_model</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> temp.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>node </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>temp.<font color='#BB00BB'>get_label</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            brute_force_score <font color='#5555FF'>=</font> <font color='#BB00BB'>potts_model_score</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>brute force score: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> brute_force_score;
+        <b>}</b>
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>******************</font>";
+
+        <b>{</b>
+            potts_prob <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>find_max_factor_graph_potts</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> temp.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>node </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>temp.<font color='#BB00BB'>get_label</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            graph_cut_score <font color='#5555FF'>=</font> <font color='#BB00BB'>potts_model_score</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>graph cut score: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> graph_cut_score;
+        <b>}</b>
+
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>graph_cut_score <font color='#5555FF'>=</font><font color='#5555FF'>=</font> brute_force_score, std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>graph_cut_score <font color='#5555FF'>-</font> brute_force_score<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>##################</font>";
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>##################</font>";
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>##################</font>";
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                                   BASIC MIN CUT STUFF
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> directed_graph<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='brute_force_min_cut'></a>brute_force_min_cut</b> <font face='Lucida Console'>(</font>
+        directed_graph<font color='#5555FF'>&amp;</font> g,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> source,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> sink
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> directed_graph::edge_type edge_weight_type;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font><font color='#979000'>2.0</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font>node_label<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>best_cut</font><font face='Lucida Console'>(</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,FREE_NODE<font face='Lucida Console'>)</font>;
+
+        edge_weight_type best_score <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font>edge_weight_type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> T <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>j;
+                T <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font>i<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>T <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> SINK_CUT;
+                <font color='#0000FF'>else</font>
+                    g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> SOURCE_CUT;
+            <b>}</b>
+
+            <font color='#009900'>// ignore cuts that don't label the source or sink node the way we want.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>source<font face='Lucida Console'>)</font>.data <font color='#5555FF'>!</font><font color='#5555FF'>=</font> SOURCE_CUT <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>sink<font face='Lucida Console'>)</font>.data <font color='#5555FF'>!</font><font color='#5555FF'>=</font> SINK_CUT<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>continue</font>;
+
+            edge_weight_type score <font color='#5555FF'>=</font> <font color='#BB00BB'>graph_cut_score</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>score <font color='#5555FF'>&lt;</font> best_score<font face='Lucida Console'>)</font>
+            <b>{</b>
+                best_score <font color='#5555FF'>=</font> score;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                    best_cut[j] <font color='#5555FF'>=</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.data;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font>  best_cut[j];
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> directed_graph<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='print_graph'></a>print_graph</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> directed_graph<font color='#5555FF'>&amp;</font> g
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>number of nodes: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_children</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>n<font face='Lucida Console'>)</font>
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> -(</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>child_edge</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>)-&gt; </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>child</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> directed_graph<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='copy_edge_weights'></a>copy_edge_weights</b> <font face='Lucida Console'>(</font>
+        directed_graph<font color='#5555FF'>&amp;</font> dest,
+        <font color='#0000FF'>const</font> directed_graph<font color='#5555FF'>&amp;</font> src
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> src.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> src.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_children</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>n<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dest.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>child_edge</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> src.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>child_edge</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> graph_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='pick_random_source_and_sink'></a>pick_random_source_and_sink</b> <font face='Lucida Console'>(</font>
+        dlib::rand<font color='#5555FF'>&amp;</font> rnd,
+        <font color='#0000FF'>const</font> graph_type<font color='#5555FF'>&amp;</font> g,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> source,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> sink
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        source <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sink <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>sink <font color='#5555FF'>=</font><font color='#5555FF'>=</font> source<font face='Lucida Console'>)</font>
+            sink <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> dgraph_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='make_random_graph'></a>make_random_graph</b><font face='Lucida Console'>(</font>
+        dlib::rand<font color='#5555FF'>&amp;</font> rnd,
+        dgraph_type<font color='#5555FF'>&amp;</font> g,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> source,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> sink
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> dgraph_type::edge_type edge_weight_type;
+        g.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> num_nodes <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>7</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font>;
+        g.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font>num_nodes<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> num_edges <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>num_nodes<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>num_nodes<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font color='#5555FF'>*</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// add the right number of randomly selected edges
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>&lt;</font> num_edges<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> parent <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> child <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parent <font color='#5555FF'>!</font><font color='#5555FF'>=</font> child <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> g.<font color='#BB00BB'>has_edge</font><font face='Lucida Console'>(</font>parent, child<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+                g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>parent, child<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g, parent, child<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>edge_weight_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// have to have edges both ways
+</font>                <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>parent, child<font face='Lucida Console'>)</font>;
+                g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>parent, child<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g, parent, child<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>edge_weight_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#BB00BB'>pick_random_source_and_sink</font><font face='Lucida Console'>(</font>rnd, g, source, sink<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> dgraph_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='make_random_chain_graph'></a>make_random_chain_graph</b><font face='Lucida Console'>(</font>
+        dlib::rand<font color='#5555FF'>&amp;</font> rnd,
+        dgraph_type<font color='#5555FF'>&amp;</font> g,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> source,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> sink
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> dgraph_type::edge_type edge_weight_type;
+        g.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> num_nodes <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>7</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font>;
+        g.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font>num_nodes<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>i,i<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#979000'>1</font>,i<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g, i, i<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>edge_weight_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g, i<font color='#5555FF'>-</font><font color='#979000'>1</font>, i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>edge_weight_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#BB00BB'>pick_random_source_and_sink</font><font face='Lucida Console'>(</font>rnd, g, source, sink<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> dgraph_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='make_random_grid_graph'></a>make_random_grid_graph</b><font face='Lucida Console'>(</font>
+        dlib::rand<font color='#5555FF'>&amp;</font> rnd,
+        dgraph_type<font color='#5555FF'>&amp;</font> g,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> source,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> sink
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        ensures
+            - makes a grid graph like the kind used for potts models.
+    !*/</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> dgraph_type::edge_type edge_weight_type;
+        g.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> nr <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> nc <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font>;
+        g.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font>nr<font color='#5555FF'>*</font>nc<font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> rectangle <font color='#BB00BB'>rect</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,nc<font color='#5555FF'>-</font><font color='#979000'>1</font>,nr<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> nr; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> nc; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> point <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font>c,r<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>nc <font color='#5555FF'>+</font> p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>const</font> point <font color='#BB00BB'>n2</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>-</font><font color='#979000'>1</font>,r<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>n2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> n2.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>nc <font color='#5555FF'>+</font> n2.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font>;
+                    g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>j,i<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>edge_weight_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,j,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>edge_weight_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>const</font> point <font color='#BB00BB'>n4</font><font face='Lucida Console'>(</font>c,r<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>n4<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> n4.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>nc <font color='#5555FF'>+</font> n4.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font>;
+                    g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>j,i<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>edge_weight_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,j,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>edge_weight_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// use the last two nodes as source and sink.  Also connect them to all the other nodes.
+</font>        source <font color='#5555FF'>=</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        sink <font color='#5555FF'>=</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>2</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>2</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>i,source<font face='Lucida Console'>)</font>;
+            g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>source,i<font face='Lucida Console'>)</font>;
+            g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>i,sink<font face='Lucida Console'>)</font>;
+            g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>sink,i<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,i,source<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>edge_weight_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,source,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>edge_weight_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,i,sink<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>edge_weight_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,sink,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>edge_weight_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> min_cut, <font color='#0000FF'>typename</font> dgraph_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='run_test_on_graphs'></a>run_test_on_graphs</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> min_cut<font color='#5555FF'>&amp;</font> mc,
+        dgraph_type<font color='#5555FF'>&amp;</font> g1,
+        dgraph_type<font color='#5555FF'>&amp;</font> g2,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> source,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> sink
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> dgraph_type::edge_type edge_weight_type;
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>number of nodes: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> g1.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>is graph connected: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>graph_is_connected</font><font face='Lucida Console'>(</font>g1<font face='Lucida Console'>)</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>has self loops:     </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>graph_contains_length_one_cycle</font><font face='Lucida Console'>(</font>g1<font face='Lucida Console'>)</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>SOURCE_CUT: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> source;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>SINK_CUT:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sink;
+        <font color='#BB00BB'>mc</font><font face='Lucida Console'>(</font>g1, source, sink<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>brute_force_min_cut</font><font face='Lucida Console'>(</font>g2, source, sink<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>print_graph</font><font face='Lucida Console'>(</font>g1<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make sure the flow residuals are 0 at the cut locations
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> g1.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> g1.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_children</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>g1.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font><font color='#5555FF'>=</font> SOURCE_CUT <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> g1.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>child</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.data <font color='#5555FF'>!</font><font color='#5555FF'>=</font> SOURCE_CUT<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                    <font face='Lucida Console'>(</font>g1.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data <font color='#5555FF'>!</font><font color='#5555FF'>=</font> SINK_CUT <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> g1.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>child</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font><font color='#5555FF'>=</font> SINK_CUT<font face='Lucida Console'>)</font>
+                    <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>g1.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>child_edge</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>, g1.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>child_edge</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// copy the edge weights from g2 back to g1 so we can compute cut scores
+</font>        <font color='#BB00BB'>copy_edge_weights</font><font face='Lucida Console'>(</font>g1, g2<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>g1.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> g2.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> g1.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>node </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>g1.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>, </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>g2.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>g1.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data <font color='#5555FF'>!</font><font color='#5555FF'>=</font> g2.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data<font face='Lucida Console'>)</font>
+            <b>{</b>
+                edge_weight_type cut_score <font color='#5555FF'>=</font> <font color='#BB00BB'>graph_cut_score</font><font face='Lucida Console'>(</font>g1<font face='Lucida Console'>)</font>;
+                edge_weight_type brute_force_score <font color='#5555FF'>=</font> <font color='#BB00BB'>graph_cut_score</font><font face='Lucida Console'>(</font>g2<font face='Lucida Console'>)</font>;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>graph cut score: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cut_score;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>brute force score: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> brute_force_score;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>brute_force_score <font color='#5555FF'>!</font><font color='#5555FF'>=</font> cut_score<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>print_graph</font><font face='Lucida Console'>(</font>g1<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>brute_force_score <font color='#5555FF'>=</font><font color='#5555FF'>=</font> cut_score,std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>brute_force_score<font color='#5555FF'>-</font>cut_score<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> min_cut, <font color='#0000FF'>typename</font> edge_weight_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_graph_cuts'></a>test_graph_cuts</b><font face='Lucida Console'>(</font>dlib::rand<font color='#5555FF'>&amp;</font> rnd<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> dlib::directed_graph<font color='#5555FF'>&lt;</font>node_label, edge_weight_type<font color='#5555FF'>&gt;</font>::kernel_1a_c dgraph_type;
+        <font color='#009900'>// we will create two identical graphs.
+</font>        dgraph_type g1, g2;
+        min_cut mc;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> source, sink;
+
+        dlib::rand <font color='#BB00BB'>rnd_copy</font><font face='Lucida Console'>(</font>rnd<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>make_random_graph</font><font face='Lucida Console'>(</font>rnd,g1, source, sink<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>make_random_graph</font><font face='Lucida Console'>(</font>rnd_copy,g2, source, sink<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>run_test_on_graphs</font><font face='Lucida Console'>(</font>mc, g1, g2, source, sink<font face='Lucida Console'>)</font>;
+
+        rnd_copy <font color='#5555FF'>=</font> rnd;
+        <font color='#BB00BB'>make_random_grid_graph</font><font face='Lucida Console'>(</font>rnd,g1, source, sink<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>make_random_grid_graph</font><font face='Lucida Console'>(</font>rnd_copy,g2, source, sink<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>run_test_on_graphs</font><font face='Lucida Console'>(</font>mc, g1, g2, source, sink<font face='Lucida Console'>)</font>;
+
+        rnd_copy <font color='#5555FF'>=</font> rnd;
+        <font color='#BB00BB'>make_random_chain_graph</font><font face='Lucida Console'>(</font>rnd,g1, source, sink<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>make_random_chain_graph</font><font face='Lucida Console'>(</font>rnd_copy,g2, source, sink<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>run_test_on_graphs</font><font face='Lucida Console'>(</font>mc, g1, g2, source, sink<font face='Lucida Console'>)</font>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='test_potts_grid_problem'></a>test_potts_grid_problem</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='test_potts_grid_problem'></a>test_potts_grid_problem</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> seed_<font face='Lucida Console'>)</font> :seed<font face='Lucida Console'>(</font>seed_<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+        <font color='#0000FF'><u>int</u></font> seed;
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>3</font>;<b>}</b>
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>3</font>;<b>}</b>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>double</u></font> value_type;
+
+        value_type <b><a name='factor_value'></a>factor_value</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// Copy idx into a char buffer to avoid warnings about violation of strict aliasing 
+</font>            <font color='#009900'>// rules when murmur_hash3() gets inlined into this function.
+</font>            <font color='#0000FF'><u>char</u></font> buf[<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>];
+            <font color='#BB00BB'>memcpy</font><font face='Lucida Console'>(</font>buf,<font color='#5555FF'>&amp;</font>idx,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// now hash the buffer rather than idx.
+</font>            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>murmur_hash3</font><font face='Lucida Console'>(</font>buf, <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>, seed<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> std::numeric_limits<font color='#5555FF'>&lt;</font>uint32<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2.0</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>1000.0</font>;
+        <b>}</b>
+
+        value_type <b><a name='factor_value_disagreement'></a>factor_value_disagreement</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx1, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx2<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>factor_value</font><font face='Lucida Console'>(</font>idx1<font color='#5555FF'>+</font>idx2<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>10.0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> prob_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='brute_force_potts_grid_problem'></a>brute_force_potts_grid_problem</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> prob_type<font color='#5555FF'>&amp;</font> prob,
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font><font color='#979000'>2.0</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>prob.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>prob.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>prob.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, prob.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> data <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>temp[<font color='#979000'>0</font>][<font color='#979000'>0</font>];
+
+        <font color='#0000FF'><u>double</u></font> best_score <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> temp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> T <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>j;
+                T <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font>i<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>T <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>data <font color='#5555FF'>+</font> j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> SINK_CUT;
+                <font color='#0000FF'>else</font>
+                    <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>data <font color='#5555FF'>+</font> j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> SOURCE_CUT;
+            <b>}</b>
+
+
+            <font color='#0000FF'><u>double</u></font> score <font color='#5555FF'>=</font> <font color='#BB00BB'>potts_model_score</font><font face='Lucida Console'>(</font>prob, temp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>score <font color='#5555FF'>&gt;</font> best_score<font face='Lucida Console'>)</font>
+            <b>{</b>
+                best_score <font color='#5555FF'>=</font> score;
+                <font color='#BB00BB'>assign_image</font><font face='Lucida Console'>(</font>labels, temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_inf'></a>test_inf</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        graph<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::kernel_1a_c g;
+        g.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font>node_label<font color='#5555FF'>&gt;</font> labels;
+        <font color='#BB00BB'>find_max_factor_graph_potts</font><font face='Lucida Console'>(</font>g, labels<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>0</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>2</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>3</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// --------------------------
+</font>
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>3</font>;
+
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        <font color='#BB00BB'>find_max_factor_graph_potts</font><font face='Lucida Console'>(</font>g, labels<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>0</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>1</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>2</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>3</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// --------------------------
+</font>
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.1</font>;
+
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        <font color='#BB00BB'>find_max_factor_graph_potts</font><font face='Lucida Console'>(</font>g, labels<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>0</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>1</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>2</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>3</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// --------------------------
+</font>
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.1</font>;
+
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#BB00BB'>find_max_factor_graph_potts</font><font face='Lucida Console'>(</font>g, labels<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>0</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>1</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>2</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>3</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// --------------------------
+</font>
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>;
+
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#BB00BB'>find_max_factor_graph_potts</font><font face='Lucida Console'>(</font>g, labels<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>2</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>3</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// --------------------------
+</font>
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>;
+
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#BB00BB'>find_max_factor_graph_potts</font><font face='Lucida Console'>(</font>g, labels<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>1</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>2</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>3</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// --------------------------
+</font>
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>;
+
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>find_max_factor_graph_potts</font><font face='Lucida Console'>(</font>g, labels<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>0</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>1</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>2</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>3</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// --------------------------
+</font>
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>20.05</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.1</font>;
+
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+
+        <font color='#BB00BB'>find_max_factor_graph_potts</font><font face='Lucida Console'>(</font>g, labels<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>2</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>3</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// --------------------------
+</font>
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>20.2</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.1</font>;
+
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+
+        <font color='#BB00BB'>find_max_factor_graph_potts</font><font face='Lucida Console'>(</font>g, labels<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>2</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>3</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>struct</font> <b><a name='potts_pair_image_model'></a>potts_pair_image_model</b> 
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>double</u></font> value_type;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pixel_type1, <font color='#0000FF'>typename</font> pixel_type2<font color='#5555FF'>&gt;</font>
+        value_type <b><a name='factor_value'></a>factor_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> pixel_type1<font color='#5555FF'>&amp;</font> ,
+            <font color='#0000FF'>const</font> pixel_type2<font color='#5555FF'>&amp;</font> v2 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> v2;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pixel_type<font color='#5555FF'>&gt;</font>
+        value_type <b><a name='factor_value_disagreement'></a>factor_value_disagreement</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> v1,
+            <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> v2 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>v1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> v2<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>10</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_potts_pair_grid'></a>test_potts_pair_grid</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>img1</font><font face='Lucida Console'>(</font><font color='#979000'>40</font>,<font color='#979000'>40</font><font face='Lucida Console'>)</font>;
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>img2</font><font face='Lucida Console'>(</font><font color='#979000'>40</font>,<font color='#979000'>40</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>img1, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>img2, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        img1[<font color='#979000'>4</font>][<font color='#979000'>4</font>] <font color='#5555FF'>=</font> <font color='#979000'>1000</font>;
+
+        img2[<font color='#979000'>4</font>][<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        img2[<font color='#979000'>4</font>][<font color='#979000'>4</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        img2[<font color='#979000'>4</font>][<font color='#979000'>5</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        img2[<font color='#979000'>3</font>][<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        img2[<font color='#979000'>3</font>][<font color='#979000'>4</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        img2[<font color='#979000'>3</font>][<font color='#979000'>5</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        img2[<font color='#979000'>5</font>][<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        img2[<font color='#979000'>5</font>][<font color='#979000'>4</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        img2[<font color='#979000'>5</font>][<font color='#979000'>5</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> labels;
+        <font color='#BB00BB'>find_max_factor_graph_potts</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_potts_grid_problem</font><font face='Lucida Console'>(</font><font color='#BB00BB'>potts_pair_image_model</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,img2,img1<font face='Lucida Console'>)</font>, labels<font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>num true labels: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>labels<font face='Lucida Console'>)</font><font color='#5555FF'>!</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>labels<font face='Lucida Console'>)</font><font color='#5555FF'>!</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>labels<font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img1.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>4</font>][<font color='#979000'>3</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>4</font>][<font color='#979000'>4</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>4</font>][<font color='#979000'>5</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>3</font>][<font color='#979000'>3</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>3</font>][<font color='#979000'>4</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>3</font>][<font color='#979000'>5</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>5</font>][<font color='#979000'>3</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>5</font>][<font color='#979000'>4</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>5</font>][<font color='#979000'>5</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='graph_cuts_tester'></a>graph_cuts_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='graph_cuts_tester'></a>graph_cuts_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_graph_cuts</font>",
+                    "<font color='#CC0000'>Runs tests on the graph cuts tools.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        dlib::rand rnd;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>test_potts_pair_grid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_inf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>500</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> labels, brute_labels;
+                test_potts_grid_problem <font color='#BB00BB'>prob</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>find_max_factor_graph_potts</font><font face='Lucida Console'>(</font>prob, labels<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>brute_force_potts_grid_problem</font><font face='Lucida Console'>(</font>prob, brute_labels<font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> brute_labels.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>labels.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> brute_labels.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> labels.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> labels.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'><u>bool</u></font> normal <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>labels[r][c] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'><u>bool</u></font> brute <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>brute_labels[r][c] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>normal <font color='#5555FF'>=</font><font color='#5555FF'>=</font> brute<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>1000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test_grpah_cuts&lt;short&gt; iter: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i;
+                test_graph_cuts<font color='#5555FF'>&lt;</font>min_cut,<font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rnd<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test_grpah_cuts&lt;double&gt; iter: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i;
+                test_graph_cuts<font color='#5555FF'>&lt;</font>min_cut,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>rnd<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> <font color='#979000'>300</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>image_potts_problem iter </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> k;
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                image_potts_problem <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>3</font>, rnd<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>impl_test_potts_model</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> <font color='#979000'>300</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dense_potts_problem iter </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> k;
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                dense_potts_problem <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font><font color='#979000'>6</font>, rnd<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>impl_test_potts_model</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> <font color='#979000'>300</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dense_potts_problem iter </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> k;
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>test_graph_potts_model</font><font face='Lucida Console'>(</font>rnd<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b> a;
+
+
+<b>}</b>
+
+
+
+
+
+</pre></body></html>

@@ -1,0 +1,387 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD><TITLE>enable_if</TITLE>
+
+<META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<META name="GENERATOR" content="Microsoft FrontPage 5.0">
+</HEAD>
+<BODY >
+<!--HEVEA command line is: hevea -nosymb -noiso -pedantic -v enable_if_docs_for_boost.tex -->
+<!--HTMLHEAD-->
+<!--ENDHTML-->
+<!--PREFIX <ARG ></ARG>-->
+<!--CUT DEF section 1 -->
+<BR>
+<BR>
+
+
+<h1>
+<img border="0" src="boost.png" align="center" width="277" height="86">enable_if</h1>
+<BR>
+<BR>
+Copyright 2003 Jaakko J&auml;rvi, Jeremiah Willcock, Andrew Lumsdaine.<BR>
+<BR>
+<!--TOC section Introduction-->
+
+<H2><A NAME="htoc1">1</A>&nbsp;&nbsp;Introduction</H2><!--SEC END -->
+
+<A NAME="introduction"></A>
+The <TT>enable_if</TT> family of templates is a set of tools to allow a function template or a class template specialization 
+to include or exclude itself from a set of matching functions or specializations
+based on properties of its template arguments. 
+For example, one can define function templates that
+are only enabled for, and thus only match, an arbitrary set of types
+defined by a traits class. The <TT>enable_if</TT> templates can also be
+applied to enable class template specializations. Applications of
+<TT>enable_if</TT> are discussed in length
+in&nbsp;[<A HREF="#jarvi:03:cuj_arbitrary_overloading"><CITE>1</CITE></A>] and&nbsp;[<A HREF="#jarvi:03:c++typeclasses"><CITE>2</CITE></A>].<BR>
+<BR>
+<!--TOC subsection Synopsis-->
+
+<H3><A NAME="htoc2">1.1</A>&nbsp;&nbsp;Synopsis</H3><!--SEC END -->
+
+<A NAME="sec:synopsis"></A>
+<PRE>namespace boost {
+  template &lt;class Cond, class T = void&gt; struct enable_if;
+  template &lt;class Cond, class T = void&gt; struct disable_if;
+  template &lt;class Cond, class T&gt; struct lazy_enable_if;
+  template &lt;class Cond, class T&gt; struct lazy_disable_if;
+
+  template &lt;bool B, class T = void&gt; struct enable_if_c;
+  template &lt;bool B, class T = void&gt; struct disable_if_c;
+  template &lt;bool B, class T&gt; struct lazy_enable_if_c;
+  template &lt;bool B, class T&gt; struct lazy_disable_if_c;
+}
+</PRE>
+<!--TOC subsection Background-->
+
+<H3><A NAME="htoc3">1.2</A>&nbsp;&nbsp;Background</H3><!--SEC END -->
+
+<A NAME="sec:background"></A>
+Sensible operation of template function overloading in C++ relies
+on the <EM>SFINAE</EM> (substitution-failure-is-not-an-error)
+principle&nbsp;[<A HREF="#vandevoorde2002:templates"><CITE>3</CITE></A>]: if an invalid argument
+or return type is formed during the instantiation of a function
+template, the instantiation is removed from the overload resolution
+set instead of causing a compilation error. The following example, 
+taken from&nbsp;[<A HREF="#jarvi:03:cuj_arbitrary_overloading"><CITE>1</CITE></A>],
+demonstrates why this is important:
+<PRE>int negate(int i) { return -i; }
+
+template &lt;class F&gt;
+typename F::result_type negate(const F&amp; f) { return -f(); }
+
+</PRE>
+Suppose the compiler encounters the call <TT>negate(1)</TT>. The first
+definition is obviously a better match, but the compiler must
+nevertheless consider (and instantiate the prototypes) of both
+definitions to find this out. Instantiating the latter definition with
+<TT>F</TT> as <TT>int</TT> would result in:
+<PRE>int::result_type negate(const int&amp;);
+
+</PRE>
+where the return type is invalid. If this was an error, adding an unrelated function template 
+(that was never called) could break otherwise valid code.
+Due to the SFINAE principle the above example is not, however, erroneous. 
+The latter definition of <TT>negate</TT> is simply removed from the overload resolution set.<BR>
+<BR>
+The <TT>enable_if</TT> templates are tools for controlled creation of the SFINAE
+conditions.<BR>
+<BR>
+<!--TOC section The <TT>enable_if</TT> templates-->
+
+<H2><A NAME="htoc4">2</A>&nbsp;&nbsp;The <TT>enable_if</TT> templates</H2><!--SEC END -->
+
+<A NAME="enable_if"></A>
+The names of the <TT>enable_if</TT> templates have three parts: an optional <TT>lazy_</TT> tag, 
+either <TT>enable_if</TT> or <TT>disable_if</TT>, and an optional <TT>_c</TT> tag.
+All eight combinations of these parts are supported.
+The meaning of the <TT>lazy_</TT> tag is described in Section&nbsp;<A HREF="#sec:enable_if_lazy">3.3</A>.
+The second part of the name indicates whether a true condition argument should 
+enable or disable the current overload.
+The third part of the name indicates whether the condition argument is a <TT>bool</TT> value 
+(<TT>_c</TT> suffix), or a type containing a static <TT>bool</TT> constant named <TT>value</TT> (no suffix).
+The latter version interoperates with Boost.MPL. <BR>
+<BR>
+The definitions of <TT>enable_if_c</TT> and <TT>enable_if</TT> are as follows (we use <TT>enable_if</TT> templates 
+unqualified but they are in the <TT>boost</TT> namespace).
+<PRE>template &lt;bool B, class T = void&gt;
+struct enable_if_c {
+  typedef T type;
+};
+
+template &lt;class T&gt;
+struct enable_if_c&lt;false, T&gt; {};
+
+template &lt;class Cond, class T = void&gt;
+struct enable_if : public enable_if_c&lt;Cond::value, T&gt; {};
+
+</PRE>
+An instantiation of the <TT>enable_if_c</TT> template with the parameter
+<TT>B</TT> as <TT>true</TT> contains a member type <TT>type</TT>, defined
+to be <TT>T</TT>. If <TT>B</TT> is
+<TT>false</TT>, no such member is defined. Thus 
+<TT>enable_if_c&lt;B, T&gt;::type</TT> is either a valid or an invalid type
+expression, depending on the value of <TT>B</TT>.
+When valid, <TT>enable_if_c&lt;B, T&gt;::type</TT> equals <TT>T</TT>.
+The <TT>enable_if_c</TT> template can thus be used for controlling when functions are considered for
+overload resolution and when they are not. 
+For example, the following function is defined for all arithmetic types (according to the
+classification of the <A HREF="http://www.boost.org/doc/libs/release/libs/type_traits/index.html">Boost type_traits library</A>):
+<PRE>template &lt;class T&gt;
+typename enable_if_c&lt;boost::is_arithmetic&lt;T&gt;::value, T&gt;::type 
+foo(T t) { return t; }
+
+</PRE>
+The <TT>disable_if_c</TT> template is provided as well, and has the
+same functionality as <TT>enable_if_c</TT> except for the negated condition. The following
+function is enabled for all non-arithmetic types.
+<PRE>template &lt;class T&gt;
+typename disable_if_c&lt;boost::is_arithmetic&lt;T&gt;::value, T&gt;::type 
+bar(T t) { return t; }
+
+</PRE>
+For easier syntax in some cases and interoperation with Boost.MPL we provide versions of
+the <TT>enable_if</TT> templates taking any type with a <TT>bool</TT> member constant named 
+<TT>value</TT> as the condition argument.
+The MPL <TT>bool_</TT>, <TT>and_</TT>, <TT>or_</TT>, and <TT>not_</TT> templates are likely to be 
+useful for creating such types. Also, the traits classes in the Boost.Type_traits library 
+follow this convention. 
+For example, the above example function <TT>foo</TT> can be alternatively written as:
+<PRE>template &lt;class T&gt;
+typename enable_if&lt;boost::is_arithmetic&lt;T&gt;, T&gt;::type 
+foo(T t) { return t; }
+
+</PRE>
+<!--TOC section Using <TT>enable_if</TT>-->
+
+<H2><A NAME="htoc5">3</A>&nbsp;&nbsp;Using <TT>enable_if</TT></H2><!--SEC END -->
+
+<A NAME="sec:using_enable_if"></A>
+The <TT>enable_if</TT> templates are defined in
+<TT>boost/utility/enable_if.hpp</TT>, which is included by <TT>boost/utility.hpp</TT>.<BR>
+<BR>
+The <TT>enable_if</TT> template can be used either as the return type, or as an 
+extra argument. For example, the <TT>foo</TT> function in the previous section could also be written
+as:
+<PRE>template &lt;class T&gt;
+T foo(T t, typename enable_if&lt;boost::is_arithmetic&lt;T&gt; &gt;::type* dummy = 0); 
+
+</PRE>Hence, an extra parameter of type <TT>void*</TT> is added, but it is given 
+a default value to keep the parameter hidden from client code.
+Note that the second template argument was not given to <TT>enable_if</TT>, as the default 
+<TT>void</TT> gives the desired behavior.<BR>
+<BR>
+Whether to write the enabler as an argument or within the return type is
+largely a matter of taste, but for certain functions, only one
+alternative is possible:
+<UL><LI>
+Operators have a fixed number of arguments, thus <TT>enable_if</TT> must be used in the return type.
+<LI>Constructors and destructors do not have a return type; an extra argument is the only option.
+<LI>There does not seem to be a way to specify an enabler for a conversion operator. Converting constructors,
+however, can have enablers as extra default arguments.
+</UL>
+<!--TOC subsection Enabling template class specializations-->
+
+<H3><A NAME="htoc6">3.1</A>&nbsp;&nbsp;Enabling template class specializations</H3><!--SEC END -->
+
+<A NAME="sec:enable_if_classes"></A>
+Class template specializations can be enabled or disabled with <TT>enable_if</TT>.
+One extra template parameter needs to be added for the enabler expressions.
+This parameter has the default value <TT>void</TT>.
+For example:
+<PRE>template &lt;class T, class Enable = void&gt; 
+class A { ... };
+
+template &lt;class T&gt;
+class A&lt;T, typename enable_if&lt;is_integral&lt;T&gt; &gt;::type&gt; { ... };
+
+template &lt;class T&gt;
+class A&lt;T, typename enable_if&lt;is_float&lt;T&gt; &gt;::type&gt; { ... };
+
+</PRE>Instantiating <TT>A</TT> with any integral type matches the first specialization,
+whereas any floating point type matches the second one. All other types
+match the primary template.
+The condition can be any compile-time boolean expression that depends on the 
+template arguments of the class.
+Note that again, the second argument to <TT>enable_if</TT> is not needed; the default (<TT>void</TT>) 
+is the correct value.<BR>
+<BR>
+<!--TOC subsection Overlapping enabler conditions-->
+
+<H3><A NAME="htoc7">3.2</A>&nbsp;&nbsp;Overlapping enabler conditions</H3><!--SEC END -->
+
+<A NAME="sec:overlapping_conditions"></A>
+Once the compiler has examined the enabling conditions and included the
+function into the overload resolution set, normal C++ overload resolution 
+rules are used to select the best matching function.
+In particular, there is no ordering between enabling conditions.
+Function templates with enabling conditions that are not mutually exclusive can 
+lead to ambiguities. For example:
+<PRE>template &lt;class T&gt;
+typename enable_if&lt;boost::is_integral&lt;T&gt;, void&gt;::type 
+foo(T t) {}
+
+template &lt;class T&gt;
+typename enable_if&lt;boost::is_arithmetic&lt;T&gt;, void&gt;::type 
+foo(T t) {}
+
+</PRE>
+All integral types are also arithmetic. Therefore, say, for the call <TT>foo(1)</TT>,
+both conditions are true and both functions are thus in the overload resolution set.
+They are both equally good matches and thus ambiguous.
+Of course, more than one enabling condition can be simultaneously true as long as 
+other arguments disambiguate the functions.<BR>
+<BR>
+The above discussion applies to using <TT>enable_if</TT> in class template
+partial specializations as well.<BR>
+<BR>
+<!--TOC subsection Lazy <TT>enable_if</TT>-->
+
+<H3><A NAME="htoc8">3.3</A>&nbsp;&nbsp;Lazy <TT>enable_if</TT></H3><!--SEC END -->
+
+<A NAME="sec:enable_if_lazy"></A>
+In some cases it is necessary to avoid instantiating part of a
+function signature unless an enabling condition is true. For example:
+<PRE>template &lt;class T, class U&gt; class mult_traits;
+
+template &lt;class T, class U&gt;
+typename enable_if&lt;is_multipliable&lt;T, U&gt;, typename mult_traits&lt;T, U&gt;::type&gt;::type
+operator*(const T&amp; t, const U&amp; u) { ... }
+
+</PRE>Assume the class template <TT>mult_traits</TT> is a traits class defining 
+the resulting type of a multiplication operator. The <TT>is_multipliable</TT> traits
+class specifies for which types to enable the operator. Whenever
+<TT>is_multipliable&lt;A, B&gt;::value</TT> is <TT>true</TT> for some types <TT>A</TT> and <TT>B</TT>,
+then <TT>mult_traits&lt;A, B&gt;::type</TT> is defined.<BR>
+<BR>
+Now, trying to invoke (some other overload) of <TT>operator*</TT> with, say, operand types <TT>C</TT> and <TT>D</TT> 
+for which <TT>is_multipliable&lt;C, D&gt;::value</TT> is <TT>false</TT> 
+and <TT>mult_traits&lt;C, D&gt;::type</TT> is not defined is an error on some compilers. 
+The SFINAE principle is not applied because
+the invalid type occurs as an argument to another template. The <TT>lazy_enable_if</TT> 
+and <TT>lazy_disable_if</TT> templates (and their <TT>_c</TT> versions) can be used in such
+situations:
+<PRE>template&lt;class T, class U&gt;
+typename lazy_enable_if&lt;is_multipliable&lt;T, U&gt;, mult_traits&lt;T, U&gt; &gt;::type
+operator*(const T&amp; t, const U&amp; u) { ... }
+
+</PRE>The second argument of <TT>lazy_enable_if</TT> must be a class type
+that defines a nested type named <TT>type</TT> whenever the first
+parameter (the condition) is true.<BR>
+<BR>
+<!--TOC paragraph Note-->
+
+<H5>Note</H5><!--SEC END -->
+
+Referring to one member type or static constant in a traits class
+causes all of the members (type and static constant) of that
+specialization to be instantiated. Therefore, if your traits classes
+can sometimes contain invalid types, you should use two distinct
+templates for describing the conditions and the type mappings. In the
+above example, <TT>is_multipliable&lt;T, U&gt;::value</TT> defines when
+<TT>mult_traits&lt;T, U&gt;::type</TT> is valid.<BR>
+<BR>
+<!--TOC subsection Compiler workarounds-->
+
+<H3><A NAME="htoc9">3.4</A>&nbsp;&nbsp;Compiler workarounds</H3><!--SEC END -->
+
+<A NAME="sec:workarounds"></A>
+Some compilers flag functions as ambiguous if the only distinguishing factor is a different 
+condition in an enabler (even though the functions could never be ambiguous). For example,
+some compilers (e.g. GCC 3.2) diagnose the following two functions as ambiguous:
+<PRE>template &lt;class T&gt;
+typename enable_if&lt;boost::is_arithmetic&lt;T&gt;, T&gt;::type 
+foo(T t);
+
+template &lt;class T&gt;
+typename disable_if&lt;boost::is_arithmetic&lt;T&gt;, T&gt;::type 
+foo(T t);
+
+</PRE>Two workarounds can be applied:
+<UL><LI>
+Use an extra dummy parameter which disambiguates the functions. Use a default value for
+it to hide the parameter from the caller. For example:
+<PRE>template &lt;int&gt; struct dummy { dummy(int) {} };
+
+template &lt;class T&gt;
+typename enable_if&lt;boost::is_arithmetic&lt;T&gt;, T&gt;::type 
+foo(T t, dummy&lt;0&gt; = 0);
+
+template &lt;class T&gt;
+typename disable_if&lt;boost::is_arithmetic&lt;T&gt;, T&gt;::type 
+foo(T t, dummy&lt;1&gt; = 0);
+</PRE><BR>
+<BR>
+<LI>Define the functions in different namespaces and bring them into a common
+namespace with <TT>using</TT> declarations:
+<PRE>namespace A {
+  template &lt;class T&gt;
+  typename enable_if&lt;boost::is_arithmetic&lt;T&gt;, T&gt;::type 
+  foo(T t);
+}
+
+namespace B {
+  template &lt;class T&gt;
+  typename disable_if&lt;boost::is_arithmetic&lt;T&gt;, T&gt;::type 
+  foo(T t);
+}
+
+using A::foo;
+using B::foo;
+
+</PRE>
+Note that the second workaround above cannot be used for member
+templates. On the other hand, operators do not accept extra arguments,
+which makes the first workaround unusable. As the net effect,
+neither of the workarounds are of assistance for templated operators that
+need to be defined as member functions (assignment and
+subscript operators).
+</UL>
+<!--TOC section Acknowledgements-->
+
+<H2><A NAME="htoc10">4</A>&nbsp;&nbsp;Acknowledgements</H2><!--SEC END -->
+
+We are grateful to Howard Hinnant, Jason Shirk, Paul Mensonides, and Richard
+Smith whose findings have influenced the library.<BR>
+<BR>
+<!--TOC section References-->
+
+<H2>References</H2><!--SEC END -->
+<DL COMPACT=compact><DT><A NAME="jarvi:03:cuj_arbitrary_overloading"><FONT COLOR=purple>[1]</FONT></A><DD>
+Jaakko J&auml;rvi, Jeremiah Willcock, Howard Hinnant, and Andrew Lumsdaine.
+Function overloading based on arbitrary properties of types.
+<EM>C/C++ Users Journal</EM>, 21(6):25--32, June 2003.<BR>
+<BR>
+<DT><A NAME="jarvi:03:c++typeclasses"><FONT COLOR=purple>[2]</FONT></A><DD>
+Jaakko J&auml;rvi, Jeremiah Willcock, and Andrew Lumsdaine.
+Concept-controlled polymorphism.
+In Frank Pfennig and Yannis Smaragdakis, editors, <EM>Generative
+ Programming and Component Engineering</EM>, volume 2830 of <EM>LNCS</EM>, pages
+ 228--244. Springer Verlag, September 2003.<BR>
+<BR>
+<DT><A NAME="vandevoorde2002:templates"><FONT COLOR=purple>[3]</FONT></A><DD>
+David Vandevoorde and Nicolai&nbsp;M. Josuttis.
+<EM>C++ Templates: The Complete Guide</EM>.
+Addison-Wesley, 2002.</DL>
+
+
+
+
+
+<hr></hr>
+
+<B>Contributed by:</B> <BR>
+Jaakko J&auml;rvi, Jeremiah Willcock and Andrew Lumsdaine<BR>
+<EM>{jajarvi|jewillco|lums}@osl.iu.edu</EM><BR>
+Indiana University<BR>
+Open Systems Lab
+<!--HTMLFOOT-->
+<!--ENDHTML-->
+<!--FOOTER-->
+<HR SIZE=2>
+<BLOCKQUOTE><EM>This document was translated from L<sup>A</sup>T<sub>E</sub>X by
+</EM><A HREF="http://pauillac.inria.fr/~maranget/hevea/index.html"><EM>H<FONT SIZE=2><sup>E</sup></FONT>V<FONT SIZE=2><sup>E</sup></FONT>A</EM></A><EM>.
+</EM></BLOCKQUOTE>
+</BODY>
+</HTML>

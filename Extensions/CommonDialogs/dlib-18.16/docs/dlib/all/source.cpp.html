@@ -1,0 +1,80 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - source.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_ALL_SOURCe_
+<font color='#0000FF'>#define</font> DLIB_ALL_SOURCe_
+
+<font color='#009900'>// ISO C++ code
+</font><font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../base64/base64_kernel_1.cpp.html'>../base64/base64_kernel_1.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../bigint/bigint_kernel_1.cpp.html'>../bigint/bigint_kernel_1.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../bigint/bigint_kernel_2.cpp.html'>../bigint/bigint_kernel_2.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../bit_stream/bit_stream_kernel_1.cpp.html'>../bit_stream/bit_stream_kernel_1.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../entropy_decoder/entropy_decoder_kernel_1.cpp.html'>../entropy_decoder/entropy_decoder_kernel_1.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../entropy_decoder/entropy_decoder_kernel_2.cpp.html'>../entropy_decoder/entropy_decoder_kernel_2.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../entropy_encoder/entropy_encoder_kernel_1.cpp.html'>../entropy_encoder/entropy_encoder_kernel_1.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../entropy_encoder/entropy_encoder_kernel_2.cpp.html'>../entropy_encoder/entropy_encoder_kernel_2.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../md5/md5_kernel_1.cpp.html'>../md5/md5_kernel_1.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../tokenizer/tokenizer_kernel_1.cpp.html'>../tokenizer/tokenizer_kernel_1.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../unicode/unicode.cpp.html'>../unicode/unicode.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../data_io/image_dataset_metadata.cpp.html'>../data_io/image_dataset_metadata.cpp</a>"
+
+<font color='#0000FF'>#ifndef</font> DLIB_ISO_CPP_ONLY
+<font color='#009900'>// Code that depends on OS specific APIs
+</font>
+<font color='#009900'>// include this first so that it can disable the older version
+</font><font color='#009900'>// of the winsock API when compiled in windows.
+</font><font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sockets/sockets_kernel_1.cpp.html'>../sockets/sockets_kernel_1.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../bsp/bsp.cpp.html'>../bsp/bsp.cpp</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../dir_nav/dir_nav_kernel_1.cpp.html'>../dir_nav/dir_nav_kernel_1.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../dir_nav/dir_nav_kernel_2.cpp.html'>../dir_nav/dir_nav_kernel_2.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../dir_nav/dir_nav_extensions.cpp.html'>../dir_nav/dir_nav_extensions.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../linker/linker_kernel_1.cpp.html'>../linker/linker_kernel_1.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../logger/extra_logger_headers.cpp.html'>../logger/extra_logger_headers.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../logger/logger_kernel_1.cpp.html'>../logger/logger_kernel_1.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../logger/logger_config_file.cpp.html'>../logger/logger_config_file.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../misc_api/misc_api_kernel_1.cpp.html'>../misc_api/misc_api_kernel_1.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../misc_api/misc_api_kernel_2.cpp.html'>../misc_api/misc_api_kernel_2.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sockets/sockets_extensions.cpp.html'>../sockets/sockets_extensions.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sockets/sockets_kernel_2.cpp.html'>../sockets/sockets_kernel_2.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sockstreambuf/sockstreambuf.cpp.html'>../sockstreambuf/sockstreambuf.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sockstreambuf/sockstreambuf_unbuffered.cpp.html'>../sockstreambuf/sockstreambuf_unbuffered.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../server/server_kernel.cpp.html'>../server/server_kernel.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../server/server_iostream.cpp.html'>../server/server_iostream.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../server/server_http.cpp.html'>../server/server_http.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads/multithreaded_object_extension.cpp.html'>../threads/multithreaded_object_extension.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads/threaded_object_extension.cpp.html'>../threads/threaded_object_extension.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads/threads_kernel_1.cpp.html'>../threads/threads_kernel_1.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads/threads_kernel_2.cpp.html'>../threads/threads_kernel_2.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads/threads_kernel_shared.cpp.html'>../threads/threads_kernel_shared.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads/thread_pool_extension.cpp.html'>../threads/thread_pool_extension.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../timer/timer.cpp.html'>../timer/timer.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../stack_trace.cpp.html'>../stack_trace.cpp</a>"
+
+<font color='#0000FF'>#ifdef</font> DLIB_PNG_SUPPORT
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_loader/png_loader.cpp.html'>../image_loader/png_loader.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_saver/save_png.cpp.html'>../image_saver/save_png.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> DLIB_JPEG_SUPPORT
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_loader/jpeg_loader.cpp.html'>../image_loader/jpeg_loader.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_saver/save_jpeg.cpp.html'>../image_saver/save_jpeg.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifndef</font> DLIB_NO_GUI_SUPPORT
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../gui_widgets/fonts.cpp.html'>../gui_widgets/fonts.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../gui_widgets/widgets.cpp.html'>../gui_widgets/widgets.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../gui_widgets/drawable.cpp.html'>../gui_widgets/drawable.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../gui_widgets/canvas_drawing.cpp.html'>../gui_widgets/canvas_drawing.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../gui_widgets/style.cpp.html'>../gui_widgets/style.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../gui_widgets/base_widgets.cpp.html'>../gui_widgets/base_widgets.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../gui_core/gui_core_kernel_1.cpp.html'>../gui_core/gui_core_kernel_1.cpp</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../gui_core/gui_core_kernel_2.cpp.html'>../gui_core/gui_core_kernel_2.cpp</a>"
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_NO_GUI_SUPPORT
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ISO_CPP_ONLY
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ALL_SOURCe_
+</font>
+
+</pre></body></html>

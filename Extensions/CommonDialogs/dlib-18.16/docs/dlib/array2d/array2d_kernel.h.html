@@ -1,0 +1,487 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - array2d_kernel.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_ARRAY2D_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_ARRAY2D_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='array2d_kernel_abstract.h.html'>array2d_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/enumerable.h.html'>../interfaces/enumerable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry/rectangle.h.html'>../geometry/rectangle.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager <font color='#5555FF'>=</font> default_memory_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='array2d'></a>array2d</b> : <font color='#0000FF'>public</font> enumerable<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - nc_ == 0 
+                - nr_ == 0 
+                - data == 0 
+                - at_start_ == true
+                - cur == 0
+                - last == 0
+
+            CONVENTION
+                - nc_ == nc() 
+                - nr_ == nc() 
+                - if (data != 0) then
+                    - last == a pointer to the last element in the data array
+                    - data == pointer to an array of nc_*nr_ T objects 
+                - else
+                    - nc_ == 0
+                    - nr_ == 0
+                    - data == 0
+                    - last == 0
+
+
+                - nr_ * nc_ == size()
+                - if (cur == 0) then
+                    - current_element_valid() == false
+                - else 
+                    - current_element_valid() == true
+                    - *cur == element()
+
+                - at_start_ == at_start()      
+        !*/</font>
+
+
+        <font color='#0000FF'>class</font> row_helper;
+    <font color='#0000FF'>public</font>:
+
+        <font color='#009900'>// These typedefs are here for backwards compatibility with older versions of dlib.
+</font>        <font color='#0000FF'>typedef</font> array2d kernel_1a;
+        <font color='#0000FF'>typedef</font> array2d kernel_1a_c;
+         
+        <font color='#0000FF'>typedef</font> T type;
+        <font color='#0000FF'>typedef</font> mem_manager mem_manager_type;
+
+        <font color='#009900'>// -----------------------------------
+</font>
+        <font color='#0000FF'>class</font> <b><a name='row'></a>row</b> 
+        <b>{</b>
+            <font color='#009900'>/*!
+                CONVENTION
+                    - nc_ == nc()
+                    - for all x &lt; nc_:
+                        - (*this)[x] == data[x]
+            !*/</font>
+
+            <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> array2d;
+            <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> row_helper;
+
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> nc_; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> column
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+            <b>{</b> 
+                <font color='#009900'>// make sure requires clause is not broken
+</font>                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>column <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> column <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                    "<font color='#CC0000'>\tconst T&amp; array2d::operator[](long column) const</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tThe column index given must be less than the number of columns.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tcolumn:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> column 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>return</font> data[column]; 
+            <b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> column
+            <font face='Lucida Console'>)</font> 
+            <b>{</b> 
+                <font color='#009900'>// make sure requires clause is not broken
+</font>                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>column <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> column <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                    "<font color='#CC0000'>\tT&amp; array2d::operator[](long column)</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tThe column index given must be less than the number of columns.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tcolumn:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> column 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>return</font> data[column]; 
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+            <b><a name='row'></a>row</b><font face='Lucida Console'>(</font>T<font color='#5555FF'>*</font> data_, <font color='#0000FF'><u>long</u></font> cols<font face='Lucida Console'>)</font> : data<font face='Lucida Console'>(</font>data_<font face='Lucida Console'>)</font>, nc_<font face='Lucida Console'>(</font>cols<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            T<font color='#5555FF'>*</font> data; 
+            <font color='#0000FF'><u>long</u></font> nc_;
+
+
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='row'></a>row</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b><b>}</b>
+            row<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>row<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;
+        <b>}</b>;
+
+        <font color='#009900'>// -----------------------------------
+</font>
+        <b><a name='array2d'></a>array2d</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> : 
+            data<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            nc_<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            nr_<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            cur<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            last<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            at_start_<font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <b><a name='array2d'></a>array2d</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> rows,
+            <font color='#0000FF'><u>long</u></font> cols
+        <font face='Lucida Console'>)</font> : 
+            data<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            nc_<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            nr_<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            cur<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            last<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            at_start_<font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cols <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> rows <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                        "<font color='#CC0000'>\t array2d::array2d(long rows, long cols)</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t The array2d can't have negative rows or columns.</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t cols: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cols 
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t rows: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rows 
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>rows,cols<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='array2d'></a>array2d</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> nc_; <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> nr_; <b>}</b>
+
+        row <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> row_
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>row_ <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> row_ <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\trow array2d::operator[](long row_)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tThe row index given must be less than the number of rows.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trow_:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> row_ 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>row</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>+</font>row_<font color='#5555FF'>*</font>nc_, nc_<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> row <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> row_
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>row_ <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> row_ <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\tconst row array2d::operator[](long row_) const</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tThe row index given must be less than the number of rows.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trow_:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> row_ 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>row</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>+</font>row_<font color='#5555FF'>*</font>nc_, nc_<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            array2d<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>data,item.data<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>nr_,item.nr_<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>nc_,item.nc_<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>at_start_,item.at_start_<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>cur,item.cur<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>last,item.last<font face='Lucida Console'>)</font>;
+            pool.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.pool<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                pool.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+                nc_ <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                nr_ <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                data <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                at_start_ <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                cur <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                last <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> rows,
+            <font color='#0000FF'><u>long</u></font> cols
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='at_start'></a>at_start</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> at_start_; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> at_start_ <font color='#5555FF'>=</font> <font color='#979000'>true</font>; cur <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='current_element_valid'></a>current_element_valid</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>cur <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>current_element_valid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+                "<font color='#CC0000'>\tconst T&amp; array2d::element()()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can only call element() when you are at a valid one.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>cur; 
+        <b>}</b>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>current_element_valid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+                         "<font color='#CC0000'>\tT&amp; array2d::element()()</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can only call element() when you are at a valid one.</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>cur; 
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='move_next'></a>move_next</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cur <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cur <font color='#5555FF'>!</font><font color='#5555FF'>=</font> last<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>cur;
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                <b>}</b>
+                cur <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>at_start_<font face='Lucida Console'>)</font>
+            <b>{</b>
+                cur <font color='#5555FF'>=</font> data;
+                at_start_ <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>data <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>nc_ <font color='#5555FF'>*</font> nr_<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='width_step'></a>width_step</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> nc_<font color='#5555FF'>*</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+
+        T<font color='#5555FF'>*</font> data;
+        <font color='#0000FF'><u>long</u></font> nc_;
+        <font color='#0000FF'><u>long</u></font> nr_;
+
+        <font color='#0000FF'>typename</font> mem_manager::<font color='#0000FF'>template</font> rebind<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::other pool;
+        <font color='#0000FF'>mutable</font> T<font color='#5555FF'>*</font> cur;
+        T<font color='#5555FF'>*</font> last;
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>bool</u></font> at_start_;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='array2d'></a>array2d</b><font face='Lucida Console'>(</font>array2d<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        array2d<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>array2d<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        array2d<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        array2d<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> array2d<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>   
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#009900'>// The reason the serialization is a little funny is because we are trying to
+</font>            <font color='#009900'>// maintain backwards compatibility with an older serialization format used by
+</font>            <font color='#009900'>// dlib while also encoding things in a way that lets the array2d and matrix
+</font>            <font color='#009900'>// objects have compatible serialization formats.
+</font>            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>item.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>item.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>;
+
+            item.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>item.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>;
+            item.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type array2d</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        array2d<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>   
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#0000FF'><u>long</u></font> nr, nc;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>nr,in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>nc,in<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// this is the newer serialization format
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nr <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> nc <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                nr <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                nc <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>nr,nc<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            item.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>nr,nc<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>item.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,in<font face='Lucida Console'>)</font>; 
+            item.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            item.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type array2d</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> array2d<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>long</u></font> rows,
+        <font color='#0000FF'><u>long</u></font> cols
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cols <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> rows <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> ,
+               "<font color='#CC0000'>\tvoid array2d::set_size(long rows, long cols)</font>"
+               <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tThe array2d can't have negative rows or columns.</font>"
+               <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+               <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tcols: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cols 
+               <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trows: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rows 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// set the enumerator back at the start
+</font>        at_start_ <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        cur <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#009900'>// don't do anything if we are already the right size.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nc_ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> cols <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> nr_ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> rows<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+        nc_ <font color='#5555FF'>=</font> cols;
+        nr_ <font color='#5555FF'>=</font> rows;
+
+        <font color='#009900'>// free any existing memory
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            pool.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+            data <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#009900'>// now setup this object to have the new size
+</font>        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nr_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                data <font color='#5555FF'>=</font> pool.<font color='#BB00BB'>allocate_array</font><font face='Lucida Console'>(</font>nr_<font color='#5555FF'>*</font>nc_<font face='Lucida Console'>)</font>;
+                last <font color='#5555FF'>=</font> data <font color='#5555FF'>+</font> nr_<font color='#5555FF'>*</font>nc_ <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>
+                pool.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+
+            data <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            nc_ <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            nr_ <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            last <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>throw</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> MM<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_array2d'></a>is_array2d</b> <font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font>T,MM<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>  
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ARRAY2D_KERNEl_1_ 
+</font>
+
+</pre></body></html>

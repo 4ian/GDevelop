@@ -1,0 +1,251 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - circular_buffer_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_CIRCULAR_BuFFER_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_CIRCULAR_BuFFER_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='circular_buffer'></a>circular_buffer</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T
+                T must have a default constructor and be copyable.
+
+            POINTERS AND REFERENCES TO INTERNAL DATA
+                swap(), size(), front(), back(), and operator[] functions do 
+                not invalidate pointers or references to internal data.
+                All other functions have no such guarantee.
+
+            INITIAL VALUE
+                - size() == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a circular buffer of objects of type T.  This means 
+                that when objects are pushed onto one of its ends it does not grow 
+                in size.  Instead, it shifts all elements over one to make room for 
+                the new element and the element at the opposing end falls off the 
+                buffer and is lost.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> default_memory_manager mem_manager_type;
+        <font color='#0000FF'>typedef</font> T value_type;
+        <font color='#0000FF'>typedef</font> T type;
+
+        <b><a name='circular_buffer'></a>circular_buffer</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #size() == 0
+                - this object is properly initialized
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object has its initial value
+                - #size() == 0
+        !*/</font>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font> 
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - i &lt; size()
+            ensures
+                - returns a non-const reference to the i-th element of this circular buffer
+        !*/</font>
+
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font> 
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - i &lt; size()
+            ensures
+                - returns a const reference to the i-th element of this circular buffer
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='resize'></a>resize</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_size
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #size() == new_size
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_size, 
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> value
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #size() == new_size 
+                - for all valid i:
+                    - (*this)[i] == value
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of elements in this circular buffer
+        !*/</font>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='front'></a>front</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - size() &gt; 0
+            ensures
+                - returns a reference to (*this)[0]
+        !*/</font>
+
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='front'></a>front</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - size() &gt; 0
+            ensures
+                - returns a const reference to (*this)[0]
+        !*/</font>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='back'></a>back</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - size() &gt; 0
+            ensures
+                - returns a reference to (*this)[size()-1]
+        !*/</font>
+
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='back'></a>back</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - size() &gt; 0
+            ensures
+                - returns a const reference to (*this)[size()-1]
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='push_front'></a>push_front</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> value
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #size() == size()
+                  (i.e. the size of this object does not change)
+                - if (size() != 0) then
+                    - #front() == value
+                    - all items are shifted over such that, 
+                        - #(*this)[1] == (*this)[0]
+                        - #(*this)[2] == (*this)[1]
+                        - #(*this)[3] == (*this)[2]
+                        - etc.
+                        - back() is shifted out of the circular buffer
+                - else
+                    - This function has no effect on this object 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='push_back'></a>push_back</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> value
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #size() == size()
+                  (i.e. the size of this object does not change)
+                - if (size() != 0) then
+                    - #back() == value
+                    - all items are shifted over such that, 
+                        - front() is shifted out of the circular buffer 
+                        - #(*this)[0] == (*this)[1]
+                        - #(*this)[1] == (*this)[2]
+                        - #(*this)[2] == (*this)[3]
+                        - etc.
+                - else
+                    - This function has no effect on this object 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            circular_buffer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this with item
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        circular_buffer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        circular_buffer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> circular_buffer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        circular_buffer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='mat'></a>mat</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> circular_buffer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a matrix R such that:
+                - is_col_vector(R) == true 
+                - R.size() == m.size()
+                - for all valid r:
+                  R(r) == m[r]
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CIRCULAR_BuFFER_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

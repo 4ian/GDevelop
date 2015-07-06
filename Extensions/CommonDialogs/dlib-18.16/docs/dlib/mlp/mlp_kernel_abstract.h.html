@@ -1,0 +1,228 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - mlp_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_MLp_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_MLp_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='mlp'></a>mlp</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                The network is initially initialized with random weights 
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a multilayer layer perceptron network that is
+                trained using the back propagation algorithm.  The training algorithm also
+                incorporates the momentum method.  That is, each round of back propagation
+                training also adds a fraction of the previous update.  This fraction
+                is controlled by the momentum term set in the constructor.  
+
+                The activation function used at each node is the sigmoid function.  I.e.
+                sigmoid(x) = 1/(1 + pow(e,-x)).  Thus the output of the network is
+                always in the range [0,1]
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='mlp'></a>mlp</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> nodes_in_input_layer,
+            <font color='#0000FF'><u>long</u></font> nodes_in_first_hidden_layer, 
+            <font color='#0000FF'><u>long</u></font> nodes_in_second_hidden_layer <font color='#5555FF'>=</font> <font color='#979000'>0</font>, 
+            <font color='#0000FF'><u>long</u></font> nodes_in_output_layer <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+            <font color='#0000FF'><u>double</u></font> alpha <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>,
+            <font color='#0000FF'><u>double</u></font> momentum <font color='#5555FF'>=</font> <font color='#979000'>0.8</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - nodes_in_input_layer &gt; 0
+                - nodes_in_first_hidden_layer &gt; 0
+                - nodes_in_second_hidden_layer &gt;= 0
+                - nodes_in_output_layer &gt; 0
+            ensures
+                - #*this is properly initialized 
+                - #input_layer_nodes() == nodes_in_input_layer
+                - #first_hidden_layer_nodes() == nodes_in_first_hidden_layer
+                - #second_hidden_layer_nodes() == nodes_in_second_hidden_layer
+                - #output_layer_nodes() == nodes_in_output_layer
+                - #get_alpha() == alpha
+                - #get_momentum() == momentum
+            throws
+                - std::bad_alloc
+                    if this is thrown the mlp will be unusable but 
+                    will not leak memory
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='mlp'></a>mlp</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources associated with #*this have been released
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - reinitialize the network with random weights
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='input_layer_nodes'></a>input_layer_nodes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of nodes in the input layer
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='first_hidden_layer_nodes'></a>first_hidden_layer_nodes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of nodes in the first hidden layer.  This is
+                  the hidden layer that is directly connected to the input layer.
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='second_hidden_layer_nodes'></a>second_hidden_layer_nodes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (this network has a second hidden layer) then
+                    - returns the number of nodes in the second hidden layer.  This is 
+                      the hidden layer that is directly connected to the output layer.
+                - else
+                    - returns 0
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='output_layer_nodes'></a>output_layer_nodes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of nodes in the output layer
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_alpha'></a>get_alpha</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the back propagation learning rate used by this object.
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_momentum'></a>get_momentum</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the momentum term used by this object during back propagation
+                  training.  The momentum is is the fraction of a previous update to 
+                  carry forward to the next call to train()
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> in 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - in.nr() == input_layer_nodes()
+                - in.nc() == 1
+                - EXP::type == double
+            ensures
+                - returns the output of the network when it is given the
+                  input in.  The output's elements are always in the range
+                  of 0.0 to 1.0
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP1, <font color='#0000FF'>typename</font> EXP2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> example_in,
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> example_out 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - example_in.nr() == input_layer_nodes()
+                - example_in.nc() == 1
+                - example_out.nr() == output_layer_nodes()
+                - example_out.nc() == 1
+                - max(example_out) &lt;= 1.0 &amp;&amp; min(example_out) &gt;= 0.0
+                - EXP1::type == double
+                - EXP2::type == double
+            ensures
+                - trains the network that the correct output when given example_in 
+                  should be example_out.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> example_in,
+            <font color='#0000FF'><u>double</u></font> example_out
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - example_in.nr() == input_layer_nodes()
+                - example_in.nc() == 1
+                - output_layer_nodes() == 1
+                - example_out &lt;= 1.0 &amp;&amp; example_out &gt;= 0.0
+                - EXP::type == double
+            ensures
+                - trains the network that the correct output when given example_in 
+                  should be example_out.
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_average_change'></a>get_average_change</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the average change in the node weights in the
+                  neural network during the last call to train()
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            mlp<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font>
+
+    <b>}</b>;   
+   
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        mlp<font color='#5555FF'>&amp;</font> a, 
+        mlp<font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> mlp<font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        mlp<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MLp_ABSTRACT_ 
+</font>
+
+
+</pre></body></html>

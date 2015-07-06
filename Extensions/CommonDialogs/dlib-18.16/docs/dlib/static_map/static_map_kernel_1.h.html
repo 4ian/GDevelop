@@ -1,0 +1,759 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - static_map_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_STATIC_MAP_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_STATIC_MAP_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='static_map_kernel_abstract.h.html'>static_map_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/map_pair.h.html'>../interfaces/map_pair.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/enumerable.h.html'>../interfaces/enumerable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/remover.h.html'>../interfaces/remover.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>functional<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare <font color='#5555FF'>=</font> std::less<font color='#5555FF'>&lt;</font>domain<font color='#5555FF'>&gt;</font>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='static_map_kernel_1'></a>static_map_kernel_1</b> : <font color='#0000FF'>public</font> enumerable<font color='#5555FF'>&lt;</font>map_pair<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - map_size == 0
+                - d == 0
+                - r == 0
+                - mp.d = 0;
+                - at_start_ == true
+
+
+            CONVENTION                
+                - size() == map_size
+                - if (size() &gt; 0) then
+                    - d == pointer to an array containing all the domain elements
+                    - r == pointer to an array containing all the range elements
+                    - for every i:  operator[](d[i]) == r[i]
+                    - d is sorted according to operator&lt;
+                - else
+                    - d == 0
+                    - r == 0
+
+                - current_element_valid() == (mp.d != 0)
+                - at_start() == (at_start_)
+                - if (current_element_valid()) then
+                    - element() == mp
+        !*/</font>
+        
+        <font color='#0000FF'>class</font> <b><a name='mpair'></a>mpair</b> : <font color='#0000FF'>public</font> map_pair<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>const</font> domain<font color='#5555FF'>*</font> d;
+            range<font color='#5555FF'>*</font> r;
+
+            <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> <b><a name='key'></a>key</b><font face='Lucida Console'>(</font> 
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>d; <b>}</b>
+
+            <font color='#0000FF'>const</font> range<font color='#5555FF'>&amp;</font> <b><a name='value'></a>value</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>r; <b>}</b>
+
+            range<font color='#5555FF'>&amp;</font> <b><a name='value'></a>value</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>r; <b>}</b>
+        <b>}</b>;
+
+
+        <font color='#009900'>// I would define this outside the class but Borland 5.5 has some problems
+</font>        <font color='#009900'>// with non-inline templated friend functions.          
+</font>        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+            static_map_kernel_1<font color='#5555FF'>&amp;</font> item, 
+            std::istream<font color='#5555FF'>&amp;</font> in
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                item.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size;
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>size,in<font face='Lucida Console'>)</font>;
+                item.map_size <font color='#5555FF'>=</font> size;
+                item.d <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> domain[size];
+                item.r <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> range[size];
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.d[i],in<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.r[i],in<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b> 
+                item.map_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item.d<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>delete</font> [] item.d;
+                    item.d <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <b>}</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item.r<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>delete</font> [] item.r;
+                    item.r <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type static_map_kernel_1</font>"<font face='Lucida Console'>)</font>; 
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+            <b>{</b>
+                item.map_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item.d<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>delete</font> [] item.d;
+                    item.d <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <b>}</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item.r<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>delete</font> [] item.r;
+                    item.r <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>throw</font>;
+            <b>}</b>
+        <b>}</b>
+
+
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'>typedef</font> domain domain_type;
+            <font color='#0000FF'>typedef</font> range range_type;
+            <font color='#0000FF'>typedef</font> compare compare_type;
+
+            <b><a name='static_map_kernel_1'></a>static_map_kernel_1</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='static_map_kernel_1'></a>static_map_kernel_1</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>; 
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='load'></a>load</b> <font face='Lucida Console'>(</font>
+                pair_remover<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> source
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='load'></a>load</b> <font face='Lucida Console'>(</font>
+                asc_pair_remover<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> source
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> range<font color='#5555FF'>*</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> range<font color='#5555FF'>*</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+                static_map_kernel_1<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+    
+            <font color='#009900'>// functions from the enumerable interface
+</font>            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='at_start'></a>at_start</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='current_element_valid'></a>current_element_valid</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> map_pair<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> map_pair<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='move_next'></a>move_next</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='binary_search'></a>binary_search</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> item,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> pos
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - if (there is an item in d equivalent to item) then
+                        - returns true
+                        - d[#pos] is equivalent item
+                    - else
+                        - returns false
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='sort_arrays'></a>sort_arrays</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires    
+                    - left and right are within the bounts of the array
+                ensures 
+                    - everything in the convention is still true and d[left] though
+                      d[right] is sorted according to operator&lt;
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='qsort_partition'></a>qsort_partition</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> partition_element,
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left,
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right
+            <font face='Lucida Console'>)</font>;    
+            <font color='#009900'>/*!
+                requires                   
+                    - left &lt; right
+                    - left and right are within the bounts of the array
+                ensures
+                    - the convention is still true
+                    - left &lt;= #partition_element &lt;= right                              
+                    - all elements in #d &lt; #d[#partition_element] have 
+                      indices &gt;= left and &lt; #partition_element                         
+                    - all elements in #d &gt;= #d[#partition_element] have 
+                      indices &gt;= #partition_element and &lt;= right
+            !*/</font>
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='median'></a>median</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> one,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> two,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> three
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - one, two, and three are valid indexes into d
+                ensures
+                    - returns the median of d[one], d[two], and d[three]
+            !*/</font>
+
+
+
+
+            <font color='#009900'>// data members
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> map_size;
+            domain<font color='#5555FF'>*</font> d;
+            range<font color='#5555FF'>*</font> r;          
+            <font color='#0000FF'>mutable</font> mpair mp;
+            <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>bool</u></font> at_start_;
+            compare comp;
+
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='static_map_kernel_1'></a>static_map_kernel_1</b><font face='Lucida Console'>(</font>static_map_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>            static_map_kernel_1<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>static_map_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='static_map_kernel_1'></a>static_map_kernel_1</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> :
+        map_size<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        d<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        r<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        at_start_<font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        mp.d <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>::
+    ~<b><a name='static_map_kernel_1'></a>static_map_kernel_1</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>map_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>delete</font> [] d;
+            <font color='#0000FF'>delete</font> [] r;
+        <b>}</b>
+    <b>}</b> 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>map_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            map_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>delete</font> [] d;
+            <font color='#0000FF'>delete</font> [] r;
+            d <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            r <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='load'></a>load</b> <font face='Lucida Console'>(</font>
+        pair_remover<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> source
+    <font face='Lucida Console'>)</font>
+    <b>{</b>        
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>source.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>             
+            domain<font color='#5555FF'>*</font> old_d <font color='#5555FF'>=</font> d;
+            d <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> domain[source.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>];
+            <font color='#0000FF'>try</font> <b>{</b> r <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> range[source.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>]; <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>delete</font> [] d; d <font color='#5555FF'>=</font> old_d; <font color='#0000FF'>throw</font>; <b>}</b>
+
+            map_size <font color='#5555FF'>=</font> source.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; source.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                source.<font color='#BB00BB'>remove_any</font><font face='Lucida Console'>(</font>d[i],r[i]<font face='Lucida Console'>)</font>;
+                       
+            <font color='#BB00BB'>sort_arrays</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,map_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='load'></a>load</b> <font face='Lucida Console'>(</font>
+        asc_pair_remover<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> source
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>source.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>             
+            domain<font color='#5555FF'>*</font> old_d <font color='#5555FF'>=</font> d;
+            d <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> domain[source.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>];
+            <font color='#0000FF'>try</font> <b>{</b> r <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> range[source.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>]; <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>delete</font> [] d; d <font color='#5555FF'>=</font> old_d; <font color='#0000FF'>throw</font>; <b>}</b>
+
+            map_size <font color='#5555FF'>=</font> source.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; source.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                source.<font color='#BB00BB'>remove_any</font><font face='Lucida Console'>(</font>d[i],r[i]<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> range<font color='#5555FF'>*</font> static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d_item
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>binary_search</font><font face='Lucida Console'>(</font>d_item,pos<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> r<font color='#5555FF'>+</font>pos;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;        
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    range<font color='#5555FF'>*</font> static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d_item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>binary_search</font><font face='Lucida Console'>(</font>d_item,pos<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> r<font color='#5555FF'>+</font>pos;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> map_size;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>map_size,item.map_size<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>d,item.d<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>r,item.r<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>mp,item.mp<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>at_start_,item.at_start_<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>comp,item.comp<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// enumerable function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='at_start'></a>at_start</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>at_start_<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>        
+        mp.d <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        at_start_ <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    <b>}</b>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='current_element_valid'></a>current_element_valid</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>   
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>mp.d <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> map_pair<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> mp;
+    <b>}</b>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    map_pair<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> mp;
+    <b>}</b>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='move_next'></a>move_next</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// if at_start() &amp;&amp; size() &gt; 0
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>at_start_ <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> map_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            at_start_ <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            mp.r <font color='#5555FF'>=</font> r;
+            mp.d <font color='#5555FF'>=</font> d;
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+        <font color='#009900'>// else if current_element_valid()
+</font>        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>mp.d <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>mp.d;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>mp.r;            
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>mp.d <font color='#5555FF'>-</font> d<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> map_size<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                mp.d <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>      
+            at_start_ <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+    <b>}</b>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// private member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='binary_search'></a>binary_search</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> item,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> pos
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> high <font color='#5555FF'>=</font> map_size;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> low <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> p <font color='#5555FF'>=</font> map_size;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>p <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            p <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>high<font color='#5555FF'>-</font>low<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>1</font>;
+            idx <font color='#5555FF'>=</font> p<font color='#5555FF'>+</font>low;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>item , d[idx]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                high <font color='#5555FF'>=</font> idx;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>d[idx] , item<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                low <font color='#5555FF'>=</font> idx;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                pos <font color='#5555FF'>=</font> idx;
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='sort_arrays'></a>sort_arrays</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> left <font color='#5555FF'>&lt;</font> right<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> partition_element;
+            <font color='#BB00BB'>qsort_partition</font><font face='Lucida Console'>(</font>partition_element,left,right<font face='Lucida Console'>)</font>;
+            
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>partition_element <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>sort_arrays</font><font face='Lucida Console'>(</font>left,partition_element<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>sort_arrays</font><font face='Lucida Console'>(</font>partition_element<font color='#5555FF'>+</font><font color='#979000'>1</font>,right<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='qsort_partition'></a>qsort_partition</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> partition_element,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        partition_element <font color='#5555FF'>=</font> right;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> med <font color='#5555FF'>=</font> <font color='#BB00BB'>median</font><font face='Lucida Console'>(</font>partition_element,left,<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>right<font color='#5555FF'>-</font>left<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>left<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>d[partition_element],d[med]<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>r[partition_element],r[med]<font face='Lucida Console'>)</font>;
+        
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right_scan <font color='#5555FF'>=</font> right<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left_scan <font color='#5555FF'>=</font> left;
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// find an element to the left of partition_element that needs to be moved
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font> d[left_scan] , d[partition_element]<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>left_scan;
+            <b>}</b>
+
+            <font color='#009900'>// find an element to the right of partition_element that needs to be moved
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> 
+                <font color='#5555FF'>!</font><font face='Lucida Console'>(</font><font color='#BB00BB'>comp</font> <font face='Lucida Console'>(</font>d[right_scan] , d[partition_element]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>  
+                <font face='Lucida Console'>(</font>right_scan <font color='#5555FF'>&gt;</font> left_scan<font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#5555FF'>-</font><font color='#5555FF'>-</font>right_scan;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>left_scan <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> right_scan<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>break</font>;
+
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>d[left_scan],d[right_scan]<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>r[left_scan],r[right_scan]<font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>d[left_scan],d[partition_element]<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>r[left_scan],r[partition_element]<font face='Lucida Console'>)</font>;
+        partition_element <font color='#5555FF'>=</font> left_scan;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> static_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='median'></a>median</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> one,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> two,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> three
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font> d[one] , d[two]<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// one &lt; two
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font> d[two] , d[three]<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// one &lt; two &lt; three : two
+</font>                <font color='#0000FF'>return</font> two;                
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// one &lt; two &gt;= three
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font> d[one] , d[three]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// three
+</font>                    <font color='#0000FF'>return</font> three;
+                <b>}</b>
+            <b>}</b>
+            
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// one &gt;= two
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>d[three] , d[one] <font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// three &lt;= one &gt;= two
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>d[three] , d[two]<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// two
+</font>                    <font color='#0000FF'>return</font> two;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// three
+</font>                    <font color='#0000FF'>return</font> three;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>  
+        <font color='#0000FF'>return</font> one;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_STATIC_MAP_KERNEl_1_
+</font>
+
+</pre></body></html>

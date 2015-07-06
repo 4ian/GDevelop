@@ -1,0 +1,280 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - xml_parser_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_XML_PARSER_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_XML_PARSER_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iosfwd<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='xml_parser_kernel_interfaces.h.html'>xml_parser_kernel_interfaces.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='xml_parser'></a>xml_parser</b>
+    <b>{</b>
+
+        <font color='#009900'>/*!                
+            INITIAL VALUE
+                no objects are registered to receive events 
+
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a simple SAX style event driven XML parser.  
+                It takes its input from an input stream object and sends events to all 
+                registered document_handler and error_handler objects.
+
+                note that this xml parser ignores all DTD related XML markup.  It will 
+                parse XML documents with DTD's but it just won't check if the document
+                is valid.  This also means that entity references may not be used except
+                for the predefined ones which are as follows:
+                    &amp;amp;
+                    &amp;lt;
+                    &amp;gt;
+                    &amp;apos;
+                    &amp;quot;
+
+                also note that there is no interpreting of entity references inside
+                a CDATA section or inside of tags, they are only interpreted inside 
+                normal non-markup data.
+
+                This parser considers the end of the xml document to be the closing 
+                tag of the root tag (as opposed to using EOF as the end of the
+                document).  This is a deviation from the xml standard.
+
+                Aside from ignoring DTD stuff and entity references everywhere but
+                data, and the above comment regarding EOF, this parser should conform 
+                to the rest of the XML standard.
+        !*/</font>
+        
+        <font color='#0000FF'>public</font>:
+
+
+            <b><a name='xml_parser'></a>xml_parser</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures 
+                    - #*this is properly initialized
+                throws
+                    - std::bad_alloc
+            !*/</font>
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='xml_parser'></a>xml_parser</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>; 
+            <font color='#009900'>/*!
+                ensures
+                    - all memory associated with *this has been released
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - #*this has its initial value
+                throws
+                    - std::bad_alloc
+                        if this exception is thrown then *this is unusable 
+                        until clear() is called and succeeds
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='parse'></a>parse</b> <font face='Lucida Console'>(</font>
+                std::istream<font color='#5555FF'>&amp;</font> in
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - in.fail() == false
+                ensures
+                    - the data from the input stream in will be parsed and the appropriate
+                      events will be generated 
+                    - parsing will stop when the parser has reached the closing tag
+                      for the xml document or EOF (which ever comes first). Note that
+                      hitting EOF first is a fatal error.
+                throws
+                    - std::bad_alloc
+                        if parse() throws then it will be unusable until clear() is 
+                        called and succeeds
+                    - other exceptions
+                        document_handlers and error_handlers my throw any exception.  If 
+                        they throw while parse() is running then parse() will let the 
+                        exception propagate out and the xml_parser object will be unusable 
+                        until clear() is called and succeeds.    note that end_document()
+                        is still called.
+            !*/</font>
+  
+            <font color='#0000FF'><u>void</u></font> <b><a name='add_document_handler'></a>add_document_handler</b> <font face='Lucida Console'>(</font>
+                document_handler<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - item will now receive document events from the parser
+                throws
+                    - std::bad_alloc
+                        if add_document_handler() throws then it has no effect
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='add_error_handler'></a>add_error_handler</b> <font face='Lucida Console'>(</font>
+                error_handler<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - item will now receive error events from the parser
+                throws
+                    - std::bad_alloc
+                        if add_error_handler() throws then it has no effect
+            !*/</font>
+
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+                xml_parser<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - swaps *this and item
+            !*/</font> 
+    
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='xml_parser'></a>xml_parser</b><font face='Lucida Console'>(</font>xml_parser<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>            xml_parser<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>xml_parser<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;
+
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        xml_parser<font color='#5555FF'>&amp;</font> a, 
+        xml_parser<font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='xml_parse_error'></a>xml_parse_error</b> : <font color='#0000FF'>public</font> error
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is the exception object thrown by the parse_xml() routines defined
+                below.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parse_xml'></a>parse_xml</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in,
+        document_handler<font color='#5555FF'>&amp;</font> dh,
+        error_handler<font color='#5555FF'>&amp;</font> eh
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - makes an xml_parser and tells it to parse the given input stream using the
+              supplied document_handler and error_handler.
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='parse_xml'></a>parse_xml</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in,
+        error_handler<font color='#5555FF'>&amp;</font> eh,
+        document_handler<font color='#5555FF'>&amp;</font> dh
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        ensures
+            - makes an xml_parser and tells it to parse the given input stream using the
+              supplied document_handler and error_handler.
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='parse_xml'></a>parse_xml</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in,
+        error_handler<font color='#5555FF'>&amp;</font> eh
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - makes an xml_parser and tells it to parse the given input stream using the
+              supplied error_handler.
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='parse_xml'></a>parse_xml</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in,
+        document_handler<font color='#5555FF'>&amp;</font> dh
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - makes an xml_parser and tells it to parse the given input stream using the
+              supplied document_handler.
+            - Uses a default error handler that will throw an xml_parse_error exception
+              if a fatal parsing error is encountered.
+        throws
+            - xml_parse_error
+                Thrown if a fatal parsing error is encountered.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parse_xml'></a>parse_xml</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename,
+        document_handler<font color='#5555FF'>&amp;</font> dh,
+        error_handler<font color='#5555FF'>&amp;</font> eh
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - makes an xml_parser and tells it to parse the given input file using the
+              supplied error_handler and document_handler.
+        throws
+            - xml_parse_error
+                Thrown if there is a problem opening the input file.
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='parse_xml'></a>parse_xml</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename,
+        error_handler<font color='#5555FF'>&amp;</font> eh,
+        document_handler<font color='#5555FF'>&amp;</font> dh
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - makes an xml_parser and tells it to parse the given input file using the
+              supplied error_handler and document_handler.
+        throws
+            - xml_parse_error
+                Thrown if there is a problem opening the input file.
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='parse_xml'></a>parse_xml</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename,
+        error_handler<font color='#5555FF'>&amp;</font> eh
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - makes an xml_parser and tells it to parse the given input file using the
+              supplied error_handler.
+        throws
+            - xml_parse_error
+                Thrown if there is a problem opening the input file.
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='parse_xml'></a>parse_xml</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename,
+        document_handler<font color='#5555FF'>&amp;</font> dh
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - makes an xml_parser and tells it to parse the given input file using the
+              supplied document_handler.
+            - Uses a default error handler that will throw an xml_parse_error exception
+              if a fatal parsing error is encountered.
+        throws
+            - xml_parse_error
+                Thrown if a fatal parsing error is encountered or if there is a problem
+                opening the input file.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_XML_PARSER_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

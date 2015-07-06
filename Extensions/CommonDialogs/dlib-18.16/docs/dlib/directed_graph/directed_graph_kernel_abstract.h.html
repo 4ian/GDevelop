@@ -1,0 +1,386 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - directed_graph_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_DIRECTED_GRAPH_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_DIRECTED_GRAPH_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../noncopyable.h.html'>../noncopyable.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> E <font color='#5555FF'>=</font> <font color='#0000FF'><u>char</u></font>,
+        <font color='#0000FF'>typename</font> mem_manager <font color='#5555FF'>=</font> default_memory_manager 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='directed_graph'></a>directed_graph</b> : noncopyable
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T 
+                T must be swappable by a global swap() and
+                T must have a default constructor
+
+            REQUIREMENTS ON E 
+                E must be swappable by a global swap() and
+                E must have a default constructor
+
+            REQUIREMENTS ON mem_manager
+                must be an implementation of memory_manager/memory_manager_kernel_abstract.h or
+                must be an implementation of memory_manager_global/memory_manager_global_kernel_abstract.h or
+                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+                mem_manager::type can be set to anything.
+
+            POINTERS AND REFERENCES TO INTERNAL DATA
+                The only time pointers or references to nodes or edges become invalid is when
+                they reference nodes or edges that have been removed from a graph.
+
+            INITIAL VALUE
+                number_of_nodes() == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a directed graph which is a set of nodes with directed
+                edges connecting various nodes.  
+
+                In this object if there is a directed edge from a node A to a node B then I say 
+                that A is the parent of B and B is the child of A.
+
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> T type;
+        <font color='#0000FF'>typedef</font> E edge_type;
+        <font color='#0000FF'>typedef</font> mem_manager mem_manager_type;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Tr, <font color='#0000FF'>typename</font> Er, <font color='#0000FF'>typename</font> MMr<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='rebind'></a>rebind</b> <b>{</b>
+            <font color='#0000FF'>typedef</font> directed_graph<font color='#5555FF'>&lt;</font>Tr,Er,MMr<font color='#5555FF'>&gt;</font> other;
+        <b>}</b>;
+
+        <b><a name='directed_graph'></a>directed_graph</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - #*this is properly initialized
+            throws
+                - std::bad_alloc or any exception thrown by T's constructor.
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='directed_graph'></a>directed_graph</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - all resources associated with *this has been released
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this has its initial value
+            throws
+                - std::bad_alloc or any exception thrown by T's constructor.
+                  If this exception is thrown then *this is unusable 
+                  until clear() is called and succeeds
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_number_of_nodes'></a>set_number_of_nodes</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_size
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #number_of_nodes() == new_size
+                - for all i &lt; new_size:
+                    - number_of_parents(i) == 0
+                    - number_of_children(i) == 0
+            throws
+                - std::bad_alloc or any exception thrown by T's constructor.
+                  If this exception is thrown then this object reverts back 
+                  to its initial state.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_nodes'></a>number_of_nodes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of nodes in this graph
+        !*/</font>
+
+        <font color='#0000FF'>struct</font> <b><a name='node_type'></a>node_type</b>
+        <b>{</b>
+            T data;
+            <font color='#0000FF'>typedef</font> directed_graph graph_type;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='index'></a>index</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - let G be the graph that contains the node *this
+                    - returns a number N such that G.node(N) == *this
+                      (i.e. returns the index of this node in the graph)
+            !*/</font>
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_parents'></a>number_of_parents</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - returns the number of parents of this node 
+            !*/</font>
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_children'></a>number_of_children</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - returns the number of children of this node 
+            !*/</font>
+
+            <font color='#0000FF'>const</font> node_type<font color='#5555FF'>&amp;</font> <b><a name='parent'></a>parent</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> edge_index
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                requires
+                    - edge_index &lt; number_of_parents()
+                ensures
+                    - returns a const reference to the edge_index'th parent of *this
+            !*/</font>
+
+            node_type<font color='#5555FF'>&amp;</font> <b><a name='parent'></a>parent</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> edge_index
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - edge_index &lt; number_of_parents()
+                ensures
+                    - returns a non-const reference to the edge_index'th parent of *this
+            !*/</font>
+
+            <font color='#0000FF'>const</font> node_type<font color='#5555FF'>&amp;</font> <b><a name='child'></a>child</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> edge_index
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                requires
+                    - edge_index &lt; number_of_children()
+                ensures
+                    - returns a const reference to the edge_index'th child of *this
+            !*/</font>
+
+            node_type<font color='#5555FF'>&amp;</font> <b><a name='child'></a>child</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> edge_index
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - edge_index &lt; number_of_children()
+                ensures
+                    - returns a non-const reference to the edge_index'th child of *this
+            !*/</font>
+
+            <font color='#0000FF'>const</font> E<font color='#5555FF'>&amp;</font> <b><a name='parent_edge'></a>parent_edge</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> edge_index
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                requires
+                    - edge_index &lt; number_of_parents()
+                ensures
+                    - returns a const reference to the edge_index'th edge data for the
+                      edge connecting to node this-&gt;parent(edge_index)
+            !*/</font>
+
+            E<font color='#5555FF'>&amp;</font> <b><a name='parent_edge'></a>parent_edge</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> edge_index
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - edge_index &lt; number_of_parents()
+                ensures
+                    - returns a non-const reference to the edge_index'th edge data for the
+                      edge connecting to node this-&gt;parent(edge_index)
+            !*/</font>
+
+            <font color='#0000FF'>const</font> E<font color='#5555FF'>&amp;</font> <b><a name='child_edge'></a>child_edge</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> edge_index
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                requires
+                    - edge_index &lt; number_of_children()
+                ensures
+                    - returns a const reference to the edge_index'th edge data for the
+                      edge connecting to node this-&gt;child(edge_index)
+            !*/</font>
+
+            E<font color='#5555FF'>&amp;</font> <b><a name='child_edge'></a>child_edge</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> edge_index
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - edge_index &lt; number_of_children()
+                ensures
+                    - returns a non-const reference to the edge_index'th edge data for the
+                      edge connecting to node this-&gt;child(edge_index)
+            !*/</font>
+        <b>}</b>;
+
+        node_type<font color='#5555FF'>&amp;</font> <b><a name='node'></a>node</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - index &lt; number_of_nodes()
+            ensures
+                - returns a non-const reference to the node with the given index
+        !*/</font>
+
+        <font color='#0000FF'>const</font> node_type<font color='#5555FF'>&amp;</font> <b><a name='node'></a>node</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - index &lt; number_of_nodes()
+            ensures
+                - returns a const reference to the node with the given index
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='has_edge'></a>has_edge</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> parent_node_index,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> child_node_index
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - parent_node_index &lt; number_of_nodes()
+                - child_node_index &lt; number_of_nodes()
+            ensures
+                - if (there is an edge leading from node(parent_node_index) to
+                  node(child_node_index)) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add_edge'></a>add_edge</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> parent_node_index,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> child_node_index
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - parent_node_index &lt; number_of_nodes()
+                - child_node_index &lt; number_of_nodes()
+                - has_edge(parent_node_index, child_node_index) == false
+            ensures
+                - #has_edge(parent_node_index, child_node_index) == true 
+            throws
+                - std::bad_alloc 
+                  If this exception is thrown then this object reverts back 
+                  to its initial state.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='remove_edge'></a>remove_edge</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> parent_node_index,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> child_node_index
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - parent_node_index &lt; number_of_nodes()
+                - child_node_index &lt; number_of_nodes()
+                - has_edge(parent_node_index, child_node_index) == true 
+            ensures
+                - #has_edge(parent_node_index, child_node_index) == false 
+            throws
+                - std::bad_alloc 
+                  If this exception is thrown then this object reverts back 
+                  to its initial state.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='add_node'></a>add_node</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - does not change the index number of existing nodes
+                - adds a node with index N == number_of_nodes() such that:
+                    - #node(N).number_of_parents() == 0 
+                    - #node(N).number_of_children() == 0 
+                    - #number_of_nodes() == number_of_nodes() + 1
+                    - returns N  
+            throws
+                - std::bad_alloc or any exception thrown by T's constructor.
+                  If this exception is thrown then this object reverts back 
+                  to its initial state.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='remove_node'></a>remove_node</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - index &lt; number_of_nodes()
+            ensures
+                - removes the node with the given index from the graph. 
+                - removes all edges linking the removed node to the rest
+                  of the graph.
+                - the remaining node indexes are remapped so that they remain
+                  contiguous.  (This means that for all valid N, node(N) doesn't
+                  necessarily reference the same node as #node(N))
+                - #number_of_nodes() == number_of_nodes() - 1
+            throws
+                - std::bad_alloc or any exception thrown by T's constructor.
+                  If this exception is thrown then this object reverts back 
+                  to its initial state.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            directed_graph<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font> 
+
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T, 
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        directed_graph<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        directed_graph<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> directed_graph<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        directed_graph<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_DIRECTED_GRAPH_KERNEl_ABSTRACT_
+</font>
+
+
+</pre></body></html>

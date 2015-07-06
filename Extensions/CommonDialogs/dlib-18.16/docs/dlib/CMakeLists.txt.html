@@ -1,0 +1,469 @@
+<html><head><title>
+dlib/CMakeLists.txt
+</title></head><body bgcolor='white'><pre>
+<font color='#009900'>#</font>
+<font color='#009900'># This is a CMake makefile.  You can find the cmake utility and</font>
+<font color='#009900'># information about it at http://www.cmake.org</font>
+<font color='#009900'>#</font>
+
+<font color='#009900'># setting this makes CMake allow normal looking if else statements</font>
+<font color='blue'>SET</font>(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
+
+<font color='blue'>cmake_minimum_required</font>(VERSION 2.4)
+
+<font color='blue'>set</font>(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
+<font color='#009900'># Suppress cmake warnings about changes in new versions.</font>
+<font color='blue'>if</font>(COMMAND cmake_policy) 
+<font color='blue'>   cmake_policy</font>(SET CMP0003 NEW) 
+<font color='blue'>   if </font>(POLICY CMP0054)
+<font color='blue'>      cmake_policy</font>(SET CMP0054 NEW)
+<font color='blue'>   endif</font>()
+<font color='blue'>endif</font>()
+
+
+<font color='#009900'># make macros that can add #define directives to the entire project.  Not just </font>
+<font color='#009900'># to the dlib library itself.  I.e. to dlib and to any projects that depend</font>
+<font color='#009900'># on dlib.</font>
+<font color='blue'>macro </font>( add_global_define def_name )
+<font color='blue'>   if </font>(NOT CMAKE_CXX_FLAGS MATCHES "<font color='#CC0000'>-D${<font color='#BB00BB'>def_name</font>}</font>")
+<font color='blue'>      set </font>(CMAKE_CXX_FLAGS "<font color='#CC0000'>${<font color='#BB00BB'>CMAKE_CXX_FLAGS</font>} -D${<font color='#BB00BB'>def_name</font>}</font>" 
+         CACHE STRING "<font color='#CC0000'>Flags used by the compiler during all C++ builds.</font>" 
+         FORCE)
+<font color='blue'>   endif </font>()
+<font color='blue'>endmacro</font>()
+<font color='blue'>macro </font>( remove_global_define def_name )
+<font color='blue'>   if </font>(CMAKE_CXX_FLAGS MATCHES "<font color='#CC0000'> -D${<font color='#BB00BB'>def_name</font>}</font>")
+<font color='blue'>      string </font>(REGEX REPLACE "<font color='#CC0000'> -D${<font color='#BB00BB'>def_name</font>}</font>" "<font color='#CC0000'></font>" temp_var ${<font color='#BB00BB'>CMAKE_CXX_FLAGS</font>}) 
+<font color='blue'>      set </font>(CMAKE_CXX_FLAGS "<font color='#CC0000'>${<font color='#BB00BB'>temp_var</font>}</font>" 
+         CACHE STRING "<font color='#CC0000'>Flags used by the compiler during all C++ builds.</font>" 
+         FORCE)
+<font color='blue'>   endif </font>()
+<font color='blue'>endmacro</font>()
+
+
+<font color='#009900'># Make sure ENABLE_ASSERTS is defined for debug builds</font>
+<font color='blue'>if </font>(NOT CMAKE_CXX_FLAGS_DEBUG MATCHES "<font color='#CC0000'>-DENABLE_ASSERTS</font>")
+<font color='blue'>   set </font>(CMAKE_CXX_FLAGS_DEBUG "<font color='#CC0000'>${<font color='#BB00BB'>CMAKE_CXX_FLAGS_DEBUG</font>} -DENABLE_ASSERTS</font>" 
+      CACHE STRING "<font color='#CC0000'>Flags used by the compiler during C++ debug builds.</font>" 
+      FORCE)
+<font color='blue'>endif </font>()
+
+
+<font color='#009900'># Don't try to call add_library(dlib) and setup dlib's stuff if it has already</font>
+<font color='#009900'># been done by some other part of the current cmake project.  We do this</font>
+<font color='#009900'># because it avoids getting warnings/errors about cmake policy CMP0002.  This</font>
+<font color='#009900'># happens when a project tries to call add_subdirectory() <a href=')/CMakeLists.txt.html'>on</a> dlib more than</font>
+<font color='#009900'># once.  This most often happens when the top level of a project depends on two</font>
+<font color='#009900'># or more other things which both depend on dlib. </font>
+<font color='blue'>if </font>(NOT TARGET dlib)
+
+<font color='blue'>   set </font>(DLIB_ISO_CPP_ONLY_STR 
+   "<font color='#CC0000'>Enable this if you don't want to compile any non-ISO C++ code (i.e. you don't use any of the API Wrappers)</font>" )
+<font color='blue'>   set </font>(DLIB_NO_GUI_SUPPORT_STR 
+   "<font color='#CC0000'>Enable this if you don't want to compile any of the dlib GUI code</font>" )
+<font color='blue'>   set </font>(DLIB_ENABLE_STACK_TRACE_STR 
+   "<font color='#CC0000'>Enable this if you want to turn on the DLIB_STACK_TRACE macros</font>" )
+<font color='blue'>   set </font>(DLIB_ENABLE_ASSERTS_STR 
+   "<font color='#CC0000'>Enable this if you want to turn on the DLIB_ASSERT macro</font>" )
+<font color='blue'>   set </font>(DLIB_USE_BLAS_STR
+   "<font color='#CC0000'>Disable this if you don't want to use a BLAS library</font>" )
+<font color='blue'>   set </font>(DLIB_USE_LAPACK_STR
+   "<font color='#CC0000'>Disable this if you don't want to use a LAPACK library</font>" )
+<font color='blue'>   set </font>(DLIB_LINK_WITH_LIBPNG_STR
+   "<font color='#CC0000'>Disable this if you don't want to link against libpng</font>" )
+<font color='blue'>   set </font>(DLIB_LINK_WITH_LIBJPEG_STR
+   "<font color='#CC0000'>Disable this if you don't want to link against libjpeg</font>" )
+<font color='blue'>   set </font>(DLIB_LINK_WITH_SQLITE3_STR
+   "<font color='#CC0000'>Disable this if you don't want to link against sqlite3</font>" )
+<font color='#009900'>   #set (DLIB_LINK_WITH_FFTW_STR "<font color='#CC0000'>Disable this if you don't want to link against fftw</font>" )</font>
+
+<font color='blue'>   option</font>(DLIB_ISO_CPP_ONLY ${<font color='#BB00BB'>DLIB_ISO_CPP_ONLY_STR</font>} OFF)
+<font color='blue'>   option</font>(DLIB_NO_GUI_SUPPORT ${<font color='#BB00BB'>DLIB_NO_GUI_SUPPORT_STR</font>} OFF)
+<font color='blue'>   option</font>(DLIB_ENABLE_STACK_TRACE ${<font color='#BB00BB'>DLIB_ENABLE_STACK_TRACE_STR</font>} OFF)
+<font color='blue'>   option</font>(DLIB_ENABLE_ASSERTS ${<font color='#BB00BB'>DLIB_ENABLE_ASSERTS_STR</font>} OFF)
+<font color='blue'>   option</font>(DLIB_USE_BLAS ${<font color='#BB00BB'>DLIB_USE_BLAS_STR</font>} ON)
+<font color='blue'>   option</font>(DLIB_USE_LAPACK ${<font color='#BB00BB'>DLIB_USE_LAPACK_STR</font>} ON)
+<font color='blue'>   option</font>(DLIB_LINK_WITH_LIBPNG ${<font color='#BB00BB'>DLIB_LINK_WITH_LIBPNG_STR</font>} ON)
+<font color='blue'>   option</font>(DLIB_LINK_WITH_LIBJPEG ${<font color='#BB00BB'>DLIB_LINK_WITH_LIBJPEG_STR</font>} ON)
+<font color='blue'>   option</font>(DLIB_LINK_WITH_SQLITE3 ${<font color='#BB00BB'>DLIB_LINK_WITH_SQLITE3_STR</font>} ON)
+<font color='#009900'>   #option(DLIB_LINK_WITH_FFTW ${<font color='#BB00BB'>DLIB_LINK_WITH_FFTW_STR</font>} ON)</font>
+
+<font color='blue'>   set</font>(source_files 
+         base64/base64_kernel_1.cpp
+         bigint/bigint_kernel_1.cpp
+         bigint/bigint_kernel_2.cpp
+         bit_stream/bit_stream_kernel_1.cpp
+         entropy_decoder/entropy_decoder_kernel_1.cpp
+         entropy_decoder/entropy_decoder_kernel_2.cpp
+         entropy_encoder/entropy_encoder_kernel_1.cpp
+         entropy_encoder/entropy_encoder_kernel_2.cpp
+         md5/md5_kernel_1.cpp
+         tokenizer/tokenizer_kernel_1.cpp
+         unicode/unicode.cpp
+         data_io/image_dataset_metadata.cpp)
+
+<font color='blue'>   if </font>(DLIB_ISO_CPP_ONLY)
+<font color='blue'>      add_library</font>(dlib STATIC ${<font color='#BB00BB'>source_files</font>} )
+<font color='blue'>   else</font>()
+
+<font color='blue'>      set</font>(source_files ${<font color='#BB00BB'>source_files</font>}
+         sockets/sockets_kernel_1.cpp
+         bsp/bsp.cpp
+         dir_nav/dir_nav_kernel_1.cpp
+         dir_nav/dir_nav_kernel_2.cpp
+         dir_nav/dir_nav_extensions.cpp
+         linker/linker_kernel_1.cpp
+         logger/extra_logger_headers.cpp
+         logger/logger_kernel_1.cpp
+         logger/logger_config_file.cpp
+         misc_api/misc_api_kernel_1.cpp
+         misc_api/misc_api_kernel_2.cpp
+         sockets/sockets_extensions.cpp
+         sockets/sockets_kernel_2.cpp
+         sockstreambuf/sockstreambuf.cpp
+         sockstreambuf/sockstreambuf_unbuffered.cpp
+         server/server_kernel.cpp
+         server/server_iostream.cpp
+         server/server_http.cpp
+         threads/multithreaded_object_extension.cpp
+         threads/threaded_object_extension.cpp
+         threads/threads_kernel_1.cpp
+         threads/threads_kernel_2.cpp
+         threads/threads_kernel_shared.cpp
+         threads/thread_pool_extension.cpp
+         timer/timer.cpp
+         stack_trace.cpp
+         )
+
+<font color='#009900'>      # we want to link to the right stuff depending on our platform.  </font>
+<font color='blue'>      if </font>(WIN32 AND NOT CYGWIN) ###############################################################################
+<font color='blue'>         if </font>(DLIB_NO_GUI_SUPPORT)
+<font color='blue'>            set </font>(dlib_needed_libraries ws2_32 winmm)
+<font color='blue'>         else</font>()
+<font color='blue'>            set </font>(dlib_needed_libraries ws2_32 winmm comctl32 gdi32 imm32)
+<font color='blue'>         endif</font>()
+<font color='blue'>      elseif</font>(APPLE) ############################################################################
+<font color='blue'>         find_library</font>(pthreadlib pthread)
+<font color='blue'>         set </font>(dlib_needed_libraries ${<font color='#BB00BB'>pthreadlib</font>})
+
+<font color='blue'>         if </font>(NOT DLIB_NO_GUI_SUPPORT)
+<font color='blue'>            find_library</font>(xlib X11)
+<font color='#009900'>            # make sure X11 is in the include path</font>
+<font color='blue'>            find_path</font>(xlib_path Xlib.h
+               PATHS 
+               /Developer/SDKs/MacOSX10.4u.sdk/usr/X11R6/include
+               PATH_SUFFIXES X11
+               )
+<font color='blue'>            if </font>(xlib AND xlib_path)
+<font color='blue'>               get_filename_component</font>(x11_path ${<font color='#BB00BB'>xlib_path</font>} PATH CACHE)
+<font color='blue'>               include_directories</font>(${<font color='#BB00BB'>x11_path</font>})
+<font color='blue'>               set</font>(dlib_needed_libraries ${<font color='#BB00BB'>dlib_needed_libraries</font>} ${<font color='#BB00BB'>xlib</font>} )
+<font color='blue'>            else</font>()
+<font color='blue'>               message</font>("<font color='#CC0000'> *****************************************************************************</font>")
+<font color='blue'>               message</font>("<font color='#CC0000'> *** DLIB GUI SUPPORT DISABLED BECAUSE X11 DEVELOPMENT LIBRARIES NOT FOUND ***</font>")
+<font color='blue'>               message</font>("<font color='#CC0000'> *** Make sure XQuartz is installed if you want GUI support.               ***</font>")
+<font color='blue'>               message</font>("<font color='#CC0000'> *** You can download XQuartz from: http://xquartz.macosforge.org/landing/ ***</font>")
+<font color='blue'>               message</font>("<font color='#CC0000'> *****************************************************************************</font>")
+<font color='blue'>               set</font>(DLIB_NO_GUI_SUPPORT ON CACHE STRING ${<font color='#BB00BB'>DLIB_NO_GUI_SUPPORT_STR</font>} FORCE )
+<font color='blue'>            endif</font>()
+<font color='blue'>         endif</font>()
+
+<font color='blue'>         mark_as_advanced</font>(pthreadlib xlib xlib_path x11_path)
+<font color='blue'>      else </font>() ##################################################################################
+<font color='blue'>         find_library</font>(pthreadlib pthread)
+<font color='blue'>         set </font>(dlib_needed_libraries ${<font color='#BB00BB'>pthreadlib</font>})
+
+<font color='#009900'>         # link to the nsl library if it exists.  this is something you need sometimes </font>
+<font color='blue'>         find_library</font>(nsllib nsl)
+<font color='blue'>         if </font>(nsllib)
+<font color='blue'>            set </font>(dlib_needed_libraries ${<font color='#BB00BB'>dlib_needed_libraries</font>} ${<font color='#BB00BB'>nsllib</font>})
+<font color='blue'>         endif </font>()
+
+<font color='#009900'>         # link to the socket library if it exists.  this is something you need on solaris</font>
+<font color='blue'>         find_library</font>(socketlib socket)
+<font color='blue'>         if </font>(socketlib)
+<font color='blue'>            set </font>(dlib_needed_libraries ${<font color='#BB00BB'>dlib_needed_libraries</font>} ${<font color='#BB00BB'>socketlib</font>})
+<font color='blue'>         endif </font>()
+
+<font color='blue'>         if </font>(NOT DLIB_NO_GUI_SUPPORT)
+<font color='blue'>            include</font>(FindX11)
+<font color='blue'>            if </font>(X11_FOUND)
+<font color='blue'>               include_directories</font>(${<font color='#BB00BB'>X11_INCLUDE_DIR</font>})
+<font color='blue'>               set </font>(dlib_needed_libraries ${<font color='#BB00BB'>dlib_needed_libraries</font>} ${<font color='#BB00BB'>X11_LIBRARIES</font>})
+<font color='blue'>            else</font>()
+<font color='blue'>               message</font>("<font color='#CC0000'> *****************************************************************************</font>")
+<font color='blue'>               message</font>("<font color='#CC0000'> *** DLIB GUI SUPPORT DISABLED BECAUSE X11 DEVELOPMENT LIBRARIES NOT FOUND ***</font>")
+<font color='blue'>               message</font>("<font color='#CC0000'> *** Make sure libx11-dev is installed if you want GUI support.            ***</font>")
+<font color='blue'>               message</font>("<font color='#CC0000'> *** On Ubuntu run: sudo apt-get install libx11-dev                        ***</font>")
+<font color='blue'>               message</font>("<font color='#CC0000'> *****************************************************************************</font>")
+<font color='blue'>               set</font>(DLIB_NO_GUI_SUPPORT ON CACHE STRING ${<font color='#BB00BB'>DLIB_NO_GUI_SUPPORT_STR</font>} FORCE )
+<font color='blue'>            endif</font>()
+<font color='blue'>         endif</font>()
+
+<font color='blue'>         mark_as_advanced</font>(nsllib pthreadlib socketlib)
+<font color='blue'>      endif </font>() ##################################################################################
+
+<font color='blue'>      if </font>(NOT DLIB_NO_GUI_SUPPORT)
+<font color='blue'>         set</font>(source_files ${<font color='#BB00BB'>source_files</font>}
+            gui_widgets/fonts.cpp
+            gui_widgets/widgets.cpp
+            gui_widgets/drawable.cpp
+            gui_widgets/canvas_drawing.cpp
+            gui_widgets/style.cpp
+            gui_widgets/base_widgets.cpp
+            gui_core/gui_core_kernel_1.cpp
+            gui_core/gui_core_kernel_2.cpp
+            )
+<font color='blue'>      endif</font>()
+
+<font color='blue'>      INCLUDE </font>(CheckFunctionExists)
+
+<font color='blue'>      if </font>(DLIB_LINK_WITH_LIBPNG)
+<font color='#009900'>         # try to find libpng </font>
+<font color='blue'>         find_package</font>(PNG QUIET)
+<font color='#009900'>         # Make sure there isn't something wrong with the version of LIBPNG</font>
+<font color='#009900'>         # installed on this system.  </font>
+<font color='blue'>         if </font>(PNG_FOUND)
+<font color='blue'>            set</font>(CMAKE_REQUIRED_LIBRARIES ${<font color='#BB00BB'>PNG_LIBRARY</font>})
+<font color='blue'>            CHECK_FUNCTION_EXISTS</font>(png_create_read_struct LIBPNG_IS_GOOD)
+<font color='blue'>         endif</font>()
+<font color='blue'>         if </font>(PNG_FOUND AND LIBPNG_IS_GOOD)
+<font color='blue'>            include_directories</font>(${<font color='#BB00BB'>PNG_INCLUDE_DIR</font>})
+<font color='blue'>            set </font>(dlib_needed_libraries ${<font color='#BB00BB'>dlib_needed_libraries</font>} ${<font color='#BB00BB'>PNG_LIBRARY</font>})
+<font color='blue'>         else</font>()
+<font color='#009900'>            # If we can't find libpng then statically compile it in.</font>
+<font color='blue'>            include_directories</font>(external/libpng external/zlib)
+<font color='blue'>            set</font>(source_files ${<font color='#BB00BB'>source_files</font>}
+               external/libpng/png.c
+               external/libpng/pngerror.c
+               external/libpng/pngget.c
+               external/libpng/pngmem.c
+               external/libpng/pngpread.c
+               external/libpng/pngread.c
+               external/libpng/pngrio.c
+               external/libpng/pngrtran.c
+               external/libpng/pngrutil.c
+               external/libpng/pngset.c
+               external/libpng/pngtrans.c
+               external/libpng/pngwio.c
+               external/libpng/pngwrite.c
+               external/libpng/pngwtran.c
+               external/libpng/pngwutil.c
+               external/zlib/adler32.c
+               external/zlib/compress.c
+               external/zlib/crc32.c
+               external/zlib/deflate.c
+               external/zlib/gzclose.c
+               external/zlib/gzlib.c
+               external/zlib/gzread.c
+               external/zlib/gzwrite.c
+               external/zlib/infback.c
+               external/zlib/inffast.c
+               external/zlib/inflate.c
+               external/zlib/inftrees.c
+               external/zlib/trees.c
+               external/zlib/uncompr.c
+               external/zlib/zutil.c
+               )
+<font color='blue'>         endif</font>()
+<font color='blue'>         set</font>(source_files ${<font color='#BB00BB'>source_files</font>}
+            image_loader/png_loader.cpp
+            image_saver/save_png.cpp
+            )
+<font color='blue'>      endif</font>()
+
+<font color='blue'>      if </font>(DLIB_LINK_WITH_LIBJPEG)
+<font color='#009900'>         # try to find libjpeg </font>
+<font color='blue'>         find_package</font>(JPEG QUIET)
+<font color='#009900'>         # Make sure there isn't something wrong with the version of libjpeg </font>
+<font color='#009900'>         # installed on this system.  Also don't use the installed libjpeg</font>
+<font color='#009900'>         # if this is an APPLE system because apparently it's broken (as of 2015/01/01).</font>
+<font color='blue'>         if </font>(JPEG_FOUND)
+<font color='blue'>            set</font>(CMAKE_REQUIRED_LIBRARIES ${<font color='#BB00BB'>JPEG_LIBRARY</font>})
+<font color='blue'>            CHECK_FUNCTION_EXISTS</font>(jpeg_read_header LIBJPEG_IS_GOOD)
+<font color='blue'>         endif</font>()
+<font color='blue'>         if </font>(JPEG_FOUND AND LIBJPEG_IS_GOOD AND NOT APPLE)
+<font color='blue'>            include_directories</font>(${<font color='#BB00BB'>JPEG_INCLUDE_DIR</font>})
+<font color='blue'>            set </font>(dlib_needed_libraries ${<font color='#BB00BB'>dlib_needed_libraries</font>} ${<font color='#BB00BB'>JPEG_LIBRARY</font>})
+<font color='blue'>         else</font>()
+<font color='#009900'>            # If we can't find libjpeg then statically compile it in.</font>
+<font color='blue'>            add_definitions</font>(-DDLIB_JPEG_STATIC)
+<font color='blue'>            set</font>(source_files ${<font color='#BB00BB'>source_files</font>}
+                  external/libjpeg/jcomapi.cpp
+                  external/libjpeg/jdapimin.cpp
+                  external/libjpeg/jdapistd.cpp
+                  external/libjpeg/jdatasrc.cpp
+                  external/libjpeg/jdcoefct.cpp
+                  external/libjpeg/jdcolor.cpp
+                  external/libjpeg/jddctmgr.cpp
+                  external/libjpeg/jdhuff.cpp
+                  external/libjpeg/jdinput.cpp
+                  external/libjpeg/jdmainct.cpp
+                  external/libjpeg/jdmarker.cpp
+                  external/libjpeg/jdmaster.cpp
+                  external/libjpeg/jdmerge.cpp
+                  external/libjpeg/jdphuff.cpp
+                  external/libjpeg/jdpostct.cpp
+                  external/libjpeg/jdsample.cpp
+                  external/libjpeg/jerror.cpp
+                  external/libjpeg/jidctflt.cpp
+                  external/libjpeg/jidctfst.cpp
+                  external/libjpeg/jidctint.cpp
+                  external/libjpeg/jidctred.cpp
+                  external/libjpeg/jmemmgr.cpp
+                  external/libjpeg/jmemnobs.cpp
+                  external/libjpeg/jquant1.cpp
+                  external/libjpeg/jquant2.cpp
+                  external/libjpeg/jutils.cpp  
+                  external/libjpeg/jcapimin.cpp
+                  external/libjpeg/jdatadst.cpp
+                  external/libjpeg/jcparam.cpp
+                  external/libjpeg/jcapistd.cpp
+                  external/libjpeg/jcmarker.cpp
+                  external/libjpeg/jcinit.cpp
+                  external/libjpeg/jcmaster.cpp
+                  external/libjpeg/jcdctmgr.cpp
+                  external/libjpeg/jccoefct.cpp  
+                  external/libjpeg/jccolor.cpp  
+                  external/libjpeg/jchuff.cpp  
+                  external/libjpeg/jcmainct.cpp  
+                  external/libjpeg/jcphuff.cpp  
+                  external/libjpeg/jcprepct.cpp  
+                  external/libjpeg/jcsample.cpp
+                  external/libjpeg/jfdctint.cpp
+                  external/libjpeg/jfdctflt.cpp
+                  external/libjpeg/jfdctfst.cpp
+                  )
+<font color='blue'>         endif</font>()
+<font color='blue'>         set</font>(source_files ${<font color='#BB00BB'>source_files</font>}
+            image_loader/jpeg_loader.cpp
+            image_saver/save_jpeg.cpp
+            )
+<font color='blue'>      endif</font>()
+
+
+<font color='blue'>      if </font>(DLIB_USE_BLAS OR DLIB_USE_LAPACK)
+<font color='#009900'>         # Try to find BLAS and LAPACK </font>
+<font color='blue'>         include</font>(cmake_find_blas.txt)
+
+<font color='blue'>         if </font>(DLIB_USE_BLAS)
+<font color='blue'>            if </font>(blas_found)
+<font color='blue'>               set </font>(dlib_needed_libraries ${<font color='#BB00BB'>dlib_needed_libraries</font>} ${<font color='#BB00BB'>blas_libraries</font>})
+<font color='blue'>            else</font>()
+<font color='blue'>               set</font>(DLIB_USE_BLAS OFF CACHE STRING ${<font color='#BB00BB'>DLIB_USE_BLAS_STR</font>} FORCE )
+<font color='blue'>            endif</font>()
+<font color='blue'>         endif</font>()
+
+<font color='blue'>         if </font>(DLIB_USE_LAPACK)
+<font color='blue'>            if </font>(lapack_found)
+<font color='blue'>               set </font>(dlib_needed_libraries ${<font color='#BB00BB'>dlib_needed_libraries</font>} ${<font color='#BB00BB'>lapack_libraries</font>})
+<font color='blue'>            else</font>()
+<font color='blue'>               set</font>(DLIB_USE_LAPACK OFF CACHE STRING ${<font color='#BB00BB'>DLIB_USE_LAPACK_STR</font>} FORCE )
+<font color='blue'>            endif</font>()
+<font color='blue'>         endif</font>()
+<font color='blue'>      endif</font>()
+
+
+
+<font color='blue'>      if </font>(DLIB_LINK_WITH_SQLITE3)
+<font color='blue'>         find_library</font>(sqlite sqlite3)
+<font color='#009900'>         # make sure sqlite3.h is in the include path</font>
+<font color='blue'>         find_path</font>(sqlite_path sqlite3.h)
+<font color='blue'>         if </font>(sqlite AND sqlite_path)
+<font color='blue'>            get_filename_component</font>(sqlite_path2 ${<font color='#BB00BB'>sqlite_path</font>} PATH CACHE)
+<font color='blue'>            include_directories</font>(${<font color='#BB00BB'>sqlite_path2</font>})
+<font color='blue'>            set</font>(dlib_needed_libraries ${<font color='#BB00BB'>dlib_needed_libraries</font>} ${<font color='#BB00BB'>sqlite</font>} )
+<font color='blue'>         else</font>()
+<font color='blue'>            set</font>(DLIB_LINK_WITH_SQLITE3 OFF CACHE STRING ${<font color='#BB00BB'>DLIB_LINK_WITH_SQLITE3_STR</font>} FORCE )
+<font color='blue'>         endif</font>()
+<font color='blue'>         mark_as_advanced</font>(sqlite sqlite_path sqlite_path2)
+<font color='blue'>      endif</font>()
+
+
+
+<font color='blue'>      if </font>(DLIB_LINK_WITH_FFTW)
+<font color='blue'>         find_library</font>(fftw fftw3)
+<font color='#009900'>         # make sure fftw3.h is in the include path</font>
+<font color='blue'>         find_path</font>(fftw_path fftw3.h)
+<font color='blue'>         if </font>(fftw AND fftw_path)
+<font color='blue'>            include_directories</font>(${<font color='#BB00BB'>fftw_path</font>})
+<font color='blue'>            set</font>(dlib_needed_libraries ${<font color='#BB00BB'>dlib_needed_libraries</font>} ${<font color='#BB00BB'>fftw</font>} )
+<font color='blue'>         else</font>()
+<font color='blue'>            set</font>(DLIB_LINK_WITH_FFTW OFF CACHE STRING ${<font color='#BB00BB'>DLIB_LINK_WITH_SQLITE3_STR</font>} FORCE )
+<font color='blue'>         endif</font>()
+<font color='blue'>         mark_as_advanced</font>(fftw fftw_path)
+<font color='blue'>      endif</font>()
+
+
+<font color='blue'>      add_library</font>(dlib STATIC ${<font color='#BB00BB'>source_files</font>} )
+<font color='blue'>      target_link_libraries</font>(dlib ${<font color='#BB00BB'>dlib_needed_libraries</font>} )
+
+<font color='blue'>   endif </font>()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
+
+
+<font color='#009900'>   #test for some things that really should be true about the compiler</font>
+<font color='blue'>   include</font>(TestForSTDNamespace)
+<font color='blue'>   include</font>(TestForANSIStreamHeaders)
+
+
+<font color='blue'>   if </font>(DLIB_LINK_WITH_LIBPNG AND NOT DLIB_ISO_CPP_ONLY)
+<font color='blue'>      add_global_define</font>(DLIB_PNG_SUPPORT)
+<font color='blue'>   else</font>()
+<font color='blue'>      remove_global_define</font>(DLIB_PNG_SUPPORT)
+<font color='blue'>   endif</font>()
+
+<font color='blue'>   if </font>(DLIB_LINK_WITH_LIBJPEG AND NOT DLIB_ISO_CPP_ONLY)
+<font color='blue'>      add_global_define</font>(DLIB_JPEG_SUPPORT)
+<font color='blue'>   else</font>()
+<font color='blue'>      remove_global_define</font>(DLIB_JPEG_SUPPORT)
+<font color='blue'>   endif</font>()
+
+<font color='blue'>   if </font>(DLIB_LINK_WITH_FFTW AND NOT DLIB_ISO_CPP_ONLY)
+<font color='blue'>      add_global_define</font>(DLIB_USE_FFTW)
+<font color='blue'>   else</font>()
+<font color='blue'>      remove_global_define</font>(DLIB_USE_FFTW)
+<font color='blue'>   endif</font>()
+
+
+<font color='blue'>   if </font>(DLIB_USE_BLAS AND blas_found)
+<font color='blue'>      add_global_define</font>(DLIB_USE_BLAS)
+<font color='blue'>   else</font>()
+<font color='blue'>      remove_global_define</font>(DLIB_USE_BLAS)
+<font color='blue'>   endif</font>()
+
+<font color='blue'>   if </font>(DLIB_USE_LAPACK AND lapack_found)
+<font color='blue'>      add_global_define</font>(DLIB_USE_LAPACK)
+<font color='blue'>   else</font>()
+<font color='blue'>      remove_global_define</font>(DLIB_USE_LAPACK)
+<font color='blue'>   endif</font>()
+
+
+<font color='blue'>   if </font>(DLIB_ISO_CPP_ONLY)
+<font color='blue'>      add_global_define</font>(DLIB_ISO_CPP_ONLY)
+<font color='blue'>   else</font>()
+<font color='blue'>      remove_global_define</font>(DLIB_ISO_CPP_ONLY)
+<font color='blue'>   endif</font>()
+
+
+<font color='blue'>   if </font>(DLIB_NO_GUI_SUPPORT)
+<font color='blue'>      add_global_define</font>(DLIB_NO_GUI_SUPPORT)
+<font color='blue'>   else</font>()
+<font color='blue'>      remove_global_define</font>(DLIB_NO_GUI_SUPPORT)
+<font color='blue'>   endif</font>()
+
+<font color='blue'>   if </font>(DLIB_ENABLE_STACK_TRACE)
+<font color='blue'>      add_global_define</font>(DLIB_ENABLE_STACK_TRACE)
+<font color='blue'>   else</font>()
+<font color='blue'>      remove_global_define</font>(DLIB_ENABLE_STACK_TRACE)
+<font color='blue'>   endif</font>()
+
+
+<font color='blue'>   if </font>(DLIB_ENABLE_ASSERTS)
+<font color='blue'>      add_global_define</font>(ENABLE_ASSERTS)
+<font color='blue'>   else</font>()
+<font color='blue'>      remove_global_define</font>(ENABLE_ASSERTS)
+<font color='blue'>   endif</font>()
+
+
+<font color='blue'>endif</font>()
+</pre></body></html>

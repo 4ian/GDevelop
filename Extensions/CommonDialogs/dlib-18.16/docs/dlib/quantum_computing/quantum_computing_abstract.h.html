@@ -1,0 +1,593 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - quantum_computing_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_QUANTUM_COMPUTINg_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_QUANTUM_COMPUTINg_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../rand.h.html'>../rand.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>typedef</font> std::complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> qc_scalar_type;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='quantum_register'></a>quantum_register</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - num_bits() == 1
+                - state_vector().nr() == 2
+                - state_vector().nc() == 1
+                - state_vector()(0) == 1
+                - state_vector()(1) == 0
+                - probability_of_bit(0) == 0
+
+                - i.e. This register represents a single quantum bit and it is
+                  completely in the 0 state.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a set of quantum bits.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='quantum_register'></a>quantum_register</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+        !*/</font>
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='num_bits'></a>num_bits</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of quantum bits in this register
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_num_bits'></a>set_num_bits</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> new_num_bits
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 1 &lt;= new_num_bits &lt;= 30
+            ensures
+                - #num_bits() == new_num_bits
+                - #state_vector().nr() == 2^new_num_bits
+                  (i.e. the size of the state_vector is exponential in the number of bits in a register)
+                - for all valid i:
+                    - probability_of_bit(i) == 0
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='zero_all_bits'></a>zero_all_bits</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - for all valid i:
+                    - probability_of_bit(i) == 0
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='append'></a>append</b> <font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> quantum_register<font color='#5555FF'>&amp;</font> reg
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #num_bits() == num_bits() + reg.num_bits()
+                - #this-&gt;state_vector() == tensor_product(this-&gt;state_vector(), reg.state_vector())
+                - The original bits in *this become the high order bits of the resulting 
+                  register and all the bits in reg end up as the low order bits in the
+                  resulting register.
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='probability_of_bit'></a>probability_of_bit</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> bit
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= bit &lt; num_bits()
+            ensures
+                - returns the probability of measuring the given bit and it being in the 1 state.
+                - The returned value is also equal to the sum of norm(state_vector()(i)) for all
+                  i where the bit'th bit in i is set to 1. (note that the lowest order bit is bit 0)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> rand_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='measure_bit'></a>measure_bit</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> bit,
+            rand_type<font color='#5555FF'>&amp;</font> rnd
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= bit &lt; num_bits()
+                - rand_type == an implementation of dlib/rand/rand_float_abstract.h
+            ensures
+                - measures the given bit in this register.  Let R denote the boolean
+                  result of the measurement, where true means the bit was measured to
+                  have value 1 and false means it had a value of 0.
+                - if (R == true) then
+                    - returns true
+                    - #probability_of_bit(bit) == 1
+                - else
+                    - returns false
+                    - #probability_of_bit(bit) == 0
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> rand_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='measure_and_remove_bit'></a>measure_and_remove_bit</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> bit,
+            rand_type<font color='#5555FF'>&amp;</font> rnd
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - num_bits() &gt; 1
+                - 0 &lt;= bit &lt; num_bits()
+                - rand_type == an implementation of dlib/rand/rand_float_abstract.h
+            ensures
+                - measures the given bit in this register.  Let R denote the boolean
+                  result of the measurement, where true means the bit was measured to
+                  have value 1 and false means it had a value of 0.
+                - #num_bits() == num_bits() - 1
+                - removes the bit that was measured from this register.
+                - if (R == true) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>qc_scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='state_vector'></a>state_vector</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a const reference to the state vector that describes the state of
+                  the quantum bits in this register.
+        !*/</font>
+
+        matrix<font color='#5555FF'>&lt;</font>qc_scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='state_vector'></a>state_vector</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a non-const reference to the state vector that describes the state of
+                  the quantum bits in this register.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            quantum_register<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font>
+
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        quantum_register<font color='#5555FF'>&amp;</font> a,
+        quantum_register<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='gate_exp'></a>gate_exp</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T
+                T must be some object that inherits from gate_exp and implements its own
+                version of operator() and compute_state_element().
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents an expression that evaluates to a quantum gate 
+                that operates on T::num_bits qubits.
+
+                This object makes it easy to create new types of gate objects. All
+                you need to do is inherit from gate_exp in the proper way and 
+                then you can use your new gate objects in conjunction with all the 
+                others.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_bits <font color='#5555FF'>=</font> T::num_bits;
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> dims <font color='#5555FF'>=</font> T::dims; 
+
+        <b><a name='gate_exp'></a>gate_exp</b><font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> exp
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #&amp;ref() == &amp;exp
+        !*/</font>
+
+        <font color='#0000FF'>const</font> qc_scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> r, 
+            <font color='#0000FF'><u>long</u></font> c
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= r &lt; dims
+                - 0 &lt;= c &lt; dims
+            ensures
+                - returns ref()(r,c)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='apply_gate_to'></a>apply_gate_to</b> <font face='Lucida Console'>(</font>
+            quantum_register<font color='#5555FF'>&amp;</font> reg
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - reg.num_bits() == num_bits
+            ensures
+                - applies this quantum gate to the given quantum register
+                - Let M represent the matrix for this quantum gate, then
+                  #reg().state_vector() = M*reg().state_vector()
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> exp<font color='#5555FF'>&gt;</font>
+        qc_scalar_type <b><a name='compute_state_element'></a>compute_state_element</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>exp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> reg,
+            <font color='#0000FF'><u>long</u></font> row_idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - reg.nr() == dims
+                - reg.nc() == 1
+                - 0 &lt;= row_idx &lt; dims
+            ensures
+                - Let M represent the matrix for this gate, then   
+                  this function returns rowm(M*reg, row_idx)
+                  (i.e. returns the row_idx row of what you get when you apply this
+                  gate to the given column vector in reg)
+                - This function works by calling ref().compute_state_element(reg,row_idx)
+        !*/</font>
+
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='ref'></a>ref</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a reference to the subexpression contained in this object
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>qc_scalar_type<font color='#5555FF'>&gt;</font> <b><a name='mat'></a>mat</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a dense matrix object that contains the matrix for this gate
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='composite_gate'></a>composite_gate</b> : <font color='#0000FF'>public</font> gate_exp<font color='#5555FF'>&lt;</font>composite_gate<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T AND U
+                Both must be gate expressions that inherit from gate_exp
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a quantum gate that is the tensor product of 
+                two other quantum gates.
+
+
+                As an example, suppose you have 3 registers, reg_high, reg_low, and reg_all.  Also
+                suppose that reg_all is what you get when you append reg_high and reg_low,
+                so reg_all.state_vector() == tensor_product(reg_high.state_vector(),reg_low.state_vector()).
+                
+                Then applying a composite gate to reg_all would give you the same thing as
+                applying the lhs gate to reg_high and the rhs gate to reg_low and then appending 
+                the two resulting registers.  So the lhs gate of a composite_gate applies to
+                the high order bits of a regitser and the rhs gate applies to the lower order bits.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='composite_gate'></a>composite_gate</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> composite_gate<font color='#5555FF'>&amp;</font> g
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - *this is a copy of g
+        !*/</font>
+
+        <b><a name='composite_gate'></a>composite_gate</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> gate_exp<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs_, 
+            <font color='#0000FF'>const</font> gate_exp<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs_
+        <font face='Lucida Console'>)</font>: 
+        <font color='#009900'>/*!
+            ensures
+                - #lhs == lhs_.ref()
+                - #rhs == rhs_.ref()
+                - #num_bits == T::num_bits + U::num_bits
+                - #dims == 2^num_bits
+                - #&amp;ref() == this
+        !*/</font>
+
+        <font color='#0000FF'>const</font> qc_scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> r, 
+            <font color='#0000FF'><u>long</u></font> c
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= r &lt; dims
+                - 0 &lt;= c &lt; dims
+            ensures
+                - Let M denote the tensor product of lhs with rhs, then this function
+                  returns M(r,c)
+                  (i.e. returns lhs(r/U::dims,c/U::dims)*rhs(r%U::dims, c%U::dims))
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> exp<font color='#5555FF'>&gt;</font>
+        qc_scalar_type compute_state_element <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>exp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> reg,
+            <font color='#0000FF'><u>long</u></font> row_idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - reg.nr() == dims
+                - reg.nc() == 1
+                - 0 &lt;= row_idx &lt; dims
+            ensures
+                - Let M represent the matrix for this gate, then this function
+                  returns rowm(M*reg, row_idx)
+                  (i.e. returns the row_idx row of what you get when you apply this
+                  gate to the given column vector in reg)
+                - This function works by calling rhs.compute_state_element() and using elements
+                  of the matrix in lhs.  
+        !*/</font>
+
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_bits;
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> dims;
+
+        <font color='#0000FF'>const</font> T lhs;
+        <font color='#0000FF'>const</font> U rhs;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> bits<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='gate'></a>gate</b> : <font color='#0000FF'>public</font> gate_exp<font color='#5555FF'>&lt;</font>gate<font color='#5555FF'>&lt;</font>bits<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON bits
+                0 &lt; bits &lt;= 30
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a quantum gate that operates on bits qubits. 
+                It stores its gate matrix explicitly in a dense in-memory matrix. 
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <b><a name='gate'></a>gate</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - num_bits == bits
+                - dims == 2^bits
+                - #&amp;ref() == this
+                - for all valid r and c:
+                    #(*this)(r,c) == 0
+        !*/</font>
+
+        <b><a name='gate'></a>gate</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> gate<font color='#5555FF'>&amp;</font> g
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - *this is a copy of g
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>explicit</font> <b><a name='gate'></a>gate</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> gate_exp<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> g
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - T::num_bits == num_bits
+            ensures
+                - num_bits == bits
+                - dims == 2^bits
+                - #&amp;ref() == this
+                - for all valid r and c:
+                    #(*this)(r,c) == g(r,c)
+        !*/</font>
+
+        <font color='#0000FF'>const</font> qc_scalar_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> r, 
+            <font color='#0000FF'><u>long</u></font> c
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= r &lt; dims
+                - 0 &lt;= c &lt; dims
+            ensures
+                - Let M denote the matrix for this gate, then this function
+                  returns a const reference to M(r,c)
+        !*/</font>
+
+        qc_scalar_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> r, 
+            <font color='#0000FF'><u>long</u></font> c
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= r &lt; dims
+                - 0 &lt;= c &lt; dims
+            ensures
+                - Let M denote the matrix for this gate, then this function 
+                  returns a non-const reference to M(r,c)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> exp<font color='#5555FF'>&gt;</font>
+        qc_scalar_type <b><a name='compute_state_element'></a>compute_state_element</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>exp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> reg,
+            <font color='#0000FF'><u>long</u></font> row_idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - reg.nr() == dims
+                - reg.nc() == 1
+                - 0 &lt;= row_idx &lt; dims
+            ensures
+                - Let M represent the matrix for this gate, then this function
+                  returns rowm(M*reg, row_idx)
+                  (i.e. returns the row_idx row of what you get when you apply this
+                  gate to the given column vector in reg)
+        !*/</font>
+
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_bits;
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> dims;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> composite_gate<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b>, <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> gate_exp<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+        <font color='#0000FF'>const</font> gate_exp<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> composite_gate<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>lhs,rhs<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        ensures
+            - returns a composite_gate that represents the tensor product of the lhs
+              gate with the rhs gate.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> quantum_gates
+    <b>{</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='hadamard'></a>hadamard</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the Hadamard gate.
+                  (i.e. A gate with a matrix of
+                                 |1, 1|
+                     1/sqrt(2) * |1,-1|   )
+        !*/</font>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='x'></a>x</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the not gate.
+                  (i.e. A gate with a matrix of
+                      |0, 1|
+                      |1, 0|   )
+        !*/</font>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='y'></a>y</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the y gate.
+                  (i.e. A gate with a matrix of
+                      |0,-i|
+                      |i, 0|   )
+        !*/</font>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='z'></a>z</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the z gate.
+                  (i.e. A gate with a matrix of
+                      |1, 0|
+                      |0,-1|   )
+        !*/</font>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='noop'></a>noop</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the no-op or identity gate.
+                  (i.e. A gate with a matrix of
+                      |1, 0|
+                      |0, 1|   )
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'><u>int</u></font> control_bit,
+            <font color='#0000FF'><u>int</u></font> target_bit
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='cnot'></a>cnot</b> : <font color='#0000FF'>public</font> gate_exp<font color='#5555FF'>&lt;</font>cnot<font color='#5555FF'>&lt;</font>control_bit, target_bit<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+        <b>{</b>
+            <font color='#009900'>/*!
+                REQUIREMENTS ON control_bit AND target_bit
+                    - control_bit != target_bit
+
+                WHAT THIS OBJECT REPRESENTS
+                    This object represents the controlled-not quantum gate.  It is a gate that
+                    operates on abs(control_bit-target_bit)+1 qubits.   
+
+                    In terms of the computational basis vectors, this gate maps input
+                    vectors to output vectors in the following way:
+                        - if (the input vector corresponds to a state where the control_bit
+                          qubit is 1) then
+                            - this gate outputs the computational basis vector that
+                              corresponds to the state where the target_bit has been flipped
+                              with respect to the input vector
+                        - else
+                            - this gate outputs the input vector unmodified
+
+            !*/</font>
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'><u>int</u></font> control_bit1,
+            <font color='#0000FF'><u>int</u></font> control_bit2,
+            <font color='#0000FF'><u>int</u></font> target_bit
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='toffoli'></a>toffoli</b> : <font color='#0000FF'>public</font> gate_exp<font color='#5555FF'>&lt;</font>toffoli<font color='#5555FF'>&lt;</font>control_bit1, control_bit2, target_bit<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+        <b>{</b>
+            <font color='#009900'>/*!
+                REQUIREMENTS ON control_bit1, control_bit2, AND target_bit
+                    - all the arguments denote different bits, i.e.:
+                        - control_bit1 != target_bit
+                        - control_bit2 != target_bit
+                        - control_bit1 != control_bit2
+                    - The target bit can't be in-between the control bits, i.e.:
+                        - (control_bit1 &lt; target_bit &amp;&amp; control_bit2 &lt; target_bit) ||
+                          (control_bit1 &gt; target_bit &amp;&amp; control_bit2 &gt; target_bit) 
+
+                WHAT THIS OBJECT REPRESENTS
+                    This object represents the toffoli variant of a controlled-not quantum gate.  
+                    It is a gate that operates on max(abs(control_bit2-target_bit),abs(control_bit1-target_bit))+1 
+                    qubits.   
+
+                    In terms of the computational basis vectors, this gate maps input
+                    vectors to output vectors in the following way:
+                        - if (the input vector corresponds to a state where the control_bit1 and
+                          control_bit2 qubits are 1) then
+                            - this gate outputs the computational basis vector that
+                              corresponds to the state where the target_bit has been flipped
+                              with respect to the input vector
+                        - else
+                            - this gate outputs the input vector unmodified
+
+            !*/</font>
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_QUANTUM_COMPUTINg_ABSTRACT_
+</font>
+
+
+
+</pre></body></html>

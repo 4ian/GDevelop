@@ -1,0 +1,159 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - mpc_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use of the linear model predictive
+    control tool from the dlib C++ Library.  To explain what it does, suppose
+    you have some process you want to control and the process dynamics are
+    described by the linear equation:
+        x_{i+1} = A*x_i + B*u_i + C
+    That is, the next state the system goes into is a linear function of its
+    current state (x_i) and the current control (u_i) plus some constant bias or
+    disturbance.  
+                
+    A model predictive controller can find the control (u) you should apply to
+    drive the state (x) to some reference value, which is what we show in this
+    example.  In particular, we will simulate a simple vehicle moving around in
+    a planet's gravity.  We will use MPC to get the vehicle to fly to and then
+    hover at a certain point in the air.
+    
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>gui_widgets.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>control.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_transforms.h<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>//  ----------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> STATES <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> CONTROLS <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+    <font color='#009900'>// The first thing we do is setup our vehicle dynamics model (A*x + B*u + C).
+</font>    <font color='#009900'>// Our state space (the x) will have 4 dimensions, the 2D vehicle position
+</font>    <font color='#009900'>// and also the 2D velocity.  The control space (u) will be just 2 variables
+</font>    <font color='#009900'>// which encode the amount of force we apply to the vehicle along each axis.
+</font>    <font color='#009900'>// Therefore, the A matrix defines a simple constant velocity model.
+</font>    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,STATES,STATES<font color='#5555FF'>&gt;</font> A;
+    A <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>,  <font color='#009900'>// next_pos = pos + velocity
+</font>        <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>,  <font color='#009900'>// next_pos = pos + velocity
+</font>        <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>,  <font color='#009900'>// next_velocity = velocity
+</font>        <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>;  <font color='#009900'>// next_velocity = velocity
+</font>
+    <font color='#009900'>// Here we say that the control variables effect only the velocity. That is,
+</font>    <font color='#009900'>// the control applies an acceleration to the vehicle.
+</font>    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,STATES,CONTROLS<font color='#5555FF'>&gt;</font> B;
+    B <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>,
+        <font color='#979000'>0</font>, <font color='#979000'>0</font>,
+        <font color='#979000'>1</font>, <font color='#979000'>0</font>,
+        <font color='#979000'>0</font>, <font color='#979000'>1</font>;
+
+    <font color='#009900'>// Let's also say there is a small constant acceleration in one direction.
+</font>    <font color='#009900'>// This is the force of gravity in our model. 
+</font>    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,STATES,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> C;
+    C <font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+        <font color='#979000'>0</font>,
+        <font color='#979000'>0</font>,
+        <font color='#979000'>0.1</font>;
+
+
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> HORIZON <font color='#5555FF'>=</font> <font color='#979000'>30</font>;
+    <font color='#009900'>// Now we need to setup some MPC specific parameters.  To understand them,
+</font>    <font color='#009900'>// let's first talk about how MPC works.  When the MPC tool finds the "best"
+</font>    <font color='#009900'>// control to apply it does it by simulating the process for HORIZON time
+</font>    <font color='#009900'>// steps and selecting the control that leads to the best performance over
+</font>    <font color='#009900'>// the next HORIZON steps.
+</font>    <font color='#009900'>//  
+</font>    <font color='#009900'>// To be precise, each time you ask it for a control, it solves the
+</font>    <font color='#009900'>// following quadratic program:
+</font>    <font color='#009900'>//   
+</font>    <font color='#009900'>//     min     sum_i trans(x_i-target_i)*Q*(x_i-target_i) + trans(u_i)*R*u_i 
+</font>    <font color='#009900'>//    x_i,u_i
+</font>    <font color='#009900'>//
+</font>    <font color='#009900'>//     such that: x_0     == current_state 
+</font>    <font color='#009900'>//                x_{i+1} == A*x_i + B*u_i + C
+</font>    <font color='#009900'>//                lower &lt;= u_i &lt;= upper
+</font>    <font color='#009900'>//                0 &lt;= i &lt; HORIZON
+</font>    <font color='#009900'>//
+</font>    <font color='#009900'>// and reports u_0 as the control you should take given that you are currently
+</font>    <font color='#009900'>// in current_state.  Q and R are user supplied matrices that define how we
+</font>    <font color='#009900'>// penalize variations away from the target state as well as how much we want
+</font>    <font color='#009900'>// to avoid generating large control signals.  We also allow you to specify
+</font>    <font color='#009900'>// upper and lower bound constraints on the controls.  The next few lines
+</font>    <font color='#009900'>// define these parameters for our simple example.
+</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,STATES,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> Q;
+    <font color='#009900'>// Setup Q so that the MPC only cares about matching the target position and
+</font>    <font color='#009900'>// ignores the velocity.  
+</font>    Q <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>;
+
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,CONTROLS,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> R, lower, upper;
+    R <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>1</font>;
+    lower <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.5</font>, <font color='#5555FF'>-</font><font color='#979000'>0.5</font>;
+    upper <font color='#5555FF'>=</font>  <font color='#979000'>0.5</font>,  <font color='#979000'>0.5</font>;
+
+    <font color='#009900'>// Finally, create the MPC controller.
+</font>    mpc<font color='#5555FF'>&lt;</font>STATES,CONTROLS,HORIZON<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>controller</font><font face='Lucida Console'>(</font>A,B,C,Q,R,lower,upper<font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// Let's tell the controller to send our vehicle to a random location.  It
+</font>    <font color='#009900'>// will try to find the controls that makes the vehicle just hover at this
+</font>    <font color='#009900'>// target position.
+</font>    dlib::rand rnd;
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,STATES,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> target;
+    target <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>400</font>,rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>400</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+    controller.<font color='#BB00BB'>set_target</font><font face='Lucida Console'>(</font>target<font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// Now let's start simulating our vehicle.  Our vehicle moves around inside
+</font>    <font color='#009900'>// a 400x400 unit sized world.
+</font>    matrix<font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>world</font><font face='Lucida Console'>(</font><font color='#979000'>400</font>,<font color='#979000'>400</font><font face='Lucida Console'>)</font>;
+    image_window win;
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,STATES,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> current_state;
+    <font color='#009900'>// And we start it at the center of the world with zero velocity.
+</font>    current_state <font color='#5555FF'>=</font> <font color='#979000'>200</font>,<font color='#979000'>200</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+
+    <font color='#0000FF'><u>int</u></font> iter <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>while</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>win.<font color='#BB00BB'>is_closed</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// Find the best control action given our current state.
+</font>        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,CONTROLS,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> action <font color='#5555FF'>=</font> <font color='#BB00BB'>controller</font><font face='Lucida Console'>(</font>current_state<font face='Lucida Console'>)</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>best control: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>action<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now draw our vehicle on the world.  We will draw the vehicle as a
+</font>        <font color='#009900'>// black circle and its target position as a green circle.  
+</font>        <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>world, <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>255</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> dpoint pos <font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#BB00BB'>current_state</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,<font color='#BB00BB'>current_state</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> dpoint goal <font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#BB00BB'>target</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,<font color='#BB00BB'>target</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_solid_circle</font><font face='Lucida Console'>(</font>world, goal, <font color='#979000'>9</font>, <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>100</font>,<font color='#979000'>255</font>,<font color='#979000'>100</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_solid_circle</font><font face='Lucida Console'>(</font>world, pos, <font color='#979000'>7</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// We will also draw the control as a line showing which direction the
+</font>        <font color='#009900'>// vehicle's thruster is firing.
+</font>        <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>world, pos, pos<font color='#5555FF'>-</font><font color='#979000'>50</font><font color='#5555FF'>*</font>action, <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        win.<font color='#BB00BB'>set_image</font><font face='Lucida Console'>(</font>world<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Take a step in the simulation
+</font>        current_state <font color='#5555FF'>=</font> A<font color='#5555FF'>*</font>current_state <font color='#5555FF'>+</font> B<font color='#5555FF'>*</font>action <font color='#5555FF'>+</font> C;
+        dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Every 100 iterations change the target to some other random location. 
+</font>        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>iter;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>iter <font color='#5555FF'>&gt;</font> <font color='#979000'>100</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            iter <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            target <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>400</font>,rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>400</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+            controller.<font color='#BB00BB'>set_target</font><font face='Lucida Console'>(</font>target<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>//  ----------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

@@ -1,0 +1,179 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - byte_orderer_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_BYTE_ORDEREr_KERNEL_1_ 
+<font color='#0000FF'>#define</font> DLIB_BYTE_ORDEREr_KERNEL_1_ 
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='byte_orderer_kernel_abstract.h.html'>byte_orderer_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='byte_orderer'></a>byte_orderer</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - if (this machine is little endian) then
+                    - little_endian == true
+                - else
+                    - little_endian == false
+
+            CONVENTION
+                - host_is_big_endian() == !little_endian
+                - host_is_little_endian() == little_endian
+
+                - if (this machine is little endian) then
+                    - little_endian == true
+                - else
+                    - little_endian == false
+
+
+        !*/</font>
+
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#009900'>// this is here for backwards compatibility with older versions of dlib.
+</font>        <font color='#0000FF'>typedef</font> byte_orderer kernel_1a;
+
+        <b><a name='byte_orderer'></a>byte_orderer</b> <font face='Lucida Console'>(</font>        
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// This will probably never be false but if it is then it means chars are not 8bits
+</font>            <font color='#009900'>// on this system.  Which is a problem for this object.
+</font>            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>short</u></font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> ptr <font color='#5555FF'>=</font> <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>temp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                little_endian <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>else</font>
+                little_endian <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='byte_orderer'></a>byte_orderer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='host_is_big_endian'></a>host_is_big_endian</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>!</font>little_endian; <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='host_is_little_endian'></a>host_is_little_endian</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> little_endian; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='host_to_network'></a>host_to_network</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>little_endian<font face='Lucida Console'>)</font> <font color='#BB00BB'>flip</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='network_to_host'></a>network_to_host</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>little_endian<font face='Lucida Console'>)</font> <font color='#BB00BB'>flip</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='host_to_big'></a>host_to_big</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>little_endian<font face='Lucida Console'>)</font> <font color='#BB00BB'>flip</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='big_to_host'></a>big_to_host</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>little_endian<font face='Lucida Console'>)</font> <font color='#BB00BB'>flip</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='host_to_little'></a>host_to_little</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>little_endian<font face='Lucida Console'>)</font> <font color='#BB00BB'>flip</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='little_to_host'></a>little_to_host</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>little_endian<font face='Lucida Console'>)</font> <font color='#BB00BB'>flip</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>; <b>}</b>
+
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'><u>size_t</u></font> size
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='flip'></a>flip</b> <font face='Lucida Console'>(</font>
+            <font color='#BB00BB'>T</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>array<font face='Lucida Console'>)</font>[size]
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            ensures
+                - flips the bytes in every element of this array
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>flip</font><font face='Lucida Console'>(</font>array[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='flip'></a>flip</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            ensures
+                - reverses the byte ordering in item
+        !*/</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT_HAS_STANDARD_LAYOUT</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font>;
+
+            T value;
+
+            <font color='#009900'>// If you are getting this as an error then you are probably using
+</font>            <font color='#009900'>// this object wrong.  If you think you aren't then send me (Davis) an
+</font>            <font color='#009900'>// email and I'll either set you straight or change/remove this check so
+</font>            <font color='#009900'>// your stuff works :)
+</font>            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// If you are getting a compile error on this line then it means T is
+</font>            <font color='#009900'>// a pointer type.  It doesn't make any sense to byte swap pointers
+</font>            <font color='#009900'>// since they have no meaning outside the context of their own process.
+</font>            <font color='#009900'>// So you probably just forgot to dereference that pointer before passing
+</font>            <font color='#009900'>// it to this function  :)
+</font>            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_pointer_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>size_t</u></font> size <font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> <font color='#0000FF'>const</font> ptr <font color='#5555FF'>=</font> <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>item<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> <font color='#0000FF'>const</font> ptr_temp <font color='#5555FF'>=</font> <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>value<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                ptr_temp[size<font color='#5555FF'>-</font>i<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> ptr[i];
+
+            item <font color='#5555FF'>=</font> value;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> little_endian;
+    <b>}</b>;    
+
+    <font color='#009900'>// make flip not do anything at all for chars
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> byte_orderer::flip<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b><b>}</b> 
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> byte_orderer::flip<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b><b>}</b> 
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> byte_orderer::flip<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b><b>}</b> 
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BYTE_ORDEREr_KERNEL_1_ 
+</font>
+
+</pre></body></html>

@@ -1,0 +1,441 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - conditioning_class_kernel_3.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2004  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_CONDITIONING_CLASS_KERNEl_3_
+<font color='#0000FF'>#define</font> DLIB_CONDITIONING_CLASS_KERNEl_3_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='conditioning_class_kernel_abstract.h.html'>conditioning_class_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='conditioning_class_kernel_3'></a>conditioning_class_kernel_3</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                total == 1
+                counts == pointer to an array of alphabet_size data structs                
+                for all i except i == 0: counts[i].count == 0
+                counts[0].count == 1
+                counts[0].symbol == alphabet_size-1
+                for all i except i == alphabet_size-1:  counts[i].present == false
+                counts[alphabet_size-1].present == true
+
+            CONVENTION
+                counts == pointer to an array of alphabet_size data structs
+                get_total() == total
+                get_count(symbol) == counts[x].count where 
+                                     counts[x].symbol == symbol
+
+
+                LOW_COUNT(symbol) == sum of counts[0].count though counts[x-1].count
+                                     where counts[x].symbol == symbol
+                                     if (counts[0].symbol == symbol) LOW_COUNT(symbol)==0
+
+
+                if (counts[i].count == 0) then
+                    counts[i].symbol == undefined value
+
+                if (symbol has a nonzero count) then
+                    counts[symbol].present == true
+
+                get_memory_usage() == global_state.memory_usage
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>class</font> <b><a name='global_state_type'></a>global_state_type</b>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='global_state_type'></a>global_state_type</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : memory_usage<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#0000FF'>private</font>:
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> memory_usage;
+
+            <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> <b><a name='conditioning_class_kernel_3'></a>conditioning_class_kernel_3</b><font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>&gt;</font>;
+        <b>}</b>;
+
+        <b><a name='conditioning_class_kernel_3'></a>conditioning_class_kernel_3</b> <font face='Lucida Console'>(</font>
+            global_state_type<font color='#5555FF'>&amp;</font> global_state_
+        <font face='Lucida Console'>)</font>;
+
+        ~<b><a name='conditioning_class_kernel_3'></a>conditioning_class_kernel_3</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='increment_count'></a>increment_count</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> amount <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_count'></a>get_count</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_total'></a>get_total</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_range'></a>get_range</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> low_count,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> high_count,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> total_count
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_symbol'></a>get_symbol</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> target,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> symbol,            
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> low_count,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> high_count
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_memory_usage'></a>get_memory_usage</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        global_state_type<font color='#5555FF'>&amp;</font> <b><a name='get_global_state'></a>get_global_state</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_alphabet_size'></a>get_alphabet_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='conditioning_class_kernel_3'></a>conditioning_class_kernel_3</b><font face='Lucida Console'>(</font>conditioning_class_kernel_3<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        conditioning_class_kernel_3<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>conditioning_class_kernel_3<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+        <font color='#0000FF'>struct</font> <b><a name='data'></a>data</b>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> count;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> symbol;
+            <font color='#0000FF'><u>bool</u></font> present;
+        <b>}</b>;
+
+        <font color='#009900'>// data members
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> total;
+        data<font color='#5555FF'>*</font> counts;
+        global_state_type<font color='#5555FF'>&amp;</font> global_state;
+
+    <b>}</b>;   
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size
+        <font color='#5555FF'>&gt;</font>
+    conditioning_class_kernel_3<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>&gt;</font>::
+    <b><a name='conditioning_class_kernel_3'></a>conditioning_class_kernel_3</b> <font face='Lucida Console'>(</font>
+        global_state_type<font color='#5555FF'>&amp;</font> global_state_
+    <font face='Lucida Console'>)</font> :
+        total<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,
+        counts<font face='Lucida Console'>(</font><font color='#0000FF'>new</font> data[alphabet_size]<font face='Lucida Console'>)</font>,
+        global_state<font face='Lucida Console'>(</font>global_state_<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> <font color='#979000'>1</font> <font color='#5555FF'>&lt;</font> alphabet_size <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> alphabet_size <font color='#5555FF'>&lt;</font> <font color='#979000'>65536</font> <font face='Lucida Console'>)</font>;
+
+        data<font color='#5555FF'>*</font> start <font color='#5555FF'>=</font> counts;
+        data<font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> counts<font color='#5555FF'>+</font>alphabet_size;
+        start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol <font color='#5555FF'>=</font> alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>present <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>start;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>start <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+        <b>{</b>
+            start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>present <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>start;
+        <b>}</b>        
+        counts[alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>].present <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+        <font color='#009900'>// update memory usage
+</font>        global_state.memory_usage <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>alphabet_size <font color='#5555FF'>+</font> 
+                                     <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>conditioning_class_kernel_3<font face='Lucida Console'>)</font>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size
+        <font color='#5555FF'>&gt;</font>
+    conditioning_class_kernel_3<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>&gt;</font>::
+    ~<b><a name='conditioning_class_kernel_3'></a>conditioning_class_kernel_3</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>delete</font> [] counts;
+        <font color='#009900'>// update memory usage
+</font>        global_state.memory_usage <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>alphabet_size <font color='#5555FF'>+</font> 
+                                     <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>conditioning_class_kernel_3<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> conditioning_class_kernel_3<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>&gt;</font>::
+    <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        total <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        data<font color='#5555FF'>*</font> start <font color='#5555FF'>=</font> counts;
+        data<font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> counts<font color='#5555FF'>+</font>alphabet_size;
+        start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol <font color='#5555FF'>=</font> alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>present <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>start;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>start <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+        <b>{</b>
+            start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>present <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>start;
+        <b>}</b>        
+        counts[alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>].present <font color='#5555FF'>=</font> <font color='#979000'>true</font>; 
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> conditioning_class_kernel_3<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>&gt;</font>::global_state_type<font color='#5555FF'>&amp;</font> conditioning_class_kernel_3<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_global_state'></a>get_global_state</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> global_state;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> conditioning_class_kernel_3<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_memory_usage'></a>get_memory_usage</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> global_state.memory_usage;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> conditioning_class_kernel_3<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>&gt;</font>::
+    <b><a name='increment_count'></a>increment_count</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> amount
+    <font face='Lucida Console'>)</font>
+    <b>{</b>        
+        <font color='#009900'>// if we are going over a total of 65535 then scale down all counts by 2
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>total<font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>amount<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>65536</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            total <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            data<font color='#5555FF'>*</font> start <font color='#5555FF'>=</font> counts;
+            data<font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> counts<font color='#5555FF'>+</font>alphabet_size;
+            
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>start <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol <font color='#5555FF'>=</font><font color='#5555FF'>=</font> alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#009900'>// this symbol must never be zero so we will leave its count at 1
+</font>                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>total;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                        counts[start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol].present <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                    total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count;
+                <b>}</b>
+ 
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>start;
+            <b>}</b>  
+        <b>}</b>
+
+
+        data<font color='#5555FF'>*</font> start <font color='#5555FF'>=</font> counts;   
+        data<font color='#5555FF'>*</font> swap_spot <font color='#5555FF'>=</font> counts;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>counts[symbol].present<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+            <b>{</b>                
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol <font color='#5555FF'>=</font><font color='#5555FF'>=</font> symbol <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count<font color='#5555FF'>!</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>                
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> temp <font color='#5555FF'>=</font> start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>+</font> amount;
+
+                    start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol <font color='#5555FF'>=</font> swap_spot<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol;
+                    start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>=</font> swap_spot<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count;
+
+                    swap_spot<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;                
+                    swap_spot<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count  <font color='#5555FF'>=</font> temp;
+                    <font color='#0000FF'>break</font>;
+                <b>}</b>
+                
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>swap_spot<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    swap_spot <font color='#5555FF'>=</font> start;
+                <b>}</b>
+
+
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>start;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            counts[symbol].present <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol <font color='#5555FF'>=</font> swap_spot<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol;
+                    start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>=</font> swap_spot<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count;
+                    
+                    swap_spot<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;                
+                    swap_spot<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count  <font color='#5555FF'>=</font> amount;
+                    <font color='#0000FF'>break</font>;
+                <b>}</b>
+                    
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>swap_spot<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    swap_spot <font color='#5555FF'>=</font> start;
+                <b>}</b>
+
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>start;
+            <b>}</b>
+        <b>}</b>
+        
+        total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> amount;
+
+        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> conditioning_class_kernel_3<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_count'></a>get_count</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>counts[symbol].present <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+
+        data<font color='#5555FF'>*</font> start <font color='#5555FF'>=</font> counts;        
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol <font color='#5555FF'>!</font><font color='#5555FF'>=</font> symbol<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>start;
+        <b>}</b>
+        <font color='#0000FF'>return</font> start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> conditioning_class_kernel_3<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_alphabet_size'></a>get_alphabet_size</b> <font face='Lucida Console'>(</font>        
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'>return</font> alphabet_size;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> conditioning_class_kernel_3<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_total'></a>get_total</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> total;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> conditioning_class_kernel_3<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_range'></a>get_range</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> low_count,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> high_count,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> total_count
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>counts[symbol].present <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+
+        total_count <font color='#5555FF'>=</font> total;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> low_count_temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        data<font color='#5555FF'>*</font> start <font color='#5555FF'>=</font> counts;        
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol <font color='#5555FF'>!</font><font color='#5555FF'>=</font> symbol<font face='Lucida Console'>)</font>
+        <b>{</b>
+            low_count_temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>start;
+        <b>}</b> 
+
+        low_count <font color='#5555FF'>=</font> low_count_temp;
+        high_count <font color='#5555FF'>=</font> low_count_temp <font color='#5555FF'>+</font> start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count;
+        <font color='#0000FF'>return</font> start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> conditioning_class_kernel_3<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_symbol'></a>get_symbol</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> target,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> symbol,            
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> low_count,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> high_count
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> high_count_temp <font color='#5555FF'>=</font> counts<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count;
+        <font color='#0000FF'>const</font> data<font color='#5555FF'>*</font> start <font color='#5555FF'>=</font> counts;        
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>target <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> high_count_temp<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>start;
+            high_count_temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count;
+        <b>}</b> 
+
+        low_count <font color='#5555FF'>=</font> high_count_temp <font color='#5555FF'>-</font> start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count;
+        high_count <font color='#5555FF'>=</font> high_count_temp;
+        symbol <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>start<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CONDITIONING_CLASS_KERNEl_3_
+</font>
+
+</pre></body></html>

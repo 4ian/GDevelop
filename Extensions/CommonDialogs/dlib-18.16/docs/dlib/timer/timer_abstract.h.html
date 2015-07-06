@@ -1,0 +1,193 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - timer_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_TIMER_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_TIMER_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads.h.html'>../threads.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='timer'></a>timer</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                is_running()      == false
+                delay_time()      == 1000
+                action_object()   == The object that is passed into the constructor
+                action_function() == The member function pointer that is passed to 
+                                     the constructor.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a timer that will call a given member function 
+                (the action function) repeatedly at regular intervals and in its own
+                thread.
+
+                Note that the delay_time() is measured in milliseconds but you are not 
+                guaranteed to have that level of resolution.  The actual resolution
+                is implementation dependent.
+
+            THREAD SAFETY
+                All methods of this class are thread safe. 
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>af_type<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <b><a name='timer'></a>timer</b> <font face='Lucida Console'>(</font>  
+            T<font color='#5555FF'>&amp;</font> ao,
+            af_type af
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - af does not throw
+            ensures                
+                - does not block.
+                - #*this is properly initialized
+                - #action_object() == ao
+                - #action_function() == af
+                  (af is a member function pointer to a member in the class T)
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='timer'></a>timer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - is not called from inside the action_function()
+            ensures
+                - any resources associated with *this have been released
+                - will not call the action_function() anymore.
+                - if (the action function is currently executing) then
+                    - blocks until it finishes
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this has its initial value
+                - does not block
+            throws
+                - std::bad_alloc or dlib::thread_error
+                    If either of these exceptions are thrown then #*this is unusable 
+                    until clear() is called and succeeds.
+        !*/</font>
+
+        af_type <b><a name='action_function'></a>action_function</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - does not block.
+                - returns a pointer to the member function of action_object() that is
+                  called by *this.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='action_object'></a>action_object</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - does not block.
+                - returns a const reference to the object used to call the member
+                  function pointer action_function()
+        !*/</font>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='action_object'></a>action_object</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - does not block.
+                - returns a non-const reference to the object used to call the member
+                  function pointer action_function()
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_running'></a>is_running</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - does not block.
+                - if (*this is currently scheduled to call the action_function()) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='delay_time'></a>delay_time</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - does not block.
+                - returns the amount of time, in milliseconds, that *this will wait between
+                  the return of one call to the action_function() and the beginning of the
+                  next call to the action_function().
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_delay_time'></a>set_delay_time</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> milliseconds
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!            
+            ensures
+                - does not block.
+                - #delay_time() == milliseconds
+            throws
+                - std::bad_alloc or dlib::thread_error
+                    If either of these exceptions are thrown then #is_running() == false
+                    but otherwise this function succeeds
+        !*/</font>
+        
+        <font color='#0000FF'><u>void</u></font> <b><a name='start'></a>start</b> <font face='Lucida Console'>(</font>            
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - does not block.
+                - if (is_running() == false) then
+                    - #is_running() == true
+                    - The action_function() will run in another thread.
+                    - The first call to the action_function() will occur in roughly 
+                      delay_time() milliseconds.
+                - else
+                    - this call to start() has no effect
+            throws
+                - dlib::thread_error or std::bad_alloc
+                    If this exception is thrown then #is_running() == false but 
+                    otherwise this call to start() has no effect.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='stop'></a>stop</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #is_running() == false
+                - does not block.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='stop_and_wait'></a>stop_and_wait</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - #is_running() == false
+                - if (the action function is currently executing) then
+                    - blocks until it finishes
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='timer'></a>timer</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> timer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        timer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> timer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;    
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_TIMER_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

@@ -1,2 +1,0 @@
-Dlib documentation is available on http://dlib.net/
-( It was removed here for space )

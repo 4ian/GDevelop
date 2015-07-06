@@ -15,9 +15,9 @@ GDSDK\
 .build-debug\
 Widgets-Extension\
 .depend
-CommonDialogs\dlib-17.49\docs
-CommonDialogs\dlib-17.49\examples
-CommonDialogs\dlib-17.49\documentation.htm
+CommonDialogs\dlib-18.16\docs
+CommonDialogs\dlib-18.16\examples
+CommonDialogs\dlib-18.16\documentation.htm
 Skeleton-Object\
 .exe
 .dll
@@ -32,9 +32,9 @@ Skeleton-Object\
 .build-debug/
 Binaries/Releases
 GDSDK/
-CommonDialogs/dlib-17.49/docs
-CommonDialogs/dlib-17.49/examples
-CommonDialogs/dlib-17.49/documentation.htm
+CommonDialogs/dlib-18.16/docs
+CommonDialogs/dlib-18.16/examples
+CommonDialogs/dlib-18.16/documentation.htm
 *.dll
 *.a
 *.xgdwe

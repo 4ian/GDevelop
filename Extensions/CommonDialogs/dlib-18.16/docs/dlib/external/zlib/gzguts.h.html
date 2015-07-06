@@ -1,0 +1,222 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - gzguts.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/* gzguts.h -- zlib internal header definitions for gz* operations
+ * Copyright (C) 2004, 2005, 2010, 2011, 2012, 2013 Mark Adler
+ * For conditions of distribution and use, see copyright notice in zlib.h
+ */</font>
+
+<font color='#0000FF'>#ifdef</font> _MSC_VER
+<font color='#009900'>// Disable the following warnings for Visual Studio
+</font><font color='#009900'>// This is a warning you get from visual studio 2005 about things in the standard C++
+</font><font color='#009900'>// library being "deprecated."  I checked the C++ standard and it doesn't say jack 
+</font><font color='#009900'>// about any of them (I checked the searchable PDF).   So this warning is total Bunk.
+</font><font color='#0000FF'>#pragma</font> warning<font face='Lucida Console'>(</font>disable : <font color='#979000'>4996</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> _LARGEFILE64_SOURCE
+#  ifndef _LARGEFILE_SOURCE
+#    define _LARGEFILE_SOURCE <font color='#979000'>1</font>
+#  endif
+#  ifdef _FILE_OFFSET_BITS
+#    undef _FILE_OFFSET_BITS
+#  endif
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> HAVE_HIDDEN
+#  define ZLIB_INTERNAL <b><a name='__attribute__'></a>__attribute__</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#BB00BB'>visibility</font> <font face='Lucida Console'>(</font>"<font color='#CC0000'>hidden</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#else</font>
+#  define ZLIB_INTERNAL
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>stdio.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='zlib.h.html'>zlib.h</a>"
+<font color='#0000FF'>#ifdef</font> STDC
+#  include <font color='#5555FF'>&lt;</font>string.h<font color='#5555FF'>&gt;</font>
+#  include <font color='#5555FF'>&lt;</font>stdlib.h<font color='#5555FF'>&gt;</font>
+#  include <font color='#5555FF'>&lt;</font>limits.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fcntl.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#ifdef</font> _WIN32
+#  include <font color='#5555FF'>&lt;</font>stddef.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>__TURBOC__<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>_MSC_VER<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>_WIN32<font face='Lucida Console'>)</font>
+#  include <font color='#5555FF'>&lt;</font>io.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#else</font>
+#  include <font color='#5555FF'>&lt;</font>unistd.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> WINAPI_FAMILY
+#  define open _open
+#  define read _read
+#  define write _write
+#  define close _close
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> NO_DEFLATE       <font color='#009900'>/* for compatibility with old definition */</font>
+#  define NO_GZCOMPRESS
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>STDC99<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>defined<font face='Lucida Console'>(</font>__TURBOC__<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> __TURBOC__ <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0x550</font><font face='Lucida Console'>)</font>
+#  ifndef HAVE_VSNPRINTF
+#    define HAVE_VSNPRINTF
+#  endif
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>__CYGWIN__<font face='Lucida Console'>)</font>
+#  ifndef HAVE_VSNPRINTF
+#    define HAVE_VSNPRINTF
+#  endif
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>MSDOS<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> defined<font face='Lucida Console'>(</font>__BORLANDC__<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>BORLANDC <font color='#5555FF'>&gt;</font> <font color='#979000'>0x410</font><font face='Lucida Console'>)</font>
+#  ifndef HAVE_VSNPRINTF
+#    define HAVE_VSNPRINTF
+#  endif
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifndef</font> HAVE_VSNPRINTF
+#  ifdef MSDOS
+<font color='#009900'>/* vsnprintf may exist on some MS-DOS compilers (DJGPP?),
+   but for now we just assume it doesn't. */</font>
+#    define NO_vsnprintf
+#  endif
+#  ifdef __TURBOC__
+#    define NO_vsnprintf
+#  endif
+#  ifdef WIN32
+<font color='#009900'>/* In Win32, vsnprintf is available as the "non-ANSI" _vsnprintf. */</font>
+#    <font color='#0000FF'>if</font> <font color='#5555FF'>!</font><b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>vsnprintf<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font><b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>NO_vsnprintf<font face='Lucida Console'>)</font>
+#      <font color='#0000FF'>if</font> <font color='#5555FF'>!</font><b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>_MSC_VER<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>defined</font><font face='Lucida Console'>(</font>_MSC_VER<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> _MSC_VER <font color='#5555FF'>&lt;</font> <font color='#979000'>1500</font> <font face='Lucida Console'>)</font>
+#         define vsnprintf _vsnprintf
+#      endif
+#    endif
+#  endif
+#  ifdef __SASC
+#    define NO_vsnprintf
+#  endif
+#  ifdef VMS
+#    define NO_vsnprintf
+#  endif
+#  ifdef __OS400__
+#    define NO_vsnprintf
+#  endif
+#  ifdef __MVS__
+#    define NO_vsnprintf
+#  endif
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* unlike snprintf (which is required in C99, yet still not supported by
+   Microsoft more than a decade later!), _snprintf does not guarantee null
+   termination of the result -- however this is only used in gzlib.c where
+   the result is assured to fit in the space provided */</font>
+<font color='#0000FF'>#ifdef</font> _MSC_VER
+#  define snprintf _snprintf
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifndef</font> local
+#  define local <font color='#0000FF'>static</font>
+<font color='#0000FF'>#endif</font>
+<font color='#009900'>/* compile with -Dlocal if your debugger can't find static symbols */</font>
+
+<font color='#009900'>/* gz* functions always use library allocation functions */</font>
+<font color='#0000FF'>#ifndef</font> STDC
+  <font color='#0000FF'>extern</font> voidp  malloc <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>uInt size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>extern</font> <font color='#0000FF'><u>void</u></font>   free   <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>voidpf ptr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* get errno and strerror definition */</font>
+<font color='#0000FF'>#if</font> defined UNDER_CE
+#  include <font color='#5555FF'>&lt;</font>windows.h<font color='#5555FF'>&gt;</font>
+#  define <b><a name='zstrerror'></a>zstrerror</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b><a name='gz_strwinerror'></a>gz_strwinerror</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>DWORD<font face='Lucida Console'>)</font><font color='#BB00BB'>GetLastError</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#else</font>
+#  ifndef NO_STRERROR
+#    include <font color='#5555FF'>&lt;</font>errno.h<font color='#5555FF'>&gt;</font>
+#    define <b><a name='zstrerror'></a>zstrerror</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b><a name='strerror'></a>strerror</b><font face='Lucida Console'>(</font>errno<font face='Lucida Console'>)</font>
+#  <font color='#0000FF'>else</font>
+#    define <b><a name='zstrerror'></a>zstrerror</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> "<font color='#CC0000'>stdio error (consult errno)</font>"
+#  endif
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* provide prototypes for these when building zlib without LFS */</font>
+<font color='#0000FF'>#if</font> <font color='#5555FF'>!</font>defined<font face='Lucida Console'>(</font>_LARGEFILE64_SOURCE<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> _LFS64_LARGEFILE<font color='#5555FF'>-</font><font color='#979000'>0</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    ZEXTERN gzFile ZEXPORT gzopen64 <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>, <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    ZEXTERN z_off64_t ZEXPORT gzseek64 <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>gzFile, z_off64_t, <font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    ZEXTERN z_off64_t ZEXPORT gztell64 <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>gzFile<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    ZEXTERN z_off64_t ZEXPORT gzoffset64 <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>gzFile<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* default memLevel */</font>
+<font color='#0000FF'>#if</font> MAX_MEM_LEVEL <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>
+#  define DEF_MEM_LEVEL <font color='#979000'>8</font>
+<font color='#0000FF'>#else</font>
+#  define DEF_MEM_LEVEL  MAX_MEM_LEVEL
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* default i/o buffer size -- double this for output when reading (this and
+   twice this must be able to fit in an unsigned type) */</font>
+<font color='#0000FF'>#define</font> GZBUFSIZE <font color='#979000'>8192</font>
+
+<font color='#009900'>/* gzip modes, also provide a little integrity check on the passed structure */</font>
+<font color='#0000FF'>#define</font> GZ_NONE <font color='#979000'>0</font>
+<font color='#0000FF'>#define</font> GZ_READ <font color='#979000'>7247</font>
+<font color='#0000FF'>#define</font> GZ_WRITE <font color='#979000'>31153</font>
+<font color='#0000FF'>#define</font> GZ_APPEND <font color='#979000'>1</font>     <font color='#009900'>/* mode set to GZ_WRITE after the file is opened */</font>
+
+<font color='#009900'>/* values for gz_state how */</font>
+<font color='#0000FF'>#define</font> LOOK <font color='#979000'>0</font>      <font color='#009900'>/* look for a gzip header */</font>
+<font color='#0000FF'>#define</font> COPY <font color='#979000'>1</font>      <font color='#009900'>/* copy input directly */</font>
+<font color='#0000FF'>#define</font> GZIP <font color='#979000'>2</font>      <font color='#009900'>/* decompress a gzip stream */</font>
+
+<font color='#009900'>/* internal gzip file state data structure */</font>
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+        <font color='#009900'>/* exposed contents for gzgetc() macro */</font>
+    <font color='#0000FF'>struct</font> gzFile_s x;      <font color='#009900'>/* "x" for exposed */</font>
+                            <font color='#009900'>/* x.have: number of bytes available at x.next */</font>
+                            <font color='#009900'>/* x.next: next output data to deliver or write */</font>
+                            <font color='#009900'>/* x.pos: current position in uncompressed data */</font>
+        <font color='#009900'>/* used for both reading and writing */</font>
+    <font color='#0000FF'><u>int</u></font> mode;               <font color='#009900'>/* see gzip modes above */</font>
+    <font color='#0000FF'><u>int</u></font> fd;                 <font color='#009900'>/* file descriptor */</font>
+    <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>path;             <font color='#009900'>/* path or fd for error messages */</font>
+    <font color='#0000FF'><u>unsigned</u></font> size;          <font color='#009900'>/* buffer size, zero if not allocated yet */</font>
+    <font color='#0000FF'><u>unsigned</u></font> want;          <font color='#009900'>/* requested buffer size, default is GZBUFSIZE */</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>in;      <font color='#009900'>/* input buffer */</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>out;     <font color='#009900'>/* output buffer (double-sized when reading) */</font>
+    <font color='#0000FF'><u>int</u></font> direct;             <font color='#009900'>/* 0 if processing gzip, 1 if transparent */</font>
+        <font color='#009900'>/* just for reading */</font>
+    <font color='#0000FF'><u>int</u></font> how;                <font color='#009900'>/* 0: get header, 1: copy, 2: decompress */</font>
+    z_off64_t start;        <font color='#009900'>/* where the gzip data started, for rewinding */</font>
+    <font color='#0000FF'><u>int</u></font> eof;                <font color='#009900'>/* true if end of input file reached */</font>
+    <font color='#0000FF'><u>int</u></font> past;               <font color='#009900'>/* true if read requested past end */</font>
+        <font color='#009900'>/* just for writing */</font>
+    <font color='#0000FF'><u>int</u></font> level;              <font color='#009900'>/* compression level */</font>
+    <font color='#0000FF'><u>int</u></font> strategy;           <font color='#009900'>/* compression strategy */</font>
+        <font color='#009900'>/* seek request */</font>
+    z_off64_t skip;         <font color='#009900'>/* amount to skip (already rewound if backwards) */</font>
+    <font color='#0000FF'><u>int</u></font> seek;               <font color='#009900'>/* true if seek request pending */</font>
+        <font color='#009900'>/* error information */</font>
+    <font color='#0000FF'><u>int</u></font> err;                <font color='#009900'>/* error code */</font>
+    <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>msg;              <font color='#009900'>/* error message */</font>
+        <font color='#009900'>/* zlib inflate or deflate stream */</font>
+    z_stream strm;          <font color='#009900'>/* stream structure in-place (not a pointer) */</font>
+<b>}</b> gz_state;
+<font color='#0000FF'>typedef</font> gz_state FAR <font color='#5555FF'>*</font>gz_statep;
+
+<font color='#009900'>/* shared functions */</font>
+<font color='#0000FF'><u>void</u></font> ZLIB_INTERNAL gz_error <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>gz_statep, <font color='#0000FF'><u>int</u></font>, <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#if</font> defined UNDER_CE
+<font color='#0000FF'><u>char</u></font> ZLIB_INTERNAL <font color='#5555FF'>*</font>gz_strwinerror <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>DWORD error<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* GT_OFF(x), where x is an unsigned value, is true if x &gt; maximum z_off64_t
+   value -- needed when comparing unsigned to z_off64_t, which is signed
+   (possible z_off64_t types off_t, off64_t, and long are all signed) */</font>
+<font color='#0000FF'>#ifdef</font> INT_MAX
+#  define <b><a name='GT_OFF'></a>GT_OFF</b><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>z_off64_t<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> INT_MAX<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#else</font>
+<font color='#0000FF'><u>unsigned</u></font> ZLIB_INTERNAL gz_intmax <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+#  define <b><a name='GT_OFF'></a>GT_OFF</b><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>z_off64_t<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>gz_intmax</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+</pre></body></html>

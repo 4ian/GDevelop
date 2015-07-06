@@ -1,0 +1,390 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - optimization_solve_qp_using_smo.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_OPTIMIZATION_SOLVE_QP_UsING_SMO_Hh_
+<font color='#0000FF'>#define</font> DLIB_OPTIMIZATION_SOLVE_QP_UsING_SMO_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='optimization_solve_qp_using_smo_abstract.h.html'>optimization_solve_qp_using_smo_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>/*
+        The algorithm defined in the solve_qp_using_smo() function below can be
+        derived by using an important theorem from the theory of constrained optimization.
+        This theorem tells us that any optimal point of a constrained function must
+        satisfy what are called the KKT conditions (also sometimes called just the KT 
+        conditions, especially in older literature).  A very good book to consult 
+        regarding this topic is Practical Methods of Optimization (second edition) by 
+        R. Fletcher.  Below I will try to explain the general idea of how this is 
+        applied.
+
+        Let e == ones_matrix(alpha.size(),1)
+
+        First, note that the function below solves the following quadratic program.  
+            Minimize: f(alpha) == 0.5*trans(alpha)*Q*alpha - trans(alpha)*b
+            subject to the following constraints:
+                - trans(e)*alpha == C (i.e. the sum of alpha values doesn't change)
+                - min(alpha) &gt;= 0 (i.e. all alpha values are nonnegative)
+            Where f is convex.  This means that Q should be positive-semidefinite.
+
+
+        To get from this problem formulation to the algorithm below we have to 
+        consider the KKT conditions.  They tell us that any solution to the above
+        problem must satisfy the following 5 conditions:
+            1. trans(e)*alpha == C
+            2. min(alpha) &gt;= 0
+
+            3. Let L(alpha, x, y) == f(alpha) - trans(x)*alpha - y*(trans(e)*alpha - C)
+               Where x is a vector of length alpha.size() and y is a single scalar.
+               Then the derivative of L with respect to alpha must == 0
+               So we get the following as our 3rd condition:
+               f'(alpha) - x - y*e == 0
+
+            4. min(x) &gt;= 0 (i.e. all x values are nonnegative)
+            5. pointwise_multiply(x, alpha) == 0
+               (i.e. only one member of each x(i) and alpha(i) pair can be non-zero)
+        
+        
+        From 3 we can easily obtain this rule:
+            for all i: f'(alpha)(i) - x(i) == y
+
+        If we then consider 4 and 5 we see that we can infer that the following
+        must also be the case:
+            - if (alpha(i) &gt; 0) then
+                - x(i) == 0
+                - f'(alpha)(i) == y
+            - else
+                - x(i) == some nonnegative number
+                - f'(alpha)(i) &gt;= y
+
+        
+        The important thing to take away is the final rule.  It tells us that at the
+        optimal solution all elements of the gradient of f have the same value if 
+        their corresponding alpha is non-zero.  It also tells us that all the other
+        gradient values are bigger than y.  We can use this information to help us
+        pick which alpha variables to optimize at each iteration. 
+    */</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> EXP1,
+        <font color='#0000FF'>typename</font> EXP2,
+        <font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR, <font color='#0000FF'><u>long</u></font> NC, <font color='#0000FF'>typename</font> MM, <font color='#0000FF'>typename</font> L
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='solve_qp_using_smo'></a>solve_qp_using_smo</b> <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> Q,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b,
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> alpha,
+        T eps,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>Q.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Q.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     b.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     b.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Q.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     eps <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     max_iter <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                     "<font color='#CC0000'>\t unsigned long solve_qp_using_smo()</font>"
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid arguments were given to this function</font>"
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Q.nr():               </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> Q.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Q.nc():               </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> Q.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_col_vector(b):     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_col_vector(alpha): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font>
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t b.size():             </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t alpha.size():         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Q.nr():               </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> Q.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t min(alpha):           </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font> 
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps:                  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> eps 
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_iter:             </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> max_iter 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> T C <font color='#5555FF'>=</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Compute f'(alpha) (i.e. the gradient of f(alpha)) for the current alpha.  
+</font>        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font> df <font color='#5555FF'>=</font> Q<font color='#5555FF'>*</font>alpha <font color='#5555FF'>-</font> b;
+
+        <font color='#0000FF'>const</font> T tau <font color='#5555FF'>=</font> <font color='#979000'>1000</font><font color='#5555FF'>*</font>std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        T big, little;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> iter <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; iter <font color='#5555FF'>&lt;</font> max_iter; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>iter<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// Find the two elements of df that satisfy the following:
+</font>            <font color='#009900'>//    - little_idx == index_of_min(df)
+</font>            <font color='#009900'>//    - big_idx   == the index of the largest element in df such that alpha(big_idx) &gt; 0
+</font>            <font color='#009900'>// These two indices will tell us which two alpha values are most in violation of the KKT 
+</font>            <font color='#009900'>// optimality conditions.  
+</font>            big <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>long</u></font> big_idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            little <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>long</u></font> little_idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> df.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> big <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    big <font color='#5555FF'>=</font> <font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                    big_idx <font color='#5555FF'>=</font> i;
+                <b>}</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> little<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    little <font color='#5555FF'>=</font> <font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                    little_idx <font color='#5555FF'>=</font> i;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#009900'>// Check if the KKT conditions are still violated and stop if so.  
+</font>            <font color='#009900'>//if (alpha(little_idx) &gt; 0 &amp;&amp; (big - little) &lt; eps)
+</font>            <font color='#009900'>//    break;
+</font>
+            <font color='#009900'>// Check how big the duality gap is and stop when it goes below eps.  
+</font>            <font color='#009900'>// The duality gap is the gap between the objective value of the function
+</font>            <font color='#009900'>// we are optimizing and the value of its primal form.  This value is always 
+</font>            <font color='#009900'>// greater than or equal to the distance to the optimum solution so it is a 
+</font>            <font color='#009900'>// good way to decide if we should stop.   See the book referenced above for 
+</font>            <font color='#009900'>// more information.  In particular, see the part about the Wolfe Dual.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>df <font color='#5555FF'>-</font> C<font color='#5555FF'>*</font>little <font color='#5555FF'>&lt;</font> eps<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>break</font>;
+
+
+            <font color='#009900'>// Save these values, we will need them later.
+</font>            <font color='#0000FF'>const</font> T old_alpha_big <font color='#5555FF'>=</font> <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>big_idx<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> T old_alpha_little <font color='#5555FF'>=</font> <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>little_idx<font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// Now optimize the two variables we just picked. 
+</font>            T quad_coef <font color='#5555FF'>=</font> <font color='#BB00BB'>Q</font><font face='Lucida Console'>(</font>big_idx,big_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>Q</font><font face='Lucida Console'>(</font>little_idx,little_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#BB00BB'>Q</font><font face='Lucida Console'>(</font>big_idx, little_idx<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>quad_coef <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> tau<font face='Lucida Console'>)</font>
+                quad_coef <font color='#5555FF'>=</font> tau;
+            <font color='#0000FF'>const</font> T delta <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>big <font color='#5555FF'>-</font> little<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>quad_coef;
+            <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>big_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> delta;
+            <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>little_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> delta;
+
+            <font color='#009900'>// Make sure alpha stays feasible.  That is, make sure the updated alpha doesn't
+</font>            <font color='#009900'>// violate the non-negativity constraint.  
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>big_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// Since an alpha can't be negative we will just set it to 0 and shift all the
+</font>                <font color='#009900'>// weight to the other alpha.
+</font>                <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>big_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>little_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> old_alpha_big <font color='#5555FF'>+</font> old_alpha_little;
+            <b>}</b>
+
+            <font color='#009900'>// Every 300 iterations
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>iter<font color='#5555FF'>%</font><font color='#979000'>300</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>299</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// Perform this form of the update every so often because doing so can help
+</font>                <font color='#009900'>// avoid the buildup of numerical errors you get with the alternate update
+</font>                <font color='#009900'>// below.
+</font>                df <font color='#5555FF'>=</font> Q<font color='#5555FF'>*</font>alpha <font color='#5555FF'>-</font> b;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// Now update the gradient. We will perform the equivalent of: df = Q*alpha - b;
+</font>                <font color='#0000FF'>const</font> T delta_alpha_big   <font color='#5555FF'>=</font> <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>big_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> old_alpha_big;
+                <font color='#0000FF'>const</font> T delta_alpha_little <font color='#5555FF'>=</font> <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>little_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> old_alpha_little;
+
+                <font color='#0000FF'>for</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> df.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>Q</font><font face='Lucida Console'>(</font>big_idx,k<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>delta_alpha_big <font color='#5555FF'>+</font> <font color='#BB00BB'>Q</font><font face='Lucida Console'>(</font>little_idx,k<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>delta_alpha_little;;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>/*
+        using namespace std;
+        cout &lt;&lt; "SMO: " &lt;&lt; endl;
+        cout &lt;&lt; "   duality gap: "&lt;&lt; trans(alpha)*df - C*min(df) &lt;&lt; endl;
+        cout &lt;&lt; "   KKT gap:     "&lt;&lt; big-little &lt;&lt; endl;
+        cout &lt;&lt; "   iter:        "&lt;&lt; iter+1 &lt;&lt; endl;
+        cout &lt;&lt; "   eps:         "&lt;&lt; eps &lt;&lt; endl;
+        */</font>
+
+        <font color='#0000FF'>return</font> iter<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> EXP1,
+        <font color='#0000FF'>typename</font> EXP2,
+        <font color='#0000FF'>typename</font> EXP3,
+        <font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR, <font color='#0000FF'><u>long</u></font> NC, <font color='#0000FF'>typename</font> MM, <font color='#0000FF'>typename</font> L
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='solve_qp4_using_smo'></a>solve_qp4_using_smo</b> <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> Q,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP3<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b,
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> alpha,
+        T eps,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>A.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     Q.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Q.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     b.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     b.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Q.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     eps <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     max_iter <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                     "<font color='#CC0000'>\t void solve_qp4_using_smo()</font>"
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid arguments were given to this function</font>"
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t A.nc():               </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> A.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Q.nr():               </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> Q.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Q.nc():               </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> Q.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_col_vector(b):     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_col_vector(alpha): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font>
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t b.size():             </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t alpha.size():         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Q.nr():               </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> Q.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t min(alpha):           </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font> 
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps:                  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> eps 
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_iter:             </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> max_iter 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> T C <font color='#5555FF'>=</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>/*
+            For this optimization problem, it is the case that the optimal
+            value of lambda is given by a simple closed form expression if we
+            know the optimal alpha.  So what we will do is to just optimize 
+            alpha and every now and then we will update lambda with its optimal
+            value.  Therefore, we use essentially the same method as the
+            solve_qp_using_smo() routine.  
+        */</font>
+
+        <font color='#009900'>// compute optimal lambda for current alpha
+</font>        matrix<font color='#5555FF'>&lt;</font>T,NR,<font color='#979000'>1</font>,MM,L<font color='#5555FF'>&gt;</font> lambda <font color='#5555FF'>=</font> A<font color='#5555FF'>*</font>alpha;
+        lambda <font color='#5555FF'>=</font> <font color='#BB00BB'>lowerbound</font><font face='Lucida Console'>(</font>lambda, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Compute f'(alpha) (i.e. the gradient of f(alpha) with respect to alpha) for the current alpha.  
+</font>        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font> df <font color='#5555FF'>=</font> Q<font color='#5555FF'>*</font>alpha <font color='#5555FF'>-</font> b <font color='#5555FF'>-</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>lambda;
+
+        <font color='#0000FF'>const</font> T tau <font color='#5555FF'>=</font> <font color='#979000'>1000</font><font color='#5555FF'>*</font>std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        T big, little;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> iter <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; iter <font color='#5555FF'>&lt;</font> max_iter; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>iter<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// Find the two elements of df that satisfy the following:
+</font>            <font color='#009900'>//    - little_idx == index_of_min(df)
+</font>            <font color='#009900'>//    - big_idx   == the index of the largest element in df such that alpha(big_idx) &gt; 0
+</font>            <font color='#009900'>// These two indices will tell us which two alpha values are most in violation of the KKT 
+</font>            <font color='#009900'>// optimality conditions.  
+</font>            big <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>long</u></font> big_idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            little <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>long</u></font> little_idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> df.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> big <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    big <font color='#5555FF'>=</font> <font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                    big_idx <font color='#5555FF'>=</font> i;
+                <b>}</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> little<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    little <font color='#5555FF'>=</font> <font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                    little_idx <font color='#5555FF'>=</font> i;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#009900'>// Check how big the duality gap is and stop when it goes below eps.  
+</font>            <font color='#009900'>// The duality gap is the gap between the objective value of the function
+</font>            <font color='#009900'>// we are optimizing and the value of its primal form.  This value is always 
+</font>            <font color='#009900'>// greater than or equal to the distance to the optimum solution so it is a 
+</font>            <font color='#009900'>// good way to decide if we should stop.   
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>df <font color='#5555FF'>-</font> C<font color='#5555FF'>*</font>little <font color='#5555FF'>&lt;</font> eps<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// compute optimal lambda and recheck the duality gap to make
+</font>                <font color='#009900'>// sure we have really converged.
+</font>                lambda <font color='#5555FF'>=</font> A<font color='#5555FF'>*</font>alpha;
+                lambda <font color='#5555FF'>=</font> <font color='#BB00BB'>lowerbound</font><font face='Lucida Console'>(</font>lambda, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                df <font color='#5555FF'>=</font> Q<font color='#5555FF'>*</font>alpha <font color='#5555FF'>-</font> b <font color='#5555FF'>-</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>lambda;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>df <font color='#5555FF'>-</font> C<font color='#5555FF'>*</font><font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>df<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> eps<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>else</font>
+                    <font color='#0000FF'>continue</font>;
+            <b>}</b>
+
+
+            <font color='#009900'>// Save these values, we will need them later.
+</font>            <font color='#0000FF'>const</font> T old_alpha_big <font color='#5555FF'>=</font> <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>big_idx<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> T old_alpha_little <font color='#5555FF'>=</font> <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>little_idx<font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// Now optimize the two variables we just picked. 
+</font>            T quad_coef <font color='#5555FF'>=</font> <font color='#BB00BB'>Q</font><font face='Lucida Console'>(</font>big_idx,big_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>Q</font><font face='Lucida Console'>(</font>little_idx,little_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#BB00BB'>Q</font><font face='Lucida Console'>(</font>big_idx, little_idx<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>quad_coef <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> tau<font face='Lucida Console'>)</font>
+                quad_coef <font color='#5555FF'>=</font> tau;
+            <font color='#0000FF'>const</font> T delta <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>big <font color='#5555FF'>-</font> little<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>quad_coef;
+            <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>big_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> delta;
+            <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>little_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> delta;
+
+            <font color='#009900'>// Make sure alpha stays feasible.  That is, make sure the updated alpha doesn't
+</font>            <font color='#009900'>// violate the non-negativity constraint.  
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>big_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// Since an alpha can't be negative we will just set it to 0 and shift all the
+</font>                <font color='#009900'>// weight to the other alpha.
+</font>                <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>big_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>little_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> old_alpha_big <font color='#5555FF'>+</font> old_alpha_little;
+            <b>}</b>
+
+
+            <font color='#009900'>// Every 300 iterations
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>iter<font color='#5555FF'>%</font><font color='#979000'>300</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>299</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// compute the optimal lambda for the current alpha
+</font>                lambda <font color='#5555FF'>=</font> A<font color='#5555FF'>*</font>alpha;
+                lambda <font color='#5555FF'>=</font> <font color='#BB00BB'>lowerbound</font><font face='Lucida Console'>(</font>lambda, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// Perform this form of the update every so often because doing so can help
+</font>                <font color='#009900'>// avoid the buildup of numerical errors you get with the alternate update
+</font>                <font color='#009900'>// below.
+</font>                df <font color='#5555FF'>=</font> Q<font color='#5555FF'>*</font>alpha <font color='#5555FF'>-</font> b <font color='#5555FF'>-</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>lambda;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// Now update the gradient. We will perform the equivalent of: df = Q*alpha - b;
+</font>                <font color='#0000FF'>const</font> T delta_alpha_big   <font color='#5555FF'>=</font> <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>big_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> old_alpha_big;
+                <font color='#0000FF'>const</font> T delta_alpha_little <font color='#5555FF'>=</font> <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>little_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> old_alpha_little;
+
+                <font color='#0000FF'>for</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> df.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>Q</font><font face='Lucida Console'>(</font>big_idx,k<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>delta_alpha_big <font color='#5555FF'>+</font> <font color='#BB00BB'>Q</font><font face='Lucida Console'>(</font>little_idx,k<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>delta_alpha_little;;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>/*
+        using namespace std;
+        cout &lt;&lt; "SMO: " &lt;&lt; endl;
+        cout &lt;&lt; "   duality gap: "&lt;&lt; trans(alpha)*df - C*min(df) &lt;&lt; endl;
+        cout &lt;&lt; "   KKT gap:     "&lt;&lt; big-little &lt;&lt; endl;
+        cout &lt;&lt; "   iter:        "&lt;&lt; iter+1 &lt;&lt; endl;
+        cout &lt;&lt; "   eps:         "&lt;&lt; eps &lt;&lt; endl;
+        */</font>
+
+
+        <font color='#0000FF'>return</font> iter<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_OPTIMIZATION_SOLVE_QP_UsING_SMO_Hh_
+</font>
+
+</pre></body></html>

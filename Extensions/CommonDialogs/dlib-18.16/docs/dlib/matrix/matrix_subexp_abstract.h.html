@@ -1,0 +1,504 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - matrix_subexp_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_MATRIx_SUBEXP_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_MATRIx_SUBEXP_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_abstract.h.html'>matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry/rectangle.h.html'>../geometry/rectangle.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> start, <font color='#0000FF'><u>long</u></font> inc, <font color='#0000FF'><u>long</u></font> end<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='range'></a>range</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - inc &gt; 0
+        ensures
+            - returns a matrix R such that:
+                - R::type == long
+                - R.nr() == 1
+                - R.nc() == abs(end - start)/inc + 1
+                - if (start &lt;= end) then
+                    - R(i) == start + i*inc
+                - else
+                    - R(i) == start - i*inc
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> start, <font color='#0000FF'><u>long</u></font> end<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='range'></a>range</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> range<font color='#5555FF'>&lt;</font>start,<font color='#979000'>1</font>,end<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='range'></a>range</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>long</u></font> start,
+        <font color='#0000FF'><u>long</u></font> inc,
+        <font color='#0000FF'><u>long</u></font> end
+    <font face='Lucida Console'>)</font>; 
+    <font color='#009900'>/*!
+        requires
+            - inc &gt; 0
+        ensures
+            - returns a matrix R such that:
+                - R::type == long
+                - R.nr() == 1
+                - R.nc() == abs(end - start)/inc + 1
+                - if (start &lt;= end) then
+                    - R(i) == start + i*inc
+                - else
+                    - R(i) == start - i*inc
+    !*/</font>
+
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='range'></a>range</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>long</u></font> start,
+        <font color='#0000FF'><u>long</u></font> end
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font>start,<font color='#979000'>1</font>,end<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='subm'></a>subm</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> rows,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> cols,
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - rows and cols contain integral elements (e.g. int, long)
+            - 0 &lt;= min(rows) &amp;&amp; max(rows) &lt; m.nr() 
+            - 0 &lt;= min(cols) &amp;&amp; max(cols) &lt; m.nc()
+            - rows.nr() == 1 || rows.nc() == 1
+            - cols.nr() == 1 || cols.nc() == 1
+              (i.e. rows and cols must be vectors)
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R.nr() == rows.size()
+                - R.nc() == cols.size()
+                - for all valid r and c:
+                  R(r,c) == m(rows(r),cols(c))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='subm'></a>subm</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>long</u></font> row,
+        <font color='#0000FF'><u>long</u></font> col,
+        <font color='#0000FF'><u>long</u></font> nr,
+        <font color='#0000FF'><u>long</u></font> nc
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - row &gt;= 0
+            - col &gt;= 0
+            - nr &gt;= 0
+            - nc &gt;= 0
+            - row + nr &lt;= m.nr()
+            - col + nc &lt;= m.nc()
+        ensures
+            - returns a matrix R such that:
+                - R.nr() == nr 
+                - R.nc() == nc
+                - for all valid r and c:
+                  R(r, c) == m(r+row,c+col)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='subm'></a>subm</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - get_rect(m).contains(rect) == true
+              (i.e. rect is a region inside the matrix m)
+        ensures
+            - returns a matrix R such that:
+                - R.nr() == rect.height()  
+                - R.nc() == rect.width()
+                - for all valid r and c:
+                  R(r, c) == m(r+rect.top(), c+rect.left())
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='rowm'></a>rowm</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>long</u></font> row
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt;= row &lt; m.nr()
+        ensures
+            - returns a matrix R such that:
+                - R.nr() == 1
+                - R.nc() == m.nc()
+                - for all valid i:
+                  R(i) == m(row,i)
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='rowm_exp'></a>rowm_exp</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This struct allows you to determine the type of matrix expression 
+                object returned from the rowm(m,row) function.  An example makes its
+                use clear:
+
+                template &lt;typename EXP&gt;
+                void do_something( const matrix_exp&lt;EXP&gt;&amp; mat)
+                {
+                    // r is a matrix expression that aliases mat.
+                    typename rowm_exp&lt;EXP&gt;::type r = rowm(mat,0);
+
+                    // Print the first row of mat.  So we see that by using
+                    // rowm_exp we can save the object returned by rowm() in
+                    // a local variable.    
+                    cout &lt;&lt; r &lt;&lt; endl;
+
+                    // Note that you can only save the return value of rowm() to
+                    // a local variable if the argument to rowm() has a lifetime
+                    // beyond the rowm() expression.  The example shown above is
+                    // OK but the following would result in undefined behavior:
+                    typename rowm_exp&lt;EXP&gt;::type bad = rowm(mat + mat,0);
+                }
+        !*/</font>
+        <font color='#0000FF'>typedef</font> type_of_expression_returned_by_rowm type;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='rowm'></a>rowm</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>long</u></font> row,
+        <font color='#0000FF'><u>long</u></font> length
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt;= row &lt; m.nr()
+            - 0 &lt;= length &lt;= m.nc()
+        ensures
+            - returns a matrix R such that:
+                - R.nr() == 1
+                - R.nc() == length
+                - for all valid i:
+                  R(i) == m(row,i)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='rowm'></a>rowm</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> rows
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - rows contains integral elements (e.g. int, long)
+            - 0 &lt;= min(rows) &amp;&amp; max(rows) &lt; m.nr() 
+            - rows.nr() == 1 || rows.nc() == 1
+              (i.e. rows must be a vector)
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R.nr() == rows.size()
+                - R.nc() == m.nc() 
+                - for all valid r and c:
+                  R(r,c) == m(rows(r),c)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='colm'></a>colm</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>long</u></font> col 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt;= col &lt; m.nc()
+        ensures
+            - returns a matrix R such that:
+                - R.nr() == m.nr() 
+                - R.nc() == 1
+                - for all valid i:
+                  R(i) == m(i,col)
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='colm_exp'></a>colm_exp</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This struct allows you to determine the type of matrix expression 
+                object returned from the colm(m,col) function.  An example makes its
+                use clear:
+
+                template &lt;typename EXP&gt;
+                void do_something( const matrix_exp&lt;EXP&gt;&amp; mat)
+                {
+                    // c is a matrix expression that aliases mat.
+                    typename colm_exp&lt;EXP&gt;::type c = colm(mat,0);
+
+                    // Print the first column of mat.  So we see that by using
+                    // colm_exp we can save the object returned by colm() in
+                    // a local variable.    
+                    cout &lt;&lt; c &lt;&lt; endl;
+
+                    // Note that you can only save the return value of colm() to
+                    // a local variable if the argument to colm() has a lifetime
+                    // beyond the colm() expression.  The example shown above is
+                    // OK but the following would result in undefined behavior:
+                    typename colm_exp&lt;EXP&gt;::type bad = colm(mat + mat,0);
+                }
+        !*/</font>
+        <font color='#0000FF'>typedef</font> type_of_expression_returned_by_colm type;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='colm'></a>colm</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>long</u></font> col,
+        <font color='#0000FF'><u>long</u></font> length
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt;= col &lt; m.nc()
+            - 0 &lt;= length &lt;= m.nr()
+        ensures
+            - returns a matrix R such that:
+                - R.nr() == length 
+                - R.nc() == 1
+                - for all valid i:
+                  R(i) == m(i,col)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='colm'></a>colm</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> cols
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - cols contains integral elements (e.g. int, long)
+            - 0 &lt;= min(cols) &amp;&amp; max(cols) &lt; m.nc() 
+            - cols.nr() == 1 || cols.nc() == 1
+              (i.e. cols must be a vector)
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R.nr() == m.nr()
+                - R.nc() == cols.size()
+                - for all valid r and c:
+                  R(r,c) == m(r,cols(c))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    assignable_matrix_expression <b><a name='set_subm'></a>set_subm</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>long</u></font> row,
+        <font color='#0000FF'><u>long</u></font> col,
+        <font color='#0000FF'><u>long</u></font> nr,
+        <font color='#0000FF'><u>long</u></font> nc
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - row &gt;= 0
+            - col &gt;= 0
+            - nr &gt;= 0
+            - nc &gt;= 0
+            - row + nr &lt;= m.nr()
+            - col + nc &lt;= m.nc()
+        ensures
+            - statements of the following form:
+                - set_subm(m,row,col,nr,nc) = some_matrix;
+              result in it being the case that:
+                - subm(m,row,col,nr,nc) == some_matrix.
+
+            - statements of the following form:
+                - set_subm(m,row,col,nr,nc) = scalar_value;
+              result in it being the case that:
+                - subm(m,row,col,nr,nc) == uniform_matrix&lt;matrix::type&gt;(nr,nc,scalar_value).
+
+            - In addition to the normal assignment statements using the = symbol, you may
+              also use the usual += and -= versions of the assignment operator.  In these
+              cases, they have their usual effect.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    assignable_matrix_expression <b><a name='set_subm'></a>set_subm</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - get_rect(m).contains(rect) == true
+              (i.e. rect is a region inside the matrix m)
+        ensures
+            - statements of the following form:
+                - set_subm(m,rect) = some_matrix;
+              result in it being the case that:
+                - subm(m,rect) == some_matrix.
+
+            - statements of the following form:
+                - set_subm(m,rect) = scalar_value;
+              result in it being the case that:
+                - subm(m,rect) == uniform_matrix&lt;matrix::type&gt;(nr,nc,scalar_value).
+
+            - In addition to the normal assignment statements using the = symbol, you may
+              also use the usual += and -= versions of the assignment operator.  In these
+              cases, they have their usual effect.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    assignable_matrix_expression <b><a name='set_subm'></a>set_subm</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> rows,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> cols
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - rows and cols contain integral elements (e.g. int, long)
+            - 0 &lt;= min(rows) &amp;&amp; max(rows) &lt; m.nr() 
+            - 0 &lt;= min(cols) &amp;&amp; max(cols) &lt; m.nc()
+            - rows.nr() == 1 || rows.nc() == 1
+            - cols.nr() == 1 || cols.nc() == 1
+              (i.e. rows and cols must be vectors)
+        ensures
+            - statements of the following form:
+                - set_subm(m,rows,cols) = some_matrix;
+              result in it being the case that:
+                - subm(m,rows,cols) == some_matrix.
+
+            - statements of the following form:
+                - set_subm(m,rows,cols) = scalar_value;
+              result in it being the case that:
+                - subm(m,rows,cols) == uniform_matrix&lt;matrix::type&gt;(nr,nc,scalar_value).
+
+            - In addition to the normal assignment statements using the = symbol, you may
+              also use the usual += and -= versions of the assignment operator.  In these
+              cases, they have their usual effect.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    assignable_matrix_expression <b><a name='set_rowm'></a>set_rowm</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>long</u></font> row
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt;= row &lt; m.nr()
+        ensures
+            - statements of the following form:
+                - set_rowm(m,row) = some_matrix;
+              result in it being the case that:
+                - rowm(m,row) == some_matrix.
+
+            - statements of the following form:
+                - set_rowm(m,row) = scalar_value;
+              result in it being the case that:
+                - rowm(m,row) == uniform_matrix&lt;matrix::type&gt;(1,nc,scalar_value).
+
+            - In addition to the normal assignment statements using the = symbol, you may
+              also use the usual += and -= versions of the assignment operator.  In these
+              cases, they have their usual effect.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    assignable_matrix_expression <b><a name='set_rowm'></a>set_rowm</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> rows
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - rows contains integral elements (e.g. int, long)
+            - 0 &lt;= min(rows) &amp;&amp; max(rows) &lt; m.nr() 
+            - rows.nr() == 1 || rows.nc() == 1
+              (i.e. rows must be a vector)
+        ensures
+            - statements of the following form:
+                - set_rowm(m,rows) = some_matrix;
+              result in it being the case that:
+                - rowm(m,rows) == some_matrix.
+
+            - statements of the following form:
+                - set_rowm(m,rows) = scalar_value;
+              result in it being the case that:
+                - rowm(m,rows) == uniform_matrix&lt;matrix::type&gt;(nr,nc,scalar_value).
+
+            - In addition to the normal assignment statements using the = symbol, you may
+              also use the usual += and -= versions of the assignment operator.  In these
+              cases, they have their usual effect.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    assignable_matrix_expression <b><a name='set_colm'></a>set_colm</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>long</u></font> col 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt;= col &lt; m.nr()
+        ensures
+            - statements of the following form:
+                - set_colm(m,col) = some_matrix;
+              result in it being the case that:
+                - colm(m,col) == some_matrix.
+
+            - statements of the following form:
+                - set_colm(m,col) = scalar_value;
+              result in it being the case that:
+                - colm(m,col) == uniform_matrix&lt;matrix::type&gt;(nr,1,scalar_value).
+
+            - In addition to the normal assignment statements using the = symbol, you may
+              also use the usual += and -= versions of the assignment operator.  In these
+              cases, they have their usual effect.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    assignable_matrix_expression <b><a name='set_colm'></a>set_colm</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> cols
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - cols contains integral elements (e.g. int, long)
+            - 0 &lt;= min(cols) &amp;&amp; max(cols) &lt; m.nc() 
+            - cols.nr() == 1 || cols.nc() == 1
+              (i.e. cols must be a vector)
+        ensures
+            - statements of the following form:
+                - set_colm(m,cols) = some_matrix;
+              result in it being the case that:
+                - colm(m,cols) == some_matrix.
+
+            - statements of the following form:
+                - set_colm(m,cols) = scalar_value;
+              result in it being the case that:
+                - colm(m,cols) == uniform_matrix&lt;matrix::type&gt;(nr,nc,scalar_value).
+
+            - In addition to the normal assignment statements using the = symbol, you may
+              also use the usual += and -= versions of the assignment operator.  In these
+              cases, they have their usual effect.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MATRIx_SUBEXP_ABSTRACT_
+</font>
+
+</pre></body></html>

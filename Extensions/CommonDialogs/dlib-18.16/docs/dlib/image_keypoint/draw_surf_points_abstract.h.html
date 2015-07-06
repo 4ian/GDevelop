@@ -1,0 +1,33 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - draw_surf_points_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_DRAW_SURf_POINTS_ABSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_DRAW_SURf_POINTS_ABSTRACT_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='surf_abstract.h.html'>surf_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../gui_widgets.h.html'>../gui_widgets.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_surf_points'></a>draw_surf_points</b> <font face='Lucida Console'>(</font>
+        image_window<font color='#5555FF'>&amp;</font> win,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>surf_point<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> sp
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - draws all the SURF points in sp onto the given image_window.  They
+              are drawn as overlay circles with extra lines to indicate the rotation
+              of the SURF descriptor.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_DRAW_SURf_POINTS_ABSTRACT_H_
+</font>
+
+</pre></body></html>

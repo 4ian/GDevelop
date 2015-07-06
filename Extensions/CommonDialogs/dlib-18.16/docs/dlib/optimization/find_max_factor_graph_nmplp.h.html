@@ -1,0 +1,340 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - find_max_factor_graph_nmplp.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_FIND_MAX_FACTOR_GRAPH_nMPLP_Hh_
+<font color='#0000FF'>#define</font> DLIB_FIND_MAX_FACTOR_GRAPH_nMPLP_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='find_max_factor_graph_nmplp_abstract.h.html'>find_max_factor_graph_nmplp_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>map<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../hash.h.html'>../hash.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>class</font> <b><a name='simple_hash_map'></a>simple_hash_map</b>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+
+            <b><a name='simple_hash_map'></a>simple_hash_map</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> : 
+                scan_dist<font face='Lucida Console'>(</font><font color='#979000'>6</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                data.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>5000</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='insert'></a>insert</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> a,
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> b,
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value
+            <font face='Lucida Console'>)</font> 
+            <font color='#009900'>/*!
+                requires
+                    - a != std::numeric_limits&lt;unsigned long&gt;::max()
+                ensures
+                    - #(*this)(a,b) == value
+            !*/</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> uint32 h <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_hash3_2</font><font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font face='Lucida Console'>(</font>data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>scan_dist<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> empty_bucket <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>uint32 i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> scan_dist; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data[i<font color='#5555FF'>+</font>h].key1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> empty_bucket<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        data[i<font color='#5555FF'>+</font>h].key1 <font color='#5555FF'>=</font> a;
+                        data[i<font color='#5555FF'>+</font>h].key2 <font color='#5555FF'>=</font> b;
+                        data[i<font color='#5555FF'>+</font>h].value <font color='#5555FF'>=</font> value;
+                        <font color='#0000FF'>return</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#009900'>// if we get this far it means the hash table is filling up.  So double its size.
+</font>                std::vector<font color='#5555FF'>&lt;</font>bucket<font color='#5555FF'>&gt;</font> new_data;
+                new_data.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                new_data.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>uint32 i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> new_data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>new_data[i].key1 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> empty_bucket<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>new_data[i].key1, new_data[i].key2, new_data[i].value<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>a,b,value<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> a,
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> b
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <font color='#009900'>/*!
+                requires
+                    - this-&gt;insert(a,b,some_value) has been called
+                ensures
+                    - returns the value stored at key (a,b)
+            !*/</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b, "<font color='#CC0000'>An invalid map_problem was given to find_max_factor_graph_nmplp().</font>"
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nNode </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> is listed as being a neighbor with itself, which is illegal.</font>"<font face='Lucida Console'>)</font>;
+
+                uint32 h <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_hash3_2</font><font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font face='Lucida Console'>(</font>data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>scan_dist<font face='Lucida Console'>)</font>;
+
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> scan_dist; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data[h].key1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> a <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> data[h].key2 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>return</font> data[h].value;
+                    <b>}</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>h;
+                <b>}</b>
+                
+
+                <font color='#009900'>// this should never happen (since this function requires (a,b) to be in the hash table
+</font>                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>false</font>, "<font color='#CC0000'>An invalid map_problem was given to find_max_factor_graph_nmplp().</font>"
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nThe nodes in the map_problem are inconsistent because node </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>a<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'> is in the neighbor list</font>"
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nof node </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>b<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> but node </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>b<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'> isn't in the neighbor list of node </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>a<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>.  The neighbor relationship</font>"
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nis supposed to be symmetric.</font>"
+                            <font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#0000FF'>struct</font> <b><a name='bucket'></a>bucket</b>
+            <b>{</b>
+                <font color='#009900'>// having max() in key1 indicates that the bucket isn't used.
+</font>                <b><a name='bucket'></a>bucket</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : key1<font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::max<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> key1;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> key2;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value;
+            <b>}</b>;
+
+            std::vector<font color='#5555FF'>&lt;</font>bucket<font color='#5555FF'>&gt;</font> data;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> scan_dist;
+        <b>}</b>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_problem
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_max_factor_graph_nmplp'></a>find_max_factor_graph_nmplp</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> map_problem<font color='#5555FF'>&amp;</font> prob,
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> map_assignment,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter,
+        <font color='#0000FF'><u>double</u></font> eps
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> eps <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                     "<font color='#CC0000'>\t void find_max_factor_graph_nmplp()</font>"
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps must be greater than zero</font>"
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> eps 
+                <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>/*
+            This function is an implementation of the NMPLP algorithm introduced in the 
+            following papers:
+                Fixing Max-Product: Convergent Message Passing Algorithms for MAP LP-Relaxations (2008)
+                by Amir Globerson and Tommi Jaakkola
+
+                Introduction to dual decomposition for inference (2011)
+                by David Sontag, Amir Globerson, and Tommi Jaakkola 
+
+            In particular, this function implements the star MPLP update equations shown as
+            equation 1.20 from the paper Introduction to dual decomposition for inference
+            (the method was called NMPLP in the first paper).  It should also be noted that
+            the original description of the NMPLP in the first paper had an error in the
+            equations and the second paper contains corrected equations, which is what this 
+            function uses.
+        */</font>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> map_problem::node_iterator node_iterator;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> map_problem::neighbor_iterator neighbor_iterator;
+
+        map_assignment.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>prob.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>prob.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> delta_elements;
+        delta_elements.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>prob.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>prob.<font color='#BB00BB'>num_states</font><font face='Lucida Console'>(</font>prob.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+        impl::simple_hash_map delta_idx;
+
+
+
+        <font color='#009900'>// Initialize delta to zero and fill up the hash table with the appropriate values
+</font>        <font color='#009900'>// so we can index into delta later on.
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>node_iterator i <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> prob.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> id_i <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>neighbor_iterator j <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>; j <font color='#5555FF'>!</font><font color='#5555FF'>=</font> prob.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> id_j <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+                delta_idx.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>id_i, id_j, delta_elements.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_states_xj <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>num_states</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> xj <font color='#5555FF'>=</font> <font color='#979000'>0</font>; xj <font color='#5555FF'>&lt;</font> num_states_xj; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>xj<font face='Lucida Console'>)</font>
+                    delta_elements.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> gamma_i;
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> gamma_ji;
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> delta_to_j_no_i;
+        <font color='#009900'>// These arrays will end up with a length equal to the maximum number of neighbors
+</font>        <font color='#009900'>// of any node in the graph.  So reserve a bigish number of slots so that we are
+</font>        <font color='#009900'>// very unlikely to need to preform an expensive reallocation during the
+</font>        <font color='#009900'>// optimization.
+</font>        gamma_ji.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font><font color='#979000'>10000</font><font face='Lucida Console'>)</font>;
+        delta_to_j_no_i.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font><font color='#979000'>10000</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'><u>double</u></font> max_change <font color='#5555FF'>=</font> eps <font color='#5555FF'>+</font> <font color='#979000'>1</font>; 
+        <font color='#009900'>// Now do the main body of the optimization. 
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> iter;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>iter <font color='#5555FF'>=</font> <font color='#979000'>0</font>; iter <font color='#5555FF'>&lt;</font> max_iter <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> max_change <font color='#5555FF'>&gt;</font> eps; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>iter<font face='Lucida Console'>)</font>
+        <b>{</b>
+            max_change <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>node_iterator i <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> prob.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> id_i <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_states_xi <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>num_states</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                gamma_i.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>num_states_xi, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'><u>double</u></font> num_neighbors <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> jcnt <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#009900'>// first we fill in the gamma vectors
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>neighbor_iterator j <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>; j <font color='#5555FF'>!</font><font color='#5555FF'>=</font> prob.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// Make sure these arrays are big enough to hold all the neighbor
+</font>                    <font color='#009900'>// information.
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>jcnt <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> gamma_ji.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        gamma_ji.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>gamma_ji.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                        delta_to_j_no_i.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>delta_to_j_no_i.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>num_neighbors;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> id_j <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_states_xj <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>num_states</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+
+                    gamma_ji[jcnt].<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>num_states_xi, <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    delta_to_j_no_i[jcnt].<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>num_states_xj, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// compute delta_j^{-i} and store it in delta_to_j_no_i[jcnt]  
+</font>                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>neighbor_iterator k <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>; k <font color='#5555FF'>!</font><font color='#5555FF'>=</font> prob.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> id_k <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>id_k<font color='#5555FF'>=</font><font color='#5555FF'>=</font>id_i<font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>continue</font>;
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>*</font> <font color='#0000FF'>const</font> delta_kj <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>delta_elements[<font color='#BB00BB'>delta_idx</font><font face='Lucida Console'>(</font>id_k,id_j<font face='Lucida Console'>)</font>];
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> xj <font color='#5555FF'>=</font> <font color='#979000'>0</font>; xj <font color='#5555FF'>&lt;</font> num_states_xj; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>xj<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            delta_to_j_no_i[jcnt][xj] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> delta_kj[xj];
+                        <b>}</b>
+                    <b>}</b>
+
+                    <font color='#009900'>// now compute gamma values
+</font>                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> xi <font color='#5555FF'>=</font> <font color='#979000'>0</font>; xi <font color='#5555FF'>&lt;</font> num_states_xi; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>xi<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> xj <font color='#5555FF'>=</font> <font color='#979000'>0</font>; xj <font color='#5555FF'>&lt;</font> num_states_xj; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>xj<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            gamma_ji[jcnt][xi] <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>gamma_ji[jcnt][xi], prob.<font color='#BB00BB'>factor_value</font><font face='Lucida Console'>(</font>i,j,xi,xj<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> delta_to_j_no_i[jcnt][xj]<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        gamma_i[xi] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> gamma_ji[jcnt][xi];
+                    <b>}</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>jcnt;
+                <b>}</b>
+
+                <font color='#009900'>// now update the delta values
+</font>                jcnt <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>neighbor_iterator j <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>; j <font color='#5555FF'>!</font><font color='#5555FF'>=</font> prob.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> id_j <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_states_xj <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>num_states</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// messages from j to i
+</font>                    <font color='#0000FF'><u>double</u></font><font color='#5555FF'>*</font> <font color='#0000FF'>const</font> delta_ji <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>delta_elements[<font color='#BB00BB'>delta_idx</font><font face='Lucida Console'>(</font>id_j,id_i<font face='Lucida Console'>)</font>];
+
+                    <font color='#009900'>// messages from i to j
+</font>                    <font color='#0000FF'><u>double</u></font><font color='#5555FF'>*</font> <font color='#0000FF'>const</font> delta_ij <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>delta_elements[<font color='#BB00BB'>delta_idx</font><font face='Lucida Console'>(</font>id_i,id_j<font face='Lucida Console'>)</font>];
+
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> xj <font color='#5555FF'>=</font> <font color='#979000'>0</font>; xj <font color='#5555FF'>&lt;</font> num_states_xj; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>xj<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'><u>double</u></font> best_val <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> xi <font color='#5555FF'>=</font> <font color='#979000'>0</font>; xi <font color='#5555FF'>&lt;</font> num_states_xi; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>xi<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'><u>double</u></font> val <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>factor_value</font><font face='Lucida Console'>(</font>i,j,xi,xj<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>num_neighbors<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>gamma_i[xi] <font color='#5555FF'>-</font>gamma_ji[jcnt][xi];
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val <font color='#5555FF'>&gt;</font> best_val<font face='Lucida Console'>)</font>
+                                best_val <font color='#5555FF'>=</font> val;
+                        <b>}</b>
+                        best_val <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.5</font><font color='#5555FF'>*</font>delta_to_j_no_i[jcnt][xj] <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font color='#5555FF'>*</font>best_val;
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>delta_ij[xj] <font color='#5555FF'>-</font> best_val<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> max_change<font face='Lucida Console'>)</font>
+                            max_change <font color='#5555FF'>=</font> std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>delta_ij[xj] <font color='#5555FF'>-</font> best_val<font face='Lucida Console'>)</font>;
+
+                        delta_ij[xj] <font color='#5555FF'>=</font> best_val;
+                    <b>}</b>
+
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> xi <font color='#5555FF'>=</font> <font color='#979000'>0</font>; xi <font color='#5555FF'>&lt;</font> num_states_xi; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>xi<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'><u>double</u></font> new_val <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>num_neighbors<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>gamma_i[xi] <font color='#5555FF'>+</font> gamma_ji[jcnt][xi];
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>delta_ji[xi] <font color='#5555FF'>-</font> new_val<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> max_change<font face='Lucida Console'>)</font>
+                            max_change <font color='#5555FF'>=</font> std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>delta_ji[xi] <font color='#5555FF'>-</font> new_val<font face='Lucida Console'>)</font>;
+                        delta_ji[xi] <font color='#5555FF'>=</font> new_val;
+                    <b>}</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>jcnt;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+
+        <font color='#009900'>// now decode the "beliefs"
+</font>        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> b;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>node_iterator i <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> prob.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> id_i <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+            b.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>prob.<font color='#BB00BB'>num_states</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>neighbor_iterator k <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>; k <font color='#5555FF'>!</font><font color='#5555FF'>=</font> prob.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> id_k <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> xi <font color='#5555FF'>=</font> <font color='#979000'>0</font>; xi <font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>xi<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>*</font> <font color='#0000FF'>const</font> delta_ki <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>delta_elements[<font color='#BB00BB'>delta_idx</font><font face='Lucida Console'>(</font>id_k,id_i<font face='Lucida Console'>)</font>];
+                    b[xi] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> delta_ki[xi];
+                <b>}</b>
+            <b>}</b>
+
+            map_assignment[id_i] <font color='#5555FF'>=</font> <font color='#BB00BB'>index_of_max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_FIND_MAX_FACTOR_GRAPH_nMPLP_Hh_
+</font>
+
+</pre></body></html>

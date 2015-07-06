@@ -1,0 +1,65 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - vectorstream_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_VECTORStREAM_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_VECTORStREAM_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>class</font> <b><a name='vectorstream'></a>vectorstream</b> : <font color='#0000FF'>public</font> std::iostream
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an iostream object that reads and writes from an in-memory buffer.
+                It functions very much the same way as the std::stringstream object.
+                However, while the std::stringstream holds its buffer internally and it can
+                only be accessed by copying it out, the vectorstream uses an external
+                std::vector&lt;char&gt; as its buffer.  That is, it holds a reference to an
+                external vector and does not contain any internal buffers of its own.  
+
+                This object is useful as a slightly more efficient alternative to the
+                std::stringstream since you can avoid the overhead of copying buffer
+                contents to and from the stream.  This is particularly useful when used as
+                a source or target for serialization routines.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='vectorstream'></a>vectorstream</b> <font face='Lucida Console'>(</font>
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> buffer
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object will use the given vector as its read/write buffer.  That is:
+                    - Any data written to this stream will be appended to the given buffer
+                    - Any data read from this stream is read from the given buffer,
+                      starting with buffer[0], then buffer[1], and so on.  Just like
+                      std::stringstream, writes to the stream do not move the position of
+                      the next byte that will be read from the buffer.
+                - This constructor does not copy the buffer.  Only a reference to it will
+                  be used.  Therefore, any time data is written to this stream it will
+                  immediately show up in the buffer.
+        !*/</font>
+
+        std::istream<font color='#5555FF'>&amp;</font> <b><a name='seekg'></a>seekg</b> <font face='Lucida Console'>(</font>
+            std::streampos pos
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - The next read from this object will read from the position buffer[pos],
+                  where buffer is the std::vector given to this object's constructor.  Note
+                  that if pos &gt;= buffer.size() then the next read will simply return EOF.
+                - returns *this
+        !*/</font>
+
+    <b>}</b>;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_VECTORStREAM_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

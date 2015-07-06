@@ -1,0 +1,110 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - rmutex_extension_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_RMUTEX_EXTENSIOn_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_RMUTEX_EXTENSIOn_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel_abstract.h.html'>threads_kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='rmutex'></a>rmutex</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                rmutex is in the unlocked state
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a recursive mutex intended to be used for synchronous 
+                thread control of shared data. When a thread wants to access some 
+                shared data it locks out other threads by calling lock() and calls 
+                unlock() when it is finished.  
+
+                The difference between this and the normal mutex object is that it is safe to
+                call lock() from a thread that already has a lock on this mutex.  Doing
+                so just increments a counter but otherwise has no effect on the mutex.
+                Note that unlock() must be called for each call to lock() to release the
+                mutex.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='rmutex'></a>rmutex</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is properly initialized
+            throws
+                - dlib::thread_error
+                    the constructor may throw this exception if there is a problem 
+                    gathering resources to create the rmutex.
+        !*/</font>
+
+        ~<b><a name='rmutex'></a>rmutex</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - *this is not locked
+            ensures
+                - all resources allocated by *this have been freed
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='lock_count'></a>lock_count</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - the calling thread has a lock on this mutex
+            ensures
+                - returns the number of times the thread has called lock()
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='lock'></a>lock</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> times <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (*this is currently locked by another thread) then 
+                    - the thread that called lock() on *this is put to sleep until 
+                      it becomes available.               
+                    - #lock_count() == times
+                - if (*this is currently unlocked) then 
+                    - #*this becomes locked and the current thread is NOT put to sleep 
+                      but now "owns" #*this
+                    - #lock_count() == times
+                - if (*this is locked and owned by the current thread) then
+                    - the calling thread retains its lock on *this and isn't put to sleep.  
+                    - #lock_count() == lock_count() + times
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='unlock'></a>unlock</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> times <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (*this is currently locked and owned by the thread calling unlock) then
+                    - if (lock_count() &lt;= times ) then
+                        - #*this is unlocked (i.e. other threads may now lock this object)
+                    - else
+                        - #*this will remain locked
+                        - #lock_count() == lock_count() - times
+                - else
+                    - the call to unlock() has no effect
+        !*/</font>
+
+
+    <font color='#0000FF'>private</font>:
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='rmutex'></a>rmutex</b><font face='Lucida Console'>(</font>rmutex<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        rmutex<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>rmutex<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_RMUTEX_EXTENSIOn_ABSTRACT_
+</font>
+
+</pre></body></html>

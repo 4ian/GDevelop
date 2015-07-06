@@ -1,0 +1,236 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - server_kernel.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SERVER_KERNEL_1_
+<font color='#0000FF'>#define</font> DLIB_SERVER_KERNEL_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='server_kernel_abstract.h.html'>server_kernel_abstract.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads.h.html'>../threads.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sockets.h.html'>../sockets.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../set.h.html'>../set.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../logger.h.html'>../logger.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../smart_pointers.h.html'>../smart_pointers.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#009900'>// These forward declarations are here so we can use them in the typedefs in the server
+</font>    <font color='#009900'>// class.  The reason for this is for backwards compatibility with previous versions of
+</font>    <font color='#009900'>// dlib.
+</font>    <font color='#0000FF'>class</font> server_http;
+    <font color='#0000FF'>class</font> server_iostream;
+
+    <font color='#0000FF'>class</font> <b><a name='server'></a>server</b>
+    <b>{</b>
+
+
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                listening_port          == 0
+                listening_ip            == ""
+                running                 == false
+                shutting_down           == false
+                cons.size()             == 0
+                listening_port_mutex    == a mutex
+                listening_ip_mutex      == a mutex
+                running_mutex           == a mutex
+                running_signaler        == a signaler associated with running_mutex
+                shutting_down_mutex     == a mutex
+                cons_mutex              == a mutex
+                thread_count            == 0
+                thread_count_mutex      == a mutex
+                thread_count_signaler   == a signaler associated with thread_count_mutex
+                thread_count_zero       == a signaler associated with thread_count_mutex
+                max_connections         == 1000 
+                max_connections_mutex   == a mutex for max_connections and graceful_close_timeout
+                graceful_close_timeout  == 500 
+             
+            CONVENTION
+                listening_port          == get_listening_port()
+                listening_ip            == get_listening_ip()
+                running                 == is_running()
+                shutting_down           == true while clear() is running.  this
+                                           bool is used to tell the thread blocked on
+                                           accept that it should terminate
+                cons                    == a set containing all open connections
+                listening_port_mutex    == a mutex for listening_port
+                listening_ip_mutex      == a mutex for listening_ip
+                running_mutex           == a mutex for running
+                running_signaler        == a signaler for running and
+                                           is associated with running_mutex.  it is 
+                                           used to signal when running is false
+                shutting_down_mutex     == a mutex for shutting_down
+                cons_mutex              == a mutex for cons
+                thread_count            == the number of threads currently running
+                thread_count_mutex      == a mutex for thread_count
+                thread_count_signaler   == a signaler for thread_count and
+                                           is associated with thread_count_mutex.  it
+                                           is used to signal when thread_count is
+                                           decremented  
+                thread_count_zero       == a signaler for thread_count and
+                                           is associated with thread_count_mutex.  it
+                                           is used to signal when thread_count becomes
+                                           zero
+                max_connections         == get_max_connections()
+                max_connections_mutex   == a mutex for max_connections
+        !*/</font>
+        
+
+        <font color='#0000FF'>typedef</font> set<font color='#5555FF'>&lt;</font>connection<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font>::kernel_1a set_of_connections;
+
+        <font color='#009900'>// this structure is used to pass parameters to new threads
+</font>        <font color='#0000FF'>struct</font> <b><a name='param'></a>param</b>
+        <b>{</b>
+            <b><a name='param'></a>param</b> <font face='Lucida Console'>(</font>
+                server<font color='#5555FF'>&amp;</font> server_,
+                connection<font color='#5555FF'>&amp;</font> new_connection_,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> graceful_close_timeout_
+            <font face='Lucida Console'>)</font> :
+                the_server<font face='Lucida Console'>(</font>server_<font face='Lucida Console'>)</font>,
+                new_connection<font face='Lucida Console'>(</font>new_connection_<font face='Lucida Console'>)</font>,
+                graceful_close_timeout<font face='Lucida Console'>(</font>graceful_close_timeout_<font face='Lucida Console'>)</font>
+            <b>{</b><b>}</b>
+
+            server<font color='#5555FF'>&amp;</font> the_server;
+            connection<font color='#5555FF'>&amp;</font> new_connection;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> graceful_close_timeout; 
+        <b>}</b>;
+        
+
+
+        <font color='#0000FF'>public</font>:
+
+            <font color='#009900'>// These typedefs are here for backward compatibility with previous versions of dlib
+</font>            <font color='#0000FF'>typedef</font>     server kernel_1a;
+            <font color='#0000FF'>typedef</font>     server kernel_1a_c;
+            <font color='#0000FF'>typedef</font>     server_iostream iostream_1a;
+            <font color='#0000FF'>typedef</font>     server_iostream iostream_1a_c;
+            <font color='#0000FF'>typedef</font>     server_http http_1a;
+            <font color='#0000FF'>typedef</font>     server_http http_1a_c;
+
+            <b><a name='server'></a>server</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='server'></a>server</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>; 
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='start'></a>start</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='is_running'></a>is_running</b> <font face='Lucida Console'>(</font> 
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>const</font> std::string <b><a name='get_listening_ip'></a>get_listening_ip</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'><u>int</u></font> <b><a name='get_listening_port'></a>get_listening_port</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_listening_port'></a>set_listening_port</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>int</u></font> port
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_listening_ip'></a>set_listening_ip</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ip
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_max_connections'></a>set_max_connections</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>int</u></font> max
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>int</u></font> <b><a name='get_max_connections'></a>get_max_connections</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='start_async'></a>start_async</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_graceful_close_timeout'></a>set_graceful_close_timeout</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_graceful_close_timeout'></a>get_graceful_close_timeout</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='start_async_helper'></a>start_async_helper</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='start_accepting_connections'></a>start_accepting_connections</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='open_listening_socket'></a>open_listening_socket</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='on_connect'></a>on_connect</b> <font face='Lucida Console'>(</font>
+                connection<font color='#5555FF'>&amp;</font> new_connection
+            <font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#979000'>0</font>;
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='on_listening_port_assigned'></a>on_listening_port_assigned</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> logger sdlog;
+
+            <font color='#0000FF'>static</font> <font color='#0000FF'><u>void</u></font> <b><a name='service_connection'></a>service_connection</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    item is a pointer to a param struct
+                ensures
+                    services the new connection
+                    will take care of closing the connection and 
+                    adding the connection to cons when it first starts and
+                    remove the connection from cons and signal that it has 
+                    done so when it ends
+            !*/</font>
+
+            <font color='#009900'>// data members
+</font>            <font color='#0000FF'><u>int</u></font> listening_port;
+            std::string listening_ip;
+            <font color='#0000FF'><u>bool</u></font> running;
+            <font color='#0000FF'><u>bool</u></font> shutting_down;
+            set_of_connections cons;
+            mutex listening_port_mutex;
+            mutex listening_ip_mutex;
+            rmutex running_mutex;
+            rsignaler running_signaler;
+            mutex shutting_down_mutex;
+            mutex cons_mutex;
+            <font color='#0000FF'><u>int</u></font> thread_count;
+            mutex thread_count_mutex;
+            signaler thread_count_signaler;
+            <font color='#0000FF'><u>int</u></font> max_connections;
+            mutex max_connections_mutex;
+            signaler thread_count_zero;
+            scoped_ptr<font color='#5555FF'>&lt;</font>thread_function<font color='#5555FF'>&gt;</font> async_start_thread;
+            scoped_ptr<font color='#5555FF'>&lt;</font>listener<font color='#5555FF'>&gt;</font> sock;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> graceful_close_timeout;
+
+
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='server'></a>server</b><font face='Lucida Console'>(</font>server<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;   
+            server<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+                server<font color='#5555FF'>&amp;</font>
+                <font face='Lucida Console'>)</font>;    
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='server_kernel.cpp.html'>server_kernel.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SERVER_KERNEL_1_
+</font>
+
+</pre></body></html>

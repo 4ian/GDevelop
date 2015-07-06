@@ -1,0 +1,1036 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - algs.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_ALGs_
+<font color='#0000FF'>#define</font> DLIB_ALGs_
+
+<font color='#009900'>// this file contains miscellaneous stuff                      
+</font>
+
+<font color='#0000FF'>#ifdef</font> _MSC_VER
+<font color='#009900'>// Disable the following warnings for Visual Studio
+</font>
+<font color='#009900'>// this is to disable the "'this' : used in base member initializer list"
+</font><font color='#009900'>// warning you get from some of the GUI objects since all the objects
+</font><font color='#009900'>// require that their parent class be passed into their constructor. 
+</font><font color='#009900'>// In this case though it is totally safe so it is ok to disable this warning.
+</font><font color='#0000FF'>#pragma</font> warning<font face='Lucida Console'>(</font>disable : <font color='#979000'>4355</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>// This is a warning you get sometimes when Visual Studio performs a Koenig Lookup. 
+</font><font color='#009900'>// This is a bug in visual studio.  It is a totally legitimate thing to 
+</font><font color='#009900'>// expect from a compiler. 
+</font><font color='#0000FF'>#pragma</font> warning<font face='Lucida Console'>(</font>disable : <font color='#979000'>4675</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>// This is a warning you get from visual studio 2005 about things in the standard C++
+</font><font color='#009900'>// library being "deprecated."  I checked the C++ standard and it doesn't say jack 
+</font><font color='#009900'>// about any of them (I checked the searchable PDF).   So this warning is total Bunk.
+</font><font color='#0000FF'>#pragma</font> warning<font face='Lucida Console'>(</font>disable : <font color='#979000'>4996</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>// This is a warning you get from visual studio 2003:
+</font><font color='#009900'>//    warning C4345: behavior change: an object of POD type constructed with an initializer 
+</font><font color='#009900'>//    of the form () will be default-initialized.
+</font><font color='#009900'>// I love it when this compiler gives warnings about bugs in previous versions of itself. 
+</font><font color='#0000FF'>#pragma</font> warning<font face='Lucida Console'>(</font>disable : <font color='#979000'>4345</font><font face='Lucida Console'>)</font>
+
+
+<font color='#009900'>// Disable warnings about conversion from size_t to unsigned long and long.
+</font><font color='#0000FF'>#pragma</font> warning<font face='Lucida Console'>(</font>disable : <font color='#979000'>4267</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>// Disable warnings about conversion from double to float  
+</font><font color='#0000FF'>#pragma</font> warning<font face='Lucida Console'>(</font>disable : <font color='#979000'>4244</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#pragma</font> warning<font face='Lucida Console'>(</font>disable : <font color='#979000'>4305</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>// Disable "warning C4180: qualifier applied to function type has no meaning; ignored".
+</font><font color='#009900'>// This warning happens often in generic code that works with functions and isn't useful.
+</font><font color='#0000FF'>#pragma</font> warning<font face='Lucida Console'>(</font>disable : <font color='#979000'>4180</font><font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> __BORLANDC__
+<font color='#009900'>// Disable the following warnings for the Borland Compilers
+</font><font color='#009900'>//
+</font><font color='#009900'>// These warnings just say that the compiler is refusing to inline functions with
+</font><font color='#009900'>// loops or try blocks in them.  
+</font><font color='#009900'>//
+</font><font color='#0000FF'>#pragma</font> option <font color='#5555FF'>-</font>w<font color='#5555FF'>-</font><font color='#979000'>8027</font>
+<font color='#0000FF'>#pragma</font> option <font color='#5555FF'>-</font>w<font color='#5555FF'>-</font><font color='#979000'>8026</font> 
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>       <font color='#009900'>// for the exceptions
+</font>
+<font color='#0000FF'>#ifdef</font> __CYGWIN__
+<font color='#0000FF'>namespace</font> std
+<b>{</b>
+   <font color='#0000FF'>typedef</font> std::basic_string<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>wchar_t</u></font><font color='#5555FF'>&gt;</font> wstring;
+<b>}</b>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='platform.h.html'>platform.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='windows_magic.h.html'>windows_magic.h</a>"
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>algorithm<font color='#5555FF'>&gt;</font>    <font color='#009900'>// for std::swap
+</font><font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>new<font color='#5555FF'>&gt;</font>          <font color='#009900'>// for std::bad_alloc
+</font><font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font> <font color='#009900'>// for std::numeric_limits for is_finite()
+</font><font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='assert.h.html'>assert.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='error.h.html'>error.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='noncopyable.h.html'>noncopyable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='enable_if.h.html'>enable_if.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='uintn.h.html'>uintn.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='numeric_constants.h.html'>numeric_constants.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='memory_manager_stateless/memory_manager_stateless_kernel_1.h.html'>memory_manager_stateless/memory_manager_stateless_kernel_1.h</a>" <font color='#009900'>// for the default memory manager
+</font>
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><a name='_dT'/><font color='#009900'>/*!A _dT !*/</font>
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> charT<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>inline</font> charT <b><a name='_dTcast'></a>_dTcast</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> a, <font color='#0000FF'>const</font> <font color='#0000FF'><u>wchar_t</u></font> b<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>inline</font> <font color='#0000FF'><u>char</u></font> _dTcast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> a, <font color='#0000FF'>const</font> <font color='#0000FF'><u>wchar_t</u></font> <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a; <b>}</b>
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>inline</font> <font color='#0000FF'><u>wchar_t</u></font> _dTcast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>wchar_t</u></font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> , <font color='#0000FF'>const</font> <font color='#0000FF'><u>wchar_t</u></font> b<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> b; <b>}</b>
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> charT<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> charT<font color='#5555FF'>*</font> <b><a name='_dTcast'></a>_dTcast</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> a, <font color='#0000FF'>const</font> <font color='#0000FF'><u>wchar_t</u></font><font color='#5555FF'>*</font> b<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> _dTcast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> a, <font color='#0000FF'>const</font> <font color='#0000FF'><u>wchar_t</u></font><font color='#5555FF'>*</font> <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a; <b>}</b>
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>wchar_t</u></font><font color='#5555FF'>*</font> _dTcast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>wchar_t</u></font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> , <font color='#0000FF'>const</font> <font color='#0000FF'><u>wchar_t</u></font><font color='#5555FF'>*</font> b<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> b; <b>}</b>
+
+
+<font color='#0000FF'>#define</font> _dT<font face='Lucida Console'>(</font>charT,str<font face='Lucida Console'>)</font> _dTcast<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>str,L##str<font face='Lucida Console'>)</font> 
+<font color='#009900'>/*!
+    requires
+        - charT == char or wchar_t
+        - str == a string or character literal
+    ensures
+        - returns the literal in the form of a charT type literal.
+!*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <a name='default_memory_manager'/><font color='#009900'>/*!A default_memory_manager
+
+        This memory manager just calls new and delete directly.  
+
+    !*/</font>
+    <font color='#0000FF'>typedef</font> memory_manager_stateless_kernel_1<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> default_memory_manager;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <a name='swap'/><font color='#009900'>/*!A swap !*/</font>
+    <font color='#009900'>// make swap available in the dlib namespace
+</font>    <font color='#0000FF'>using</font> std::swap;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>/*!
+        Here is where I define my return codes.  It is 
+        important that they all be &lt; 0.
+    !*/</font>
+
+    <font color='#0000FF'>enum</font> <b><a name='general_return_codes'></a>general_return_codes</b>
+    <b>{</b>
+        TIMEOUT     <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>,
+        WOULDBLOCK  <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>2</font>,
+        OTHER_ERROR <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>3</font>,
+        SHUTDOWN    <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>4</font>,
+        PORTINUSE   <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>5</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='square_root'></a>square_root</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - value &lt;= 2^32 - 1
+        ensures
+            - returns the square root of value.  if the square root is not an
+              integer then it will be rounded up to the nearest integer.
+    !*/</font>
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> x;
+
+        <font color='#009900'>// set the initial guess for what the root is depending on 
+</font>        <font color='#009900'>// how big value is
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>value <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> value;
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>value <font color='#5555FF'>&lt;</font> <font color='#979000'>4096</font><font face='Lucida Console'>)</font> <font color='#009900'>// 12
+</font>            x <font color='#5555FF'>=</font> <font color='#979000'>45</font>;
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>value <font color='#5555FF'>&lt;</font> <font color='#979000'>65536</font><font face='Lucida Console'>)</font> <font color='#009900'>// 16
+</font>            x <font color='#5555FF'>=</font> <font color='#979000'>179</font>;
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>value <font color='#5555FF'>&lt;</font> <font color='#979000'>1048576</font><font face='Lucida Console'>)</font> <font color='#009900'>// 20
+</font>            x <font color='#5555FF'>=</font> <font color='#979000'>717</font>;
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>value <font color='#5555FF'>&lt;</font> <font color='#979000'>16777216</font><font face='Lucida Console'>)</font> <font color='#009900'>// 24
+</font>            x <font color='#5555FF'>=</font> <font color='#979000'>2867</font>;
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>value <font color='#5555FF'>&lt;</font> <font color='#979000'>268435456</font><font face='Lucida Console'>)</font> <font color='#009900'>// 28
+</font>            x <font color='#5555FF'>=</font> <font color='#979000'>11469</font>;
+        <font color='#0000FF'>else</font>   <font color='#009900'>// 32
+</font>            x <font color='#5555FF'>=</font> <font color='#979000'>45875</font>;
+
+
+
+        <font color='#009900'>// find the root
+</font>        x <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>+</font> value<font color='#5555FF'>/</font>x<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>1</font>;
+        x <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>+</font> value<font color='#5555FF'>/</font>x<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>1</font>;
+        x <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>+</font> value<font color='#5555FF'>/</font>x<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>1</font>;
+        x <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>+</font> value<font color='#5555FF'>/</font>x<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>1</font>;
+
+
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x<font color='#5555FF'>*</font>x <font color='#5555FF'>&lt;</font> value<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> x<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> x;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>    
+    <font color='#0000FF'><u>void</u></font> <b><a name='median'></a>median</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> one,
+        T<font color='#5555FF'>&amp;</font> two,
+        T<font color='#5555FF'>&amp;</font> three
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T implements operator&lt; 
+            - T is swappable by a global swap()
+        ensures
+            - #one is the median 
+            - #one, #two, and #three is some permutation of one, two, and three.  
+    !*/</font>
+    
+    
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='median'></a>median</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> one,
+        T<font color='#5555FF'>&amp;</font> two,
+        T<font color='#5555FF'>&amp;</font> three
+    <font face='Lucida Console'>)</font>    
+    <b>{</b>    
+        <font color='#0000FF'>using</font> std::swap;
+        <font color='#0000FF'>using</font> dlib::swap;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> one <font color='#5555FF'>&lt;</font> two <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// one &lt; two
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> two <font color='#5555FF'>&lt;</font> three <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// one &lt; two &lt; three : two
+</font>                <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>one,two<font face='Lucida Console'>)</font>;
+                
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// one &lt; two &gt;= three
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> one <font color='#5555FF'>&lt;</font> three<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// three
+</font>                    <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>three,one<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// one &gt;= two
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> three <font color='#5555FF'>&lt;</font> one <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// three &lt;= one &gt;= two
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> three <font color='#5555FF'>&lt;</font> two <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// two
+</font>                    <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>two,one<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// three
+</font>                    <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>three,one<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>        
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> relational_operators
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> A,
+            <font color='#0000FF'>typename</font> B
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> A<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> B<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> b <font color='#5555FF'>&lt;</font> a; <b>}</b>
+
+    <font color='#009900'>// ---------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> A,
+            <font color='#0000FF'>typename</font> B
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> A<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> B<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#009900'>// ---------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> A,
+            <font color='#0000FF'>typename</font> B
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> A<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> B<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>&lt;</font> a<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#009900'>// ---------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> A,
+            <font color='#0000FF'>typename</font> B
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> A<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> B<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>&lt;</font> b<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='exchange'></a>exchange</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> a,
+        T<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        This function does the exact same thing that global swap does and it does it by
+        just calling swap.  But a lot of compilers have problems doing a Koenig Lookup
+        and the fact that this has a different name (global swap has the same name as
+        the member functions called swap) makes them compile right.
+
+        So this is a workaround but not too ugly of one.  But hopefully I get get
+        rid of this in a few years.  So this function is already deprecated. 
+
+        This also means you should NOT use this function in your own code unless
+        you have to support an old buggy compiler that benefits from this hack.
+    !*/</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> std::swap;
+        <font color='#0000FF'>using</font> dlib::swap;
+        <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <a name='is_pointer_type'/><font color='#009900'>/*!A is_pointer_type
+
+        This is a template where is_pointer_type&lt;T&gt;::value == true when T is a pointer 
+        type and false otherwise.
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='is_pointer_type'></a>is_pointer_type</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>enum</font> <b>{</b> value <font color='#5555FF'>=</font> <font color='#979000'>false</font> <b>}</b>;
+    <font color='#0000FF'>private</font>:
+        <b><a name='is_pointer_type'></a>is_pointer_type</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='is_pointer_type'></a>is_pointer_type</b><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>enum</font> <b>{</b> value <font color='#5555FF'>=</font> <font color='#979000'>true</font> <b>}</b>;
+    <font color='#0000FF'>private</font>:
+        <b><a name='is_pointer_type'></a>is_pointer_type</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <a name='is_const_type'/><font color='#009900'>/*!A is_const_type
+
+        This is a template where is_const_type&lt;T&gt;::value == true when T is a const 
+        type and false otherwise.
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_const_type'></a>is_const_type</b>
+    <b>{</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+    <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_const_type'></a>is_const_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_const_type'></a>is_const_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <a name='is_reference_type'/><font color='#009900'>/*!A is_reference_type 
+
+        This is a template where is_reference_type&lt;T&gt;::value == true when T is a reference 
+        type and false otherwise.
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_reference_type'></a>is_reference_type</b>
+    <b>{</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_reference_type'></a>is_reference_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_reference_type'></a>is_reference_type</b><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <a name='is_same_type'/><font color='#009900'>/*!A is_same_type 
+
+        This is a template where is_same_type&lt;T,U&gt;::value == true when T and U are the
+        same type and false otherwise.   
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='is_same_type'></a>is_same_type</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>enum</font> <b>{</b>value <font color='#5555FF'>=</font> <font color='#979000'>false</font><b>}</b>;
+    <font color='#0000FF'>private</font>:
+        <b><a name='is_same_type'></a>is_same_type</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='is_same_type'></a>is_same_type</b><font color='#5555FF'>&lt;</font>T,T<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>enum</font> <b>{</b>value <font color='#5555FF'>=</font> <font color='#979000'>true</font><b>}</b>;
+    <font color='#0000FF'>private</font>:
+        <b><a name='is_same_type'></a>is_same_type</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <a name='is_float_type'/><font color='#009900'>/*!A is_float_type
+
+        This is a template that can be used to determine if a type is one of the built
+        int floating point types (i.e. float, double, or long double).
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T <font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_float_type'></a>is_float_type</b>  <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>false</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_float_type'></a>is_float_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>       <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_float_type'></a>is_float_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>      <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_float_type'></a>is_float_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <a name='is_convertible'/><font color='#009900'>/*!A is_convertible
+
+        This is a template that can be used to determine if one type is convertible 
+        into another type.
+
+        For example:
+            is_convertible&lt;int,float&gt;::value == true    // because ints are convertible to floats
+            is_convertible&lt;int*,float&gt;::value == false  // because int pointers are NOT convertible to floats
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> from, <font color='#0000FF'>typename</font> to<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_convertible'></a>is_convertible</b>
+    <b>{</b>
+        <font color='#0000FF'>struct</font> <b><a name='yes_type'></a>yes_type</b> <b>{</b> <font color='#0000FF'><u>char</u></font> a; <b>}</b>;
+        <font color='#0000FF'>struct</font> <b><a name='no_type'></a>no_type</b> <b>{</b> yes_type a[<font color='#979000'>2</font>]; <b>}</b>;
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> from<font color='#5555FF'>&amp;</font> <b><a name='from_helper'></a>from_helper</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>static</font> yes_type <b><a name='test'></a>test</b><font face='Lucida Console'>(</font>to<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>static</font> no_type <b><a name='test'></a>test</b><font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font><font color='#BB00BB'>from_helper</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>yes_type<font face='Lucida Console'>)</font>;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <a name='is_same_object'/><font color='#009900'>/*!A is_same_object 
+
+        This is a templated function which checks if both of its arguments are actually
+        references to the same object.  It returns true if they are and false otherwise.
+
+    !*/</font>
+
+    <font color='#009900'>// handle the case where T and U are unrelated types.
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> disable_if_c<font color='#5555FF'>&lt;</font>is_convertible<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font>, U<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font> is_convertible<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>*</font>,T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font>::value, <font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font>::type
+    <b><a name='is_same_object'></a>is_same_object</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a, 
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>b<font face='Lucida Console'>)</font>; 
+    <b>}</b>
+
+    <font color='#009900'>// handle the case where T and U are related types because their pointers can be
+</font>    <font color='#009900'>// implicitly converted into one or the other.  E.g. a derived class and its base class. 
+</font>    <font color='#009900'>// Or where both T and U are just the same type.  This way we make sure that if there is a
+</font>    <font color='#009900'>// valid way to convert between these two pointer types then we will take that route rather
+</font>    <font color='#009900'>// than the void* approach used otherwise.
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>is_convertible<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font>, U<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font> is_convertible<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>*</font>,T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font>::value, <font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font>::type
+    <b><a name='is_same_object'></a>is_same_object</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a, 
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>b<font face='Lucida Console'>)</font>; 
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <a name='is_unsigned_type'/><font color='#009900'>/*!A is_unsigned_type 
+
+        This is a template where is_unsigned_type&lt;T&gt;::value == true when T is an unsigned
+        scalar type and false when T is a signed scalar type.
+    !*/</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_unsigned_type'></a>is_unsigned_type</b>
+    <b>{</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>;
+    <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_unsigned_type'></a>is_unsigned_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>false</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_unsigned_type'></a>is_unsigned_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>      <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>false</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_unsigned_type'></a>is_unsigned_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>       <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>false</font>; <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <a name='is_signed_type'/><font color='#009900'>/*!A is_signed_type 
+
+        This is a template where is_signed_type&lt;T&gt;::value == true when T is a signed
+        scalar type and false when T is an unsigned scalar type.
+    !*/</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_signed_type'></a>is_signed_type</b>
+    <b>{</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#5555FF'>!</font>is_unsigned_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='copy_functor'></a>copy_functor</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> source, 
+            T<font color='#5555FF'>&amp;</font> destination
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            destination <font color='#5555FF'>=</font> source;
+        <b>}</b>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <a name='static_switch'/><font color='#009900'>/*!A static_switch
+
+        To use this template you give it some number of boolean expressions and it
+        tells you which one of them is true.   If more than one of them is true then
+        it causes a compile time error.
+
+        for example:
+            static_switch&lt;1 + 1 == 2, 4 - 1 == 4&gt;::value == 1  // because the first expression is true
+            static_switch&lt;1 + 1 == 3, 4 == 4&gt;::value == 2      // because the second expression is true
+            static_switch&lt;1 + 1 == 3, 4 == 5&gt;::value == 0      // 0 here because none of them are true 
+            static_switch&lt;1 + 1 == 2, 4 == 4&gt;::value == compiler error  // because more than one expression is true 
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'><u>bool</u></font> v1 <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#0000FF'><u>bool</u></font> v2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#0000FF'><u>bool</u></font> v3 <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#0000FF'><u>bool</u></font> v4 <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#0000FF'><u>bool</u></font> v5 <font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+               <font color='#0000FF'><u>bool</u></font> v6 <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#0000FF'><u>bool</u></font> v7 <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#0000FF'><u>bool</u></font> v8 <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#0000FF'><u>bool</u></font> v9 <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#0000FF'><u>bool</u></font> v10 <font color='#5555FF'>=</font> <font color='#979000'>0</font>, 
+               <font color='#0000FF'><u>bool</u></font> v11 <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#0000FF'><u>bool</u></font> v12 <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#0000FF'><u>bool</u></font> v13 <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#0000FF'><u>bool</u></font> v14 <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#0000FF'><u>bool</u></font> v15 <font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> static_switch; 
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='static_switch'></a>static_switch</b><font color='#5555FF'>&lt;</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='static_switch'></a>static_switch</b><font color='#5555FF'>&lt;</font><font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>1</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='static_switch'></a>static_switch</b><font color='#5555FF'>&lt;</font><font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>2</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='static_switch'></a>static_switch</b><font color='#5555FF'>&lt;</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>3</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='static_switch'></a>static_switch</b><font color='#5555FF'>&lt;</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>4</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='static_switch'></a>static_switch</b><font color='#5555FF'>&lt;</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>5</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='static_switch'></a>static_switch</b><font color='#5555FF'>&lt;</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>6</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='static_switch'></a>static_switch</b><font color='#5555FF'>&lt;</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>7</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='static_switch'></a>static_switch</b><font color='#5555FF'>&lt;</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>8</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='static_switch'></a>static_switch</b><font color='#5555FF'>&lt;</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>9</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='static_switch'></a>static_switch</b><font color='#5555FF'>&lt;</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>10</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='static_switch'></a>static_switch</b><font color='#5555FF'>&lt;</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>11</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='static_switch'></a>static_switch</b><font color='#5555FF'>&lt;</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>12</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='static_switch'></a>static_switch</b><font color='#5555FF'>&lt;</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>13</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='static_switch'></a>static_switch</b><font color='#5555FF'>&lt;</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>14</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='static_switch'></a>static_switch</b><font color='#5555FF'>&lt;</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>15</font>; <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <a name='is_built_in_scalar_type'/><font color='#009900'>/*!A is_built_in_scalar_type
+        
+        This is a template that allows you to determine if the given type is a built
+        in scalar type such as an int, char, float, short, etc.
+
+        For example, is_built_in_scalar_type&lt;char&gt;::value == true
+        For example, is_built_in_scalar_type&lt;std::string&gt;::value == false 
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_built_in_scalar_type'></a>is_built_in_scalar_type</b>        <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>false</font>; <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_built_in_scalar_type'></a>is_built_in_scalar_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>           <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_built_in_scalar_type'></a>is_built_in_scalar_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>          <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_built_in_scalar_type'></a>is_built_in_scalar_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>     <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_built_in_scalar_type'></a>is_built_in_scalar_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font>           <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_built_in_scalar_type'></a>is_built_in_scalar_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font>             <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_built_in_scalar_type'></a>is_built_in_scalar_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>            <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_built_in_scalar_type'></a>is_built_in_scalar_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font>  <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_built_in_scalar_type'></a>is_built_in_scalar_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font>    <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_built_in_scalar_type'></a>is_built_in_scalar_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>   <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_built_in_scalar_type'></a>is_built_in_scalar_type</b><font color='#5555FF'>&lt;</font>uint64<font color='#5555FF'>&gt;</font>          <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_built_in_scalar_type'></a>is_built_in_scalar_type</b><font color='#5555FF'>&lt;</font>int64<font color='#5555FF'>&gt;</font>           <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_built_in_scalar_type'></a>is_built_in_scalar_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>            <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_built_in_scalar_type'></a>is_built_in_scalar_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>     <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_built_in_scalar_type'></a>is_built_in_scalar_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>   <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#009900'>// Don't define one for wchar_t when using a version of visual studio
+</font>    <font color='#009900'>// older than 8.0 (visual studio 2005) since before then they improperly set
+</font>    <font color='#009900'>// wchar_t to be a typedef rather than its own type as required by the C++ 
+</font>    <font color='#009900'>// standard.
+</font><font color='#0000FF'>#if</font> <font color='#5555FF'>!</font>defined<font face='Lucida Console'>(</font>_MSC_VER<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> _NATIVE_WCHAR_T_DEFINED
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_built_in_scalar_type'></a>is_built_in_scalar_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>wchar_t</u></font><font color='#5555FF'>&gt;</font>         <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_built_in_scalar_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='is_finite'></a>is_finite</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> value
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - value must be some kind of scalar type such as int or double
+        ensures
+            - returns true if value is a finite value (e.g. not infinity or NaN) and false
+              otherwise.
+    !*/</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_float_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> value <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> value <font color='#5555FF'>&lt;</font> std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <a name='promote'/><font color='#009900'>/*!A promote 
+        
+        This is a template that takes one of the built in scalar types and gives you another
+        scalar type that should be big enough to hold sums of values from the original scalar 
+        type.  The new scalar type will also always be signed.
+
+        For example, promote&lt;uint16&gt;::type == int32
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>size_t</u></font> s <font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> promote;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='promote'></a>promote</b><font color='#5555FF'>&lt;</font>T,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>typedef</font> int32 type; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='promote'></a>promote</b><font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>typedef</font> int32 type; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='promote'></a>promote</b><font color='#5555FF'>&lt;</font>T,<font color='#979000'>4</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>typedef</font> int64 type; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='promote'></a>promote</b><font color='#5555FF'>&lt;</font>T,<font color='#979000'>8</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>typedef</font> int64 type; <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='promote'></a>promote</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>float</u></font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>             <b>{</b> <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>double</u></font> type; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='promote'></a>promote</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>           <b>{</b> <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>double</u></font> type; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='promote'></a>promote</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font>,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> type; <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <a name='assign_zero_if_built_in_scalar_type'/><font color='#009900'>/*!A assign_zero_if_built_in_scalar_type
+
+        This function assigns its argument the value of 0 if it is a built in scalar
+        type according to the is_built_in_scalar_type&lt;&gt; template.  If it isn't a
+        built in scalar type then it does nothing.
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_built_in_scalar_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='assign_zero_if_built_in_scalar_type'></a>assign_zero_if_built_in_scalar_type</b> <font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font><b>{</b><b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_built_in_scalar_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='assign_zero_if_built_in_scalar_type'></a>assign_zero_if_built_in_scalar_type</b> <font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font> a<font face='Lucida Console'>)</font><b>{</b>a<font color='#5555FF'>=</font><font color='#979000'>0</font>;<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <a name='basic_type'/><font color='#009900'>/*!A basic_type
+
+        This is a template that takes a type and strips off any const, volatile, or reference
+        qualifiers and gives you back the basic underlying type.  So for example:
+
+        basic_type&lt;const int&amp;&gt;::type == int
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='basic_type'></a>basic_type</b> <b>{</b> <font color='#0000FF'>typedef</font> T type; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='basic_type'></a>basic_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>typedef</font> T type; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='basic_type'></a>basic_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>typedef</font> T type; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='basic_type'></a>basic_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'>volatile</font> <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>typedef</font> T type; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='basic_type'></a>basic_type</b><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>typedef</font> T type; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='basic_type'></a>basic_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'>volatile</font> T<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>typedef</font> T type; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='basic_type'></a>basic_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'>volatile</font> T<font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>typedef</font> T type; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='basic_type'></a>basic_type</b><font color='#5555FF'>&lt;</font><font color='#0000FF'>volatile</font> <font color='#0000FF'>const</font> T<font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>typedef</font> T type; <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    T <b><a name='put_in_range'></a>put_in_range</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a, 
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> b, 
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> val
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - T is a type that looks like double, float, int, or so forth
+        ensures
+            - if (val is within the range [a,b]) then
+                - returns val
+            - else 
+                - returns the end of the range [a,b] that is closest to val
+    !*/</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a <font color='#5555FF'>&lt;</font> b<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val <font color='#5555FF'>&lt;</font> a<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> a;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val <font color='#5555FF'>&gt;</font> b<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> b;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val <font color='#5555FF'>&lt;</font> b<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> b;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val <font color='#5555FF'>&gt;</font> a<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> a;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> val;
+    <b>}</b>
+
+    <font color='#009900'>// overload for double 
+</font>    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>double</u></font> <b><a name='put_in_range'></a>put_in_range</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> b, <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> val<font face='Lucida Console'>)</font>
+    <b>{</b> <font color='#0000FF'>return</font> put_in_range<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>a,b,val<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <a name='tabs'/><font color='#009900'>/*!A tabs 
+
+        This is a template to compute the absolute value a number at compile time.
+
+        For example,
+            abs&lt;-4&gt;::value == 4
+            abs&lt;4&gt;::value == 4
+    !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> x, <font color='#0000FF'>typename</font> enabled<font color='#5555FF'>=</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='tabs'></a>tabs</b> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> value <font color='#5555FF'>=</font> x; <b>}</b>;
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> x<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='tabs'></a>tabs</b><font color='#5555FF'>&lt;</font>x,<font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font><font face='Lucida Console'>(</font>x <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> value <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>x; <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <a name='tmax'/><font color='#009900'>/*!A tmax
+
+        This is a template to compute the max of two values at compile time
+
+        For example,
+            abs&lt;4,7&gt;::value == 7
+    !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> x, <font color='#0000FF'><u>long</u></font> y, <font color='#0000FF'>typename</font> enabled<font color='#5555FF'>=</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='tmax'></a>tmax</b> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> value <font color='#5555FF'>=</font> x; <b>}</b>;
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> x, <font color='#0000FF'><u>long</u></font> y<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='tmax'></a>tmax</b><font color='#5555FF'>&lt;</font>x,y,<font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font><font face='Lucida Console'>(</font>y <font color='#5555FF'>&gt;</font> x<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> value <font color='#5555FF'>=</font> y; <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <a name='tmin'/><font color='#009900'>/*!A tmin 
+
+        This is a template to compute the min of two values at compile time
+
+        For example,
+            abs&lt;4,7&gt;::value == 4
+    !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> x, <font color='#0000FF'><u>long</u></font> y, <font color='#0000FF'>typename</font> enabled<font color='#5555FF'>=</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='tmin'></a>tmin</b> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> value <font color='#5555FF'>=</font> x; <b>}</b>;
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> x, <font color='#0000FF'><u>long</u></font> y<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='tmin'></a>tmin</b><font color='#5555FF'>&lt;</font>x,y,<font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font><font face='Lucida Console'>(</font>y <font color='#5555FF'>&lt;</font> x<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> value <font color='#5555FF'>=</font> y; <b>}</b>;
+
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#define</font> DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST<font face='Lucida Console'>(</font>testname, returnT, funct_name, args<font face='Lucida Console'>)</font>                        \
+    <font color='#0000FF'>struct</font> <b><a name='_two_bytes_'></a>_two_bytes_</b>##testname <b>{</b> <font color='#0000FF'><u>char</u></font> a[<font color='#979000'>2</font>]; <b>}</b>;                                                       \
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T, <b><a name='returnT'></a>returnT</b> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font>args <font color='#5555FF'>&gt;</font>                                                   \
+    <font color='#0000FF'>struct</font> <b><a name='_helper_'></a>_helper_</b>##testname <b>{</b> <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>char</u></font> type; <b>}</b>;                                                  \
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>                                                                              \
+    <font color='#0000FF'>static</font> <font color='#0000FF'><u>char</u></font> _has_##testname##<b><a name='_helper'></a>_helper</b><font face='Lucida Console'>(</font> <font color='#0000FF'>typename</font> _helper_##testname<font color='#5555FF'>&lt;</font>T,<font color='#5555FF'>&amp;</font>T::funct_name <font color='#5555FF'>&gt;</font>::type <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>0</font>;<b>}</b> \
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>                                                                              \
+    <font color='#0000FF'>static</font> _two_bytes_##testname _has_##testname##<b><a name='_helper'></a>_helper</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> _two_bytes_##<font color='#BB00BB'>testname</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;<b>}</b>             \
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='_'></a>_</b>##testname##workaroundbug <b>{</b>                                          \
+                <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> U <font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>_has_##testname##_helper<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>a</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>;            \
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> U <font color='#5555FF'>=</font> _##testname##workaroundbug<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::U <font color='#5555FF'>&gt;</font>                         \
+    <font color='#0000FF'>struct</font> <b><a name='testname'></a>testname</b>      <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>false</font>; <b>}</b>;                                         \
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>                                                                              \
+    <font color='#0000FF'>struct</font> <b><a name='testname'></a>testname</b><font color='#5555FF'>&lt;</font>T,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <a name='DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST'/><font color='#009900'>/*!A DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST
+
+        The DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST() macro is used to define traits templates
+        that tell you if a class has a certain member function.  For example, to make a
+        test to see if a class has a public method with the signature void print(int) you
+        would say:
+            DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_print, void, print, (int))
+
+        Then you can check if a class, T, has this method by looking at the boolean value:
+            has_print&lt;T&gt;::value 
+        which will be true if the member function is in the T class.
+
+        Note that you can test for member functions taking no arguments by simply passing
+        in empty () like so:
+            DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_print, void, print, ())
+        This would test for a member of the form:
+            void print().
+
+        To test for const member functions you would use a statement such as this:
+            DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_print, void, print, ()const)
+        This would test for a member of the form: 
+            void print() const.
+
+        To test for const templated member functions you would use a statement such as this:
+            DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_print, void, template print&lt;int&gt;, ())
+        This would test for a member of the form: 
+            template &lt;typename T&gt; void print().
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <a name='is_function'/><font color='#009900'>/*!A is_function 
+        
+        This is a template that allows you to determine if the given type is a function.
+
+        For example,
+            void funct();
+
+            is_built_in_scalar_type&lt;funct&gt;::value == true
+            is_built_in_scalar_type&lt;int&gt;::value == false 
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_function'></a>is_function</b> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>false</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>struct</font> <b><a name='is_function'></a>is_function</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A0<font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>struct</font> <b><a name='is_function'></a>is_function</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A0<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A0, <font color='#0000FF'>typename</font> A1<font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>struct</font> <b><a name='is_function'></a>is_function</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A0, A1<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A0, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2<font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>struct</font> <b><a name='is_function'></a>is_function</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A0, A1, A2<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A0, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3<font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>struct</font> <b><a name='is_function'></a>is_function</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A0, A1, A2, A3<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A0, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3, <font color='#0000FF'>typename</font> A4<font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>struct</font> <b><a name='is_function'></a>is_function</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A0, A1, A2, A3, A4<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A0, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3, <font color='#0000FF'>typename</font> A4,
+                          <font color='#0000FF'>typename</font> A5<font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>struct</font> <b><a name='is_function'></a>is_function</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A0,A1,A2,A3,A4,A5<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A0, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3, <font color='#0000FF'>typename</font> A4,
+                          <font color='#0000FF'>typename</font> A5, <font color='#0000FF'>typename</font> A6<font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>struct</font> <b><a name='is_function'></a>is_function</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A0,A1,A2,A3,A4,A5,A6<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A0, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3, <font color='#0000FF'>typename</font> A4,
+                          <font color='#0000FF'>typename</font> A5, <font color='#0000FF'>typename</font> A6, <font color='#0000FF'>typename</font> A7<font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>struct</font> <b><a name='is_function'></a>is_function</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A0,A1,A2,A3,A4,A5,A6,A7<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A0, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3, <font color='#0000FF'>typename</font> A4,
+                          <font color='#0000FF'>typename</font> A5, <font color='#0000FF'>typename</font> A6, <font color='#0000FF'>typename</font> A7, <font color='#0000FF'>typename</font> A8<font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>struct</font> <b><a name='is_function'></a>is_function</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A0,A1,A2,A3,A4,A5,A6,A7,A8<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A0, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3, <font color='#0000FF'>typename</font> A4,
+                          <font color='#0000FF'>typename</font> A5, <font color='#0000FF'>typename</font> A6, <font color='#0000FF'>typename</font> A7, <font color='#0000FF'>typename</font> A8, <font color='#0000FF'>typename</font> A9<font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>struct</font> <b><a name='is_function'></a>is_function</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A0,A1,A2,A3,A4,A5,A6,A7,A8,A9<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>class</font> <b><a name='funct_wrap0'></a>funct_wrap0</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='funct_wrap0'></a>funct_wrap0</b><font face='Lucida Console'>(</font><font color='#BB00BB'>T</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>f_<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>:f<font face='Lucida Console'>(</font>f_<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+        T <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>private</font>:
+        <b><a name='T'></a>T</b> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>f<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A0<font color='#5555FF'>&gt;</font> <font color='#0000FF'>class</font> <b><a name='funct_wrap1'></a>funct_wrap1</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='funct_wrap1'></a>funct_wrap1</b><font face='Lucida Console'>(</font><font color='#BB00BB'>T</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>f_<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A0<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>:f<font face='Lucida Console'>(</font>f_<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+        T <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A0 a0<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>a0<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>private</font>:
+        <b><a name='T'></a>T</b> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>f<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A0<font face='Lucida Console'>)</font>;
+    <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A0, <font color='#0000FF'>typename</font> A1<font color='#5555FF'>&gt;</font> <font color='#0000FF'>class</font> <b><a name='funct_wrap2'></a>funct_wrap2</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='funct_wrap2'></a>funct_wrap2</b><font face='Lucida Console'>(</font><font color='#BB00BB'>T</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>f_<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A0,A1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>:f<font face='Lucida Console'>(</font>f_<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+        T <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A0 a0, A1 a1<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>a0,a1<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>private</font>:
+        <b><a name='T'></a>T</b> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>f<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A0,A1<font face='Lucida Console'>)</font>;
+    <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A0, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2<font color='#5555FF'>&gt;</font> <font color='#0000FF'>class</font> <b><a name='funct_wrap3'></a>funct_wrap3</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='funct_wrap3'></a>funct_wrap3</b><font face='Lucida Console'>(</font><font color='#BB00BB'>T</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>f_<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A0,A1,A2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>:f<font face='Lucida Console'>(</font>f_<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+        T <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A0 a0, A1 a1, A2 a2<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>a0,a1,a2<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>private</font>:
+        <b><a name='T'></a>T</b> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>f<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A0,A1,A2<font face='Lucida Console'>)</font>;
+    <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A0, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3<font color='#5555FF'>&gt;</font> <font color='#0000FF'>class</font> <b><a name='funct_wrap4'></a>funct_wrap4</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='funct_wrap4'></a>funct_wrap4</b><font face='Lucida Console'>(</font><font color='#BB00BB'>T</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>f_<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A0,A1,A2,A3<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>:f<font face='Lucida Console'>(</font>f_<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+        T <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A0 a0, A1 a1, A2 a2, A3 a3<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>a0,a1,a2,a3<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>private</font>:
+        <b><a name='T'></a>T</b> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>f<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A0,A1,A2,A3<font face='Lucida Console'>)</font>;
+    <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A0, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3, <font color='#0000FF'>typename</font> A4<font color='#5555FF'>&gt;</font> <font color='#0000FF'>class</font> <b><a name='funct_wrap5'></a>funct_wrap5</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='funct_wrap5'></a>funct_wrap5</b><font face='Lucida Console'>(</font><font color='#BB00BB'>T</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>f_<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A0,A1,A2,A3,A4<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>:f<font face='Lucida Console'>(</font>f_<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+        T <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A0 a0, A1 a1, A2 a2, A3 a3, A4 a4<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>a0,a1,a2,a3,a4<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>private</font>:
+        <b><a name='T'></a>T</b> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>f<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A0,A1,A2,A3,A4<font face='Lucida Console'>)</font>;
+    <b>}</b>;
+
+    <a name='wrap_function'/><font color='#009900'>/*!A wrap_function 
+        
+        This is a template that allows you to turn a global function into a 
+        function object.  The reason for this template's existance is so you can
+        do stuff like this:
+            
+            template &lt;typename T&gt;
+            void call_funct(const T&amp; funct)
+            {  cout &lt;&lt; funct(); }
+
+            std::string test() { return "asdfasf"; }
+
+            int main()
+            {
+                call_funct(wrap_function(test));
+            }
+
+        The above code doesn't work right on some compilers if you don't
+        use wrap_function.  
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    funct_wrap0<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='wrap_function'></a>wrap_function</b><font face='Lucida Console'>(</font><font color='#BB00BB'>T</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>f<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> funct_wrap0<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A0<font color='#5555FF'>&gt;</font>
+    funct_wrap1<font color='#5555FF'>&lt;</font>T,A0<font color='#5555FF'>&gt;</font> <b><a name='wrap_function'></a>wrap_function</b><font face='Lucida Console'>(</font><font color='#BB00BB'>T</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>f<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A0<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> funct_wrap1<font color='#5555FF'>&lt;</font>T,A0<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A0, <font color='#0000FF'>typename</font> A1<font color='#5555FF'>&gt;</font>
+    funct_wrap2<font color='#5555FF'>&lt;</font>T,A0,A1<font color='#5555FF'>&gt;</font> <b><a name='wrap_function'></a>wrap_function</b><font face='Lucida Console'>(</font><font color='#BB00BB'>T</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>f<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A0, A1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> funct_wrap2<font color='#5555FF'>&lt;</font>T,A0,A1<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A0, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2<font color='#5555FF'>&gt;</font>
+    funct_wrap3<font color='#5555FF'>&lt;</font>T,A0,A1,A2<font color='#5555FF'>&gt;</font> <b><a name='wrap_function'></a>wrap_function</b><font face='Lucida Console'>(</font><font color='#BB00BB'>T</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>f<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A0, A1, A2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> funct_wrap3<font color='#5555FF'>&lt;</font>T,A0,A1,A2<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A0, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3<font color='#5555FF'>&gt;</font>
+    funct_wrap4<font color='#5555FF'>&lt;</font>T,A0,A1,A2,A3<font color='#5555FF'>&gt;</font> <b><a name='wrap_function'></a>wrap_function</b><font face='Lucida Console'>(</font><font color='#BB00BB'>T</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>f<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A0, A1, A2, A3<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> funct_wrap4<font color='#5555FF'>&lt;</font>T,A0,A1,A2,A3<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A0, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3, <font color='#0000FF'>typename</font> A4<font color='#5555FF'>&gt;</font>
+    funct_wrap5<font color='#5555FF'>&lt;</font>T,A0,A1,A2,A3,A4<font color='#5555FF'>&gt;</font> <b><a name='wrap_function'></a>wrap_function</b><font face='Lucida Console'>(</font><font color='#BB00BB'>T</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>f<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>A0, A1, A2, A3, A4<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> funct_wrap5<font color='#5555FF'>&lt;</font>T,A0,A1,A2,A3,A4<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> bSIZE<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='stack_based_memory_block'></a>stack_based_memory_block</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a simple container for a block of memory
+                of bSIZE bytes.  This memory block is located on the stack
+                and properly aligned to hold any kind of object.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size <font color='#5555FF'>=</font> bSIZE;
+
+        <b><a name='stack_based_memory_block'></a>stack_based_memory_block</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>: data<font face='Lucida Console'>(</font>mem.data<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> <b><a name='get'></a>get</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> data; <b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - returns a pointer to the block of memory contained in this object
+        !*/</font>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> <b><a name='get'></a>get</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data; <b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - returns a pointer to the block of memory contained in this object
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// You obviously can't have a block of memory that has zero bytes in it.
+</font>        <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font>bSIZE <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        
+        <font color='#0000FF'>union</font> mem_block
+        <b>{</b>
+            <font color='#009900'>// All of this garbage is to make sure this union is properly aligned 
+</font>            <font color='#009900'>// (a union is always aligned such that everything in it would be properly
+</font>            <font color='#009900'>// aligned.  So the assumption here is that one of these objects has 
+</font>            <font color='#009900'>// a large enough alignment requirement to satisfy any object this
+</font>            <font color='#009900'>// block of memory might be cast into).
+</font>            <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> void_ptr;
+            <font color='#0000FF'><u>int</u></font> integer;
+            <font color='#0000FF'>struct</font> <b>{</b>
+                <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>stack_based_memory_block::<font color='#5555FF'>*</font>callback<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                stack_based_memory_block<font color='#5555FF'>*</font> o; 
+            <b>}</b> stuff;
+            <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> more_stuff;
+
+            uint64 var1;
+            uint32 var2;
+            <font color='#0000FF'><u>double</u></font> var3;
+
+            <font color='#0000FF'><u>char</u></font> data[size]; 
+        <b>}</b> mem;
+
+        <font color='#009900'>// The reason for having this variable is that doing it this way avoids
+</font>        <font color='#009900'>// warnings from gcc about violations of strict-aliasing rules.
+</font>        <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> <font color='#0000FF'>const</font> data; 
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ALGs_
+</font>
+
+</pre></body></html>

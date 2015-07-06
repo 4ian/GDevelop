@@ -1,0 +1,360 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - linker_kernel_1.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_LINKER_KERNEL_1_CPp_
+<font color='#0000FF'>#define</font> DLIB_LINKER_KERNEL_1_CPp_
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='linker_kernel_1.h.html'>linker_kernel_1.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    linker::
+    <b><a name='linker'></a>linker</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> :
+        running<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+        running_signaler<font face='Lucida Console'>(</font>running_mutex<font face='Lucida Console'>)</font>,
+        A<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        B<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        service_connection_running_signaler<font face='Lucida Console'>(</font>service_connection_running_mutex<font face='Lucida Console'>)</font>
+    <b>{</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    linker::
+    <b><a name='linker'></a>linker</b> <font face='Lucida Console'>(</font>
+        connection<font color='#5555FF'>&amp;</font> a,
+        connection<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> :
+        running<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+        running_signaler<font face='Lucida Console'>(</font>running_mutex<font face='Lucida Console'>)</font>,
+        A<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        B<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        service_connection_running_signaler<font face='Lucida Console'>(</font>service_connection_running_mutex<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>link</font><font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    linker::
+    ~<b><a name='linker'></a>linker</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> linker::
+    <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+
+        <font color='#009900'>// shutdown the connections
+</font>        cons_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>A <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+            A<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            A <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>B <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            B<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            B <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        cons_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+       
+
+        <font color='#009900'>// wait for the other threads to signal that they have ended
+</font>        running_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>running <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            running_signaler.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        running_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> linker::
+    <b><a name='is_running'></a>is_running</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        running_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>bool</u></font> temp <font color='#5555FF'>=</font> running;
+        running_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> linker::
+    <b><a name='link'></a>link</b> <font face='Lucida Console'>(</font>
+        connection<font color='#5555FF'>&amp;</font> a,
+        connection<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>is_running</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> ,
+            "<font color='#CC0000'>\tvoid linker::link</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tis_running() == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>is_running</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        running_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        running <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        running_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        cons_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        A <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>a;
+        B <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>b;
+        cons_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        
+
+        service_connection_running_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        service_connection_running <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        service_connection_running_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        service_connection_error_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        service_connection_error <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        service_connection_error_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// if we fail to make the thread
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>create_new_thread</font><font face='Lucida Console'>(</font>service_connection,<font color='#0000FF'>this</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            a.<font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            b.<font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            service_connection_running_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            service_connection_running <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            service_connection_running_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            cons_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            A <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            B <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            cons_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;  
+
+            running_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            running <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            running_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+
+            <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>thread_error</font> <font face='Lucida Console'>(</font>
+                ECREATE_THREAD,
+                "<font color='#CC0000'>failed to make new thread in linker::link()</font>"
+                <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+
+        <font color='#009900'>// forward data from a to b
+</font>        <font color='#0000FF'><u>char</u></font> buf[<font color='#979000'>200</font>];
+        <font color='#0000FF'><u>int</u></font> status;
+        <font color='#0000FF'><u>bool</u></font> error <font color='#5555FF'>=</font> <font color='#979000'>false</font>; <font color='#009900'>// becomes true if one of the connections returns an error
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            status <font color='#5555FF'>=</font> a.<font color='#BB00BB'>read</font><font face='Lucida Console'>(</font>buf,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// if there was an error reading from the socket
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> OTHER_ERROR<font face='Lucida Console'>)</font>
+            <b>{</b>
+                error <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> SHUTDOWN<font face='Lucida Console'>)</font>
+            <b>{</b>
+                b.<font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// if a has closed normally
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    b.<font color='#BB00BB'>shutdown_outgoing</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>break</font>;            
+            <b>}</b>
+
+            status <font color='#5555FF'>=</font> b.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font>buf,status<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// if there was an error writing to the socket then break
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> OTHER_ERROR<font face='Lucida Console'>)</font>
+            <b>{</b>
+                error <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+            
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>break</font>;            
+        <b>}</b>
+
+
+        <font color='#009900'>// if there was an error then shutdown both connections
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>error<font face='Lucida Console'>)</font>
+        <b>{</b>
+            a.<font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            b.<font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+
+
+        <font color='#009900'>// wait for the other thread to end
+</font>        service_connection_running_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>service_connection_running<font face='Lucida Console'>)</font>
+        <b>{</b>
+            service_connection_running_signaler.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        service_connection_running_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// make sure connections are shutdown
+</font>        a.<font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        b.<font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// both threads have ended so the connections are no longer needed
+</font>        cons_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        A <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        B <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        cons_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// if service_connection terminated due to an error then set error to true
+</font>        service_connection_error_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>service_connection_error<font face='Lucida Console'>)</font>
+            error <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        service_connection_error_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// if we are ending because of an error
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>error<font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#009900'>// signal that the link() function is ending
+</font>            running_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            running <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            running_signaler.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            running_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// throw the exception for this error
+</font>            <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>socket_error</font> <font face='Lucida Console'>(</font>
+                ECONNECTION,
+                "<font color='#CC0000'>a connection returned an error in linker::link()</font>"
+                <font face='Lucida Console'>)</font>;
+         
+        <b>}</b>
+
+        <font color='#009900'>// signal that the link() function is ending
+</font>        running_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        running <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        running_signaler.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        running_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> linker::
+    <b><a name='service_connection'></a>service_connection</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> param
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        linker<font color='#5555FF'>&amp;</font> p <font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>linker<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>param<font face='Lucida Console'>)</font>;
+
+        p.cons_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// if the connections are gone for whatever reason then return
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p.A <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> p.B <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// signal that this function is ending
+</font>            p.service_connection_running_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            p.service_connection_running <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            p.service_connection_running_signaler.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            p.service_connection_running_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+        connection<font color='#5555FF'>&amp;</font> a <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>p.A;
+        connection<font color='#5555FF'>&amp;</font> b <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>p.B;
+        p.cons_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+
+        <font color='#009900'>// forward data from b to a
+</font>        <font color='#0000FF'><u>char</u></font> buf[<font color='#979000'>200</font>];
+        <font color='#0000FF'><u>int</u></font> status;
+        <font color='#0000FF'><u>bool</u></font> error <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            status <font color='#5555FF'>=</font> b.<font color='#BB00BB'>read</font><font face='Lucida Console'>(</font>buf,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// if there was an error reading from the socket
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> OTHER_ERROR<font face='Lucida Console'>)</font>
+            <b>{</b>
+                error <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> SHUTDOWN<font face='Lucida Console'>)</font>
+            <b>{</b>
+                a.<font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// if b has closed normally 
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    a.<font color='#BB00BB'>shutdown_outgoing</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>break</font>;            
+            <b>}</b>
+
+
+            status <font color='#5555FF'>=</font> a.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font>buf,status<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// if there was an error writing to the socket then break
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> OTHER_ERROR<font face='Lucida Console'>)</font>
+            <b>{</b>
+                error <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+            
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>break</font>;            
+        <b>}</b>
+
+
+        <font color='#009900'>// if there was an error then shutdown both connections
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>error<font face='Lucida Console'>)</font>
+        <b>{</b>
+            a.<font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            b.<font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        <font color='#009900'>// if there was an error then signal that
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>error<font face='Lucida Console'>)</font>
+        <b>{</b>
+            p.service_connection_error_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            p.service_connection_error <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            p.service_connection_error_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// signal that this function is ending
+</font>        p.service_connection_running_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        p.service_connection_running <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        p.service_connection_running_signaler.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        p.service_connection_running_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LINKER_KERNEL_1_CPp_
+</font>
+
+</pre></body></html>

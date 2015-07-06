@@ -1,0 +1,86 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - threads_kernel_1.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_THREADS_KERNEL_1_CPp_
+<font color='#0000FF'>#define</font> DLIB_THREADS_KERNEL_1_CPp_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../platform.h.html'>../platform.h</a>"
+
+<font color='#0000FF'>#ifdef</font> WIN32
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel_1.h.html'>threads_kernel_1.h</a>"
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>process.h<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>namespace</font> threads_kernel_shared_helpers
+    <b>{</b>
+
+    <font color='#009900'>// -----------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>struct</font> <b><a name='info'></a>info</b>
+        <b>{</b>
+            <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> param;
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font>;
+        <b>}</b>;
+
+    <font color='#009900'>// -----------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> __stdcall <b><a name='thread_starter'></a>thread_starter</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> param
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            info<font color='#5555FF'>*</font> alloc_p <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>info<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>param<font face='Lucida Console'>)</font>;
+            info p <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>alloc_p;
+            <font color='#0000FF'>delete</font> alloc_p;
+
+            p.<font color='#BB00BB'>funct</font><font face='Lucida Console'>(</font>p.param<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+    <font color='#009900'>// -----------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='spawn_thread'></a>spawn_thread</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font>,
+            <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> param
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            info<font color='#5555FF'>*</font> p;
+            <font color='#0000FF'>try</font> <b>{</b> p <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> info; <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>false</font>; <b>}</b>
+
+            p<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>funct <font color='#5555FF'>=</font> funct;
+            p<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>param <font color='#5555FF'>=</font> param;
+
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> garbage;
+
+            HANDLE thandle <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>HANDLE<font face='Lucida Console'>)</font><font color='#BB00BB'>_beginthreadex</font> <font face='Lucida Console'>(</font>NULL,<font color='#979000'>0</font>,thread_starter,p,<font color='#979000'>0</font>,<font color='#5555FF'>&amp;</font>garbage<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// make thread and add it to the pool
+</font>
+            <font color='#009900'>// return false if _beginthreadex didn't work
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> thandle <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>delete</font> p;
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+
+            <font color='#009900'>// throw away the thread handle
+</font>            <font color='#BB00BB'>CloseHandle</font><font face='Lucida Console'>(</font>thandle<font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+    <font color='#009900'>// -----------------------------------------------------------------------------------
+</font>
+    <b>}</b>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// WIN32
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_THREADS_KERNEL_1_CPp_
+</font>
+
+</pre></body></html>

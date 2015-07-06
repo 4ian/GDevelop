@@ -1,0 +1,537 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - drawable.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net), Keita Mochizuki
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_DRAWABLe_CPP_
+<font color='#0000FF'>#define</font> DLIB_DRAWABLe_CPP_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='drawable.h.html'>drawable.h</a>"
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>algorithm<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// -----------  drawable_window object  ------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    rgb_pixel drawable_window::
+    <b><a name='background_color'></a>background_color</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>wm<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> bg_color;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> drawable_window::
+    <b><a name='set_background_color'></a>set_background_color</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> red_,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> green_,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> blue_
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        wm.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        bg_color.red <font color='#5555FF'>=</font> red_;
+        bg_color.green <font color='#5555FF'>=</font> green_;
+        bg_color.blue <font color='#5555FF'>=</font> blue_;
+        wm.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// now repaint the window
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width,height;
+        <font color='#BB00BB'>get_size</font><font face='Lucida Console'>(</font>width,height<font face='Lucida Console'>)</font>;
+        rectangle <font color='#BB00BB'>rect</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,width<font color='#5555FF'>-</font><font color='#979000'>1</font>,height<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>invalidate_rectangle</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> drawable_window::
+    <b><a name='paint'></a>paint</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>event_id;
+        c.<font color='#BB00BB'>fill</font><font face='Lucida Console'>(</font>bg_color.red,bg_color.green,bg_color.blue<font face='Lucida Console'>)</font>;
+
+        widgets.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>widgets.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            widgets.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>widgets.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// only dispatch a draw() call if this widget isn't hidden
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>widgets.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hidden <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    widgets.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>!</font><font color='#5555FF'>=</font> event_id<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    widgets.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>=</font> event_id;
+                    widgets.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>draw</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> drawable_window::
+    <b><a name='on_user_event'></a>on_user_event</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> p,
+        <font color='#0000FF'><u>int</u></font> i
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        drawable<font color='#5555FF'>*</font> d <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>drawable<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>widget_set.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>d<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            d<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>on_user_event</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> drawable_window::
+    <b><a name='on_window_moved'></a>on_window_moved</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>event_id;
+        window_moved.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>window_moved.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>window_moved.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>!</font><font color='#5555FF'>=</font> event_id<font face='Lucida Console'>)</font>
+            <b>{</b>
+                window_moved.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>=</font> event_id;
+                window_moved.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>on_window_moved</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> drawable_window::
+    <b><a name='on_window_resized'></a>on_window_resized</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>event_id;
+        window_resized.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>window_resized.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>window_resized.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>!</font><font color='#5555FF'>=</font> event_id<font face='Lucida Console'>)</font>
+            <b>{</b>
+                window_resized.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>=</font> event_id;
+                window_resized.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>on_window_resized</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> drawable_window::
+    <b><a name='on_keydown'></a>on_keydown</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> key,
+        <font color='#0000FF'><u>bool</u></font> is_printable,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> state
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>event_id;
+        keyboard.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>keyboard.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>keyboard.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>!</font><font color='#5555FF'>=</font> event_id<font face='Lucida Console'>)</font>
+            <b>{</b>
+                keyboard.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>=</font> event_id;
+                keyboard.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>on_keydown</font><font face='Lucida Console'>(</font>key,is_printable,state<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> drawable_window::
+    <b><a name='on_focus_gained'></a>on_focus_gained</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>event_id;
+        focus.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>focus.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>focus.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>!</font><font color='#5555FF'>=</font> event_id<font face='Lucida Console'>)</font>
+            <b>{</b>
+                focus.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>=</font> event_id;
+                focus.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>on_focus_gained</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> drawable_window::
+    <b><a name='on_focus_lost'></a>on_focus_lost</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>event_id;
+        focus.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>focus.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>focus.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>!</font><font color='#5555FF'>=</font> event_id<font face='Lucida Console'>)</font>
+            <b>{</b>
+                focus.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>=</font> event_id;
+                focus.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>on_focus_lost</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> drawable_window::
+    <b><a name='on_mouse_down'></a>on_mouse_down</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> btn,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> state,
+        <font color='#0000FF'><u>long</u></font> x,
+        <font color='#0000FF'><u>long</u></font> y,
+        <font color='#0000FF'><u>bool</u></font> is_double_click
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        lastx <font color='#5555FF'>=</font> x;
+        lasty <font color='#5555FF'>=</font> y;
+
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>event_id;
+        mouse_click.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>mouse_click.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>mouse_click.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>!</font><font color='#5555FF'>=</font> event_id<font face='Lucida Console'>)</font>
+            <b>{</b>
+                mouse_click.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>=</font> event_id;
+                mouse_click.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>on_mouse_down</font><font face='Lucida Console'>(</font>btn,state,x,y,is_double_click<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> drawable_window::
+    <b><a name='on_mouse_up'></a>on_mouse_up</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> btn,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> state,
+        <font color='#0000FF'><u>long</u></font> x,
+        <font color='#0000FF'><u>long</u></font> y
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        lastx <font color='#5555FF'>=</font> x;
+        lasty <font color='#5555FF'>=</font> y;
+
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>event_id;
+        mouse_click.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>mouse_click.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>mouse_click.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>!</font><font color='#5555FF'>=</font> event_id<font face='Lucida Console'>)</font>
+            <b>{</b>
+                mouse_click.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>=</font> event_id;
+                mouse_click.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>on_mouse_up</font><font face='Lucida Console'>(</font>btn,state,x,y<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> drawable_window::
+    <b><a name='on_mouse_move'></a>on_mouse_move</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> state,
+        <font color='#0000FF'><u>long</u></font> x,
+        <font color='#0000FF'><u>long</u></font> y
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        lastx <font color='#5555FF'>=</font> x;
+        lasty <font color='#5555FF'>=</font> y;
+
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>event_id;
+        mouse_move.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>mouse_move.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>mouse_move.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>!</font><font color='#5555FF'>=</font> event_id<font face='Lucida Console'>)</font>
+            <b>{</b>
+                mouse_move.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>=</font> event_id;
+                mouse_move.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>on_mouse_move</font><font face='Lucida Console'>(</font>state,x,y<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> drawable_window::
+    <b><a name='on_mouse_leave'></a>on_mouse_leave</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        lastx <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        lasty <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>event_id;
+        mouse_move.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>mouse_move.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>mouse_move.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>!</font><font color='#5555FF'>=</font> event_id<font face='Lucida Console'>)</font>
+            <b>{</b>
+                mouse_move.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>=</font> event_id;
+                mouse_move.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>on_mouse_leave</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> drawable_window::
+    <b><a name='on_mouse_enter'></a>on_mouse_enter</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>event_id;
+        mouse_move.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>mouse_move.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>mouse_move.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>!</font><font color='#5555FF'>=</font> event_id<font face='Lucida Console'>)</font>
+            <b>{</b>
+                mouse_move.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>=</font> event_id;
+                mouse_move.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>on_mouse_enter</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> drawable_window::
+    <b><a name='on_wheel_up'></a>on_wheel_up</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> state
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>event_id;
+        mouse_wheel.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>mouse_wheel.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>mouse_wheel.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>!</font><font color='#5555FF'>=</font> event_id<font face='Lucida Console'>)</font>
+            <b>{</b>
+                mouse_wheel.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>=</font> event_id;
+                mouse_wheel.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>on_wheel_up</font><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> drawable_window::
+    <b><a name='on_wheel_down'></a>on_wheel_down</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> state
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>event_id;
+        mouse_wheel.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>mouse_wheel.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>mouse_wheel.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>!</font><font color='#5555FF'>=</font> event_id<font face='Lucida Console'>)</font>
+            <b>{</b>
+                mouse_wheel.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>=</font> event_id;
+                mouse_wheel.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>on_wheel_down</font><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> drawable_window::
+    <b><a name='on_string_put'></a>on_string_put</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::wstring <font color='#5555FF'>&amp;</font>str
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>event_id;
+        string_put.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>string_put.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>string_put.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>!</font><font color='#5555FF'>=</font> event_id<font face='Lucida Console'>)</font>
+            <b>{</b>
+                string_put.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>event_id <font color='#5555FF'>=</font> event_id;
+                string_put.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>on_string_put</font><font face='Lucida Console'>(</font>str<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// -----------  drawable object  ----------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> drawable::
+    <b><a name='enable_events'></a>enable_events</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled_events <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            enabled_events <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            drawable<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>this</font>;
+            <font color='#0000FF'><u>long</u></font> zo <font color='#5555FF'>=</font> z_order_value;
+
+            drawable_window::set_of_drawables<font color='#5555FF'>*</font> sod <font color='#5555FF'>=</font> parent.widgets[zo];
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sod <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// this drawable is the first widget at this z order so we need
+</font>                <font color='#009900'>// to make its containing set
+</font>                drawable_window::set_of_drawables s;
+                s.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                parent.widgets.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>zo,s<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                sod<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            temp <font color='#5555FF'>=</font> <font color='#0000FF'>this</font>;
+            parent.widget_set.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>events <font color='#5555FF'>&amp;</font> MOUSE_MOVE<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> <font color='#0000FF'>this</font>;
+                parent.mouse_move.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>events <font color='#5555FF'>&amp;</font> MOUSE_CLICK<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> <font color='#0000FF'>this</font>;
+                parent.mouse_click.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>events <font color='#5555FF'>&amp;</font> MOUSE_WHEEL<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> <font color='#0000FF'>this</font>;
+                parent.mouse_wheel.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>events <font color='#5555FF'>&amp;</font> WINDOW_RESIZED<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> <font color='#0000FF'>this</font>;
+                parent.window_resized.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>events <font color='#5555FF'>&amp;</font> KEYBOARD_EVENTS<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> <font color='#0000FF'>this</font>;
+                parent.keyboard.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>events <font color='#5555FF'>&amp;</font> FOCUS_EVENTS<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> <font color='#0000FF'>this</font>;
+                parent.focus.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>events <font color='#5555FF'>&amp;</font> WINDOW_MOVED<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> <font color='#0000FF'>this</font>;
+                parent.window_moved.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>events <font color='#5555FF'>&amp;</font> STRING_PUT<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> <font color='#0000FF'>this</font>;
+                parent.string_put.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            parent.<font color='#BB00BB'>invalidate_rectangle</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> drawable::
+    <b><a name='set_z_order'></a>set_z_order</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>long</u></font> order
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>order <font color='#5555FF'>!</font><font color='#5555FF'>=</font> z_order_value <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> enabled_events<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// first remove this drawable from widgets
+</font>            drawable_window::set_of_drawables<font color='#5555FF'>*</font> sod <font color='#5555FF'>=</font> parent.widgets[z_order_value];
+            drawable<font color='#5555FF'>*</font> junk;
+            sod<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font>,junk<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// if there are no more drawables at this z order then destroy the
+</font>            <font color='#009900'>// set for this order
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sod<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                parent.widgets.<font color='#BB00BB'>destroy</font><font face='Lucida Console'>(</font>z_order_value<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now add this drawable to its new z order
+</font>            sod <font color='#5555FF'>=</font> parent.widgets[order];                
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sod <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// this drawable is the first widget at this z order so we need
+</font>                <font color='#009900'>// to make its containing set
+</font>                drawable_window::set_of_drawables s, x;
+                s.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>junk<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>long</u></font> temp_order <font color='#5555FF'>=</font> order;
+                parent.widgets.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp_order,s<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                sod<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>junk<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            parent.<font color='#BB00BB'>invalidate_rectangle</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+        z_order_value <font color='#5555FF'>=</font> order;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> drawable::
+    <b><a name='disable_events'></a>disable_events</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled_events<font face='Lucida Console'>)</font>
+        <b>{</b>
+            enabled_events <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#009900'>// first remove this drawable from widgets
+</font>            drawable_window::set_of_drawables<font color='#5555FF'>*</font> sod <font color='#5555FF'>=</font> parent.widgets[z_order_value];
+            drawable<font color='#5555FF'>*</font> junk;
+            sod<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font>,junk<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// if there are no more drawables at this z order then destroy the
+</font>            <font color='#009900'>// set for this order
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sod<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                parent.widgets.<font color='#BB00BB'>destroy</font><font face='Lucida Console'>(</font>z_order_value<font face='Lucida Console'>)</font>;
+
+            parent.widget_set.<font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font>,junk<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now unregister this drawable from all the events it has registered for.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>events <font color='#5555FF'>&amp;</font> MOUSE_MOVE<font face='Lucida Console'>)</font>
+                parent.mouse_move.<font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font>,junk<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>events <font color='#5555FF'>&amp;</font> MOUSE_CLICK<font face='Lucida Console'>)</font>
+                parent.mouse_click.<font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font>,junk<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>events <font color='#5555FF'>&amp;</font> MOUSE_WHEEL<font face='Lucida Console'>)</font>
+                parent.mouse_wheel.<font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font>,junk<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>events <font color='#5555FF'>&amp;</font> WINDOW_RESIZED<font face='Lucida Console'>)</font>
+                parent.window_resized.<font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font>,junk<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>events <font color='#5555FF'>&amp;</font> KEYBOARD_EVENTS<font face='Lucida Console'>)</font>
+                parent.keyboard.<font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font>,junk<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>events <font color='#5555FF'>&amp;</font> FOCUS_EVENTS<font face='Lucida Console'>)</font>
+                parent.focus.<font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font>,junk<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>events <font color='#5555FF'>&amp;</font> WINDOW_MOVED<font face='Lucida Console'>)</font>
+                parent.window_moved.<font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font>,junk<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>events <font color='#5555FF'>&amp;</font> STRING_PUT<font face='Lucida Console'>)</font>
+                parent.string_put.<font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font>,junk<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    drawable::
+    ~<b><a name='drawable'></a>drawable</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>events_are_enabled</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+            "<font color='#CC0000'>\tdrawable::~drawable()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou must disable events for drawable objects in their destructor by calling disable_events().</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>disable_events</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_DRAWABLe_CPP_
+</font>
+
+</pre></body></html>

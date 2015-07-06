@@ -1,0 +1,316 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - pipe_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_PIPE_KERNEl_ABSTRACT_ 
+<font color='#0000FF'>#ifdef</font> DLIB_PIPE_KERNEl_ABSTRACT_ 
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads.h.html'>../threads.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='pipe'></a>pipe</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T
+                T must be swappable by a global swap() 
+                T must have a default constructor
+
+            INITIAL VALUE
+                size() == 0
+                is_enabled() == true
+                is_enqueue_enabled() == true
+                is_dequeue_enabled() == true
+
+            WHAT THIS OBJECT REPRESENTS
+                This is a first in first out queue with a fixed maximum size containing 
+                items of type T.  It is suitable for passing objects between threads.
+                
+            THREAD SAFETY
+                All methods of this class are thread safe.  You may call them from any
+                thread and any number of threads my call them at once.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> T type;
+
+        <font color='#0000FF'>explicit</font> <b><a name='pipe'></a>pipe</b> <font face='Lucida Console'>(</font>  
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> maximum_size
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures                
+                - #*this is properly initialized
+                - #max_size() == maximum_size
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='pipe'></a>pipe</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - any resources associated with *this have been released
+                - disables (i.e. sets is_enabled() == false) this object so that 
+                  all calls currently blocking on it will return immediately. 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='enable'></a>enable</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #is_enabled() == true
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='disable'></a>disable</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #is_enabled() == false
+                - causes all current and future calls to enqueue(), dequeue(),
+                  enqueue_or_timeout() and dequeue_or_timeout() to not block but 
+                  to return false immediately until enable() is called.
+                - causes all current and future calls to wait_until_empty() and
+                  wait_for_num_blocked_dequeues() to not block but return
+                  immediately until enable() is called.
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_enabled'></a>is_enabled</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if this pipe is currently enabled, false otherwise.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='empty'></a>empty</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #size() == 0
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='wait_until_empty'></a>wait_until_empty</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - blocks until one of the following is the case:
+                    - size() == 0  
+                    - is_enabled() == false
+                    - is_dequeue_enabled() == false
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='wait_for_num_blocked_dequeues'></a>wait_for_num_blocked_dequeues</b> <font face='Lucida Console'>(</font>
+           <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - blocks until one of the following is the case: 
+                    - size() == 0 and the number of threads blocked on calls 
+                      to dequeue() and dequeue_or_timeout() is greater than 
+                      or equal to num.
+                    - is_enabled() == false
+                    - is_dequeue_enabled() == false
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_enqueue_enabled'></a>is_enqueue_enabled</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if the enqueue() and enqueue_or_timeout() functions are 
+                  currently enabled, returns false otherwise.  (note that the higher 
+                  level is_enabled() function can overrule this one.  So if 
+                  is_enabled() == false then enqueue functions are still disabled even
+                  if is_enqueue_enabled() returns true.  But if is_enqueue_enabled() == false 
+                  then enqueue functions are always disabled no matter the state of 
+                  is_enabled())
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='disable_enqueue'></a>disable_enqueue</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #is_enqueue_enabled() == false 
+                - causes all current and future calls to enqueue() and
+                  enqueue_or_timeout() to not block but to return false 
+                  immediately until enable_enqueue() is called.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='enable_enqueue'></a>enable_enqueue</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #is_enqueue_enabled() == true
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_dequeue_enabled'></a>is_dequeue_enabled</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if the dequeue() and dequeue_or_timeout() functions are 
+                  currently enabled, returns false otherwise.  (note that the higher 
+                  level is_enabled() function can overrule this one.  So if 
+                  is_enabled() == false then dequeue functions are still disabled even
+                  if is_dequeue_enabled() returns true.  But if is_dequeue_enabled() == false 
+                  then dequeue functions are always disabled no matter the state of 
+                  is_enabled())
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='disable_dequeue'></a>disable_dequeue</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #is_dequeue_enabled() == false 
+                - causes all current and future calls to dequeue() and
+                  dequeue_or_timeout() to not block but to return false 
+                  immediately until enable_dequeue() is called.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='enable_dequeue'></a>enable_dequeue</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #is_dequeue_enabled() == true
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='max_size'></a>max_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the maximum number of objects of type T that this 
+                  pipe can contain.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of objects of type T that this
+                  object currently contains.
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='enqueue'></a>enqueue</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (size() == max_size()) then
+                    - this call to enqueue() blocks until one of the following is the case:
+                        - there is room in the pipe for another item
+                        - max_size() == 0 and another thread is trying to dequeue from this 
+                          pipe and we can pass our item object directly to that thread.
+                        - someone calls disable() 
+                        - someone calls disable_enqueue()
+                - else
+                    - this call does not block.
+                - if (this call to enqueue() returns true) then
+                    - #is_enabled() == true 
+                    - #is_enqueue_enabled() == true
+                    - if (max_size() == 0) then
+                        - using global swap, item was passed directly to a 
+                          thread attempting to dequeue from this pipe
+                    - else
+                        - using global swap, item was added into this pipe.
+                    - #item is in an undefined but valid state for its type 
+                - else
+                    - item was NOT added into the pipe
+                    - #item == item (i.e. the value of item is unchanged)
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='enqueue_or_timeout'></a>enqueue_or_timeout</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> item,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (size() == max_size() &amp;&amp; timeout &gt; 0) then
+                    - this call to enqueue_or_timeout() blocks until one of the following is the case:
+                        - there is room in the pipe to add another item
+                        - max_size() == 0 and another thread is trying to dequeue from this pipe 
+                          and we can pass our item object directly to that thread.
+                        - someone calls disable() 
+                        - someone calls disable_enqueue() 
+                        - timeout milliseconds passes
+                - else
+                    - this call does not block. 
+                - if (this call to enqueue() returns true) then
+                    - #is_enabled() == true 
+                    - #is_enqueue_enabled() == true
+                    - if (max_size() == 0) then
+                        - using global swap, item was passed directly to a 
+                          thread attempting to dequeue from this pipe
+                    - else
+                        - using global swap, item was added into this pipe.
+                    - #item is in an undefined but valid state for its type
+                - else
+                    - item was NOT added into the pipe
+                    - #item == item (i.e. the value of item is unchanged)
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='dequeue'></a>dequeue</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (size() == 0) then
+                    - this call to dequeue() blocks until one of the following is the case:
+                        - there is something in the pipe we can dequeue
+                        - max_size() == 0 and another thread is trying to enqueue an item 
+                          onto this pipe and we can receive our item directly from that thread.  
+                        - someone calls disable()
+                        - someone calls disable_dequeue()
+                - else
+                    - this call does not block.
+                - if (this call to dequeue() returns true) then
+                    - #is_enabled() == true 
+                    - #is_dequeue_enabled() == true 
+                    - the oldest item that was enqueued into this pipe has been
+                      swapped into #item.
+                - else
+                    - nothing was dequeued from this pipe.
+                    - #item == item (i.e. the value of item is unchanged)
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='dequeue_or_timeout'></a>dequeue_or_timeout</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> item,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (size() == 0 &amp;&amp; timeout &gt; 0) then
+                    - this call to dequeue_or_timeout() blocks until one of the following is the case:
+                        - there is something in the pipe we can dequeue 
+                        - max_size() == 0 and another thread is trying to enqueue an item onto this 
+                          pipe and we can receive our item directly from that thread.  
+                        - someone calls disable() 
+                        - someone calls disable_dequeue()
+                        - timeout milliseconds passes
+                - else
+                    - this call does not block.
+                - if (this call to dequeue_or_timeout() returns true) then
+                    - #is_enabled() == true 
+                    - #is_dequeue_enabled() == true 
+                    - the oldest item that was enqueued into this pipe has been
+                      swapped into #item.
+                - else
+                    - nothing was dequeued from this pipe.
+                    - #item == item (i.e. the value of item is unchanged)
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='pipe'></a>pipe</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> pipe<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        pipe<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> pipe<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;    
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_PIPE_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

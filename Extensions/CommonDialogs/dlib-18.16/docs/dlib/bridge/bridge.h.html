@@ -1,0 +1,670 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bridge.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_BRIDGe_Hh_
+<font color='#0000FF'>#define</font> DLIB_BRIDGe_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='bridge_abstract.h.html'>bridge_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pipe.h.html'>../pipe.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads.h.html'>../threads.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../smart_pointers.h.html'>../smart_pointers.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sockets.h.html'>../sockets.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sockstreambuf.h.html'>../sockstreambuf.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../logger.h.html'>../logger.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='connect_to_ip_and_port'></a>connect_to_ip_and_port</b>
+    <b>{</b>
+        <b><a name='connect_to_ip_and_port'></a>connect_to_ip_and_port</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ip_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port_
+        <font face='Lucida Console'>)</font>: ip<font face='Lucida Console'>(</font>ip_<font face='Lucida Console'>)</font>, port<font face='Lucida Console'>(</font>port_<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_ip_address</font><font face='Lucida Console'>(</font>ip<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> port <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t connect_to_ip_and_port()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t ip:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> ip 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t port: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> port
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> bridge;
+        <font color='#0000FF'>const</font> std::string ip;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port;
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> connect_to_ip_and_port <b><a name='connect_to'></a>connect_to</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> network_address<font color='#5555FF'>&amp;</font> addr
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>addr.port <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t connect_to_ip_and_port()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t The TCP port to connect to can't be 0.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t addr.port: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> addr.port
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_ip_address</font><font face='Lucida Console'>(</font>addr.host_address<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>connect_to_ip_and_port</font><font face='Lucida Console'>(</font>addr.host_address, addr.port<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            std::string ip;
+            <font color='#0000FF'>if</font><font face='Lucida Console'>(</font><font color='#BB00BB'>hostname_to_ip</font><font face='Lucida Console'>(</font>addr.host_address,ip<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>socket_error</font><font face='Lucida Console'>(</font>ERESOLVE,"<font color='#CC0000'>unable to resolve '</font>" <font color='#5555FF'>+</font> addr.host_address <font color='#5555FF'>+</font> "<font color='#CC0000'>' in connect_to()</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>connect_to_ip_and_port</font><font face='Lucida Console'>(</font>ip, addr.port<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>struct</font> <b><a name='listen_on_port'></a>listen_on_port</b>
+    <b>{</b>
+        <b><a name='listen_on_port'></a>listen_on_port</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port_
+        <font face='Lucida Console'>)</font> : port<font face='Lucida Console'>(</font>port_<font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> port <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t listen_on_port()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t port: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> port
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> bridge;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pipe_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='bridge_transmit_decoration'></a>bridge_transmit_decoration</b>
+    <b>{</b>
+        <b><a name='bridge_transmit_decoration'></a>bridge_transmit_decoration</b> <font face='Lucida Console'>(</font> 
+            pipe_type<font color='#5555FF'>&amp;</font> p_
+        <font face='Lucida Console'>)</font> : p<font face='Lucida Console'>(</font>p_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> bridge;
+        pipe_type<font color='#5555FF'>&amp;</font> p;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pipe_type<font color='#5555FF'>&gt;</font>
+    bridge_transmit_decoration<font color='#5555FF'>&lt;</font>pipe_type<font color='#5555FF'>&gt;</font> <b><a name='transmit'></a>transmit</b> <font face='Lucida Console'>(</font> pipe_type<font color='#5555FF'>&amp;</font> p<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> bridge_transmit_decoration<font color='#5555FF'>&lt;</font>pipe_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pipe_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='bridge_receive_decoration'></a>bridge_receive_decoration</b>
+    <b>{</b>
+        <b><a name='bridge_receive_decoration'></a>bridge_receive_decoration</b> <font face='Lucida Console'>(</font> 
+            pipe_type<font color='#5555FF'>&amp;</font> p_
+        <font face='Lucida Console'>)</font> : p<font face='Lucida Console'>(</font>p_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> bridge;
+        pipe_type<font color='#5555FF'>&amp;</font> p;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pipe_type<font color='#5555FF'>&gt;</font>
+    bridge_receive_decoration<font color='#5555FF'>&lt;</font>pipe_type<font color='#5555FF'>&gt;</font> <b><a name='receive'></a>receive</b> <font face='Lucida Console'>(</font> pipe_type<font color='#5555FF'>&amp;</font> p<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> bridge_receive_decoration<font color='#5555FF'>&lt;</font>pipe_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='bridge_status'></a>bridge_status</b>
+    <b>{</b>
+        <b><a name='bridge_status'></a>bridge_status</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : is_connected<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>, foreign_port<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> is_connected;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> foreign_port;
+        std::string foreign_ip;
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> bridge_status<font color='#5555FF'>&amp;</font> , std::ostream<font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>It is illegal to serialize bridge_status objects.</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font> bridge_status<font color='#5555FF'>&amp;</font> , std::istream<font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>It is illegal to serialize bridge_status objects.</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>class</font> <b><a name='impl_bridge_base'></a>impl_bridge_base</b>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='impl_bridge_base'></a>impl_bridge_base</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            <font color='#0000FF'>virtual</font> bridge_status <b><a name='get_bridge_status'></a>get_bridge_status</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> transmit_pipe_type,
+            <font color='#0000FF'>typename</font> receive_pipe_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='impl_bridge'></a>impl_bridge</b> : <font color='#0000FF'>public</font> impl_bridge_base, <font color='#0000FF'>private</font> noncopyable, <font color='#0000FF'>private</font> multithreaded_object
+        <b>{</b>
+            <font color='#009900'>/*!
+                CONVENTION
+                    - if (list) then
+                        - this object is supposed to be listening on the list object for incoming
+                          connections when not connected.
+                    - else
+                        - this object is supposed to be attempting to connect to ip:port when
+                          not connected.
+
+                    - get_bridge_status() == current_bs
+            !*/</font>
+        <font color='#0000FF'>public</font>:
+
+            <b><a name='impl_bridge'></a>impl_bridge</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> listen_port,
+                transmit_pipe_type<font color='#5555FF'>*</font> transmit_pipe_,
+                receive_pipe_type<font color='#5555FF'>*</font> receive_pipe_
+            <font face='Lucida Console'>)</font> :
+                s<font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>,
+                receive_thread_active<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+                transmit_thread_active<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+                port<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                transmit_pipe<font face='Lucida Console'>(</font>transmit_pipe_<font face='Lucida Console'>)</font>,
+                receive_pipe<font face='Lucida Console'>(</font>receive_pipe_<font face='Lucida Console'>)</font>,
+                dlog<font face='Lucida Console'>(</font>"<font color='#CC0000'>dlib.bridge</font>"<font face='Lucida Console'>)</font>,
+                keepalive_code<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                message_code<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>int</u></font> status <font color='#5555FF'>=</font> <font color='#BB00BB'>create_listener</font><font face='Lucida Console'>(</font>list, listen_port<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> PORTINUSE<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    std::ostringstream sout;
+                    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Error, the port </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> listen_port <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> is already in use.</font>";
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>socket_error</font><font face='Lucida Console'>(</font>EPORT_IN_USE, sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> OTHER_ERROR<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>socket_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to create listening socket for an unknown reason.</font>"<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>impl_bridge::transmit_thread<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>impl_bridge::receive_thread<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>impl_bridge::connect_thread<font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <b><a name='impl_bridge'></a>impl_bridge</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> std::string ip_,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port_,
+                transmit_pipe_type<font color='#5555FF'>*</font> transmit_pipe_,
+                receive_pipe_type<font color='#5555FF'>*</font> receive_pipe_
+            <font face='Lucida Console'>)</font> :
+                s<font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>,
+                receive_thread_active<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+                transmit_thread_active<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+                port<font face='Lucida Console'>(</font>port_<font face='Lucida Console'>)</font>,
+                ip<font face='Lucida Console'>(</font>ip_<font face='Lucida Console'>)</font>,
+                transmit_pipe<font face='Lucida Console'>(</font>transmit_pipe_<font face='Lucida Console'>)</font>,
+                receive_pipe<font face='Lucida Console'>(</font>receive_pipe_<font face='Lucida Console'>)</font>,
+                dlog<font face='Lucida Console'>(</font>"<font color='#CC0000'>dlib.bridge</font>"<font face='Lucida Console'>)</font>,
+                keepalive_code<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                message_code<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>impl_bridge::transmit_thread<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>impl_bridge::receive_thread<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>impl_bridge::connect_thread<font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            ~<b><a name='impl_bridge'></a>impl_bridge</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// tell the threads to terminate
+</font>                <font color='#BB00BB'>stop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// save current pipe enabled status so we can restore it to however
+</font>                <font color='#009900'>// it was before this destructor ran.
+</font>                <font color='#0000FF'><u>bool</u></font> transmit_enabled <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <font color='#0000FF'><u>bool</u></font> receive_enabled <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+                <font color='#009900'>// make any calls blocked on a pipe return immediately.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>transmit_pipe<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    transmit_enabled <font color='#5555FF'>=</font> transmit_pipe<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>is_dequeue_enabled</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    transmit_pipe<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>disable_dequeue</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>receive_pipe<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    receive_enabled <font color='#5555FF'>=</font> receive_pipe<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>is_enqueue_enabled</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    receive_pipe<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>disable_enqueue</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <b>{</b>
+                    auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                    s.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#009900'>// Shutdown the connection if we have one.  This will cause
+</font>                    <font color='#009900'>// all blocked I/O calls to return an error.
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>con<font face='Lucida Console'>)</font>
+                        con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#009900'>// wait for all the threads to terminate.
+</font>                <font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>transmit_pipe <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> transmit_enabled<font face='Lucida Console'>)</font>
+                    transmit_pipe<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>enable_dequeue</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>receive_pipe <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> receive_enabled<font face='Lucida Console'>)</font>
+                    receive_pipe<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>enable_enqueue</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            bridge_status <b><a name='get_bridge_status'></a>get_bridge_status</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>current_bs_mutex<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> current_bs;
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pipe_type<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_convertible<font color='#5555FF'>&lt;</font>bridge_status, <font color='#0000FF'>typename</font> pipe_type::type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type  <b><a name='enqueue_bridge_status'></a>enqueue_bridge_status</b> <font face='Lucida Console'>(</font>
+                pipe_type<font color='#5555FF'>*</font> p,
+                <font color='#0000FF'>const</font> bridge_status<font color='#5555FF'>&amp;</font> status
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>typename</font> pipe_type::type <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>status<font face='Lucida Console'>)</font>;
+                    p<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pipe_type<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_convertible<font color='#5555FF'>&lt;</font>bridge_status, <font color='#0000FF'>typename</font> pipe_type::type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type  <b><a name='enqueue_bridge_status'></a>enqueue_bridge_status</b> <font face='Lucida Console'>(</font>
+                pipe_type<font color='#5555FF'>*</font> ,
+                <font color='#0000FF'>const</font> bridge_status<font color='#5555FF'>&amp;</font> 
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='connect_thread'></a>connect_thread</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>should_stop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'><u>int</u></font> status <font color='#5555FF'>=</font> OTHER_ERROR;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>list<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>do</font>
+                        <b>{</b>
+                            status <font color='#5555FF'>=</font> list<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>accept</font><font face='Lucida Console'>(</font>con, <font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+                        <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> TIMEOUT <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font><font color='#BB00BB'>should_stop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        status <font color='#5555FF'>=</font> <font color='#BB00BB'>create_connection</font><font face='Lucida Console'>(</font>con, port, ip<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>should_stop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>break</font>;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#009900'>// The last connection attempt failed.  So pause for a little bit before making another attempt.
+</font>                        s.<font color='#BB00BB'>wait_or_timeout</font><font face='Lucida Console'>(</font><font color='#979000'>2000</font><font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>continue</font>;
+                    <b>}</b>
+
+                    dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Established new connection to </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_ip</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>:</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_port</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.</font>";
+
+                    bridge_status temp_bs;
+                    <b>{</b>   auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>current_bs_mutex<font face='Lucida Console'>)</font>;
+                        current_bs.is_connected <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                        current_bs.foreign_port <font color='#5555FF'>=</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_port</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        current_bs.foreign_ip <font color='#5555FF'>=</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_ip</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        temp_bs <font color='#5555FF'>=</font> current_bs;
+                    <b>}</b>
+                    <font color='#BB00BB'>enqueue_bridge_status</font><font face='Lucida Console'>(</font>receive_pipe, temp_bs<font face='Lucida Console'>)</font>;
+
+
+                    receive_thread_active <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    transmit_thread_active <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+                    s.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// Wait for the transmit and receive threads to end before we continue.
+</font>                    <font color='#009900'>// This way we don't invalidate the con pointer while it is in use.
+</font>                    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>receive_thread_active <font color='#5555FF'>|</font><font color='#5555FF'>|</font> transmit_thread_active<font face='Lucida Console'>)</font>
+                        s.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+                    dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Closed connection to </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_ip</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>:</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_port</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.</font>";
+                    <b>{</b>   auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>current_bs_mutex<font face='Lucida Console'>)</font>;
+                        current_bs.is_connected <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                        current_bs.foreign_port <font color='#5555FF'>=</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_port</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        current_bs.foreign_ip <font color='#5555FF'>=</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_ip</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        temp_bs <font color='#5555FF'>=</font> current_bs;
+                    <b>}</b>
+                    <font color='#BB00BB'>enqueue_bridge_status</font><font face='Lucida Console'>(</font>receive_pipe, temp_bs<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+            <b>}</b>
+
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='receive_thread'></a>receive_thread</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// wait until we have a connection
+</font>                    <b>{</b>   auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>receive_thread_active <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font><font color='#BB00BB'>should_stop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            s.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <b>}</b>
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>should_stop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>break</font>;
+                    <b>}</b>
+
+
+
+                    <font color='#0000FF'>try</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>receive_pipe<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            sockstreambuf <font color='#BB00BB'>buf</font><font face='Lucida Console'>(</font>con<font face='Lucida Console'>)</font>;
+                            std::istream <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>buf<font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>typename</font> receive_pipe_type::type item;
+                            <font color='#009900'>// This isn't necessary but doing it avoids a warning about
+</font>                            <font color='#009900'>// item being uninitialized sometimes.
+</font>                            <font color='#BB00BB'>assign_zero_if_built_in_scalar_type</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+
+                            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> code;
+                                in.<font color='#BB00BB'>read</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>code, <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>code<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>code <font color='#5555FF'>=</font><font color='#5555FF'>=</font> message_code<font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item, in<font face='Lucida Console'>)</font>;
+                                    receive_pipe<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+                                <b>}</b>
+                            <b>}</b>
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            <font color='#009900'>// Since we don't have a receive pipe to put messages into we will
+</font>                            <font color='#009900'>// just read the bytes from the connection and ignore them.
+</font>                            <font color='#0000FF'><u>char</u></font> buf[<font color='#979000'>1000</font>];
+                            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>read</font><font face='Lucida Console'>(</font>buf, <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> ;
+                        <b>}</b>
+                    <b>}</b>
+                    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::bad_alloc<font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>std::bad_alloc thrown while deserializing message from </font>" 
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_ip</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>:</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_port</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>dlib::serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dlib::serialization_error thrown while deserializing message from </font>" 
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_ip</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>:</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_port</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.\nThe exception error message is: \n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>std::exception thrown while deserializing message from </font>" 
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_ip</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>:</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_port</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.\nThe exception error message is: \n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+
+
+
+                    con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                    receive_thread_active <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    s.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                receive_thread_active <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                s.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='transmit_thread'></a>transmit_thread</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// wait until we have a connection
+</font>                    <b>{</b>   auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>transmit_thread_active <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font><font color='#BB00BB'>should_stop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            s.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <b>}</b>
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>should_stop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>break</font>;
+                    <b>}</b>
+
+
+
+                    <font color='#0000FF'>try</font>
+                    <b>{</b>
+                        sockstreambuf <font color='#BB00BB'>buf</font><font face='Lucida Console'>(</font>con<font face='Lucida Console'>)</font>;
+                        std::ostream <font color='#BB00BB'>out</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>buf<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>typename</font> transmit_pipe_type::type item;
+                        <font color='#009900'>// This isn't necessary but doing it avoids a warning about
+</font>                        <font color='#009900'>// item being uninitialized sometimes.
+</font>                        <font color='#BB00BB'>assign_zero_if_built_in_scalar_type</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+
+
+                        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>out<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'><u>bool</u></font> dequeue_timed_out <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>transmit_pipe <font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>transmit_pipe<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>dequeue_or_timeout</font><font face='Lucida Console'>(</font>item,<font color='#979000'>1000</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    out.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>message_code, <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>message_code<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                                    <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item, out<font face='Lucida Console'>)</font>;
+                                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>transmit_pipe<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                                        out.<font color='#BB00BB'>flush</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                                    <font color='#0000FF'>continue</font>;
+                                <b>}</b>
+
+                                dequeue_timed_out <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>transmit_pipe<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>is_enabled</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> transmit_pipe<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>is_dequeue_enabled</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                            <b>}</b>
+
+                            <font color='#009900'>// Pause for about a second.  Note that we use a wait_or_timeout() call rather 
+</font>                            <font color='#009900'>// than sleep() here because we want to wake up immediately if this object is 
+</font>                            <font color='#009900'>// being destructed rather than hang for a second.
+</font>                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>dequeue_timed_out<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>should_stop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                                    <font color='#0000FF'>break</font>;
+
+                                s.<font color='#BB00BB'>wait_or_timeout</font><font face='Lucida Console'>(</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                            <font color='#009900'>// Just send the keepalive byte periodically so we can
+</font>                            <font color='#009900'>// tell if the connection is alive. 
+</font>                            out.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>keepalive_code, <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>keepalive_code<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                            out.<font color='#BB00BB'>flush</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>
+                    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::bad_alloc<font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>std::bad_alloc thrown while serializing message to </font>" 
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_ip</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>:</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_port</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>dlib::serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dlib::serialization_error thrown while serializing message to </font>" 
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_ip</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>:</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_port</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.\nThe exception error message is: \n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>std::exception thrown while serializing message to </font>" 
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_ip</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>:</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_port</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.\nThe exception error message is: \n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+
+
+
+                    con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                    transmit_thread_active <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    s.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                transmit_thread_active <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                s.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            mutex m;
+            signaler s;
+            <font color='#0000FF'><u>bool</u></font> receive_thread_active;
+            <font color='#0000FF'><u>bool</u></font> transmit_thread_active;
+            scoped_ptr<font color='#5555FF'>&lt;</font>connection<font color='#5555FF'>&gt;</font> con;
+            scoped_ptr<font color='#5555FF'>&lt;</font>listener<font color='#5555FF'>&gt;</font> list;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port;
+            <font color='#0000FF'>const</font> std::string ip;
+            transmit_pipe_type<font color='#5555FF'>*</font> <font color='#0000FF'>const</font> transmit_pipe;
+            receive_pipe_type<font color='#5555FF'>*</font> <font color='#0000FF'>const</font> receive_pipe;
+            logger dlog;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> keepalive_code;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> message_code;
+
+            mutex current_bs_mutex;
+            bridge_status current_bs;
+        <b>}</b>;
+    <b>}</b>
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='bridge'></a>bridge</b> : noncopyable
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='bridge'></a>bridge</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U, <font color='#0000FF'>typename</font> V <font color='#5555FF'>&gt;</font>
+        <b><a name='bridge'></a>bridge</b> <font face='Lucida Console'>(</font>
+            T network_parameters,
+            U pipe1,
+            V pipe2 
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>reconfigure</font><font face='Lucida Console'>(</font>network_parameters,pipe1,pipe2<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <b><a name='bridge'></a>bridge</b> <font face='Lucida Console'>(</font>
+            T network_parameters,
+            U pipe 
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>reconfigure</font><font face='Lucida Console'>(</font>network_parameters,pipe<font face='Lucida Console'>)</font>; <b>}</b>
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            pimpl.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> R <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='reconfigure'></a>reconfigure</b> <font face='Lucida Console'>(</font>
+            listen_on_port network_parameters,
+            bridge_transmit_decoration<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> transmit_pipe,
+            bridge_receive_decoration<font color='#5555FF'>&lt;</font>R<font color='#5555FF'>&gt;</font> receive_pipe
+        <font face='Lucida Console'>)</font> <b>{</b> pimpl.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; pimpl.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> impl::impl_bridge<font color='#5555FF'>&lt;</font>T,R<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>network_parameters.port, <font color='#5555FF'>&amp;</font>transmit_pipe.p, <font color='#5555FF'>&amp;</font>receive_pipe.p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> R <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='reconfigure'></a>reconfigure</b> <font face='Lucida Console'>(</font>
+            listen_on_port network_parameters,
+            bridge_receive_decoration<font color='#5555FF'>&lt;</font>R<font color='#5555FF'>&gt;</font> receive_pipe,
+            bridge_transmit_decoration<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> transmit_pipe
+        <font face='Lucida Console'>)</font> <b>{</b> pimpl.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; pimpl.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> impl::impl_bridge<font color='#5555FF'>&lt;</font>T,R<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>network_parameters.port, <font color='#5555FF'>&amp;</font>transmit_pipe.p, <font color='#5555FF'>&amp;</font>receive_pipe.p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='reconfigure'></a>reconfigure</b> <font face='Lucida Console'>(</font>
+            listen_on_port network_parameters,
+            bridge_transmit_decoration<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> transmit_pipe
+        <font face='Lucida Console'>)</font> <b>{</b> pimpl.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; pimpl.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> impl::impl_bridge<font color='#5555FF'>&lt;</font>T,T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>network_parameters.port, <font color='#5555FF'>&amp;</font>transmit_pipe.p, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> R <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='reconfigure'></a>reconfigure</b> <font face='Lucida Console'>(</font>
+            listen_on_port network_parameters,
+            bridge_receive_decoration<font color='#5555FF'>&lt;</font>R<font color='#5555FF'>&gt;</font> receive_pipe
+        <font face='Lucida Console'>)</font> <b>{</b> pimpl.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; pimpl.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> impl::impl_bridge<font color='#5555FF'>&lt;</font>R,R<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>network_parameters.port, <font color='#979000'>0</font>, <font color='#5555FF'>&amp;</font>receive_pipe.p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> R <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='reconfigure'></a>reconfigure</b> <font face='Lucida Console'>(</font>
+            connect_to_ip_and_port network_parameters,
+            bridge_transmit_decoration<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> transmit_pipe,
+            bridge_receive_decoration<font color='#5555FF'>&lt;</font>R<font color='#5555FF'>&gt;</font> receive_pipe
+        <font face='Lucida Console'>)</font> <b>{</b> pimpl.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; pimpl.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> impl::impl_bridge<font color='#5555FF'>&lt;</font>T,R<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>network_parameters.ip, network_parameters.port, <font color='#5555FF'>&amp;</font>transmit_pipe.p, <font color='#5555FF'>&amp;</font>receive_pipe.p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> R <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='reconfigure'></a>reconfigure</b> <font face='Lucida Console'>(</font>
+            connect_to_ip_and_port network_parameters,
+            bridge_receive_decoration<font color='#5555FF'>&lt;</font>R<font color='#5555FF'>&gt;</font> receive_pipe,
+            bridge_transmit_decoration<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> transmit_pipe
+        <font face='Lucida Console'>)</font> <b>{</b> pimpl.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; pimpl.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> impl::impl_bridge<font color='#5555FF'>&lt;</font>T,R<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>network_parameters.ip, network_parameters.port, <font color='#5555FF'>&amp;</font>transmit_pipe.p, <font color='#5555FF'>&amp;</font>receive_pipe.p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> R <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='reconfigure'></a>reconfigure</b> <font face='Lucida Console'>(</font>
+            connect_to_ip_and_port network_parameters,
+            bridge_receive_decoration<font color='#5555FF'>&lt;</font>R<font color='#5555FF'>&gt;</font> receive_pipe
+        <font face='Lucida Console'>)</font> <b>{</b> pimpl.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; pimpl.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> impl::impl_bridge<font color='#5555FF'>&lt;</font>R,R<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>network_parameters.ip, network_parameters.port, <font color='#979000'>0</font>, <font color='#5555FF'>&amp;</font>receive_pipe.p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='reconfigure'></a>reconfigure</b> <font face='Lucida Console'>(</font>
+            connect_to_ip_and_port network_parameters,
+            bridge_transmit_decoration<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> transmit_pipe
+        <font face='Lucida Console'>)</font> <b>{</b> pimpl.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; pimpl.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> impl::impl_bridge<font color='#5555FF'>&lt;</font>T,T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>network_parameters.ip, network_parameters.port, <font color='#5555FF'>&amp;</font>transmit_pipe.p, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+
+        bridge_status <b><a name='get_bridge_status'></a>get_bridge_status</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pimpl<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> pimpl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_bridge_status</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>bridge_status</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        scoped_ptr<font color='#5555FF'>&lt;</font>impl::impl_bridge_base<font color='#5555FF'>&gt;</font> pimpl;
+    <b>}</b>;
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BRIDGe_Hh_
+</font>
+
+</pre></body></html>

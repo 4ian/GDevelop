@@ -1,0 +1,613 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jcparam.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jcparam.c
+ *
+ * Copyright (C) 1991-1998, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains optional default-setting code for the JPEG compressor.
+ * Applications do not have to use this file, but those that don't use it
+ * must know a lot more about the innards of the JPEG code.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+
+
+<font color='#009900'>/*
+ * Quantization table setup routines
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_add_quant_table'></a>jpeg_add_quant_table</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> which_tbl,
+		      <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font>basic_table,
+		      <font color='#0000FF'><u>int</u></font> scale_factor, <font color='#0000FF'><u>int</u></font> force_baseline<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Define a quantization table equal to the basic_table times
+ * a scale factor (given as a percentage).
+ * If force_baseline is TRUE, the computed quantization table entries
+ * are limited to 1..255 for JPEG baseline compatibility.
+ */</font>
+<b>{</b>
+  JQUANT_TBL <font color='#5555FF'>*</font><font color='#5555FF'>*</font> qtblptr;
+  <font color='#0000FF'><u>int</u></font> i;
+  <font color='#0000FF'><u>long</u></font> temp;
+
+  <font color='#009900'>/* Safety check to ensure start_compress not called yet. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> CSTATE_START<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>which_tbl <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> which_tbl <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> NUM_QUANT_TBLS<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_DQT_INDEX, which_tbl<font face='Lucida Console'>)</font>;
+
+  qtblptr <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quant_tbl_ptrs[which_tbl];
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>qtblptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+    <font color='#5555FF'>*</font>qtblptr <font color='#5555FF'>=</font> <font color='#BB00BB'>jpeg_alloc_quant_table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> DCTSIZE2; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    temp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> basic_table[i] <font color='#5555FF'>*</font> scale_factor <font color='#5555FF'>+</font> <font color='#979000'>50</font>L<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>100</font>L;
+    <font color='#009900'>/* limit the values to the valid range */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>L<font face='Lucida Console'>)</font> temp <font color='#5555FF'>=</font> <font color='#979000'>1</font>L;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&gt;</font> <font color='#979000'>32767</font>L<font face='Lucida Console'>)</font> temp <font color='#5555FF'>=</font> <font color='#979000'>32767</font>L; <font color='#009900'>/* max quantizer needed for 12 bits */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>force_baseline <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> temp <font color='#5555FF'>&gt;</font> <font color='#979000'>255</font>L<font face='Lucida Console'>)</font>
+      temp <font color='#5555FF'>=</font> <font color='#979000'>255</font>L;		<font color='#009900'>/* limit to baseline range if requested */</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>qtblptr<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantval[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font face='Lucida Console'>)</font> temp;
+  <b>}</b>
+
+  <font color='#009900'>/* Initialize sent_table FALSE so table will be written to JPEG file. */</font>
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>qtblptr<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sent_table <font color='#5555FF'>=</font> FALSE;
+<b>}</b>
+
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_set_linear_quality'></a>jpeg_set_linear_quality</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> scale_factor,
+			 <font color='#0000FF'><u>int</u></font> force_baseline<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Set or change the 'quality' (quantization) setting, using default tables
+ * and a straight percentage-scaling quality scale.  In most cases it's better
+ * to use jpeg_set_quality (below); this entry point is provided for
+ * applications that insist on a linear percentage scaling.
+ */</font>
+<b>{</b>
+  <font color='#009900'>/* These are the sample quantization tables given in JPEG spec section K.1.
+   * The spec says that the values given produce "good" quality, and
+   * when divided by 2, "very good" quality.
+   */</font>
+  <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> std_luminance_quant_tbl[DCTSIZE2] <font color='#5555FF'>=</font> <b>{</b>
+    <font color='#979000'>16</font>,  <font color='#979000'>11</font>,  <font color='#979000'>10</font>,  <font color='#979000'>16</font>,  <font color='#979000'>24</font>,  <font color='#979000'>40</font>,  <font color='#979000'>51</font>,  <font color='#979000'>61</font>,
+    <font color='#979000'>12</font>,  <font color='#979000'>12</font>,  <font color='#979000'>14</font>,  <font color='#979000'>19</font>,  <font color='#979000'>26</font>,  <font color='#979000'>58</font>,  <font color='#979000'>60</font>,  <font color='#979000'>55</font>,
+    <font color='#979000'>14</font>,  <font color='#979000'>13</font>,  <font color='#979000'>16</font>,  <font color='#979000'>24</font>,  <font color='#979000'>40</font>,  <font color='#979000'>57</font>,  <font color='#979000'>69</font>,  <font color='#979000'>56</font>,
+    <font color='#979000'>14</font>,  <font color='#979000'>17</font>,  <font color='#979000'>22</font>,  <font color='#979000'>29</font>,  <font color='#979000'>51</font>,  <font color='#979000'>87</font>,  <font color='#979000'>80</font>,  <font color='#979000'>62</font>,
+    <font color='#979000'>18</font>,  <font color='#979000'>22</font>,  <font color='#979000'>37</font>,  <font color='#979000'>56</font>,  <font color='#979000'>68</font>, <font color='#979000'>109</font>, <font color='#979000'>103</font>,  <font color='#979000'>77</font>,
+    <font color='#979000'>24</font>,  <font color='#979000'>35</font>,  <font color='#979000'>55</font>,  <font color='#979000'>64</font>,  <font color='#979000'>81</font>, <font color='#979000'>104</font>, <font color='#979000'>113</font>,  <font color='#979000'>92</font>,
+    <font color='#979000'>49</font>,  <font color='#979000'>64</font>,  <font color='#979000'>78</font>,  <font color='#979000'>87</font>, <font color='#979000'>103</font>, <font color='#979000'>121</font>, <font color='#979000'>120</font>, <font color='#979000'>101</font>,
+    <font color='#979000'>72</font>,  <font color='#979000'>92</font>,  <font color='#979000'>95</font>,  <font color='#979000'>98</font>, <font color='#979000'>112</font>, <font color='#979000'>100</font>, <font color='#979000'>103</font>,  <font color='#979000'>99</font>
+  <b>}</b>;
+  <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> std_chrominance_quant_tbl[DCTSIZE2] <font color='#5555FF'>=</font> <b>{</b>
+    <font color='#979000'>17</font>,  <font color='#979000'>18</font>,  <font color='#979000'>24</font>,  <font color='#979000'>47</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,
+    <font color='#979000'>18</font>,  <font color='#979000'>21</font>,  <font color='#979000'>26</font>,  <font color='#979000'>66</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,
+    <font color='#979000'>24</font>,  <font color='#979000'>26</font>,  <font color='#979000'>56</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,
+    <font color='#979000'>47</font>,  <font color='#979000'>66</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,
+    <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,
+    <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,
+    <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,
+    <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>,  <font color='#979000'>99</font>
+  <b>}</b>;
+
+  <font color='#009900'>/* Set up two quantization tables using the specified scaling */</font>
+  <font color='#BB00BB'>jpeg_add_quant_table</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>0</font>, std_luminance_quant_tbl,
+		       scale_factor, force_baseline<font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>jpeg_add_quant_table</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>1</font>, std_chrominance_quant_tbl,
+		       scale_factor, force_baseline<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_quality_scaling'></a>jpeg_quality_scaling</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> quality<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Convert a user-specified quality rating to a percentage scaling factor
+ * for an underlying quantization table, using our recommended scaling curve.
+ * The input 'quality' factor should be 0 (terrible) to 100 (very good).
+ */</font>
+<b>{</b>
+  <font color='#009900'>/* Safety limit on quality factor.  Convert 0 to 1 to avoid zero divide. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>quality <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> quality <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>quality <font color='#5555FF'>&gt;</font> <font color='#979000'>100</font><font face='Lucida Console'>)</font> quality <font color='#5555FF'>=</font> <font color='#979000'>100</font>;
+
+  <font color='#009900'>/* The basic table is used as-is (scaling 100) for a quality of 50.
+   * Qualities 50..100 are converted to scaling percentage 200 - 2*Q;
+   * note that at Q=100 the scaling is 0, which will cause jpeg_add_quant_table
+   * to make all the table entries 1 (hence, minimum quantization loss).
+   * Qualities 1..50 are converted to scaling percentage 5000/Q.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>quality <font color='#5555FF'>&lt;</font> <font color='#979000'>50</font><font face='Lucida Console'>)</font>
+    quality <font color='#5555FF'>=</font> <font color='#979000'>5000</font> <font color='#5555FF'>/</font> quality;
+  <font color='#0000FF'>else</font>
+    quality <font color='#5555FF'>=</font> <font color='#979000'>200</font> <font color='#5555FF'>-</font> quality<font color='#5555FF'>*</font><font color='#979000'>2</font>;
+
+  <font color='#0000FF'>return</font> quality;
+<b>}</b>
+
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_set_quality'></a>jpeg_set_quality</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> quality, <font color='#0000FF'><u>int</u></font> force_baseline<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Set or change the 'quality' (quantization) setting, using default tables.
+ * This is the standard quality-adjusting entry point for typical user
+ * interfaces; only those who want detailed control over quantization tables
+ * would use the preceding three routines directly.
+ */</font>
+<b>{</b>
+  <font color='#009900'>/* Convert user 0-100 rating to percentage scaling */</font>
+  quality <font color='#5555FF'>=</font> <font color='#BB00BB'>jpeg_quality_scaling</font><font face='Lucida Console'>(</font>quality<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Set up standard quality tables */</font>
+  <font color='#BB00BB'>jpeg_set_linear_quality</font><font face='Lucida Console'>(</font>cinfo, quality, force_baseline<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Huffman table setup routines
+ */</font>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='add_huff_table'></a>add_huff_table</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+		JHUFF_TBL <font color='#5555FF'>*</font><font color='#5555FF'>*</font>htblptr, <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>bits, <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>val<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Define a Huffman table */</font>
+<b>{</b>
+  <font color='#0000FF'><u>int</u></font> nsymbols, len;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>htblptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+    <font color='#5555FF'>*</font>htblptr <font color='#5555FF'>=</font> <font color='#BB00BB'>jpeg_alloc_huff_table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Copy the number-of-symbols-of-each-code-length counts */</font>
+  <font color='#BB00BB'>MEMCOPY</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>htblptr<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bits, bits, <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>htblptr<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bits<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Validate the counts.  We do this here mainly so we can copy the right
+   * number of symbols from the val[] array, without risking marching off
+   * the end of memory.  jchuff.c will do a more thorough test later.
+   */</font>
+  nsymbols <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>=</font> <font color='#979000'>1</font>; len <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>16</font>; len<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+    nsymbols <font color='#5555FF'>+</font><font color='#5555FF'>=</font> bits[len];
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nsymbols <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> nsymbols <font color='#5555FF'>&gt;</font> <font color='#979000'>256</font><font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_HUFF_TABLE<font face='Lucida Console'>)</font>;
+
+  <font color='#BB00BB'>MEMCOPY</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>htblptr<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>huffval, val, nsymbols <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Initialize sent_table FALSE so table will be written to JPEG file. */</font>
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>htblptr<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sent_table <font color='#5555FF'>=</font> FALSE;
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='std_huff_tables'></a>std_huff_tables</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Set up the standard Huffman tables (cf. JPEG standard section K.3) */</font>
+<font color='#009900'>/* IMPORTANT: these are only valid for 8-bit data precision! */</font>
+<b>{</b>
+  <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> bits_dc_luminance[<font color='#979000'>17</font>] <font color='#5555FF'>=</font>
+    <b>{</b> <font color='#009900'>/* 0-base */</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>5</font>, <font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font> <b>}</b>;
+  <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> val_dc_luminance[] <font color='#5555FF'>=</font>
+    <b>{</b> <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>2</font>, <font color='#979000'>3</font>, <font color='#979000'>4</font>, <font color='#979000'>5</font>, <font color='#979000'>6</font>, <font color='#979000'>7</font>, <font color='#979000'>8</font>, <font color='#979000'>9</font>, <font color='#979000'>10</font>, <font color='#979000'>11</font> <b>}</b>;
+  
+  <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> bits_dc_chrominance[<font color='#979000'>17</font>] <font color='#5555FF'>=</font>
+    <b>{</b> <font color='#009900'>/* 0-base */</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>3</font>, <font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font> <b>}</b>;
+  <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> val_dc_chrominance[] <font color='#5555FF'>=</font>
+    <b>{</b> <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>2</font>, <font color='#979000'>3</font>, <font color='#979000'>4</font>, <font color='#979000'>5</font>, <font color='#979000'>6</font>, <font color='#979000'>7</font>, <font color='#979000'>8</font>, <font color='#979000'>9</font>, <font color='#979000'>10</font>, <font color='#979000'>11</font> <b>}</b>;
+  
+  <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> bits_ac_luminance[<font color='#979000'>17</font>] <font color='#5555FF'>=</font>
+    <b>{</b> <font color='#009900'>/* 0-base */</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>2</font>, <font color='#979000'>1</font>, <font color='#979000'>3</font>, <font color='#979000'>3</font>, <font color='#979000'>2</font>, <font color='#979000'>4</font>, <font color='#979000'>3</font>, <font color='#979000'>5</font>, <font color='#979000'>5</font>, <font color='#979000'>4</font>, <font color='#979000'>4</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0x7d</font> <b>}</b>;
+  <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> val_ac_luminance[] <font color='#5555FF'>=</font>
+    <b>{</b> <font color='#979000'>0x01</font>, <font color='#979000'>0x02</font>, <font color='#979000'>0x03</font>, <font color='#979000'>0x00</font>, <font color='#979000'>0x04</font>, <font color='#979000'>0x11</font>, <font color='#979000'>0x05</font>, <font color='#979000'>0x12</font>,
+      <font color='#979000'>0x21</font>, <font color='#979000'>0x31</font>, <font color='#979000'>0x41</font>, <font color='#979000'>0x06</font>, <font color='#979000'>0x13</font>, <font color='#979000'>0x51</font>, <font color='#979000'>0x61</font>, <font color='#979000'>0x07</font>,
+      <font color='#979000'>0x22</font>, <font color='#979000'>0x71</font>, <font color='#979000'>0x14</font>, <font color='#979000'>0x32</font>, <font color='#979000'>0x81</font>, <font color='#979000'>0x91</font>, <font color='#979000'>0xa1</font>, <font color='#979000'>0x08</font>,
+      <font color='#979000'>0x23</font>, <font color='#979000'>0x42</font>, <font color='#979000'>0xb1</font>, <font color='#979000'>0xc1</font>, <font color='#979000'>0x15</font>, <font color='#979000'>0x52</font>, <font color='#979000'>0xd1</font>, <font color='#979000'>0xf0</font>,
+      <font color='#979000'>0x24</font>, <font color='#979000'>0x33</font>, <font color='#979000'>0x62</font>, <font color='#979000'>0x72</font>, <font color='#979000'>0x82</font>, <font color='#979000'>0x09</font>, <font color='#979000'>0x0a</font>, <font color='#979000'>0x16</font>,
+      <font color='#979000'>0x17</font>, <font color='#979000'>0x18</font>, <font color='#979000'>0x19</font>, <font color='#979000'>0x1a</font>, <font color='#979000'>0x25</font>, <font color='#979000'>0x26</font>, <font color='#979000'>0x27</font>, <font color='#979000'>0x28</font>,
+      <font color='#979000'>0x29</font>, <font color='#979000'>0x2a</font>, <font color='#979000'>0x34</font>, <font color='#979000'>0x35</font>, <font color='#979000'>0x36</font>, <font color='#979000'>0x37</font>, <font color='#979000'>0x38</font>, <font color='#979000'>0x39</font>,
+      <font color='#979000'>0x3a</font>, <font color='#979000'>0x43</font>, <font color='#979000'>0x44</font>, <font color='#979000'>0x45</font>, <font color='#979000'>0x46</font>, <font color='#979000'>0x47</font>, <font color='#979000'>0x48</font>, <font color='#979000'>0x49</font>,
+      <font color='#979000'>0x4a</font>, <font color='#979000'>0x53</font>, <font color='#979000'>0x54</font>, <font color='#979000'>0x55</font>, <font color='#979000'>0x56</font>, <font color='#979000'>0x57</font>, <font color='#979000'>0x58</font>, <font color='#979000'>0x59</font>,
+      <font color='#979000'>0x5a</font>, <font color='#979000'>0x63</font>, <font color='#979000'>0x64</font>, <font color='#979000'>0x65</font>, <font color='#979000'>0x66</font>, <font color='#979000'>0x67</font>, <font color='#979000'>0x68</font>, <font color='#979000'>0x69</font>,
+      <font color='#979000'>0x6a</font>, <font color='#979000'>0x73</font>, <font color='#979000'>0x74</font>, <font color='#979000'>0x75</font>, <font color='#979000'>0x76</font>, <font color='#979000'>0x77</font>, <font color='#979000'>0x78</font>, <font color='#979000'>0x79</font>,
+      <font color='#979000'>0x7a</font>, <font color='#979000'>0x83</font>, <font color='#979000'>0x84</font>, <font color='#979000'>0x85</font>, <font color='#979000'>0x86</font>, <font color='#979000'>0x87</font>, <font color='#979000'>0x88</font>, <font color='#979000'>0x89</font>,
+      <font color='#979000'>0x8a</font>, <font color='#979000'>0x92</font>, <font color='#979000'>0x93</font>, <font color='#979000'>0x94</font>, <font color='#979000'>0x95</font>, <font color='#979000'>0x96</font>, <font color='#979000'>0x97</font>, <font color='#979000'>0x98</font>,
+      <font color='#979000'>0x99</font>, <font color='#979000'>0x9a</font>, <font color='#979000'>0xa2</font>, <font color='#979000'>0xa3</font>, <font color='#979000'>0xa4</font>, <font color='#979000'>0xa5</font>, <font color='#979000'>0xa6</font>, <font color='#979000'>0xa7</font>,
+      <font color='#979000'>0xa8</font>, <font color='#979000'>0xa9</font>, <font color='#979000'>0xaa</font>, <font color='#979000'>0xb2</font>, <font color='#979000'>0xb3</font>, <font color='#979000'>0xb4</font>, <font color='#979000'>0xb5</font>, <font color='#979000'>0xb6</font>,
+      <font color='#979000'>0xb7</font>, <font color='#979000'>0xb8</font>, <font color='#979000'>0xb9</font>, <font color='#979000'>0xba</font>, <font color='#979000'>0xc2</font>, <font color='#979000'>0xc3</font>, <font color='#979000'>0xc4</font>, <font color='#979000'>0xc5</font>,
+      <font color='#979000'>0xc6</font>, <font color='#979000'>0xc7</font>, <font color='#979000'>0xc8</font>, <font color='#979000'>0xc9</font>, <font color='#979000'>0xca</font>, <font color='#979000'>0xd2</font>, <font color='#979000'>0xd3</font>, <font color='#979000'>0xd4</font>,
+      <font color='#979000'>0xd5</font>, <font color='#979000'>0xd6</font>, <font color='#979000'>0xd7</font>, <font color='#979000'>0xd8</font>, <font color='#979000'>0xd9</font>, <font color='#979000'>0xda</font>, <font color='#979000'>0xe1</font>, <font color='#979000'>0xe2</font>,
+      <font color='#979000'>0xe3</font>, <font color='#979000'>0xe4</font>, <font color='#979000'>0xe5</font>, <font color='#979000'>0xe6</font>, <font color='#979000'>0xe7</font>, <font color='#979000'>0xe8</font>, <font color='#979000'>0xe9</font>, <font color='#979000'>0xea</font>,
+      <font color='#979000'>0xf1</font>, <font color='#979000'>0xf2</font>, <font color='#979000'>0xf3</font>, <font color='#979000'>0xf4</font>, <font color='#979000'>0xf5</font>, <font color='#979000'>0xf6</font>, <font color='#979000'>0xf7</font>, <font color='#979000'>0xf8</font>,
+      <font color='#979000'>0xf9</font>, <font color='#979000'>0xfa</font> <b>}</b>;
+  
+  <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> bits_ac_chrominance[<font color='#979000'>17</font>] <font color='#5555FF'>=</font>
+    <b>{</b> <font color='#009900'>/* 0-base */</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>2</font>, <font color='#979000'>1</font>, <font color='#979000'>2</font>, <font color='#979000'>4</font>, <font color='#979000'>4</font>, <font color='#979000'>3</font>, <font color='#979000'>4</font>, <font color='#979000'>7</font>, <font color='#979000'>5</font>, <font color='#979000'>4</font>, <font color='#979000'>4</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>2</font>, <font color='#979000'>0x77</font> <b>}</b>;
+  <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> val_ac_chrominance[] <font color='#5555FF'>=</font>
+    <b>{</b> <font color='#979000'>0x00</font>, <font color='#979000'>0x01</font>, <font color='#979000'>0x02</font>, <font color='#979000'>0x03</font>, <font color='#979000'>0x11</font>, <font color='#979000'>0x04</font>, <font color='#979000'>0x05</font>, <font color='#979000'>0x21</font>,
+      <font color='#979000'>0x31</font>, <font color='#979000'>0x06</font>, <font color='#979000'>0x12</font>, <font color='#979000'>0x41</font>, <font color='#979000'>0x51</font>, <font color='#979000'>0x07</font>, <font color='#979000'>0x61</font>, <font color='#979000'>0x71</font>,
+      <font color='#979000'>0x13</font>, <font color='#979000'>0x22</font>, <font color='#979000'>0x32</font>, <font color='#979000'>0x81</font>, <font color='#979000'>0x08</font>, <font color='#979000'>0x14</font>, <font color='#979000'>0x42</font>, <font color='#979000'>0x91</font>,
+      <font color='#979000'>0xa1</font>, <font color='#979000'>0xb1</font>, <font color='#979000'>0xc1</font>, <font color='#979000'>0x09</font>, <font color='#979000'>0x23</font>, <font color='#979000'>0x33</font>, <font color='#979000'>0x52</font>, <font color='#979000'>0xf0</font>,
+      <font color='#979000'>0x15</font>, <font color='#979000'>0x62</font>, <font color='#979000'>0x72</font>, <font color='#979000'>0xd1</font>, <font color='#979000'>0x0a</font>, <font color='#979000'>0x16</font>, <font color='#979000'>0x24</font>, <font color='#979000'>0x34</font>,
+      <font color='#979000'>0xe1</font>, <font color='#979000'>0x25</font>, <font color='#979000'>0xf1</font>, <font color='#979000'>0x17</font>, <font color='#979000'>0x18</font>, <font color='#979000'>0x19</font>, <font color='#979000'>0x1a</font>, <font color='#979000'>0x26</font>,
+      <font color='#979000'>0x27</font>, <font color='#979000'>0x28</font>, <font color='#979000'>0x29</font>, <font color='#979000'>0x2a</font>, <font color='#979000'>0x35</font>, <font color='#979000'>0x36</font>, <font color='#979000'>0x37</font>, <font color='#979000'>0x38</font>,
+      <font color='#979000'>0x39</font>, <font color='#979000'>0x3a</font>, <font color='#979000'>0x43</font>, <font color='#979000'>0x44</font>, <font color='#979000'>0x45</font>, <font color='#979000'>0x46</font>, <font color='#979000'>0x47</font>, <font color='#979000'>0x48</font>,
+      <font color='#979000'>0x49</font>, <font color='#979000'>0x4a</font>, <font color='#979000'>0x53</font>, <font color='#979000'>0x54</font>, <font color='#979000'>0x55</font>, <font color='#979000'>0x56</font>, <font color='#979000'>0x57</font>, <font color='#979000'>0x58</font>,
+      <font color='#979000'>0x59</font>, <font color='#979000'>0x5a</font>, <font color='#979000'>0x63</font>, <font color='#979000'>0x64</font>, <font color='#979000'>0x65</font>, <font color='#979000'>0x66</font>, <font color='#979000'>0x67</font>, <font color='#979000'>0x68</font>,
+      <font color='#979000'>0x69</font>, <font color='#979000'>0x6a</font>, <font color='#979000'>0x73</font>, <font color='#979000'>0x74</font>, <font color='#979000'>0x75</font>, <font color='#979000'>0x76</font>, <font color='#979000'>0x77</font>, <font color='#979000'>0x78</font>,
+      <font color='#979000'>0x79</font>, <font color='#979000'>0x7a</font>, <font color='#979000'>0x82</font>, <font color='#979000'>0x83</font>, <font color='#979000'>0x84</font>, <font color='#979000'>0x85</font>, <font color='#979000'>0x86</font>, <font color='#979000'>0x87</font>,
+      <font color='#979000'>0x88</font>, <font color='#979000'>0x89</font>, <font color='#979000'>0x8a</font>, <font color='#979000'>0x92</font>, <font color='#979000'>0x93</font>, <font color='#979000'>0x94</font>, <font color='#979000'>0x95</font>, <font color='#979000'>0x96</font>,
+      <font color='#979000'>0x97</font>, <font color='#979000'>0x98</font>, <font color='#979000'>0x99</font>, <font color='#979000'>0x9a</font>, <font color='#979000'>0xa2</font>, <font color='#979000'>0xa3</font>, <font color='#979000'>0xa4</font>, <font color='#979000'>0xa5</font>,
+      <font color='#979000'>0xa6</font>, <font color='#979000'>0xa7</font>, <font color='#979000'>0xa8</font>, <font color='#979000'>0xa9</font>, <font color='#979000'>0xaa</font>, <font color='#979000'>0xb2</font>, <font color='#979000'>0xb3</font>, <font color='#979000'>0xb4</font>,
+      <font color='#979000'>0xb5</font>, <font color='#979000'>0xb6</font>, <font color='#979000'>0xb7</font>, <font color='#979000'>0xb8</font>, <font color='#979000'>0xb9</font>, <font color='#979000'>0xba</font>, <font color='#979000'>0xc2</font>, <font color='#979000'>0xc3</font>,
+      <font color='#979000'>0xc4</font>, <font color='#979000'>0xc5</font>, <font color='#979000'>0xc6</font>, <font color='#979000'>0xc7</font>, <font color='#979000'>0xc8</font>, <font color='#979000'>0xc9</font>, <font color='#979000'>0xca</font>, <font color='#979000'>0xd2</font>,
+      <font color='#979000'>0xd3</font>, <font color='#979000'>0xd4</font>, <font color='#979000'>0xd5</font>, <font color='#979000'>0xd6</font>, <font color='#979000'>0xd7</font>, <font color='#979000'>0xd8</font>, <font color='#979000'>0xd9</font>, <font color='#979000'>0xda</font>,
+      <font color='#979000'>0xe2</font>, <font color='#979000'>0xe3</font>, <font color='#979000'>0xe4</font>, <font color='#979000'>0xe5</font>, <font color='#979000'>0xe6</font>, <font color='#979000'>0xe7</font>, <font color='#979000'>0xe8</font>, <font color='#979000'>0xe9</font>,
+      <font color='#979000'>0xea</font>, <font color='#979000'>0xf2</font>, <font color='#979000'>0xf3</font>, <font color='#979000'>0xf4</font>, <font color='#979000'>0xf5</font>, <font color='#979000'>0xf6</font>, <font color='#979000'>0xf7</font>, <font color='#979000'>0xf8</font>,
+      <font color='#979000'>0xf9</font>, <font color='#979000'>0xfa</font> <b>}</b>;
+  
+  <font color='#BB00BB'>add_huff_table</font><font face='Lucida Console'>(</font>cinfo, <font color='#5555FF'>&amp;</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dc_huff_tbl_ptrs[<font color='#979000'>0</font>],
+		 bits_dc_luminance, val_dc_luminance<font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>add_huff_table</font><font face='Lucida Console'>(</font>cinfo, <font color='#5555FF'>&amp;</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ac_huff_tbl_ptrs[<font color='#979000'>0</font>],
+		 bits_ac_luminance, val_ac_luminance<font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>add_huff_table</font><font face='Lucida Console'>(</font>cinfo, <font color='#5555FF'>&amp;</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dc_huff_tbl_ptrs[<font color='#979000'>1</font>],
+		 bits_dc_chrominance, val_dc_chrominance<font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>add_huff_table</font><font face='Lucida Console'>(</font>cinfo, <font color='#5555FF'>&amp;</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ac_huff_tbl_ptrs[<font color='#979000'>1</font>],
+		 bits_ac_chrominance, val_ac_chrominance<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Default parameter setup for compression.
+ *
+ * Applications that don't choose to use this routine must do their
+ * own setup of all these parameters.  Alternately, you can call this
+ * to establish defaults and then alter parameters selectively.  This
+ * is the recommended approach since, if we add any new parameters,
+ * your code will still work (they'll be set to reasonable defaults).
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_set_defaults'></a>jpeg_set_defaults</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'><u>int</u></font> i;
+
+  <font color='#009900'>/* Safety check to ensure start_compress not called yet. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> CSTATE_START<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Allocate comp_info array large enough for maximum component count.
+   * Array is made permanent in case application wants to compress
+   * multiple images at same param settings.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>jpeg_component_info <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_PERMANENT,
+				  MAX_COMPONENTS <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>jpeg_component_info<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Initialize everything not dependent on the color space */</font>
+
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>data_precision <font color='#5555FF'>=</font> BITS_IN_JSAMPLE;
+  <font color='#009900'>/* Set up two quantization tables using default quality of 75 */</font>
+  <font color='#BB00BB'>jpeg_set_quality</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>75</font>, TRUE<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Set up two Huffman tables */</font>
+  <font color='#BB00BB'>std_huff_tables</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Initialize default arithmetic coding conditioning */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> NUM_ARITH_TBLS; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arith_dc_L[i] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arith_dc_U[i] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arith_ac_K[i] <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Default is no multiple-scan output */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>scan_info <font color='#5555FF'>=</font> NULL;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_scans <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+  <font color='#009900'>/* Expect normal source image, not raw downsampled data */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>raw_data_in <font color='#5555FF'>=</font> FALSE;
+
+  <font color='#009900'>/* Use Huffman coding, not arithmetic coding, by default */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arith_code <font color='#5555FF'>=</font> FALSE;
+
+  <font color='#009900'>/* By default, don't do extra passes to optimize entropy coding */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>optimize_coding <font color='#5555FF'>=</font> FALSE;
+  <font color='#009900'>/* The standard Huffman tables are only valid for 8-bit data precision.
+   * If the precision is higher, force optimization on so that usable
+   * tables will be computed.  This test can be removed if default tables
+   * are supplied that are valid for the desired precision.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>data_precision <font color='#5555FF'>&gt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>optimize_coding <font color='#5555FF'>=</font> TRUE;
+
+  <font color='#009900'>/* By default, use the simpler non-cosited sampling alignment */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>CCIR601_sampling <font color='#5555FF'>=</font> FALSE;
+
+  <font color='#009900'>/* No input smoothing */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>smoothing_factor <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+  <font color='#009900'>/* DCT algorithm preference */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dct_method <font color='#5555FF'>=</font> JDCT_DEFAULT;
+
+  <font color='#009900'>/* No restart markers */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restart_interval <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restart_in_rows <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+  <font color='#009900'>/* Fill in default JFIF marker parameters.  Note that whether the marker
+   * will actually be written is determined by jpeg_set_colorspace.
+   *
+   * By default, the library emits JFIF version code 1.01.
+   * An application that wants to emit JFIF 1.02 extension markers should set
+   * JFIF_minor_version to 2.  We could probably get away with just defaulting
+   * to 1.02, but there may still be some decoders in use that will complain
+   * about that; saying 1.01 should minimize compatibility problems.
+   */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>JFIF_major_version <font color='#5555FF'>=</font> <font color='#979000'>1</font>; <font color='#009900'>/* Default JFIF version = 1.01 */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>JFIF_minor_version <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>density_unit <font color='#5555FF'>=</font> <font color='#979000'>0</font>;	<font color='#009900'>/* Pixel size is unknown by default */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>X_density <font color='#5555FF'>=</font> <font color='#979000'>1</font>;		<font color='#009900'>/* Pixel aspect ratio is square by default */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Y_density <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+  <font color='#009900'>/* Choose JPEG colorspace based on input space, set defaults accordingly */</font>
+
+  <font color='#BB00BB'>jpeg_default_colorspace</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Select an appropriate JPEG colorspace for in_color_space.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_default_colorspace'></a>jpeg_default_colorspace</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>in_color_space<font face='Lucida Console'>)</font> <b>{</b>
+  <font color='#0000FF'>case</font> JCS_GRAYSCALE:
+    <font color='#BB00BB'>jpeg_set_colorspace</font><font face='Lucida Console'>(</font>cinfo, JCS_GRAYSCALE<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> JCS_RGB:
+    <font color='#BB00BB'>jpeg_set_colorspace</font><font face='Lucida Console'>(</font>cinfo, JCS_YCbCr<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> JCS_YCbCr:
+    <font color='#BB00BB'>jpeg_set_colorspace</font><font face='Lucida Console'>(</font>cinfo, JCS_YCbCr<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> JCS_CMYK:
+    <font color='#BB00BB'>jpeg_set_colorspace</font><font face='Lucida Console'>(</font>cinfo, JCS_CMYK<font face='Lucida Console'>)</font>; <font color='#009900'>/* By default, no translation */</font>
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> JCS_YCCK:
+    <font color='#BB00BB'>jpeg_set_colorspace</font><font face='Lucida Console'>(</font>cinfo, JCS_YCCK<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> JCS_UNKNOWN:
+    <font color='#BB00BB'>jpeg_set_colorspace</font><font face='Lucida Console'>(</font>cinfo, JCS_UNKNOWN<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>default</font>:
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_IN_COLORSPACE<font face='Lucida Console'>)</font>;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Set the JPEG colorspace, and choose colorspace-dependent default values.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_set_colorspace'></a>jpeg_set_colorspace</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, J_COLOR_SPACE colorspace<font face='Lucida Console'>)</font>
+<b>{</b>
+  jpeg_component_info <font color='#5555FF'>*</font> compptr;
+  <font color='#0000FF'><u>int</u></font> ci;
+
+<font color='#0000FF'>#define</font> SET_COMP<font face='Lucida Console'>(</font>index,id,hsamp,vsamp,quant,dctbl,actbl<font face='Lucida Console'>)</font>  \
+  <font face='Lucida Console'>(</font>compptr <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info[index], \
+   compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>component_id <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font>, \
+   compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>h_samp_factor <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>hsamp<font face='Lucida Console'>)</font>, \
+   compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>vsamp<font face='Lucida Console'>)</font>, \
+   compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quant_tbl_no <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>quant<font face='Lucida Console'>)</font>, \
+   compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dc_tbl_no <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>dctbl<font face='Lucida Console'>)</font>, \
+   compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ac_tbl_no <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>actbl<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+
+  <font color='#009900'>/* Safety check to ensure start_compress not called yet. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> CSTATE_START<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* For all colorspaces, we use Q and Huff tables 0 for luminance components,
+   * tables 1 for chrominance components.
+   */</font>
+
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_color_space <font color='#5555FF'>=</font> colorspace;
+
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_JFIF_header <font color='#5555FF'>=</font> FALSE; <font color='#009900'>/* No marker for non-JFIF colorspaces */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_Adobe_marker <font color='#5555FF'>=</font> FALSE; <font color='#009900'>/* write no Adobe marker by default */</font>
+
+  <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>colorspace<font face='Lucida Console'>)</font> <b>{</b>
+  <font color='#0000FF'>case</font> JCS_GRAYSCALE:
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_JFIF_header <font color='#5555FF'>=</font> TRUE; <font color='#009900'>/* Write a JFIF marker */</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <font color='#009900'>/* JFIF specifies component ID 1 */</font>
+    <font color='#BB00BB'>SET_COMP</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>1</font>,<font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> JCS_RGB:
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_Adobe_marker <font color='#5555FF'>=</font> TRUE; <font color='#009900'>/* write Adobe marker to flag RGB */</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+    <font color='#BB00BB'>SET_COMP</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, <font color='#979000'>0x52</font> <font color='#009900'>/* 'R' */</font>, <font color='#979000'>1</font>,<font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>SET_COMP</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, <font color='#979000'>0x47</font> <font color='#009900'>/* 'G' */</font>, <font color='#979000'>1</font>,<font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>SET_COMP</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>, <font color='#979000'>0x42</font> <font color='#009900'>/* 'B' */</font>, <font color='#979000'>1</font>,<font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> JCS_YCbCr:
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_JFIF_header <font color='#5555FF'>=</font> TRUE; <font color='#009900'>/* Write a JFIF marker */</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+    <font color='#009900'>/* JFIF specifies component IDs 1,2,3 */</font>
+    <font color='#009900'>/* We default to 2x2 subsamples of chrominance */</font>
+    <font color='#BB00BB'>SET_COMP</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>2</font>,<font color='#979000'>2</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>SET_COMP</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, <font color='#979000'>2</font>, <font color='#979000'>1</font>,<font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>SET_COMP</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>, <font color='#979000'>3</font>, <font color='#979000'>1</font>,<font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> JCS_CMYK:
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_Adobe_marker <font color='#5555FF'>=</font> TRUE; <font color='#009900'>/* write Adobe marker to flag CMYK */</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+    <font color='#BB00BB'>SET_COMP</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, <font color='#979000'>0x43</font> <font color='#009900'>/* 'C' */</font>, <font color='#979000'>1</font>,<font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>SET_COMP</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, <font color='#979000'>0x4D</font> <font color='#009900'>/* 'M' */</font>, <font color='#979000'>1</font>,<font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>SET_COMP</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>, <font color='#979000'>0x59</font> <font color='#009900'>/* 'Y' */</font>, <font color='#979000'>1</font>,<font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>SET_COMP</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>, <font color='#979000'>0x4B</font> <font color='#009900'>/* 'K' */</font>, <font color='#979000'>1</font>,<font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> JCS_YCCK:
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_Adobe_marker <font color='#5555FF'>=</font> TRUE; <font color='#009900'>/* write Adobe marker to flag YCCK */</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+    <font color='#BB00BB'>SET_COMP</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>2</font>,<font color='#979000'>2</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>SET_COMP</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, <font color='#979000'>2</font>, <font color='#979000'>1</font>,<font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>SET_COMP</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>, <font color='#979000'>3</font>, <font color='#979000'>1</font>,<font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>SET_COMP</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>, <font color='#979000'>4</font>, <font color='#979000'>2</font>,<font color='#979000'>2</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> JCS_UNKNOWN:
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>input_components;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components <font color='#5555FF'>&gt;</font> MAX_COMPONENTS<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>ERREXIT2</font><font face='Lucida Console'>(</font>cinfo, JERR_COMPONENT_COUNT, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components,
+	       MAX_COMPONENTS<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components; ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#BB00BB'>SET_COMP</font><font face='Lucida Console'>(</font>ci, ci, <font color='#979000'>1</font>,<font color='#979000'>1</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>default</font>:
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_J_COLORSPACE<font face='Lucida Console'>)</font>;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#0000FF'>#ifdef</font> C_PROGRESSIVE_SUPPORTED
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font>jpeg_scan_info <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+<b><a name='fill_a_scan'></a>fill_a_scan</b> <font face='Lucida Console'>(</font>jpeg_scan_info <font color='#5555FF'>*</font> scanptr, <font color='#0000FF'><u>int</u></font> ci,
+	     <font color='#0000FF'><u>int</u></font> Ss, <font color='#0000FF'><u>int</u></font> Se, <font color='#0000FF'><u>int</u></font> Ah, <font color='#0000FF'><u>int</u></font> Al<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Support routine: generate one scan for specified component */</font>
+<b>{</b>
+  scanptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comps_in_scan <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+  scanptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>component_index[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> ci;
+  scanptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ss <font color='#5555FF'>=</font> Ss;
+  scanptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Se <font color='#5555FF'>=</font> Se;
+  scanptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ah <font color='#5555FF'>=</font> Ah;
+  scanptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Al <font color='#5555FF'>=</font> Al;
+  scanptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+  <font color='#0000FF'>return</font> scanptr;
+<b>}</b>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font>jpeg_scan_info <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+<b><a name='fill_scans'></a>fill_scans</b> <font face='Lucida Console'>(</font>jpeg_scan_info <font color='#5555FF'>*</font> scanptr, <font color='#0000FF'><u>int</u></font> ncomps,
+	    <font color='#0000FF'><u>int</u></font> Ss, <font color='#0000FF'><u>int</u></font> Se, <font color='#0000FF'><u>int</u></font> Ah, <font color='#0000FF'><u>int</u></font> Al<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Support routine: generate one scan for each component */</font>
+<b>{</b>
+  <font color='#0000FF'><u>int</u></font> ci;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ci <font color='#5555FF'>&lt;</font> ncomps; ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    scanptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comps_in_scan <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    scanptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>component_index[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> ci;
+    scanptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ss <font color='#5555FF'>=</font> Ss;
+    scanptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Se <font color='#5555FF'>=</font> Se;
+    scanptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ah <font color='#5555FF'>=</font> Ah;
+    scanptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Al <font color='#5555FF'>=</font> Al;
+    scanptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+  <b>}</b>
+  <font color='#0000FF'>return</font> scanptr;
+<b>}</b>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font>jpeg_scan_info <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+<b><a name='fill_dc_scans'></a>fill_dc_scans</b> <font face='Lucida Console'>(</font>jpeg_scan_info <font color='#5555FF'>*</font> scanptr, <font color='#0000FF'><u>int</u></font> ncomps, <font color='#0000FF'><u>int</u></font> Ah, <font color='#0000FF'><u>int</u></font> Al<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Support routine: generate interleaved DC scan if possible, else N scans */</font>
+<b>{</b>
+  <font color='#0000FF'><u>int</u></font> ci;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ncomps <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> MAX_COMPS_IN_SCAN<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Single interleaved DC scan */</font>
+    scanptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comps_in_scan <font color='#5555FF'>=</font> ncomps;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ci <font color='#5555FF'>&lt;</font> ncomps; ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+      scanptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>component_index[ci] <font color='#5555FF'>=</font> ci;
+    scanptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ss <font color='#5555FF'>=</font> scanptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Se <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    scanptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ah <font color='#5555FF'>=</font> Ah;
+    scanptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Al <font color='#5555FF'>=</font> Al;
+    scanptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    <font color='#009900'>/* Noninterleaved DC scan for each component */</font>
+    scanptr <font color='#5555FF'>=</font> <font color='#BB00BB'>fill_scans</font><font face='Lucida Console'>(</font>scanptr, ncomps, <font color='#979000'>0</font>, <font color='#979000'>0</font>, Ah, Al<font face='Lucida Console'>)</font>;
+  <b>}</b>
+  <font color='#0000FF'>return</font> scanptr;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Create a recommended progressive-JPEG script.
+ * cinfo-&gt;num_components and cinfo-&gt;jpeg_color_space must be correct.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_simple_progression'></a>jpeg_simple_progression</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'><u>int</u></font> ncomps <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+  <font color='#0000FF'><u>int</u></font> nscans;
+  jpeg_scan_info <font color='#5555FF'>*</font> scanptr;
+
+  <font color='#009900'>/* Safety check to ensure start_compress not called yet. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> CSTATE_START<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Figure space needed for script.  Calculation must match code below! */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ncomps <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_color_space <font color='#5555FF'>=</font><font color='#5555FF'>=</font> JCS_YCbCr<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Custom script for YCbCr color images. */</font>
+    nscans <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    <font color='#009900'>/* All-purpose script for other color spaces. */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ncomps <font color='#5555FF'>&gt;</font> MAX_COMPS_IN_SCAN<font face='Lucida Console'>)</font>
+      nscans <font color='#5555FF'>=</font> <font color='#979000'>6</font> <font color='#5555FF'>*</font> ncomps;	<font color='#009900'>/* 2 DC + 4 AC scans per component */</font>
+    <font color='#0000FF'>else</font>
+      nscans <font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>*</font> ncomps;	<font color='#009900'>/* 2 DC scans; 4 AC scans per component */</font>
+  <b>}</b>
+
+  <font color='#009900'>/* Allocate space for script.
+   * We need to put it in the permanent pool in case the application performs
+   * multiple compressions without changing the settings.  To avoid a memory
+   * leak if jpeg_simple_progression is called repeatedly for the same JPEG
+   * object, we try to re-use previously allocated space, and we allocate
+   * enough space to handle YCbCr even if initially asked for grayscale.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>script_space <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL <font color='#5555FF'>|</font><font color='#5555FF'>|</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>script_space_size <font color='#5555FF'>&lt;</font> nscans<font face='Lucida Console'>)</font> <b>{</b>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>script_space_size <font color='#5555FF'>=</font> <font color='#BB00BB'>MAX</font><font face='Lucida Console'>(</font>nscans, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>script_space <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>jpeg_scan_info <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_PERMANENT,
+			cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>script_space_size <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>jpeg_scan_info<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b>}</b>
+  scanptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>script_space;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>scan_info <font color='#5555FF'>=</font> scanptr;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_scans <font color='#5555FF'>=</font> nscans;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ncomps <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_color_space <font color='#5555FF'>=</font><font color='#5555FF'>=</font> JCS_YCbCr<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Custom script for YCbCr color images. */</font>
+    <font color='#009900'>/* Initial DC scan */</font>
+    scanptr <font color='#5555FF'>=</font> <font color='#BB00BB'>fill_dc_scans</font><font face='Lucida Console'>(</font>scanptr, ncomps, <font color='#979000'>0</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Initial AC scan: get some luma data out in a hurry */</font>
+    scanptr <font color='#5555FF'>=</font> <font color='#BB00BB'>fill_a_scan</font><font face='Lucida Console'>(</font>scanptr, <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>5</font>, <font color='#979000'>0</font>, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Chroma data is too small to be worth expending many scans on */</font>
+    scanptr <font color='#5555FF'>=</font> <font color='#BB00BB'>fill_a_scan</font><font face='Lucida Console'>(</font>scanptr, <font color='#979000'>2</font>, <font color='#979000'>1</font>, <font color='#979000'>63</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    scanptr <font color='#5555FF'>=</font> <font color='#BB00BB'>fill_a_scan</font><font face='Lucida Console'>(</font>scanptr, <font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>63</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Complete spectral selection for luma AC */</font>
+    scanptr <font color='#5555FF'>=</font> <font color='#BB00BB'>fill_a_scan</font><font face='Lucida Console'>(</font>scanptr, <font color='#979000'>0</font>, <font color='#979000'>6</font>, <font color='#979000'>63</font>, <font color='#979000'>0</font>, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Refine next bit of luma AC */</font>
+    scanptr <font color='#5555FF'>=</font> <font color='#BB00BB'>fill_a_scan</font><font face='Lucida Console'>(</font>scanptr, <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>63</font>, <font color='#979000'>2</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Finish DC successive approximation */</font>
+    scanptr <font color='#5555FF'>=</font> <font color='#BB00BB'>fill_dc_scans</font><font face='Lucida Console'>(</font>scanptr, ncomps, <font color='#979000'>1</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Finish AC successive approximation */</font>
+    scanptr <font color='#5555FF'>=</font> <font color='#BB00BB'>fill_a_scan</font><font face='Lucida Console'>(</font>scanptr, <font color='#979000'>2</font>, <font color='#979000'>1</font>, <font color='#979000'>63</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    scanptr <font color='#5555FF'>=</font> <font color='#BB00BB'>fill_a_scan</font><font face='Lucida Console'>(</font>scanptr, <font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>63</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Luma bottom bit comes last since it's usually largest scan */</font>
+    scanptr <font color='#5555FF'>=</font> <font color='#BB00BB'>fill_a_scan</font><font face='Lucida Console'>(</font>scanptr, <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>63</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    <font color='#009900'>/* All-purpose script for other color spaces. */</font>
+    <font color='#009900'>/* Successive approximation first pass */</font>
+    scanptr <font color='#5555FF'>=</font> <font color='#BB00BB'>fill_dc_scans</font><font face='Lucida Console'>(</font>scanptr, ncomps, <font color='#979000'>0</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    scanptr <font color='#5555FF'>=</font> <font color='#BB00BB'>fill_scans</font><font face='Lucida Console'>(</font>scanptr, ncomps, <font color='#979000'>1</font>, <font color='#979000'>5</font>, <font color='#979000'>0</font>, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    scanptr <font color='#5555FF'>=</font> <font color='#BB00BB'>fill_scans</font><font face='Lucida Console'>(</font>scanptr, ncomps, <font color='#979000'>6</font>, <font color='#979000'>63</font>, <font color='#979000'>0</font>, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Successive approximation second pass */</font>
+    scanptr <font color='#5555FF'>=</font> <font color='#BB00BB'>fill_scans</font><font face='Lucida Console'>(</font>scanptr, ncomps, <font color='#979000'>1</font>, <font color='#979000'>63</font>, <font color='#979000'>2</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Successive approximation final pass */</font>
+    scanptr <font color='#5555FF'>=</font> <font color='#BB00BB'>fill_dc_scans</font><font face='Lucida Console'>(</font>scanptr, ncomps, <font color='#979000'>1</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    scanptr <font color='#5555FF'>=</font> <font color='#BB00BB'>fill_scans</font><font face='Lucida Console'>(</font>scanptr, ncomps, <font color='#979000'>1</font>, <font color='#979000'>63</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+  <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* C_PROGRESSIVE_SUPPORTED */</font>
+
+</pre></body></html>

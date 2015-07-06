@@ -222,8 +222,9 @@ void SpriteObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
     {
         for ( unsigned int k = 0;k < GetAnimation( j ).GetDirectionsCount();k++ )
         {
-            for ( unsigned int l = 0;l < GetAnimation( j ).GetDirection(k).GetSpritesCount();l++ )
+            for ( unsigned int l = 0;l < GetAnimation( j ).GetDirection(k).GetSpritesCount();l++ ) {
                 worker.ExposeImage(GetAnimation( j ).GetDirection(k).GetSprite(l).GetImageName());
+            }
         }
     }
 }

@@ -1,0 +1,608 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - parallel_for_extension.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_PARALLEL_FoR_Hh_
+<font color='#0000FF'>#define</font> DLIB_PARALLEL_FoR_Hh_ 
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='parallel_for_extension_abstract.h.html'>parallel_for_extension_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='thread_pool_extension.h.html'>thread_pool_extension.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../console_progress_indicator.h.html'>../console_progress_indicator.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='helper_parallel_for'></a>helper_parallel_for</b>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='helper_parallel_for'></a>helper_parallel_for</b> <font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>&amp;</font> obj_,
+                <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct_<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font> : 
+                obj<font face='Lucida Console'>(</font>obj_<font face='Lucida Console'>)</font>,
+                funct<font face='Lucida Console'>(</font>funct_<font face='Lucida Console'>)</font>
+            <b>{</b><b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> obj;
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='process_block'></a>process_block</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> begin, <font color='#0000FF'><u>long</u></font> end<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> begin; i <font color='#5555FF'>&lt;</font> end; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <font face='Lucida Console'>(</font>obj.<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='helper_parallel_for_funct'></a>helper_parallel_for_funct</b>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='helper_parallel_for_funct'></a>helper_parallel_for_funct</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct_
+            <font face='Lucida Console'>)</font> : funct<font face='Lucida Console'>(</font>funct_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='run'></a>run</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>funct</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='helper_parallel_for_funct2'></a>helper_parallel_for_funct2</b>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='helper_parallel_for_funct2'></a>helper_parallel_for_funct2</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct_
+            <font face='Lucida Console'>)</font> : funct<font face='Lucida Console'>(</font>funct_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='run'></a>run</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> begin, <font color='#0000FF'><u>long</u></font> end<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>funct</font><font face='Lucida Console'>(</font>begin, end<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_blocked'></a>parallel_for_blocked</b> <font face='Lucida Console'>(</font>
+        thread_pool<font color='#5555FF'>&amp;</font> tp,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        T<font color='#5555FF'>&amp;</font> obj,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>begin <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> chunks_per_thread <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void parallel_for_blocked()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t begin: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> begin 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t end:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> end
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t chunks_per_thread: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> chunks_per_thread
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tp.<font color='#BB00BB'>num_threads_in_pool</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> end<font color='#5555FF'>-</font>begin;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_workers <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>tp.<font color='#BB00BB'>num_threads_in_pool</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// How many samples to process in a single task (aim for chunks_per_thread jobs per worker)
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> block_size <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>L, num<font color='#5555FF'>/</font><font face='Lucida Console'>(</font>num_workers<font color='#5555FF'>*</font>chunks_per_thread<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num; i<font color='#5555FF'>+</font><font color='#5555FF'>=</font>block_size<font face='Lucida Console'>)</font>
+            <b>{</b>
+                tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>obj, funct, begin<font color='#5555FF'>+</font>i, begin<font color='#5555FF'>+</font>std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font>block_size, num<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            tp.<font color='#BB00BB'>wait_for_all_tasks</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// Since there aren't any threads in the pool we might as well just invoke
+</font>            <font color='#009900'>// the function directly since that's all the thread_pool object would do.
+</font>            <font color='#009900'>// But doing it ourselves skips a mutex lock.
+</font>            <font face='Lucida Console'>(</font>obj.<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>begin, end<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_blocked'></a>parallel_for_blocked</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        T<font color='#5555FF'>&amp;</font> obj,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>begin <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> chunks_per_thread <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void parallel_for_blocked()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t begin: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> begin 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t end:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> end
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t chunks_per_thread: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> chunks_per_thread
+            <font face='Lucida Console'>)</font>;
+
+        thread_pool <font color='#BB00BB'>tp</font><font face='Lucida Console'>(</font>num_threads<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>parallel_for_blocked</font><font face='Lucida Console'>(</font>tp, begin, end, obj, funct, chunks_per_thread<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_blocked'></a>parallel_for_blocked</b> <font face='Lucida Console'>(</font>
+        thread_pool<font color='#5555FF'>&amp;</font> tp,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>begin <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> chunks_per_thread <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void parallel_for_blocked()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t begin: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> begin 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t end:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> end
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t chunks_per_thread: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> chunks_per_thread
+            <font face='Lucida Console'>)</font>;
+
+        impl::helper_parallel_for_funct2<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>helper</font><font face='Lucida Console'>(</font>funct<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>parallel_for_blocked</font><font face='Lucida Console'>(</font>tp, begin, end,  helper, <font color='#5555FF'>&amp;</font>impl::helper_parallel_for_funct2<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::run,  chunks_per_thread<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_blocked'></a>parallel_for_blocked</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>begin <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> chunks_per_thread <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void parallel_for_blocked()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t begin: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> begin 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t end:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> end
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t chunks_per_thread: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> chunks_per_thread
+            <font face='Lucida Console'>)</font>;
+
+        thread_pool <font color='#BB00BB'>tp</font><font face='Lucida Console'>(</font>num_threads<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>parallel_for_blocked</font><font face='Lucida Console'>(</font>tp, begin, end, funct, chunks_per_thread<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for'></a>parallel_for</b> <font face='Lucida Console'>(</font>
+        thread_pool<font color='#5555FF'>&amp;</font> tp,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        T<font color='#5555FF'>&amp;</font> obj,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>begin <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> chunks_per_thread <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void parallel_for()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t begin: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> begin 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t end:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> end
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t chunks_per_thread: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> chunks_per_thread
+            <font face='Lucida Console'>)</font>;
+
+        impl::helper_parallel_for<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>helper</font><font face='Lucida Console'>(</font>obj, funct<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>parallel_for_blocked</font><font face='Lucida Console'>(</font>tp, begin, end, helper, <font color='#5555FF'>&amp;</font>impl::helper_parallel_for<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::process_block, chunks_per_thread<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for'></a>parallel_for</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        T<font color='#5555FF'>&amp;</font> obj,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>begin <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> chunks_per_thread <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void parallel_for()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t begin: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> begin 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t end:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> end
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t chunks_per_thread: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> chunks_per_thread
+            <font face='Lucida Console'>)</font>;
+
+        thread_pool <font color='#BB00BB'>tp</font><font face='Lucida Console'>(</font>num_threads<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font>tp, begin, end, obj, funct, chunks_per_thread<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for'></a>parallel_for</b> <font face='Lucida Console'>(</font>
+        thread_pool<font color='#5555FF'>&amp;</font> tp,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>begin <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> chunks_per_thread <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void parallel_for()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t begin: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> begin 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t end:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> end
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t chunks_per_thread: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> chunks_per_thread
+            <font face='Lucida Console'>)</font>;
+
+        impl::helper_parallel_for_funct<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>helper</font><font face='Lucida Console'>(</font>funct<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font>tp, begin, end,  helper, <font color='#5555FF'>&amp;</font>impl::helper_parallel_for_funct<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::run,  chunks_per_thread<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for'></a>parallel_for</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>begin <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> chunks_per_thread <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void parallel_for()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t begin: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> begin 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t end:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> end
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t chunks_per_thread: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> chunks_per_thread
+            <font face='Lucida Console'>)</font>;
+
+        thread_pool <font color='#BB00BB'>tp</font><font face='Lucida Console'>(</font>num_threads<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font>tp, begin, end, funct, chunks_per_thread<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='parfor_verbose_helper'></a>parfor_verbose_helper</b>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='parfor_verbose_helper'></a>parfor_verbose_helper</b><font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font> obj_, <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct_<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>, <font color='#0000FF'><u>long</u></font> begin, <font color='#0000FF'><u>long</u></font> end<font face='Lucida Console'>)</font> :
+                obj<font face='Lucida Console'>(</font>obj_<font face='Lucida Console'>)</font>, funct<font face='Lucida Console'>(</font>funct_<font face='Lucida Console'>)</font>, pbar<font face='Lucida Console'>(</font>end<font color='#5555FF'>-</font>begin<font face='Lucida Console'>)</font>
+            <b>{</b>
+                count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                wrote_to_screen <font color='#5555FF'>=</font> pbar.<font color='#BB00BB'>print_status</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            ~<b><a name='parfor_verbose_helper'></a>parfor_verbose_helper</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>wrote_to_screen<font face='Lucida Console'>)</font>
+                    std::cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+            <b>}</b>
+
+            <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>long</u></font> count;
+            T<font color='#5555FF'>&amp;</font> obj;
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>mutable</font> console_progress_indicator pbar;
+            <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>bool</u></font> wrote_to_screen;
+            mutex m;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font face='Lucida Console'>(</font>obj.<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                <b>{</b>
+                    auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                    wrote_to_screen <font color='#5555FF'>=</font> pbar.<font color='#BB00BB'>print_status</font><font face='Lucida Console'>(</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font>count<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> wrote_to_screen;
+                <b>}</b>
+            <b>}</b>
+
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='parfor_verbose_helper3'></a>parfor_verbose_helper3</b>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='parfor_verbose_helper3'></a>parfor_verbose_helper3</b><font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font> obj_, <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct_<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>, <font color='#0000FF'><u>long</u></font> begin, <font color='#0000FF'><u>long</u></font> end<font face='Lucida Console'>)</font> :
+                obj<font face='Lucida Console'>(</font>obj_<font face='Lucida Console'>)</font>, funct<font face='Lucida Console'>(</font>funct_<font face='Lucida Console'>)</font>, pbar<font face='Lucida Console'>(</font>end<font color='#5555FF'>-</font>begin<font face='Lucida Console'>)</font>
+            <b>{</b>
+                count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                wrote_to_screen <font color='#5555FF'>=</font> pbar.<font color='#BB00BB'>print_status</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            ~<b><a name='parfor_verbose_helper3'></a>parfor_verbose_helper3</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>wrote_to_screen<font face='Lucida Console'>)</font>
+                    std::cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+            <b>}</b>
+
+            <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>long</u></font> count;
+            T<font color='#5555FF'>&amp;</font> obj;
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>mutable</font> console_progress_indicator pbar;
+            <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>bool</u></font> wrote_to_screen;
+            mutex m;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> begin, <font color='#0000FF'><u>long</u></font> end<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font face='Lucida Console'>(</font>obj.<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>begin, end<font face='Lucida Console'>)</font>;
+                <b>{</b>
+                    auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                    count <font color='#5555FF'>+</font><font color='#5555FF'>=</font> end<font color='#5555FF'>-</font>begin;
+                    wrote_to_screen <font color='#5555FF'>=</font> pbar.<font color='#BB00BB'>print_status</font><font face='Lucida Console'>(</font>count<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> wrote_to_screen;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='parfor_verbose_helper2'></a>parfor_verbose_helper2</b>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='parfor_verbose_helper2'></a>parfor_verbose_helper2</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> obj_, <font color='#0000FF'><u>long</u></font> begin, <font color='#0000FF'><u>long</u></font> end<font face='Lucida Console'>)</font> : obj<font face='Lucida Console'>(</font>obj_<font face='Lucida Console'>)</font>, pbar<font face='Lucida Console'>(</font>end<font color='#5555FF'>-</font>begin<font face='Lucida Console'>)</font>
+            <b>{</b>
+                count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                wrote_to_screen <font color='#5555FF'>=</font> pbar.<font color='#BB00BB'>print_status</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            ~<b><a name='parfor_verbose_helper2'></a>parfor_verbose_helper2</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>wrote_to_screen<font face='Lucida Console'>)</font>
+                    std::cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+            <b>}</b>
+
+            <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>long</u></font> count;
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> obj;
+            <font color='#0000FF'>mutable</font> console_progress_indicator pbar;
+            <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>bool</u></font> wrote_to_screen;
+            mutex m;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#BB00BB'>obj</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                <b>{</b>
+                    auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                    wrote_to_screen <font color='#5555FF'>=</font> pbar.<font color='#BB00BB'>print_status</font><font face='Lucida Console'>(</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font>count<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> wrote_to_screen;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> begin, <font color='#0000FF'><u>long</u></font> end<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#BB00BB'>obj</font><font face='Lucida Console'>(</font>begin, end<font face='Lucida Console'>)</font>;
+                <b>{</b>
+                    auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                    count <font color='#5555FF'>+</font><font color='#5555FF'>=</font> end<font color='#5555FF'>-</font>begin;
+                    wrote_to_screen <font color='#5555FF'>=</font> pbar.<font color='#BB00BB'>print_status</font><font face='Lucida Console'>(</font>count<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> wrote_to_screen;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_verbose'></a>parallel_for_verbose</b> <font face='Lucida Console'>(</font>
+        thread_pool<font color='#5555FF'>&amp;</font> tp,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        T<font color='#5555FF'>&amp;</font> obj,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>begin <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> chunks_per_thread <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void parallel_for_verbose()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t begin: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> begin 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t end:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> end
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t chunks_per_thread: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> chunks_per_thread
+            <font face='Lucida Console'>)</font>;
+
+        impl::parfor_verbose_helper<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>helper</font><font face='Lucida Console'>(</font>obj, funct, begin, end<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font>tp, begin, end, helper, chunks_per_thread<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_verbose'></a>parallel_for_verbose</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        T<font color='#5555FF'>&amp;</font> obj,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>begin <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> chunks_per_thread <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void parallel_for_verbose()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t begin: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> begin 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t end:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> end
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t chunks_per_thread: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> chunks_per_thread
+            <font face='Lucida Console'>)</font>;
+
+        impl::parfor_verbose_helper<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>helper</font><font face='Lucida Console'>(</font>obj, funct, begin, end<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font>num_threads, begin, end, helper, chunks_per_thread<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_verbose'></a>parallel_for_verbose</b> <font face='Lucida Console'>(</font>
+        thread_pool<font color='#5555FF'>&amp;</font> tp,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>begin <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> chunks_per_thread <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void parallel_for_verbose()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t begin: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> begin 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t end:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> end
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t chunks_per_thread: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> chunks_per_thread
+            <font face='Lucida Console'>)</font>;
+
+        impl::parfor_verbose_helper2<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>helper</font><font face='Lucida Console'>(</font>funct, begin, end<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font>tp, begin, end,  helper, chunks_per_thread<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_verbose'></a>parallel_for_verbose</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>begin <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> chunks_per_thread <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void parallel_for_verbose()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t begin: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> begin 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t end:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> end
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t chunks_per_thread: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> chunks_per_thread
+            <font face='Lucida Console'>)</font>;
+
+        impl::parfor_verbose_helper2<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>helper</font><font face='Lucida Console'>(</font>funct, begin, end<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font>num_threads, begin, end, helper, chunks_per_thread<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_blocked_verbose'></a>parallel_for_blocked_verbose</b> <font face='Lucida Console'>(</font>
+        thread_pool<font color='#5555FF'>&amp;</font> tp,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        T<font color='#5555FF'>&amp;</font> obj,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>begin <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> chunks_per_thread <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void parallel_for_blocked_verbose()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t begin: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> begin 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t end:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> end
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t chunks_per_thread: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> chunks_per_thread
+            <font face='Lucida Console'>)</font>;
+
+        impl::parfor_verbose_helper3<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>helper</font><font face='Lucida Console'>(</font>obj, funct, begin, end<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>parallel_for_blocked</font><font face='Lucida Console'>(</font>tp, begin, end, helper, chunks_per_thread<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_blocked_verbose'></a>parallel_for_blocked_verbose</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        T<font color='#5555FF'>&amp;</font> obj,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>begin <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> chunks_per_thread <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void parallel_for_blocked_verbose()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t begin: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> begin 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t end:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> end
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t chunks_per_thread: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> chunks_per_thread
+            <font face='Lucida Console'>)</font>;
+
+        impl::parfor_verbose_helper3<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>helper</font><font face='Lucida Console'>(</font>obj, funct, begin, end<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>parallel_for_blocked</font><font face='Lucida Console'>(</font>num_threads, begin, end, helper, chunks_per_thread<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_blocked_verbose'></a>parallel_for_blocked_verbose</b> <font face='Lucida Console'>(</font>
+        thread_pool<font color='#5555FF'>&amp;</font> tp,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>begin <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> chunks_per_thread <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void parallel_for_blocked_verbose()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t begin: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> begin 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t end:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> end
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t chunks_per_thread: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> chunks_per_thread
+            <font face='Lucida Console'>)</font>;
+
+        impl::parfor_verbose_helper2<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>helper</font><font face='Lucida Console'>(</font>funct, begin, end<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>parallel_for_blocked</font><font face='Lucida Console'>(</font>tp, begin, end,  helper, chunks_per_thread<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_blocked_verbose'></a>parallel_for_blocked_verbose</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>begin <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> chunks_per_thread <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void parallel_for_blocked_verbose()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t begin: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> begin 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t end:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> end
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t chunks_per_thread: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> chunks_per_thread
+            <font face='Lucida Console'>)</font>;
+
+        impl::parfor_verbose_helper2<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>helper</font><font face='Lucida Console'>(</font>funct, begin, end<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>parallel_for_blocked</font><font face='Lucida Console'>(</font>num_threads, begin, end, helper, chunks_per_thread<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_PARALLEL_FoR_Hh_
+</font>
+
+</pre></body></html>

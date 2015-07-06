@@ -1,0 +1,373 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - mpc.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2015  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MPC_Hh_
+<font color='#0000FF'>#define</font> DLIB_MPC_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='mpc_abstract.h.html'>mpc_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>long</u></font> S_,
+        <font color='#0000FF'><u>long</u></font> I_,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> horizon_
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='mpc'></a>mpc</b>
+    <b>{</b>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> S <font color='#5555FF'>=</font> S_;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> I <font color='#5555FF'>=</font> I_;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> horizon <font color='#5555FF'>=</font> horizon_;
+
+        <b><a name='mpc'></a>mpc</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            A <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            B <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            C <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            Q <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            R <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            lower <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            upper <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            max_iterations <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            eps <font color='#5555FF'>=</font> <font color='#979000'>0.01</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> horizon; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                target[i].<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                target[i] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                controls[i].<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>B.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                controls[i] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+            lambda <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <b><a name='mpc'></a>mpc</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,S<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A_,
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,I<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> B_,
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> C_,
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> Q_,
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> R_,
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lower_,
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> upper_
+        <font face='Lucida Console'>)</font> : A<font face='Lucida Console'>(</font>A_<font face='Lucida Console'>)</font>, B<font face='Lucida Console'>(</font>B_<font face='Lucida Console'>)</font>, C<font face='Lucida Console'>(</font>C_<font face='Lucida Console'>)</font>, Q<font face='Lucida Console'>(</font>Q_<font face='Lucida Console'>)</font>, R<font face='Lucida Console'>(</font>R_<font face='Lucida Console'>)</font>, lower<font face='Lucida Console'>(</font>lower_<font face='Lucida Console'>)</font>, upper<font face='Lucida Console'>(</font>upper_<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> B.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t mpc::mpc()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t A.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>  A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t B.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>  B.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> A.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                        A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> B.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                        A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> C.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                        A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Q.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\t mpc::mpc()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t A.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>  A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t A.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>  A.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t B.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>  B.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t C.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>  C.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Q.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>  Q.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>
+                        B.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> R.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                        B.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> lower.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                        B.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> upper.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> ,
+                "<font color='#CC0000'>\t mpc::mpc()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t B.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>  B.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t B.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>  B.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t lower.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>  lower.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t upper.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>  upper.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>Q<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>R<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font>  <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>upper<font color='#5555FF'>-</font>lower<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t mpc::mpc()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t min(Q): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>Q<font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t min(R): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>R<font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t min(upper-lower): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>upper<font color='#5555FF'>-</font>lower<font face='Lucida Console'>)</font> 
+                <font face='Lucida Console'>)</font>;
+
+
+            max_iterations <font color='#5555FF'>=</font> <font color='#979000'>10000</font>;
+            eps <font color='#5555FF'>=</font> <font color='#979000'>0.01</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> horizon; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                target[i].<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                target[i] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                controls[i].<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>B.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                controls[i] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+            <font color='#009900'>// Bound the maximum eigenvalue of the hessian by computing the trace of the
+</font>            <font color='#009900'>// hessian matrix. 
+</font>            lambda <font color='#5555FF'>=</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>R<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>horizon;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,S<font color='#5555FF'>&gt;</font> temp <font color='#5555FF'>=</font> <font color='#BB00BB'>diagm</font><font face='Lucida Console'>(</font>Q<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> horizon; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                lambda <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>trace</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>temp<font color='#5555FF'>*</font>B<font face='Lucida Console'>)</font>;
+                Q_diag[horizon<font color='#5555FF'>-</font>c<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>temp<font color='#5555FF'>*</font>B<font face='Lucida Console'>)</font>;
+                temp <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>temp<font color='#5555FF'>*</font>A <font color='#5555FF'>+</font> <font color='#BB00BB'>diagm</font><font face='Lucida Console'>(</font>Q<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,S<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_A'></a>get_A</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> A; <b>}</b>
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,I<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_B'></a>get_B</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> B; <b>}</b>
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_C'></a>get_C</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> C; <b>}</b>
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_Q'></a>get_Q</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> Q; <b>}</b>
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_R'></a>get_R</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> R; <b>}</b>
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_lower_constraints'></a>get_lower_constraints</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> lower; <b>}</b>
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_upper_constraints'></a>get_upper_constraints</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> upper; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_target'></a>set_target</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> val,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> time
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>time <font color='#5555FF'>&lt;</font> horizon,
+                "<font color='#CC0000'>\t void mpc::set_target(eps_)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t time: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> time 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t horizon: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> horizon 
+                <font face='Lucida Console'>)</font>;
+
+            target[time] <font color='#5555FF'>=</font> val;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_target'></a>set_target</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> val
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> horizon; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                target[i] <font color='#5555FF'>=</font> val;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_last_target'></a>set_last_target</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> val
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>set_target</font><font face='Lucida Console'>(</font>val, horizon<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_target'></a>get_target</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> time
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>time <font color='#5555FF'>&lt;</font> horizon,
+                "<font color='#CC0000'>\t matrix mpc::get_target(eps_)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t time: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> time 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t horizon: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> horizon 
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> target[time];
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_iterations'></a>get_max_iterations</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> max_iterations; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_iterations'></a>set_max_iterations</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            max_iterations <font color='#5555FF'>=</font> max_iter;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_epsilon'></a>set_epsilon</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> eps_
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>eps_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t void mpc::set_epsilon(eps_)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps_: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> eps_ 
+                <font face='Lucida Console'>)</font>;
+            eps <font color='#5555FF'>=</font> eps_;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_epsilon'></a>get_epsilon</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#0000FF'>return</font> eps;
+        <b>}</b>
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> current_state
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>R<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> current_state.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\t matrix mpc::operator(current_state)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t min(R): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>R<font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t A.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t current_state.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> current_state.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Shift the inputs over by one time step so we can use them to warm start the
+</font>            <font color='#009900'>// optimizer.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> horizon; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                controls[i<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> controls[i];
+
+            <font color='#BB00BB'>solve_linear_mpc</font><font face='Lucida Console'>(</font>current_state<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> horizon; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                target[i<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> target[i];
+
+            <font color='#0000FF'>return</font> controls[<font color='#979000'>0</font>];
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+
+        <font color='#009900'>// These temporary variables here just to avoid reallocating them on each call to
+</font>        <font color='#009900'>// operator().
+</font>        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> M[horizon];
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> MM[horizon];
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> df[horizon]; 
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> v[horizon]; 
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> v_old[horizon]; 
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='solve_linear_mpc'></a>solve_linear_mpc</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> initial_state
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make it so MM == trans(K)*Q*(M-target)
+</font>            M[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> A<font color='#5555FF'>*</font>initial_state <font color='#5555FF'>+</font> C;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> horizon; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                M[i] <font color='#5555FF'>=</font> A<font color='#5555FF'>*</font>M[i<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>+</font> C;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> horizon; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                M[i] <font color='#5555FF'>=</font> <font color='#BB00BB'>diagm</font><font face='Lucida Console'>(</font>Q<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>M[i]<font color='#5555FF'>-</font>target[i]<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>horizon<font color='#5555FF'>-</font><font color='#979000'>2</font>; i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>i<font face='Lucida Console'>)</font>
+                M[i] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>M[i<font color='#5555FF'>+</font><font color='#979000'>1</font>];
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> horizon; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                MM[i] <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>M[i];
+
+
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> iter <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; iter <font color='#5555FF'>&lt;</font> max_iterations; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>iter<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// compute current gradient and put it into df.
+</font>                <font color='#009900'>// df == H*controls + MM;
+</font>                M[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> B<font color='#5555FF'>*</font>controls[<font color='#979000'>0</font>];
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> horizon; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    M[i] <font color='#5555FF'>=</font> A<font color='#5555FF'>*</font>M[i<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>+</font> B<font color='#5555FF'>*</font>controls[i];
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> horizon; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    M[i] <font color='#5555FF'>=</font> <font color='#BB00BB'>diagm</font><font face='Lucida Console'>(</font>Q<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>M[i];
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>horizon<font color='#5555FF'>-</font><font color='#979000'>2</font>; i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>i<font face='Lucida Console'>)</font>
+                    M[i] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>M[i<font color='#5555FF'>+</font><font color='#979000'>1</font>];
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> horizon; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    df[i] <font color='#5555FF'>=</font> MM[i] <font color='#5555FF'>+</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>M[i] <font color='#5555FF'>+</font> <font color='#BB00BB'>diagm</font><font face='Lucida Console'>(</font>R<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>controls[i];
+
+
+
+                <font color='#009900'>// Check the stopping condition, which is the magnitude of the largest element
+</font>                <font color='#009900'>// of the gradient.
+</font>                <font color='#0000FF'><u>double</u></font> max_df <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_t <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'><u>long</u></font> max_v <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> horizon; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> controls[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#009900'>// if this variable isn't an active constraint then we care about it's
+</font>                        <font color='#009900'>// derivative.
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>controls[i]<font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>lower</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> df[i]<font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> 
+                              <font face='Lucida Console'>(</font>controls[i]<font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>upper</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> df[i]<font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>df[i]<font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> max_df<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                max_df <font color='#5555FF'>=</font> std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>df[i]<font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                                max_t <font color='#5555FF'>=</font> i;
+                                max_v <font color='#5555FF'>=</font> j;
+                            <b>}</b>
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>max_df <font color='#5555FF'>&lt;</font> eps<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+
+
+
+                <font color='#009900'>// We will start out by doing a little bit of coordinate descent because it
+</font>                <font color='#009900'>// allows us to optimize individual variables exactly.  Since we are warm
+</font>                <font color='#009900'>// starting each iteration with a really good solution this helps speed
+</font>                <font color='#009900'>// things up a lot.
+</font>                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> smo_iters <font color='#5555FF'>=</font> <font color='#979000'>50</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>iter <font color='#5555FF'>&lt;</font> smo_iters<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>Q_diag[max_t]<font face='Lucida Console'>(</font>max_v<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#0000FF'>continue</font>;
+
+                    <font color='#009900'>// Take the optimal step but just for one variable.
+</font>                    controls[max_t]<font face='Lucida Console'>(</font>max_v<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font face='Lucida Console'>(</font>df[max_t]<font face='Lucida Console'>(</font>max_v<font face='Lucida Console'>)</font><font color='#5555FF'>-</font>Q_diag[max_t]<font face='Lucida Console'>(</font>max_v<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>controls[max_t]<font face='Lucida Console'>(</font>max_v<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>Q_diag[max_t]<font face='Lucida Console'>(</font>max_v<font face='Lucida Console'>)</font>;
+                    controls[max_t]<font face='Lucida Console'>(</font>max_v<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>put_in_range</font><font face='Lucida Console'>(</font><font color='#BB00BB'>lower</font><font face='Lucida Console'>(</font>max_v<font face='Lucida Console'>)</font>, <font color='#BB00BB'>upper</font><font face='Lucida Console'>(</font>max_v<font face='Lucida Console'>)</font>, controls[max_t]<font face='Lucida Console'>(</font>max_v<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// If this is the last SMO iteration then don't forget to initialize v
+</font>                    <font color='#009900'>// for the gradient steps.
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>iter<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> smo_iters<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> horizon; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                            v[i] <font color='#5555FF'>=</font> controls[i];
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// Take a projected gradient step.
+</font>                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> horizon; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        v_old[i] <font color='#5555FF'>=</font> v[i];
+                        v[i] <font color='#5555FF'>=</font> <font color='#BB00BB'>clamp</font><font face='Lucida Console'>(</font>controls[i] <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font color='#5555FF'>/</font>lambda <font color='#5555FF'>*</font> df[i], lower, upper<font face='Lucida Console'>)</font>;
+                        controls[i] <font color='#5555FF'>=</font> <font color='#BB00BB'>clamp</font><font face='Lucida Console'>(</font>v[i] <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>lambda<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>lambda<font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>v[i]<font color='#5555FF'>-</font>v_old[i]<font face='Lucida Console'>)</font>, lower, upper<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iterations;
+        <font color='#0000FF'><u>double</u></font> eps;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,S<font color='#5555FF'>&gt;</font> A;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,I<font color='#5555FF'>&gt;</font> B;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> C;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> Q;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> R;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> lower;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> upper;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,S,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> target[horizon]; 
+
+        <font color='#0000FF'><u>double</u></font> lambda; <font color='#009900'>// abound on the largest eigenvalue of the hessian matrix.
+</font>        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> Q_diag[horizon]; 
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,I,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> controls[horizon]; 
+
+    <b>}</b>;
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MPC_Hh_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,1032 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - serialize.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>compress_stream.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>base64.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>serialize.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_transforms.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> rgb_pixel<font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> rgb_pixel<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>a.red<font color='#5555FF'>=</font><font color='#5555FF'>=</font>b.red <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> a.green<font color='#5555FF'>=</font><font color='#5555FF'>=</font>b.green <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> a.blue<font color='#5555FF'>=</font><font color='#5555FF'>=</font>b.blue<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> bgr_pixel<font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> bgr_pixel<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>a.red<font color='#5555FF'>=</font><font color='#5555FF'>=</font>b.red <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> a.green<font color='#5555FF'>=</font><font color='#5555FF'>=</font>b.green <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> a.blue<font color='#5555FF'>=</font><font color='#5555FF'>=</font>b.blue<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> hsi_pixel<font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> hsi_pixel<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>a.h<font color='#5555FF'>=</font><font color='#5555FF'>=</font>b.h <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> a.s<font color='#5555FF'>=</font><font color='#5555FF'>=</font>b.s <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> a.i<font color='#5555FF'>=</font><font color='#5555FF'>=</font>b.i<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> rgb_alpha_pixel<font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> rgb_alpha_pixel<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>a.red<font color='#5555FF'>=</font><font color='#5555FF'>=</font>b.red <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> a.green<font color='#5555FF'>=</font><font color='#5555FF'>=</font>b.green <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> a.blue<font color='#5555FF'>=</font><font color='#5555FF'>=</font>b.blue <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> a.alpha<font color='#5555FF'>=</font><font color='#5555FF'>=</font>b.alpha<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<b>}</b>
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+    <font color='#0000FF'>struct</font> <b><a name='test_object'></a>test_object</b>
+    <b>{</b>
+        <font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font> i1;
+        <font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>short</u></font> i2;
+        <font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>long</u></font> i3;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> i4;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> i5;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i6;
+        uint64 i7;
+        int64 i8;
+
+        <font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font> i1_0;
+        <font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>short</u></font> i2_0;
+        <font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>long</u></font> i3_0;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> i4_0;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> i5_0;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i6_0;
+        uint64 i7_0;
+        int64 i8_0;
+
+        <font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font> i1_n;
+        <font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>short</u></font> i2_n;
+        <font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>long</u></font> i3_n;
+
+
+        <font color='#0000FF'><u>float</u></font> f1;
+        <font color='#0000FF'><u>double</u></font> f2;
+        <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> f3;
+        <font color='#0000FF'><u>float</u></font> f1_inf;
+        <font color='#0000FF'><u>double</u></font> f2_inf;
+        <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> f3_inf;
+        <font color='#0000FF'><u>float</u></font> f1_ninf;
+        <font color='#0000FF'><u>double</u></font> f2_ninf;
+        <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> f3_ninf;
+        <font color='#0000FF'><u>float</u></font> f1_qnan;
+        <font color='#0000FF'><u>double</u></font> f2_qnan;
+        <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> f3_qnan;
+        <font color='#0000FF'><u>float</u></font> f1_snan;
+        <font color='#0000FF'><u>double</u></font> f2_snan;
+        <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> f3_snan;
+
+        std::string s1;
+        std::wstring s2;
+
+        <font color='#0000FF'><u>int</u></font> array[<font color='#979000'>10</font>];
+
+        <font color='#0000FF'><u>bool</u></font> b_true;
+        <font color='#0000FF'><u>bool</u></font> b_false;
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_state_1'></a>set_state_1</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            i1 <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            i2 <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+            i3 <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+            i4 <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+            i5 <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+            i6 <font color='#5555FF'>=</font> <font color='#979000'>6</font>;
+            i7 <font color='#5555FF'>=</font> <font color='#979000'>7</font>;
+            i8 <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+
+            i1_0 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            i2_0 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            i3_0 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            i4_0 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            i5_0 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            i6_0 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            i7_0 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            i8_0 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            i1_n <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            i2_n <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>2</font>;
+            i3_n <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>3</font>;
+
+            f1 <font color='#5555FF'>=</font> <font color='#979000'>123.456f</font>;
+            f2 <font color='#5555FF'>=</font> <font color='#979000'>543.341</font>;
+            f3 <font color='#5555FF'>=</font> <font color='#979000'>5234234.23</font>;
+
+            f1_inf <font color='#5555FF'>=</font> numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            f2_inf <font color='#5555FF'>=</font> numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            f3_inf <font color='#5555FF'>=</font> numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            f1_ninf <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            f2_ninf <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            f3_ninf <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            f1_qnan <font color='#5555FF'>=</font> numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>quiet_NaN</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            f2_qnan <font color='#5555FF'>=</font> numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>quiet_NaN</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            f3_qnan <font color='#5555FF'>=</font> numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>quiet_NaN</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            f1_snan <font color='#5555FF'>=</font> numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>signaling_NaN</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            f2_snan <font color='#5555FF'>=</font> numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>signaling_NaN</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            f3_snan <font color='#5555FF'>=</font> numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>signaling_NaN</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            s1 <font color='#5555FF'>=</font> "<font color='#CC0000'>davis</font>";
+            s2 <font color='#5555FF'>=</font> L"<font color='#CC0000'>yo yo yo</font>";
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                array[i] <font color='#5555FF'>=</font> i; 
+
+            b_true <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            b_false <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_state_2'></a>set_state_2</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            i1 <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+            i2 <font color='#5555FF'>=</font> <font color='#979000'>20</font>;
+            i3 <font color='#5555FF'>=</font> <font color='#979000'>30</font>;
+            i4 <font color='#5555FF'>=</font> <font color='#979000'>40</font>;
+            i5 <font color='#5555FF'>=</font> <font color='#979000'>50</font>;
+            i6 <font color='#5555FF'>=</font> <font color='#979000'>60</font>;
+            i7 <font color='#5555FF'>=</font> <font color='#979000'>70</font>;
+            i8 <font color='#5555FF'>=</font> <font color='#979000'>80</font>;
+
+            i1_0 <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+            i2_0 <font color='#5555FF'>=</font> <font color='#979000'>6</font>;
+            i3_0 <font color='#5555FF'>=</font> <font color='#979000'>7</font>;
+            i4_0 <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+            i5_0 <font color='#5555FF'>=</font> <font color='#979000'>9</font>;
+            i6_0 <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+            i7_0 <font color='#5555FF'>=</font> <font color='#979000'>11</font>;
+            i8_0 <font color='#5555FF'>=</font> <font color='#979000'>12</font>;
+
+            i1_n <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>13</font>;
+            i2_n <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>25</font>;
+            i3_n <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>12</font>;
+
+            f1 <font color='#5555FF'>=</font> <font color='#979000'>45.3f</font>;
+            f2 <font color='#5555FF'>=</font> <font color='#979000'>0.001</font>;
+            f3 <font color='#5555FF'>=</font> <font color='#979000'>2.332</font>;
+
+            f1_inf <font color='#5555FF'>=</font> f1;
+            f2_inf <font color='#5555FF'>=</font> f2;
+            f3_inf <font color='#5555FF'>=</font> f3;
+            f1_ninf <font color='#5555FF'>=</font> f1;
+            f2_ninf <font color='#5555FF'>=</font> f2;
+            f3_ninf <font color='#5555FF'>=</font> f3;
+            f1_qnan <font color='#5555FF'>=</font> f1;
+            f2_qnan <font color='#5555FF'>=</font> f2;
+            f3_qnan <font color='#5555FF'>=</font> f3;
+            f1_snan <font color='#5555FF'>=</font> f1;
+            f2_snan <font color='#5555FF'>=</font> f2;
+            f3_snan <font color='#5555FF'>=</font> f3;
+
+            s1 <font color='#5555FF'>=</font> "<font color='#CC0000'></font>";
+            s2 <font color='#5555FF'>=</font> L"<font color='#CC0000'></font>";
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                array[i] <font color='#5555FF'>=</font> <font color='#979000'>10</font><font color='#5555FF'>-</font>i; 
+
+            b_true <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            b_false <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='assert_in_state_1'></a>assert_in_state_1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i2 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i3 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i4 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i5 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i6 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i7 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i8 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i1_0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i2_0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i3_0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i4_0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i5_0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i6_0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i7_0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i8_0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i1_n <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i2_n <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i3_n <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>f1 <font color='#5555FF'>-</font><font color='#979000'>123.456</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>f2 <font color='#5555FF'>-</font> <font color='#979000'>543.341</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>f3 <font color='#5555FF'>-</font> <font color='#979000'>5234234.23</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>f1_inf <font color='#5555FF'>=</font><font color='#5555FF'>=</font> numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>f2_inf <font color='#5555FF'>=</font><font color='#5555FF'>=</font> numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>f3_inf <font color='#5555FF'>=</font><font color='#5555FF'>=</font> numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>f1_ninf <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font>numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>f2_ninf <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font>numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>f3_ninf <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font>numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>f1_qnan <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> f1_qnan <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font>numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>f2_qnan <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> f1_qnan <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font>numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>f3_qnan <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> f1_qnan <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font>numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>f1_snan <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> f1_qnan <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font>numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>f2_snan <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> f1_qnan <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font>numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>f3_snan <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> f1_qnan <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font>numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>s1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>davis</font>"<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>s2 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> L"<font color='#CC0000'>yo yo yo</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>array[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>b_true <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>b_false <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='assert_in_state_2'></a>assert_in_state_2</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i2 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i3 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>30</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i4 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>40</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i5 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i6 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>60</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i7 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>70</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i8 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>80</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i1_0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i2_0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i3_0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i4_0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i5_0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i6_0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i7_0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>11</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i8_0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>12</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i1_n <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>13</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i2_n <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>25</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>i3_n <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>12</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>f1 <font color='#5555FF'>-</font> <font color='#979000'>45.3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>f2 <font color='#5555FF'>-</font> <font color='#979000'>0.001</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>f3 <font color='#5555FF'>-</font> <font color='#979000'>2.332</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>f1_inf <font color='#5555FF'>-</font> <font color='#979000'>45.3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>f2_inf <font color='#5555FF'>-</font> <font color='#979000'>0.001</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>f3_inf <font color='#5555FF'>-</font> <font color='#979000'>2.332</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>f1_ninf <font color='#5555FF'>-</font> <font color='#979000'>45.3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>f2_ninf <font color='#5555FF'>-</font> <font color='#979000'>0.001</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>f3_ninf <font color='#5555FF'>-</font> <font color='#979000'>2.332</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>f1_qnan <font color='#5555FF'>-</font> <font color='#979000'>45.3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>f2_qnan <font color='#5555FF'>-</font> <font color='#979000'>0.001</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>f3_qnan <font color='#5555FF'>-</font> <font color='#979000'>2.332</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>f1_snan <font color='#5555FF'>-</font> <font color='#979000'>45.3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>f2_snan <font color='#5555FF'>-</font> <font color='#979000'>0.001</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>f3_snan <font color='#5555FF'>-</font> <font color='#979000'>2.332</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>s1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>s2 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> L"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>array[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font color='#5555FF'>-</font>i<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>b_true <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font> <font face='Lucida Console'>(</font>b_false <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> test_object<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i1,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i2,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i3,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i4,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i5,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i6,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i7,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i8,out<font face='Lucida Console'>)</font>;
+
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i1_0,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i2_0,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i3_0,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i4_0,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i5_0,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i6_0,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i7_0,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i8_0,out<font face='Lucida Console'>)</font>;
+
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i1_n,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i2_n,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i3_n,out<font face='Lucida Console'>)</font>;
+
+
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.f1,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.f2,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.f3,out<font face='Lucida Console'>)</font>;
+
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.f1_inf,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.f2_inf,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.f3_inf,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.f1_ninf,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.f2_ninf,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.f3_ninf,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.f1_qnan,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.f2_qnan,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.f3_qnan,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.f1_snan,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.f2_snan,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.f3_snan,out<font face='Lucida Console'>)</font>;
+
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.s1,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.s2,out<font face='Lucida Console'>)</font>;
+
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.array,out<font face='Lucida Console'>)</font>;
+
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.b_true,out<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.b_false,out<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        test_object<font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i1,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i2,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i3,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i4,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i5,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i6,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i7,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i8,in<font face='Lucida Console'>)</font>;
+
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i1_0,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i2_0,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i3_0,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i4_0,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i5_0,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i6_0,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i7_0,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i8_0,in<font face='Lucida Console'>)</font>;
+
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i1_n,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i2_n,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i3_n,in<font face='Lucida Console'>)</font>;
+
+
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.f1,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.f2,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.f3,in<font face='Lucida Console'>)</font>;
+
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.f1_inf,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.f2_inf,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.f3_inf,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.f1_ninf,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.f2_ninf,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.f3_ninf,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.f1_qnan,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.f2_qnan,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.f3_qnan,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.f1_snan,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.f2_snan,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.f3_snan,in<font face='Lucida Console'>)</font>;
+
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.s1,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.s2,in<font face='Lucida Console'>)</font>;
+
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.array,in<font face='Lucida Console'>)</font>;
+
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.b_true,in<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.b_false,in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// This function returns the contents of the file 'stuff.bin' but using the old 
+</font>    <font color='#009900'>// floating point serialization format.
+</font>    <font color='#0000FF'>const</font> std::string <b><a name='get_decoded_string'></a>get_decoded_string</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::base64::kernel_1a base64_coder;
+        dlib::compress_stream::kernel_1ea compressor;
+        std::ostringstream sout;
+        std::istringstream sin;
+
+
+        <font color='#009900'>// The base64 encoded data from the file 'stuff.bin' we want to decode and return.
+</font>        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>AVaifX9zEbXa9aocsrcRuvnNrR3WLuuU5eLWiy0UeXmnKXGLKZz8V44gzT4CM6wnCmAHFQug8G3C</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>4cuLdNgp2ApkeLcvwFNJRENE0ShrRaxEBFEA8nah7vm8B2VmgImNblCejuP5IcDt60EaCKlqiit8</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>+JGrzYxqBm3xFS4P+qlOROdbxc7pXBmUdh0rqNSEvn0FBPdoqY/5SpHgA2yAcH8XFrM1cdu0xS3P</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>8PBcmLMJ7bFdzplwhrjuxtm4NfEOi6Rl9sU44AXycYgJd0+uH+dyoI9X3co5b3YWJtjvdVeztNAr</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>BfSPfR6oAVNfiMBG7QA=</font>";
+
+
+        <font color='#009900'>// Put the data into the istream sin
+</font>        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Decode the base64 text into its compressed binary form
+</font>        base64_coder.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+        sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Decompress the data into its original form
+</font>        compressor.<font color='#BB00BB'>decompress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Return the decoded and decompressed data
+</font>        <font color='#0000FF'>return</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+
+    <font color='#009900'>// This function returns the contents of the file 'stuff.bin' but using the new 
+</font>    <font color='#009900'>// floating point serialization format.
+</font>    <font color='#0000FF'>const</font> std::string <b><a name='get_decoded_string2'></a>get_decoded_string2</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::base64 base64_coder;
+        dlib::compress_stream::kernel_1ea compressor;
+        std::ostringstream sout;
+        std::istringstream sin;
+
+        <font color='#009900'>// The base64 encoded data from the file 'stuff.bin' we want to decode and return.
+</font>        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>AVaifX9zEbXa9aocsrcRuvnNqzZLptZ5mRd46xScCIfX6sq/46hG9JwIInElG50EtJKJY/+jAWit</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>TpDBWrxBz124JRLsBz62h0D3Tqgnd8zygRx7t33Ybw40o07MrhzNEHgYavUukaPje5by78JIWHgk</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>l7nb/TK+9ndVLrAThJ4v+GiPT3kh9H1tAAAAAQhbLa06pQjhrnjTXcRox1ZBEAV9/q1zAA==</font>";
+
+        <font color='#009900'>// Put the data into the istream sin
+</font>        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Decode the base64 text into its compressed binary form
+</font>        base64_coder.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+        sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Decompress the data into its original form
+</font>        compressor.<font color='#BB00BB'>decompress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Return the decoded and decompressed data
+</font>        <font color='#0000FF'>return</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// Declare the logger we will use in this test.  The name of the tester 
+</font>    <font color='#009900'>// should start with "test."
+</font>    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.serialize</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize_test'></a>serialize_test</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        ensures
+            - runs tests on the serialization code for compliance with the specs
+    !*/</font>
+    <b>{</b>        
+
+
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        ostringstream sout;
+        test_object obj;
+
+        obj.<font color='#BB00BB'>set_state_1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>assert_in_state_1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>obj, sout<font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>assert_in_state_1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        obj.<font color='#BB00BB'>set_state_2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>assert_in_state_2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>obj, sout<font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>assert_in_state_2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+        istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>obj,sin<font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>assert_in_state_1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>obj,sin<font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>assert_in_state_2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// now do the same thing as above but deserialize from some stored binary
+</font>        <font color='#009900'>// data to make sure the serialized values are portable between different
+</font>        <font color='#009900'>// machines
+</font>
+        sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_decoded_string</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>obj,sin<font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>assert_in_state_1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>obj,sin<font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>assert_in_state_2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+        sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_decoded_string2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>obj,sin<font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>assert_in_state_1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>obj,sin<font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>assert_in_state_2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>/*
+        // This is the code that produced the encoded data stored in the get_decoded_string() function
+            ofstream fout("stuff.bin",ios::binary);
+            obj.set_state_1();
+            obj.assert_in_state_1();
+            serialize(obj, fout);
+            obj.assert_in_state_1();
+
+            obj.set_state_2();
+            obj.assert_in_state_2();
+            serialize(obj, fout);
+            obj.assert_in_state_2();
+            */</font>
+
+
+        test_object obj2;
+        obj.<font color='#BB00BB'>set_state_1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        obj2.<font color='#BB00BB'>set_state_2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>serialization_test.dat</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> obj <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> obj2;
+        obj.<font color='#BB00BB'>assert_in_state_1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        obj2.<font color='#BB00BB'>assert_in_state_2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>set_state_2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        obj2.<font color='#BB00BB'>set_state_1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        obj.<font color='#BB00BB'>assert_in_state_2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        obj2.<font color='#BB00BB'>assert_in_state_1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>serialization_test.dat</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> obj <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> obj2;
+        obj.<font color='#BB00BB'>assert_in_state_1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        obj2.<font color='#BB00BB'>assert_in_state_2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_vector'></a>test_vector</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> a, b;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>30</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            a.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        ostringstream sout;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>a, sout<font face='Lucida Console'>)</font>;
+        istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>b, sin<font face='Lucida Console'>)</font>;
+
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>40</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b[i]<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> c;
+        sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>c, sout<font face='Lucida Console'>)</font>;
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>a, sin<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>c.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_vector_bool'></a>test_vector_bool</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> a, b;
+
+        a.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        a.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        a.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        a.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        a.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        a.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+
+        ostringstream sout;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>a, sout<font face='Lucida Console'>)</font>;
+        istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>b, sin<font face='Lucida Console'>)</font>;
+
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b[i]<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// This function returns the contents of the file 'matarray.dat'
+</font>    <font color='#0000FF'>const</font> std::string <b><a name='get_decoded_string_matarray_old'></a>get_decoded_string_matarray_old</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::base64 base64_coder;
+        dlib::compress_stream::kernel_1ea compressor;
+        std::ostringstream sout;
+        std::istringstream sin;
+
+        <font color='#009900'>// The base64 encoded data from the file 'matarray.dat' we want to decode and return.
+</font>        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>AW852sEbTIeV+m/wLUcKJKPW+6IclviUWZcFh1daDZ0blDjPNTgPx0Lv56sIEwlG4I6C5OJzJBkZ</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>PvczLjS7IEKh6eg7amNOyEexsQSgojL1oMe2gDEfkyInUGPJV90sNS0cvp/hIB134V8JCTYUP6vH</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>9qpegLSIIQG+/NjLWyK2472vC88BJfKgkL3CPLMjQwB3tB928FNLbESDLIvpnb6q9ve68iuoyZZt</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>z3TTJxHW3MIdgzuhNomvPxfo/Q+7lC/Orj0FewUX90al6DckwzOtLVRidh/ZKpsQsxzJYQGkjdX5</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>mDzzXKqQb3Y3DnzEmwtRD9CUON3iRv1r26gHWLYorrYA</font>";
+
+
+        <font color='#009900'>// Put the data into the istream sin
+</font>        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Decode the base64 text into its compressed binary form
+</font>        base64_coder.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+        sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Decompress the data into its original form
+</font>        compressor.<font color='#BB00BB'>decompress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Return the decoded and decompressed data
+</font>        <font color='#0000FF'>return</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>// This function returns the contents of the file 'matarray.dat'
+</font>    <font color='#0000FF'>const</font> std::string <b><a name='get_decoded_string_matarray'></a>get_decoded_string_matarray</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::base64 base64_coder;
+        dlib::compress_stream::kernel_1ea compressor;
+        std::ostringstream sout;
+        std::istringstream sin;
+
+        <font color='#009900'>// The base64 encoded data from the file 'matarray.dat' we want to decode and return.
+</font>        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>gO6XH2WGbm8Xaw3a5FJbh3V823W6P2Qk/vHaAAAAARccIppHWdmViaKby7JA5PQvXjYMWUYvXRHv</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>xPdURZl1un3CT/rjT11Yry0y3+1W7GBmfBJ0gVFKGdiGuqoNAMtmzL/ll3YfEQ7ED7aB33aDTktw</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>AWVkHT+gqTbKwjP+8YvB3s3ziK640ITOAWazAghKDVl7AHGn+fjq29paBZMczuJofl8FinZUhwa9</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Ol5gdAEQa6VZDmJUeo2soTJcEDpkW9LkRmXvjQkyEHfEHQNFDfQq4p2U+dHz4lOKlcj3VzQIeG/s</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>oxa9KhJND4aQ5xeNUUHUzFBU3XhQHlyDIn/RNdX/ZwA=</font>";
+
+
+        <font color='#009900'>// Put the data into the istream sin
+</font>        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Decode the base64 text into its compressed binary form
+</font>        base64_coder.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+        sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Decompress the data into its original form
+</font>        compressor.<font color='#BB00BB'>decompress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Return the decoded and decompressed data
+</font>        <font color='#0000FF'>return</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='setup_mats_and_arrays'></a>setup_mats_and_arrays</b> <font face='Lucida Console'>(</font>
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m,
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font>  img1,
+        array2d<font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font>      img2,
+        array2d<font color='#5555FF'>&lt;</font>bgr_pixel<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font>      img3,
+        array2d<font color='#5555FF'>&lt;</font>rgb_alpha_pixel<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> img4,
+        array2d<font color='#5555FF'>&lt;</font>hsi_pixel<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font>      img5
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        a.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>int</u></font> cnt <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> a.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> a.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                a[r][c] <font color='#5555FF'>=</font> cnt<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+            <b>}</b>
+        <b>}</b>
+        m <font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+
+        img1.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        img2.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        img3.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        img4.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        img5.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>img1, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>img2, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>img3, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>img4, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>img5, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> pcnt <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> img1.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> img1.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                rgb_alpha_pixel temp;
+                temp.red <font color='#5555FF'>=</font> pcnt<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+                temp.green <font color='#5555FF'>=</font> pcnt<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+                temp.blue <font color='#5555FF'>=</font> pcnt<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+                temp.alpha <font color='#5555FF'>=</font> <font color='#979000'>150</font><font color='#5555FF'>+</font>pcnt<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>img1[r][c], temp<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>img2[r][c], temp<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>img3[r][c], temp<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>img4[r][c], temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> img5.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> img5.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                img5[r][c].h <font color='#5555FF'>=</font> pcnt<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+                img5[r][c].s <font color='#5555FF'>=</font> pcnt<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+                img5[r][c].i <font color='#5555FF'>=</font> pcnt<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_deserialize'></a>test_deserialize</b><font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> fin
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> a;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> m;
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>  img1;
+        array2d<font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font>      img2;
+        array2d<font color='#5555FF'>&lt;</font>bgr_pixel<font color='#5555FF'>&gt;</font>      img3;
+        array2d<font color='#5555FF'>&lt;</font>rgb_alpha_pixel<font color='#5555FF'>&gt;</font> img4;
+        array2d<font color='#5555FF'>&lt;</font>hsi_pixel<font color='#5555FF'>&gt;</font>      img5;
+        <font color='#BB00BB'>setup_mats_and_arrays</font><font face='Lucida Console'>(</font>a,m,img1,img2,img3,img4,img5<font face='Lucida Console'>)</font>;
+
+
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>  img1_;
+        array2d<font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font>      img2_;
+        array2d<font color='#5555FF'>&lt;</font>bgr_pixel<font color='#5555FF'>&gt;</font>      img3_;
+        array2d<font color='#5555FF'>&lt;</font>rgb_alpha_pixel<font color='#5555FF'>&gt;</font> img4_;
+        array2d<font color='#5555FF'>&lt;</font>hsi_pixel<font color='#5555FF'>&gt;</font>      img5_;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> m_;
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> a_;
+
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>a_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>a_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>m_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>m_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>a_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>a_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>m_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>m_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>img1_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img1_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>img2_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img2_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>img3_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img3_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img3<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>img4_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img4_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img4<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>img5_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img5_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img5<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_deserialize_all_array2d'></a>test_deserialize_all_array2d</b><font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> fin
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> a;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> m;
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>  img1;
+        array2d<font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font>      img2;
+        array2d<font color='#5555FF'>&lt;</font>bgr_pixel<font color='#5555FF'>&gt;</font>      img3;
+        array2d<font color='#5555FF'>&lt;</font>rgb_alpha_pixel<font color='#5555FF'>&gt;</font> img4;
+        array2d<font color='#5555FF'>&lt;</font>hsi_pixel<font color='#5555FF'>&gt;</font>      img5;
+        <font color='#BB00BB'>setup_mats_and_arrays</font><font face='Lucida Console'>(</font>a,m,img1,img2,img3,img4,img5<font face='Lucida Console'>)</font>;
+
+
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>  img1_;
+        array2d<font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font>      img2_;
+        array2d<font color='#5555FF'>&lt;</font>bgr_pixel<font color='#5555FF'>&gt;</font>      img3_;
+        array2d<font color='#5555FF'>&lt;</font>rgb_alpha_pixel<font color='#5555FF'>&gt;</font> img4_;
+        array2d<font color='#5555FF'>&lt;</font>hsi_pixel<font color='#5555FF'>&gt;</font>      img5_;
+
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> m_;
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> a_;
+
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>a_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>a_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>m_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>m_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>a_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>a_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>m_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>m_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>img1_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img1_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>img2_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img2_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>img3_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img3_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img3<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>img4_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img4_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img4<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>img5_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img5_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img5<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_deserialize_all_matrix'></a>test_deserialize_all_matrix</b><font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> fin
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> a;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> m;
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>  img1;
+        array2d<font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font>      img2;
+        array2d<font color='#5555FF'>&lt;</font>bgr_pixel<font color='#5555FF'>&gt;</font>      img3;
+        array2d<font color='#5555FF'>&lt;</font>rgb_alpha_pixel<font color='#5555FF'>&gt;</font> img4;
+        array2d<font color='#5555FF'>&lt;</font>hsi_pixel<font color='#5555FF'>&gt;</font>      img5;
+        <font color='#BB00BB'>setup_mats_and_arrays</font><font face='Lucida Console'>(</font>a,m,img1,img2,img3,img4,img5<font face='Lucida Console'>)</font>;
+
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>  img1_;
+        matrix<font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font>      img2_;
+        matrix<font color='#5555FF'>&lt;</font>bgr_pixel<font color='#5555FF'>&gt;</font>      img3_;
+        matrix<font color='#5555FF'>&lt;</font>rgb_alpha_pixel<font color='#5555FF'>&gt;</font> img4_;
+        matrix<font color='#5555FF'>&lt;</font>hsi_pixel<font color='#5555FF'>&gt;</font>      img5_;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> m_;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> a_;
+
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>a_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>a_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>m_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>m_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>a_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>a_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>m_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>m_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>img1_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img1_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>img2_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img2_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>img3_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img3_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img3<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>img4_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img4_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img4<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>img5_, fin<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img5_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img5<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_array2d_and_matrix_serialization'></a>test_array2d_and_matrix_serialization</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        ostringstream sout;
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> a;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> m;
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>  img1;
+        array2d<font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font>      img2;
+        array2d<font color='#5555FF'>&lt;</font>bgr_pixel<font color='#5555FF'>&gt;</font>      img3;
+        array2d<font color='#5555FF'>&lt;</font>rgb_alpha_pixel<font color='#5555FF'>&gt;</font> img4;
+        array2d<font color='#5555FF'>&lt;</font>hsi_pixel<font color='#5555FF'>&gt;</font>      img5;
+        <font color='#BB00BB'>setup_mats_and_arrays</font><font face='Lucida Console'>(</font>a,m,img1,img2,img3,img4,img5<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>a, sout<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>m, sout<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>a, sout<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>m, sout<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>img1, sout<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>img2, sout<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>img3, sout<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>img4, sout<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>img5, sout<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// --------------------
+</font>
+        <b>{</b>
+            istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_deserialize</font><font face='Lucida Console'>(</font>sin<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <b>{</b>
+            istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_deserialize_all_array2d</font><font face='Lucida Console'>(</font>sin<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <b>{</b>
+            istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_deserialize_all_matrix</font><font face='Lucida Console'>(</font>sin<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        <b>{</b>
+            istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_decoded_string_matarray</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_deserialize</font><font face='Lucida Console'>(</font>sin<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <b>{</b>
+            istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_decoded_string_matarray</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_deserialize_all_array2d</font><font face='Lucida Console'>(</font>sin<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <b>{</b>
+            istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_decoded_string_matarray</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_deserialize_all_matrix</font><font face='Lucida Console'>(</font>sin<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        <b>{</b>
+            <font color='#009900'>// Make sure we can still deserialize the serialization 
+</font>            <font color='#009900'>// format for array2d and matrix objects used by older versions 
+</font>            <font color='#009900'>// of dlib.
+</font>            istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_decoded_string_matarray_old</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_deserialize</font><font face='Lucida Console'>(</font>sin<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_strings'></a>test_strings</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        string str1 <font color='#5555FF'>=</font> "<font color='#CC0000'>stuff</font>";
+        <font color='#0000FF'><u>char</u></font> buf[<font color='#979000'>6</font>];
+        buf[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        buf[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        buf[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+        buf[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        buf[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        buf[<font color='#979000'>5</font>] <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>ser_test_string.dat</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> str1 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> buf <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>morestuff</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'></font>";
+
+        string str2, str3, str4;
+        <font color='#0000FF'><u>char</u></font> buf2[<font color='#979000'>6</font>];
+        <font color='#BB00BB'>memset</font><font face='Lucida Console'>(</font>buf2,<font color='#979000'>0</font>,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buf2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>ser_test_string.dat</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> str2 <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> buf2 <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> str3 <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> str4;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>str2 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>stuff</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>str3 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>morestuff</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>str4 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>buf2[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>buf2[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>buf2[<font color='#979000'>2</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>buf2[<font color='#979000'>3</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>buf2[<font color='#979000'>4</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>buf2[<font color='#979000'>5</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+
+        ofstream <font color='#BB00BB'>fout</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>ser_test_string.dat</font>", ios::binary<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>str1, fout<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>buf, fout<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>morestuff</font>", fout<font face='Lucida Console'>)</font>;
+        fout.<font color='#BB00BB'>close</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        ifstream <font color='#BB00BB'>fin</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>ser_test_string.dat</font>", ios::binary<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>memset</font><font face='Lucida Console'>(</font>buf2,<font color='#979000'>0</font>,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buf2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        str2.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        str3.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>str2, fin<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>buf2, fin<font face='Lucida Console'>)</font>;
+        dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>str3, fin<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>str2 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>stuff</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>str3 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>morestuff</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>buf2[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>buf2[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>buf2[<font color='#979000'>2</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>buf2[<font color='#979000'>3</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>buf2[<font color='#979000'>4</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>buf2[<font color='#979000'>5</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='serialize_tester'></a>serialize_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a test for the serialization .  When it is constructed
+                it adds itself into the testing framework.  The command line switch is
+                specified as test_serialize by passing that string to the tester constructor.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+        <b><a name='serialize_tester'></a>serialize_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_serialize</font>",
+                    "<font color='#CC0000'>Runs tests on the serialization code.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize_test</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test_vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test_vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test_vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_vector_bool</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_array2d_and_matrix_serialization</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_strings</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> a;
+
+
+<b>}</b>
+
+
+
+</pre></body></html>

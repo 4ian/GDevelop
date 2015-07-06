@@ -1,0 +1,109 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jcomapi.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jcomapi.c
+ *
+ * Copyright (C) 1994-1997, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains application interface routines that are used for both
+ * compression and decompression.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+
+
+<font color='#009900'>/*
+ * Abort processing of a JPEG compression or decompression operation,
+ * but don't destroy the object itself.
+ *
+ * For this, we merely clean up all the nonpermanent memory pools.
+ * Note that temp files (virtual arrays) are not allowed to belong to
+ * the permanent pool, so we will be able to close all temp files here.
+ * Closing a data source or destination, if necessary, is the application's
+ * responsibility.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_abort'></a>jpeg_abort</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'><u>int</u></font> pool;
+
+  <font color='#009900'>/* Do nothing if called on a not-initialized or destroyed JPEG object. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+    <font color='#0000FF'>return</font>;
+
+  <font color='#009900'>/* Releasing pools in reverse order might help avoid fragmentation
+   * with some (brain-damaged) malloc libraries.
+   */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>pool <font color='#5555FF'>=</font> JPOOL_NUMPOOLS<font color='#5555FF'>-</font><font color='#979000'>1</font>; pool <font color='#5555FF'>&gt;</font> JPOOL_PERMANENT; pool<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>free_pool<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, pool<font face='Lucida Console'>)</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Reset overall state for possible reuse of object */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>is_decompressor<font face='Lucida Console'>)</font> <b>{</b>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font> DSTATE_START;
+    <font color='#009900'>/* Try to keep application from accessing now-deleted marker list.
+     * A bit kludgy to do it here, but this is the most central place.
+     */</font>
+    <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>marker_list <font color='#5555FF'>=</font> NULL;
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font> CSTATE_START;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Destruction of a JPEG object.
+ *
+ * Everything gets deallocated except the master jpeg_compress_struct itself
+ * and the error manager struct.  Both of these are supplied by the application
+ * and must be freed, if necessary, by the application.  (Often they are on
+ * the stack and so don't need to be freed anyway.)
+ * Closing a data source or destination, if necessary, is the application's
+ * responsibility.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_destroy'></a>jpeg_destroy</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#009900'>/* We need only tell the memory manager to release everything. */</font>
+  <font color='#009900'>/* NB: mem pointer is NULL if memory mgr failed to initialize. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>self_destruct<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem <font color='#5555FF'>=</font> NULL;		<font color='#009900'>/* be safe if jpeg_destroy is called twice */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font> <font color='#979000'>0</font>;	<font color='#009900'>/* mark it destroyed */</font>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Convenience routines for allocating quantization and Huffman tables.
+ * (Would jutils.c be a more reasonable place to put these?)
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font>JQUANT_TBL <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_alloc_quant_table'></a>jpeg_alloc_quant_table</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  JQUANT_TBL <font color='#5555FF'>*</font>tbl;
+
+  tbl <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JQUANT_TBL <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, JPOOL_PERMANENT, <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JQUANT_TBL<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  tbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sent_table <font color='#5555FF'>=</font> FALSE;	<font color='#009900'>/* make sure this is false in any new table */</font>
+  <font color='#0000FF'>return</font> tbl;
+<b>}</b>
+
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font>JHUFF_TBL <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_alloc_huff_table'></a>jpeg_alloc_huff_table</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  JHUFF_TBL <font color='#5555FF'>*</font>tbl;
+
+  tbl <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JHUFF_TBL <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, JPOOL_PERMANENT, <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JHUFF_TBL<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  tbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sent_table <font color='#5555FF'>=</font> FALSE;	<font color='#009900'>/* make sure this is false in any new table */</font>
+  <font color='#0000FF'>return</font> tbl;
+<b>}</b>
+
+</pre></body></html>

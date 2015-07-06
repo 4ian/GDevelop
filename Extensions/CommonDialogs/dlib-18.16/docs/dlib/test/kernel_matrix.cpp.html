@@ -1,0 +1,164 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - kernel_matrix.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+    dlib::logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.kernel_matrix</font>"<font face='Lucida Console'>)</font>;
+
+
+    <font color='#0000FF'>class</font> <b><a name='kernel_matrix_tester'></a>kernel_matrix_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a unit test.  When it is constructed
+                it adds itself into the testing framework.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+        <b><a name='kernel_matrix_tester'></a>kernel_matrix_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>
+                "<font color='#CC0000'>test_kernel_matrix</font>",       <font color='#009900'>// the command line argument name for this test
+</font>                "<font color='#CC0000'>Run tests on the kernel_matrix functions.</font>", <font color='#009900'>// the command line argument description
+</font>                <font color='#979000'>0</font>                     <font color='#009900'>// the number of command line arguments for this test
+</font>            <font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample_type;
+            <font color='#0000FF'>typedef</font> radial_basis_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> kernel_type;
+            kernel_type <font color='#BB00BB'>kern</font><font face='Lucida Console'>(</font><font color='#979000'>0.1</font><font face='Lucida Console'>)</font>;
+
+            std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> vect1;
+            std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> vect2;
+
+            <font color='#0000FF'>const</font> sample_type samp <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            sample_type samp2, samp3;
+
+            vect1.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            vect1.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            vect1.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            vect1.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            vect2.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            vect2.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            vect2.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            vect2.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            vect2.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> K;
+
+            K.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>vect1.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, vect2.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> K.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> K.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>K</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>kern</font><font face='Lucida Console'>(</font>vect1[r], vect2[c]<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, vect1, vect2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>vect1<font face='Lucida Console'>)</font>, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>vect2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+            K.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>vect2.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, vect1.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> K.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> K.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>K</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>kern</font><font face='Lucida Console'>(</font>vect2[r], vect1[c]<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, vect2, vect1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>tmp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, vect2, vect1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>vect2<font face='Lucida Console'>)</font>, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>vect1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+            K.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>vect1.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, vect1.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> K.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> K.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>K</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>kern</font><font face='Lucida Console'>(</font>vect1[r], vect1[c]<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, vect1, vect1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>tmp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, vect1, vect1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, vect1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>tmp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, vect1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>vect1<font face='Lucida Console'>)</font>, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>vect1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>tmp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>vect1<font face='Lucida Console'>)</font>, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>vect1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>vect1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>tmp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>vect1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+            K.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>vect1.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> K.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> K.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>K</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>kern</font><font face='Lucida Console'>(</font>vect1[r], samp<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, vect1, samp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>vect1<font face='Lucida Console'>)</font>, samp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+            K.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, vect1.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> K.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> K.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>K</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>kern</font><font face='Lucida Console'>(</font>samp, vect1[c]<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, samp, vect1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, samp, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>vect1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>tmp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, samp, vect1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>tmp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, samp, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>vect1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+
+            samp2 <font color='#5555FF'>=</font> samp;
+            samp3 <font color='#5555FF'>=</font> samp;
+
+            <font color='#009900'>// test the alias detection
+</font>            samp2 <font color='#5555FF'>=</font> <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, vect1, samp2<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>samp2, <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, vect1, samp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            samp3 <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, samp3, vect2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>samp3, <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, samp, vect2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+            samp2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, vect1, samp<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>samp2, <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, vect1, samp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            samp3 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, samp, vect2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>samp3, <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, samp, vect2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#009900'>// Create an instance of this object.  Doing this causes this test
+</font>    <font color='#009900'>// to be automatically inserted into the testing framework whenever this cpp file
+</font>    <font color='#009900'>// is linked into the project.  Note that since we are inside an unnamed-namespace 
+</font>    <font color='#009900'>// we won't get any linker errors about the symbol a being defined multiple times. 
+</font>    kernel_matrix_tester a;
+
+<b>}</b>
+
+
+
+</pre></body></html>

@@ -5,6 +5,7 @@ Copyright (c) 2014-2015 Victor Levasseur (victorlevasseur52@gmail.com)
 This project is released under the MIT License.
 */
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "TileSetConfigurationEditor.h"
 
 #include "GDCore/CommonTools.h"
@@ -68,6 +69,9 @@ void TileSetConfigurationEditor::UpdatePreviewTileSetPanel()
     previewTileSet.LoadResources(game);
     previewTileSet.Generate();
 
+    m_tileWidthSpin->SetRange(1, previewTileSet.GetSize().x);
+    m_tileHeightSpin->SetRange(1, previewTileSet.GetSize().y);
+
     m_tileSetPreviewPanel->Refresh();
 }
 
@@ -113,3 +117,5 @@ void TileSetConfigurationEditor::OnHelpButtonClicked(wxHyperlinkEvent& event)
 {
     gd::HelpFileAccess::Get()->OpenURL(GD_T("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_tilemap/tilesetconfig"));
 }
+
+#endif

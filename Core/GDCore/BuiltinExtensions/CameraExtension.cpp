@@ -184,7 +184,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
     extension.AddAction("CameraViewport",
                    _("Modify the render zone of a camera"),
                    _("This action modify the render zone of a camera of the specified layer."),
-                   _("Set the render zone of camera _PARAM2_ from layer _PARAM1_ to PARAM3_;_PARAM4_ _PARAM5_;_PARAM6_"),
+                   _("Set the render zone of camera _PARAM2_ from layer _PARAM1_ to _PARAM3_;_PARAM4_ _PARAM5_;_PARAM6_"),
                    _("Layers and cameras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png")

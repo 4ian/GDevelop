@@ -1,11 +1,11 @@
 #include "Preferences.h"
 
 //(*InternalHeaders(Preferences)
-#include <wx/bitmap.h>
 #include <wx/settings.h>
-#include <wx/intl.h>
-#include <wx/image.h>
 #include <wx/string.h>
+#include <wx/intl.h>
+#include <wx/bitmap.h>
+#include <wx/image.h>
 //*)
 #include <wx/propgrid/advprops.h>
 #include <wx/imaglist.h>
@@ -140,65 +140,65 @@ Preferences::Preferences( wxWindow* parent ) :
 changesNeedRestart(false)
 {
     //(*Initialize(Preferences)
+    wxStaticBoxSizer* StaticBoxSizer17;
+    wxFlexGridSizer* FlexGridSizer30;
     wxStaticBoxSizer* StaticBoxSizer2;
-    wxFlexGridSizer* FlexGridSizer4;
-    wxFlexGridSizer* FlexGridSizer16;
-    wxFlexGridSizer* FlexGridSizer24;
+    wxFlexGridSizer* FlexGridSizer21;
+    wxFlexGridSizer* FlexGridSizer28;
+    wxFlexGridSizer* FlexGridSizer8;
+    wxStaticBoxSizer* StaticBoxSizer10;
+    wxFlexGridSizer* FlexGridSizer1;
+    wxFlexGridSizer* FlexGridSizer25;
+    wxFlexGridSizer* FlexGridSizer2;
+    wxFlexGridSizer* FlexGridSizer15;
+    wxStaticBoxSizer* StaticBoxSizer19;
+    wxStaticBoxSizer* StaticBoxSizer7;
+    wxStaticBoxSizer* StaticBoxSizer5;
+    wxFlexGridSizer* FlexGridSizer17;
+    wxFlexGridSizer* FlexGridSizer29;
+    wxFlexGridSizer* FlexGridSizer11;
     wxFlexGridSizer* FlexGridSizer19;
     wxStaticBoxSizer* StaticBoxSizer12;
-    wxFlexGridSizer* FlexGridSizer23;
-    wxFlexGridSizer* FlexGridSizer38;
-    wxStaticBoxSizer* StaticBoxSizer15;
-    wxStaticBoxSizer* StaticBoxSizer14;
-    wxStaticBoxSizer* StaticBoxSizer4;
-    wxFlexGridSizer* FlexGridSizer10;
-    wxFlexGridSizer* FlexGridSizer3;
-    wxFlexGridSizer* FlexGridSizer27;
-    wxStaticBoxSizer* StaticBoxSizer16;
-    wxFlexGridSizer* FlexGridSizer37;
-    wxFlexGridSizer* FlexGridSizer5;
-    wxFlexGridSizer* FlexGridSizer25;
-    wxFlexGridSizer* FlexGridSizer22;
-    wxFlexGridSizer* FlexGridSizer9;
-    wxFlexGridSizer* FlexGridSizer2;
-    wxStaticBoxSizer* StaticBoxSizer9;
     wxFlexGridSizer* FlexGridSizer7;
-    wxStaticBoxSizer* StaticBoxSizer7;
-    wxStaticBoxSizer* StaticBoxSizer17;
-    wxStaticBoxSizer* StaticBoxSizer13;
-    wxStaticBoxSizer* StaticBoxSizer10;
-    wxStaticBoxSizer* StaticBoxSizer19;
-    wxFlexGridSizer* FlexGridSizer29;
-    wxFlexGridSizer* FlexGridSizer34;
-    wxStaticBoxSizer* StaticBoxSizer8;
+    wxFlexGridSizer* FlexGridSizer4;
+    wxStaticBoxSizer* StaticBoxSizer16;
+    wxFlexGridSizer* FlexGridSizer26;
+    wxFlexGridSizer* FlexGridSizer9;
     wxStaticBoxSizer* StaticBoxSizer3;
-    wxStaticBoxSizer* StaticBoxSizer6;
-    wxFlexGridSizer* FlexGridSizer15;
-    wxFlexGridSizer* FlexGridSizer18;
-    wxFlexGridSizer* FlexGridSizer8;
-    wxStaticBoxSizer* StaticBoxSizer20;
-    wxFlexGridSizer* FlexGridSizer21;
     wxFlexGridSizer* FlexGridSizer14;
-    wxStaticBoxSizer* StaticBoxSizer11;
-    wxFlexGridSizer* FlexGridSizer20;
-    wxFlexGridSizer* FlexGridSizer13;
-    wxFlexGridSizer* FlexGridSizer35;
-    wxFlexGridSizer* FlexGridSizer12;
-    wxFlexGridSizer* FlexGridSizer36;
-    wxFlexGridSizer* FlexGridSizer6;
-    wxStaticBoxSizer* StaticBoxSizer1;
-    wxFlexGridSizer* FlexGridSizer1;
     wxFlexGridSizer* FlexGridSizer33;
-    wxFlexGridSizer* FlexGridSizer11;
-    wxFlexGridSizer* FlexGridSizer17;
-    wxStaticBoxSizer* StaticBoxSizer5;
-    wxFlexGridSizer* FlexGridSizer32;
+    wxFlexGridSizer* FlexGridSizer6;
+    wxStaticBoxSizer* StaticBoxSizer20;
+    wxStaticBoxSizer* StaticBoxSizer13;
+    wxFlexGridSizer* FlexGridSizer38;
+    wxFlexGridSizer* FlexGridSizer27;
+    wxFlexGridSizer* FlexGridSizer37;
+    wxFlexGridSizer* FlexGridSizer3;
+    wxFlexGridSizer* FlexGridSizer22;
+    wxStaticBoxSizer* StaticBoxSizer15;
+    wxStaticBoxSizer* StaticBoxSizer8;
     wxFlexGridSizer* FlexGridSizer31;
     wxFlexGridSizer* FlexGridSizer39;
+    wxStaticBoxSizer* StaticBoxSizer9;
+    wxStaticBoxSizer* StaticBoxSizer4;
+    wxStaticBoxSizer* StaticBoxSizer6;
+    wxStaticBoxSizer* StaticBoxSizer14;
     wxStaticBoxSizer* StaticBoxSizer18;
-    wxFlexGridSizer* FlexGridSizer28;
-    wxFlexGridSizer* FlexGridSizer26;
-    wxFlexGridSizer* FlexGridSizer30;
+    wxFlexGridSizer* FlexGridSizer16;
+    wxFlexGridSizer* FlexGridSizer34;
+    wxFlexGridSizer* FlexGridSizer23;
+    wxFlexGridSizer* FlexGridSizer10;
+    wxStaticBoxSizer* StaticBoxSizer11;
+    wxFlexGridSizer* FlexGridSizer13;
+    wxFlexGridSizer* FlexGridSizer18;
+    wxFlexGridSizer* FlexGridSizer36;
+    wxFlexGridSizer* FlexGridSizer12;
+    wxFlexGridSizer* FlexGridSizer35;
+    wxFlexGridSizer* FlexGridSizer5;
+    wxFlexGridSizer* FlexGridSizer24;
+    wxFlexGridSizer* FlexGridSizer32;
+    wxStaticBoxSizer* StaticBoxSizer1;
+    wxFlexGridSizer* FlexGridSizer20;
 
     Create(parent, wxID_ANY, _("GDevelop settings"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX, _T("wxID_ANY"));
     FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -226,7 +226,7 @@ changesNeedRestart(false)
     FlexGridSizer14->AddGrowableCol(0);
     StaticBoxSizer1 = new wxStaticBoxSizer(wxVERTICAL, Panel2, _("Startup"));
     FlexGridSizer39 = new wxFlexGridSizer(0, 1, 0, 0);
-    MAJCheck = new wxCheckBox(Panel2, ID_CHECKBOX4, _("Check for updates and the news"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
+    MAJCheck = new wxCheckBox(Panel2, ID_CHECKBOX4, _("Check for updates"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
     MAJCheck->SetValue(false);
     FlexGridSizer39->Add(MAJCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     sendInfoCheck = new wxCheckBox(Panel2, ID_CHECKBOX10, _("Send anonymous statistics about GDevelop ( version, language used )"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX10"));
@@ -242,7 +242,7 @@ changesNeedRestart(false)
     autosaveActivatedCheck = new wxCheckBox(Panel2, ID_CHECKBOX3, _("Make a backup of opened projects every"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
     autosaveActivatedCheck->SetValue(false);
     FlexGridSizer19->Add(autosaveActivatedCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    autosaveTimeEdit = new wxTextCtrl(Panel2, ID_TEXTCTRL1, _("3"), wxDefaultPosition, wxSize(44,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+    autosaveTimeEdit = new wxTextCtrl(Panel2, ID_TEXTCTRL1, _("3"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
     FlexGridSizer19->Add(autosaveTimeEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticText5 = new wxStaticText(Panel2, ID_STATICTEXT5, _("minutes"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
     FlexGridSizer19->Add(StaticText5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -268,6 +268,7 @@ changesNeedRestart(false)
     StaticText13 = new wxStaticText(Panel5, ID_STATICTEXT13, _("Language:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT13"));
     FlexGridSizer9->Add(StaticText13, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     langChoice = new wxChoice(Panel5, ID_CHOICE2, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE2"));
+    langChoice->SetSelection( langChoice->Append(_("English")) );
     FlexGridSizer9->Add(langChoice, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Panel5->SetSizer(FlexGridSizer9);
     FlexGridSizer9->Fit(Panel5);
@@ -507,7 +508,7 @@ changesNeedRestart(false)
     FlexGridSizer28 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticText17 = new wxStaticText(Panel8, ID_STATICTEXT17, _("Default width of the condition column:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT17"));
     FlexGridSizer28->Add(StaticText17, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    conditionsColumnWidthEdit = new wxTextCtrl(Panel8, ID_TEXTCTRL5, wxEmptyString, wxDefaultPosition, wxSize(65,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
+    conditionsColumnWidthEdit = new wxTextCtrl(Panel8, ID_TEXTCTRL5, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
     FlexGridSizer28->Add(conditionsColumnWidthEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticText18 = new wxStaticText(Panel8, ID_STATICTEXT18, _("pixels"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT18"));
     FlexGridSizer28->Add(StaticText18, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -582,7 +583,6 @@ changesNeedRestart(false)
     	wxFontData fontData_1;
     	fontData_1.EnableEffects(false);
     	fontData_1.SetInitialFont(*wxNORMAL_FONT);
-    	fontData_1.SetAllowSymbols(false);
     eventsEditorFontDialog = new wxFontDialog(this, fontData_1);
     FlexGridSizer1->Fit(this);
     FlexGridSizer1->SetSizeHints(this);
@@ -845,6 +845,8 @@ changesNeedRestart(false)
             cont = dir.GetNext(&filename);
         }
 
+        langChoice->Clear();
+
         //Add languages to list and retrieve selected language
         for (unsigned int i = 0;i<languagesAvailables.size();++i)
         {
@@ -863,7 +865,7 @@ changesNeedRestart(false)
         pConfig->Read( _T( "/Autosave/Time" ), &time );
         pConfig->Read( _T( "/Autosave/Activated" ), &activated );
 
-        autosaveTimeEdit->ChangeValue( gd::String::FromFloat(static_cast<float>(time)/60.0f/1000.0f) );
+        autosaveTimeEdit->ChangeValue( gd::ToString(static_cast<float>(time)/60.0f/1000.0f) );
         autosaveActivatedCheck->SetValue(activated);
     }
 
@@ -899,7 +901,7 @@ changesNeedRestart(false)
         if ( avertOnSave ) avertOnSaveCheck->SetValue(true);
     }
 
-	conditionsColumnWidthEdit->SetValue(gd::String::FromInt(static_cast<int>(pConfig->ReadDouble("EventsEditor/ConditionColumnWidth", 350))));
+	conditionsColumnWidthEdit->SetValue(gd::ToString(static_cast<int>(pConfig->ReadDouble("EventsEditor/ConditionColumnWidth", 350))));
 	hideContextPanelsLabels->SetValue(pConfig->ReadBool("EventsEditor/HideContextPanelsLabels", false));
 
 	wxFont eventsEditorFont;
@@ -1042,11 +1044,11 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     if ( changesNeedRestart )
     {
-        gd::LogMessage(GD_T("GDevelop must be relaunched to apply changes."));
+        gd::LogMessage(_("GDevelop must be relaunched to apply changes."));
     }
 
     pConfig->Write( "/Autosave/Activated", autosaveActivatedCheck->GetValue());
-    pConfig->Write( "/Autosave/Time", gd::String(autosaveTimeEdit->GetValue()).ToFloat()*60*1000);
+    pConfig->Write( "/Autosave/Time", ToFloat(string(autosaveTimeEdit->GetValue().mb_str()))*60*1000);
 
     pConfig->Write( "/SceneEditor/SceneEventsTab", sceneEventsTabPosition->GetSelection());
 
@@ -1714,7 +1716,7 @@ void Preferences::OneventsEditorFontBtClick(wxCommandEvent& event)
         eventsEditorFontDialog->GetFontData().GetChosenFont().GetFamily() != wxFONTFAMILY_MODERN )
     {
         eventsEditorFontDialog->GetFontData().GetChosenFont() = oldFont;
-        gd::LogWarning(GD_T("The font you have chosen is not a fixed-width font. It cannot be used by the events editor.\n"));
+        gd::LogWarning(_("The font you have chosen is not a fixed-width font. It cannot be used by the events editor.\n"));
     }
 }
 

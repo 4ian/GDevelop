@@ -1,0 +1,507 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - stack_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_STACK_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_STACK_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='stack_kernel_abstract.h.html'>stack_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/enumerable.h.html'>../interfaces/enumerable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/remover.h.html'>../interfaces/remover.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager <font color='#5555FF'>=</font> default_memory_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='stack_kernel_1'></a>stack_kernel_1</b> : <font color='#0000FF'>public</font> enumerable<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,
+                           <font color='#0000FF'>public</font> remover<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                stack_size == 0 
+                top == 0
+                current_element == 0
+                _at_start == true
+
+
+            CONVENTION
+                at_start() == _at_start
+                current_element_valid() == (current_element != 0)
+                if (current_element != 0) then
+                    element() == current_element-&gt;item
+
+                stack_size == the number of elements in the stack. 
+                Each node points to the next node to be poped off the stack.
+                The last node in the list has its next pointer is set to 0.
+                
+                if (size == 0)
+                {
+                    top == 0
+                }
+                else
+                {
+                    top == pointer to the last element added to the stack
+                }
+        !*/</font>
+        
+        <font color='#0000FF'>struct</font> <b><a name='node'></a>node</b>
+        <b>{</b>
+            node<font color='#5555FF'>*</font> next;
+            T item;
+        <b>}</b>;
+        
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'>typedef</font> T type;
+            <font color='#0000FF'>typedef</font> mem_manager mem_manager_type;
+
+            <b><a name='stack_kernel_1'></a>stack_kernel_1</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>:
+                top<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                stack_size<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                current_element<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                _at_start<font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+            <b>{</b><b>}</b>
+    
+            <font color='#0000FF'>virtual</font> ~<b><a name='stack_kernel_1'></a>stack_kernel_1</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='push'></a>push</b><font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='pop'></a>pop</b><font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='current'></a>current</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='current'></a>current</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+                stack_kernel_1<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+        
+            <font color='#009900'>// functions from the remover interface
+</font>            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='remove_any'></a>remove_any</b> <font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>; 
+
+            <font color='#009900'>// functions from the enumerable interface
+</font>            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='at_start'></a>at_start</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='current_element_valid'></a>current_element_valid</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> T<font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='move_next'></a>move_next</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='delete_elements_in_stack'></a>delete_elements_in_stack</b><font face='Lucida Console'>(</font>
+                node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> top
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - top points to the top of the stack
+                ensures
+                    - all memory has been freed 
+                    - #top = 0
+            !*/</font>
+
+
+            <font color='#009900'>// data members
+</font>            <font color='#0000FF'>typename</font> mem_manager::<font color='#0000FF'>template</font> rebind<font color='#5555FF'>&lt;</font>node<font color='#5555FF'>&gt;</font>::other pool;
+            node<font color='#5555FF'>*</font> top;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> stack_size;
+            <font color='#0000FF'>mutable</font> node<font color='#5555FF'>*</font> current_element;
+            <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>bool</u></font> _at_start;
+
+
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='stack_kernel_1'></a>stack_kernel_1</b><font face='Lucida Console'>(</font>stack_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>            stack_kernel_1<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>stack_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>; <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        stack_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        stack_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b> 
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        stack_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            item.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>size,in<font face='Lucida Console'>)</font>;
+            T temp <font color='#5555FF'>=</font> <font color='#BB00BB'>T</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            stack_kernel_1<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> temp_stack;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>temp,in<font face='Lucida Console'>)</font>;
+                temp_stack.<font color='#BB00BB'>push</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>temp_stack.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp_stack.<font color='#BB00BB'>pop</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                item.<font color='#BB00BB'>push</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            item.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type stack_kernel_1</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    stack_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    ~<b><a name='stack_kernel_1'></a>stack_kernel_1</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#BB00BB'>delete_elements_in_stack</font><font face='Lucida Console'>(</font>top<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> stack_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>stack_size <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>delete_elements_in_stack</font><font face='Lucida Console'>(</font>top<font face='Lucida Console'>)</font>;
+            stack_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    T<font color='#5555FF'>&amp;</font> stack_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='current'></a>current</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> top<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> stack_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='current'></a>current</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> top<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> stack_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+        stack_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        pool.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.pool<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// declare temp variables
+</font>        node<font color='#5555FF'>*</font> top_temp;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> stack_size_temp;
+
+        <font color='#009900'>// swap stack_size variables
+</font>        stack_size_temp <font color='#5555FF'>=</font> item.stack_size;
+        item.stack_size <font color='#5555FF'>=</font> stack_size;
+        stack_size <font color='#5555FF'>=</font> stack_size_temp;
+
+        <font color='#009900'>// swap top pointers
+</font>        top_temp <font color='#5555FF'>=</font> item.top;
+        item.top <font color='#5555FF'>=</font> top;
+        top <font color='#5555FF'>=</font> top_temp;
+
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>current_element,item.current_element<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>_at_start,item._at_start<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> stack_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='push'></a>push</b><font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// allocate memory for new node
+</font>        node<font color='#5555FF'>*</font> new_node <font color='#5555FF'>=</font> pool.<font color='#BB00BB'>allocate</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// swap item into new_node
+</font>        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>new_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item,item<font face='Lucida Console'>)</font>;
+        
+        <font color='#009900'>// put new_node into stack
+</font>        new_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> top;
+        top <font color='#5555FF'>=</font> new_node;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>stack_size;
+
+        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> stack_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='pop'></a>pop</b><font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        node<font color='#5555FF'>*</font> old_node <font color='#5555FF'>=</font> top;
+        top <font color='#5555FF'>=</font> top<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+
+        <font color='#009900'>// swap the item from the stack into item
+</font>        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>old_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item,item<font face='Lucida Console'>)</font>;
+        
+        <font color='#009900'>// free the memory
+</font>        pool.<font color='#BB00BB'>deallocate</font><font face='Lucida Console'>(</font>old_node<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>stack_size;
+
+        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// private member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> stack_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='delete_elements_in_stack'></a>delete_elements_in_stack</b><font face='Lucida Console'>(</font>
+        node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> top
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        node<font color='#5555FF'>*</font> temp;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>top <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            temp <font color='#5555FF'>=</font> top<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+            pool.<font color='#BB00BB'>deallocate</font><font face='Lucida Console'>(</font>top<font face='Lucida Console'>)</font>;
+            top <font color='#5555FF'>=</font> temp;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// enumerable function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>   
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> stack_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> stack_size;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> stack_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='at_start'></a>at_start</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> _at_start;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> stack_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        _at_start <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        current_element <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> stack_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='current_element_valid'></a>current_element_valid</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> current_element <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> stack_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> current_element<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    T<font color='#5555FF'>&amp;</font> stack_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> current_element<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> stack_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='move_next'></a>move_next</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>_at_start<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>current_element<font face='Lucida Console'>)</font>
+            <b>{</b>
+                current_element <font color='#5555FF'>=</font> current_element<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>current_element<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                <font color='#0000FF'>else</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            _at_start <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>stack_size<font face='Lucida Console'>)</font>
+            <b>{</b>
+                current_element <font color='#5555FF'>=</font> top;
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// remover function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> stack_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='remove_any'></a>remove_any</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#BB00BB'>pop</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_STACK_KERNEl_1_
+</font>
+
+</pre></body></html>

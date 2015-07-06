@@ -1,0 +1,1229 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - trees.c</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/* trees.c -- output deflated data using Huffman coding
+ * Copyright (C) 1995-2012 Jean-loup Gailly
+ * detect_data_type() function provided freely by Cosmin Truta, 2006
+ * For conditions of distribution and use, see copyright notice in zlib.h
+ */</font>
+
+<font color='#009900'>/*
+ *  ALGORITHM
+ *
+ *      The "deflation" process uses several Huffman trees. The more
+ *      common source values are represented by shorter bit sequences.
+ *
+ *      Each code tree is stored in a compressed form which is itself
+ * a Huffman encoding of the lengths of all the code strings (in
+ * ascending order by source values).  The actual code strings are
+ * reconstructed from the lengths in the inflate process, as described
+ * in the deflate specification.
+ *
+ *  REFERENCES
+ *
+ *      Deutsch, L.P.,"'Deflate' Compressed Data Format Specification".
+ *      Available in ftp.uu.net:/pub/archiving/zip/doc/deflate-1.1.doc
+ *
+ *      Storer, James A.
+ *          Data Compression:  Methods and Theory, pp. 49-50.
+ *          Computer Science Press, 1988.  ISBN 0-7167-8156-5.
+ *
+ *      Sedgewick, R.
+ *          Algorithms, p290.
+ *          Addison-Wesley, 1983. ISBN 0-201-06672-6.
+ */</font>
+
+<font color='#009900'>/* @(#) $Id$ */</font>
+
+<font color='#009900'>/* #define GEN_TREES_H */</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='deflate.h.html'>deflate.h</a>"
+
+<font color='#0000FF'>#ifdef</font> DEBUG
+#  include <font color='#5555FF'>&lt;</font>ctype.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* ===========================================================================
+ * Constants
+ */</font>
+
+<font color='#0000FF'>#define</font> MAX_BL_BITS <font color='#979000'>7</font>
+<font color='#009900'>/* Bit length codes must not exceed MAX_BL_BITS bits */</font>
+
+<font color='#0000FF'>#define</font> END_BLOCK <font color='#979000'>256</font>
+<font color='#009900'>/* end of block literal code */</font>
+
+<font color='#0000FF'>#define</font> REP_3_6      <font color='#979000'>16</font>
+<font color='#009900'>/* repeat previous bit length 3-6 times (2 bits of repeat count) */</font>
+
+<font color='#0000FF'>#define</font> REPZ_3_10    <font color='#979000'>17</font>
+<font color='#009900'>/* repeat a zero length 3-10 times  (3 bits of repeat count) */</font>
+
+<font color='#0000FF'>#define</font> REPZ_11_138  <font color='#979000'>18</font>
+<font color='#009900'>/* repeat a zero length 11-138 times  (7 bits of repeat count) */</font>
+
+local <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> extra_lbits[LENGTH_CODES] <font color='#009900'>/* extra bits for each length code */</font>
+   <font color='#5555FF'>=</font> <b>{</b><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>1</font>,<font color='#979000'>1</font>,<font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#979000'>2</font>,<font color='#979000'>2</font>,<font color='#979000'>2</font>,<font color='#979000'>3</font>,<font color='#979000'>3</font>,<font color='#979000'>3</font>,<font color='#979000'>3</font>,<font color='#979000'>4</font>,<font color='#979000'>4</font>,<font color='#979000'>4</font>,<font color='#979000'>4</font>,<font color='#979000'>5</font>,<font color='#979000'>5</font>,<font color='#979000'>5</font>,<font color='#979000'>5</font>,<font color='#979000'>0</font><b>}</b>;
+
+local <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> extra_dbits[D_CODES] <font color='#009900'>/* extra bits for each distance code */</font>
+   <font color='#5555FF'>=</font> <b>{</b><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#979000'>2</font>,<font color='#979000'>3</font>,<font color='#979000'>3</font>,<font color='#979000'>4</font>,<font color='#979000'>4</font>,<font color='#979000'>5</font>,<font color='#979000'>5</font>,<font color='#979000'>6</font>,<font color='#979000'>6</font>,<font color='#979000'>7</font>,<font color='#979000'>7</font>,<font color='#979000'>8</font>,<font color='#979000'>8</font>,<font color='#979000'>9</font>,<font color='#979000'>9</font>,<font color='#979000'>10</font>,<font color='#979000'>10</font>,<font color='#979000'>11</font>,<font color='#979000'>11</font>,<font color='#979000'>12</font>,<font color='#979000'>12</font>,<font color='#979000'>13</font>,<font color='#979000'>13</font><b>}</b>;
+
+local <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> extra_blbits[BL_CODES]<font color='#009900'>/* extra bits for each bit length code */</font>
+   <font color='#5555FF'>=</font> <b>{</b><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>2</font>,<font color='#979000'>3</font>,<font color='#979000'>7</font><b>}</b>;
+
+local <font color='#0000FF'>const</font> uch bl_order[BL_CODES]
+   <font color='#5555FF'>=</font> <b>{</b><font color='#979000'>16</font>,<font color='#979000'>17</font>,<font color='#979000'>18</font>,<font color='#979000'>0</font>,<font color='#979000'>8</font>,<font color='#979000'>7</font>,<font color='#979000'>9</font>,<font color='#979000'>6</font>,<font color='#979000'>10</font>,<font color='#979000'>5</font>,<font color='#979000'>11</font>,<font color='#979000'>4</font>,<font color='#979000'>12</font>,<font color='#979000'>3</font>,<font color='#979000'>13</font>,<font color='#979000'>2</font>,<font color='#979000'>14</font>,<font color='#979000'>1</font>,<font color='#979000'>15</font><b>}</b>;
+<font color='#009900'>/* The lengths of the bit length codes are sent in order of decreasing
+ * probability, to avoid transmitting the lengths for unused bit length codes.
+ */</font>
+
+<font color='#009900'>/* ===========================================================================
+ * Local data. These are initialized only once.
+ */</font>
+
+<font color='#0000FF'>#define</font> DIST_CODE_LEN  <font color='#979000'>512</font> <font color='#009900'>/* see definition of array dist_code below */</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>GEN_TREES_H<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font color='#5555FF'>!</font>defined<font face='Lucida Console'>(</font>STDC<font face='Lucida Console'>)</font>
+<font color='#009900'>/* non ANSI compilers may not accept trees.h */</font>
+
+local ct_data static_ltree[L_CODES<font color='#5555FF'>+</font><font color='#979000'>2</font>];
+<font color='#009900'>/* The static literal tree. Since the bit lengths are imposed, there is no
+ * need for the L_CODES extra codes used during heap construction. However
+ * The codes 286 and 287 are needed to build a canonical tree (see _tr_init
+ * below).
+ */</font>
+
+local ct_data static_dtree[D_CODES];
+<font color='#009900'>/* The static distance tree. (Actually a trivial tree since all codes use
+ * 5 bits.)
+ */</font>
+
+uch _dist_code[DIST_CODE_LEN];
+<font color='#009900'>/* Distance codes. The first 256 values correspond to the distances
+ * 3 .. 258, the last 256 values correspond to the top 8 bits of
+ * the 15 bit distances.
+ */</font>
+
+uch _length_code[MAX_MATCH<font color='#5555FF'>-</font>MIN_MATCH<font color='#5555FF'>+</font><font color='#979000'>1</font>];
+<font color='#009900'>/* length code for each normalized match length (0 == MIN_MATCH) */</font>
+
+local <font color='#0000FF'><u>int</u></font> base_length[LENGTH_CODES];
+<font color='#009900'>/* First normalized length for each code (0 = MIN_MATCH) */</font>
+
+local <font color='#0000FF'><u>int</u></font> base_dist[D_CODES];
+<font color='#009900'>/* First normalized distance for each code (0 = distance of 1) */</font>
+
+<font color='#0000FF'>#else</font>
+#  include "<font color='#CC0000'>trees.h</font>"
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* GEN_TREES_H */</font>
+
+<font color='#0000FF'>struct</font> <b><a name='static_tree_desc_s'></a>static_tree_desc_s</b> <b>{</b>
+    <font color='#0000FF'>const</font> ct_data <font color='#5555FF'>*</font>static_tree;  <font color='#009900'>/* static tree or NULL */</font>
+    <font color='#0000FF'>const</font> intf <font color='#5555FF'>*</font>extra_bits;      <font color='#009900'>/* extra bits for each code or NULL */</font>
+    <font color='#0000FF'><u>int</u></font>     extra_base;          <font color='#009900'>/* base index for extra_bits */</font>
+    <font color='#0000FF'><u>int</u></font>     elems;               <font color='#009900'>/* max number of elements in the tree */</font>
+    <font color='#0000FF'><u>int</u></font>     max_length;          <font color='#009900'>/* max bit length for the codes */</font>
+<b>}</b>;
+
+local static_tree_desc  static_l_desc <font color='#5555FF'>=</font>
+<b>{</b>static_ltree, extra_lbits, LITERALS<font color='#5555FF'>+</font><font color='#979000'>1</font>, L_CODES, MAX_BITS<b>}</b>;
+
+local static_tree_desc  static_d_desc <font color='#5555FF'>=</font>
+<b>{</b>static_dtree, extra_dbits, <font color='#979000'>0</font>,          D_CODES, MAX_BITS<b>}</b>;
+
+local static_tree_desc  static_bl_desc <font color='#5555FF'>=</font>
+<b>{</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> ct_data <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#979000'>0</font>, extra_blbits, <font color='#979000'>0</font>,   BL_CODES, MAX_BL_BITS<b>}</b>;
+
+<font color='#009900'>/* ===========================================================================
+ * Local (static) routines in this file.
+ */</font>
+
+local <font color='#0000FF'><u>void</u></font> tr_static_init <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>void</u></font> init_block     <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>deflate_state <font color='#5555FF'>*</font>s<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>void</u></font> pqdownheap     <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>deflate_state <font color='#5555FF'>*</font>s, ct_data <font color='#5555FF'>*</font>tree, <font color='#0000FF'><u>int</u></font> k<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>void</u></font> gen_bitlen     <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>deflate_state <font color='#5555FF'>*</font>s, tree_desc <font color='#5555FF'>*</font>desc<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>void</u></font> gen_codes      <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>ct_data <font color='#5555FF'>*</font>tree, <font color='#0000FF'><u>int</u></font> max_code, ushf <font color='#5555FF'>*</font>bl_count<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>void</u></font> build_tree     <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>deflate_state <font color='#5555FF'>*</font>s, tree_desc <font color='#5555FF'>*</font>desc<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>void</u></font> scan_tree      <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>deflate_state <font color='#5555FF'>*</font>s, ct_data <font color='#5555FF'>*</font>tree, <font color='#0000FF'><u>int</u></font> max_code<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>void</u></font> send_tree      <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>deflate_state <font color='#5555FF'>*</font>s, ct_data <font color='#5555FF'>*</font>tree, <font color='#0000FF'><u>int</u></font> max_code<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>int</u></font>  build_bl_tree  <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>deflate_state <font color='#5555FF'>*</font>s<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>void</u></font> send_all_trees <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>deflate_state <font color='#5555FF'>*</font>s, <font color='#0000FF'><u>int</u></font> lcodes, <font color='#0000FF'><u>int</u></font> dcodes,
+                              <font color='#0000FF'><u>int</u></font> blcodes<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>void</u></font> compress_block <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>deflate_state <font color='#5555FF'>*</font>s, <font color='#0000FF'>const</font> ct_data <font color='#5555FF'>*</font>ltree,
+                              <font color='#0000FF'>const</font> ct_data <font color='#5555FF'>*</font>dtree<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>int</u></font>  detect_data_type <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>deflate_state <font color='#5555FF'>*</font>s<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>unsigned</u></font> bi_reverse <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> value, <font color='#0000FF'><u>int</u></font> length<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>void</u></font> bi_windup      <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>deflate_state <font color='#5555FF'>*</font>s<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>void</u></font> bi_flush       <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>deflate_state <font color='#5555FF'>*</font>s<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>void</u></font> copy_block     <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>deflate_state <font color='#5555FF'>*</font>s, charf <font color='#5555FF'>*</font>buf, <font color='#0000FF'><u>unsigned</u></font> len,
+                              <font color='#0000FF'><u>int</u></font> header<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#ifdef</font> GEN_TREES_H
+local <font color='#0000FF'><u>void</u></font> gen_trees_header <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifndef</font> DEBUG
+#  define <b><a name='send_code'></a>send_code</b><font face='Lucida Console'>(</font>s, c, tree<font face='Lucida Console'>)</font> <b><a name='send_bits'></a>send_bits</b><font face='Lucida Console'>(</font>s, tree[c].Code, tree[c].Len<font face='Lucida Console'>)</font>
+   <font color='#009900'>/* Send a code of the given tree. c and tree must not have side effects */</font>
+
+<font color='#0000FF'>#else</font> <font color='#009900'>/* DEBUG */</font>
+#  define <b><a name='send_code'></a>send_code</b><font face='Lucida Console'>(</font>s, c, tree<font face='Lucida Console'>)</font> \
+     <b>{</b> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>z_verbose<font color='#5555FF'>&gt;</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>stderr,"<font color='#CC0000'>\ncd %3d </font>",<font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; \
+       <font color='#BB00BB'>send_bits</font><font face='Lucida Console'>(</font>s, tree[c].Code, tree[c].Len<font face='Lucida Console'>)</font>; <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* ===========================================================================
+ * Output a short LSB first on the stream.
+ * IN assertion: there is enough room in pendingBuf.
+ */</font>
+<font color='#0000FF'>#define</font> put_short<font face='Lucida Console'>(</font>s, w<font face='Lucida Console'>)</font> <b>{</b> \
+    <font color='#BB00BB'>put_byte</font><font face='Lucida Console'>(</font>s, <font face='Lucida Console'>(</font>uch<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>w<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xff</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; \
+    <font color='#BB00BB'>put_byte</font><font face='Lucida Console'>(</font>s, <font face='Lucida Console'>(</font>uch<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>ush<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>w<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; \
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Send a value on a given number of bits.
+ * IN assertion: length &lt;= 16 and value fits in length bits.
+ */</font>
+<font color='#0000FF'>#ifdef</font> DEBUG
+local <font color='#0000FF'><u>void</u></font> send_bits      <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>deflate_state <font color='#5555FF'>*</font>s, <font color='#0000FF'><u>int</u></font> value, <font color='#0000FF'><u>int</u></font> length<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+local <font color='#0000FF'><u>void</u></font> <b><a name='send_bits'></a>send_bits</b><font face='Lucida Console'>(</font>s, value, length<font face='Lucida Console'>)</font>
+    deflate_state <font color='#5555FF'>*</font>s;
+    <font color='#0000FF'><u>int</u></font> value;  <font color='#009900'>/* value to send */</font>
+    <font color='#0000FF'><u>int</u></font> length; <font color='#009900'>/* number of bits */</font>
+<b>{</b>
+    <font color='#BB00BB'>Tracevv</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr,"<font color='#CC0000'> l %2d v %4x </font>", length, value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>Assert</font><font face='Lucida Console'>(</font>length <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> length <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>15</font>, "<font color='#CC0000'>invalid length</font>"<font face='Lucida Console'>)</font>;
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bits_sent <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ulg<font face='Lucida Console'>)</font>length;
+
+    <font color='#009900'>/* If not enough room in bi_buf, use (valid) bits from bi_buf and
+     * (16 - bi_valid) bits from value, leaving (width - (16-bi_valid))
+     * unused bits in value.
+     */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_valid <font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>Buf_size <font color='#5555FF'>-</font> length<font face='Lucida Console'>)</font> <b>{</b>
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_buf <font color='#5555FF'>|</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ush<font face='Lucida Console'>)</font>value <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_valid;
+        <font color='#BB00BB'>put_short</font><font face='Lucida Console'>(</font>s, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_buf<font face='Lucida Console'>)</font>;
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_buf <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ush<font face='Lucida Console'>)</font>value <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font>Buf_size <font color='#5555FF'>-</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_valid<font face='Lucida Console'>)</font>;
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_valid <font color='#5555FF'>+</font><font color='#5555FF'>=</font> length <font color='#5555FF'>-</font> Buf_size;
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_buf <font color='#5555FF'>|</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ush<font face='Lucida Console'>)</font>value <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_valid;
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_valid <font color='#5555FF'>+</font><font color='#5555FF'>=</font> length;
+    <b>}</b>
+<b>}</b>
+<font color='#0000FF'>#else</font> <font color='#009900'>/* !DEBUG */</font>
+
+<font color='#0000FF'>#define</font> send_bits<font face='Lucida Console'>(</font>s, value, length<font face='Lucida Console'>)</font> \
+<b>{</b> <font color='#0000FF'><u>int</u></font> len <font color='#5555FF'>=</font> length;\
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_valid <font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>Buf_size <font color='#5555FF'>-</font> len<font face='Lucida Console'>)</font> <b>{</b>\
+    <font color='#0000FF'><u>int</u></font> val <font color='#5555FF'>=</font> value;\
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_buf <font color='#5555FF'>|</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ush<font face='Lucida Console'>)</font>val <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_valid;\
+    <font color='#BB00BB'>put_short</font><font face='Lucida Console'>(</font>s, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_buf<font face='Lucida Console'>)</font>;\
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_buf <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ush<font face='Lucida Console'>)</font>val <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font>Buf_size <font color='#5555FF'>-</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_valid<font face='Lucida Console'>)</font>;\
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_valid <font color='#5555FF'>+</font><font color='#5555FF'>=</font> len <font color='#5555FF'>-</font> Buf_size;\
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>\
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_buf <font color='#5555FF'>|</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ush<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_valid;\
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_valid <font color='#5555FF'>+</font><font color='#5555FF'>=</font> len;\
+  <b>}</b>\
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* DEBUG */</font>
+
+
+<font color='#009900'>/* the arguments must not have side effects */</font>
+
+<font color='#009900'>/* ===========================================================================
+ * Initialize the various 'constant' tables.
+ */</font>
+local <font color='#0000FF'><u>void</u></font> <b><a name='tr_static_init'></a>tr_static_init</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>GEN_TREES_H<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font color='#5555FF'>!</font>defined<font face='Lucida Console'>(</font>STDC<font face='Lucida Console'>)</font>
+    <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> static_init_done <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'><u>int</u></font> n;        <font color='#009900'>/* iterates over tree elements */</font>
+    <font color='#0000FF'><u>int</u></font> bits;     <font color='#009900'>/* bit counter */</font>
+    <font color='#0000FF'><u>int</u></font> length;   <font color='#009900'>/* length value */</font>
+    <font color='#0000FF'><u>int</u></font> code;     <font color='#009900'>/* code value */</font>
+    <font color='#0000FF'><u>int</u></font> dist;     <font color='#009900'>/* distance index */</font>
+    ush bl_count[MAX_BITS<font color='#5555FF'>+</font><font color='#979000'>1</font>];
+    <font color='#009900'>/* number of codes at each bit length for an optimal tree */</font>
+
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>static_init_done<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font>;
+
+    <font color='#009900'>/* For some embedded targets, global variables are not initialized: */</font>
+<font color='#0000FF'>#ifdef</font> NO_INIT_GLOBAL_POINTERS
+    static_l_desc.static_tree <font color='#5555FF'>=</font> static_ltree;
+    static_l_desc.extra_bits <font color='#5555FF'>=</font> extra_lbits;
+    static_d_desc.static_tree <font color='#5555FF'>=</font> static_dtree;
+    static_d_desc.extra_bits <font color='#5555FF'>=</font> extra_dbits;
+    static_bl_desc.extra_bits <font color='#5555FF'>=</font> extra_blbits;
+<font color='#0000FF'>#endif</font>
+
+    <font color='#009900'>/* Initialize the mapping length (0..255) -&gt; length code (0..28) */</font>
+    length <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>code <font color='#5555FF'>=</font> <font color='#979000'>0</font>; code <font color='#5555FF'>&lt;</font> LENGTH_CODES<font color='#5555FF'>-</font><font color='#979000'>1</font>; code<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+        base_length[code] <font color='#5555FF'>=</font> length;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>extra_lbits[code]<font face='Lucida Console'>)</font>; n<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+            _length_code[length<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>uch<font face='Lucida Console'>)</font>code;
+        <b>}</b>
+    <b>}</b>
+    <font color='#BB00BB'>Assert</font> <font face='Lucida Console'>(</font>length <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>256</font>, "<font color='#CC0000'>tr_static_init: length != 256</font>"<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Note that the length 255 (match length 258) can be represented
+     * in two different ways: code 284 + 5 bits or code 285, so we
+     * overwrite length_code[255] to use the best encoding:
+     */</font>
+    _length_code[length<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>uch<font face='Lucida Console'>)</font>code;
+
+    <font color='#009900'>/* Initialize the mapping dist (0..32K) -&gt; dist code (0..29) */</font>
+    dist <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>code <font color='#5555FF'>=</font> <font color='#979000'>0</font> ; code <font color='#5555FF'>&lt;</font> <font color='#979000'>16</font>; code<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+        base_dist[code] <font color='#5555FF'>=</font> dist;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>extra_dbits[code]<font face='Lucida Console'>)</font>; n<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+            _dist_code[dist<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>uch<font face='Lucida Console'>)</font>code;
+        <b>}</b>
+    <b>}</b>
+    <font color='#BB00BB'>Assert</font> <font face='Lucida Console'>(</font>dist <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>256</font>, "<font color='#CC0000'>tr_static_init: dist != 256</font>"<font face='Lucida Console'>)</font>;
+    dist <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>7</font>; <font color='#009900'>/* from now on, all distances are divided by 128 */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> ; code <font color='#5555FF'>&lt;</font> D_CODES; code<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+        base_dist[code] <font color='#5555FF'>=</font> dist <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>7</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font face='Lucida Console'>(</font>extra_dbits[code]<font color='#5555FF'>-</font><font color='#979000'>7</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; n<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+            _dist_code[<font color='#979000'>256</font> <font color='#5555FF'>+</font> dist<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>uch<font face='Lucida Console'>)</font>code;
+        <b>}</b>
+    <b>}</b>
+    <font color='#BB00BB'>Assert</font> <font face='Lucida Console'>(</font>dist <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>256</font>, "<font color='#CC0000'>tr_static_init: 256+dist != 512</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/* Construct the codes of the static literal tree */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>bits <font color='#5555FF'>=</font> <font color='#979000'>0</font>; bits <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> MAX_BITS; bits<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> bl_count[bits] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    n <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>143</font><font face='Lucida Console'>)</font> static_ltree[n<font color='#5555FF'>+</font><font color='#5555FF'>+</font>].Len <font color='#5555FF'>=</font> <font color='#979000'>8</font>, bl_count[<font color='#979000'>8</font>]<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font> static_ltree[n<font color='#5555FF'>+</font><font color='#5555FF'>+</font>].Len <font color='#5555FF'>=</font> <font color='#979000'>9</font>, bl_count[<font color='#979000'>9</font>]<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>279</font><font face='Lucida Console'>)</font> static_ltree[n<font color='#5555FF'>+</font><font color='#5555FF'>+</font>].Len <font color='#5555FF'>=</font> <font color='#979000'>7</font>, bl_count[<font color='#979000'>7</font>]<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>287</font><font face='Lucida Console'>)</font> static_ltree[n<font color='#5555FF'>+</font><font color='#5555FF'>+</font>].Len <font color='#5555FF'>=</font> <font color='#979000'>8</font>, bl_count[<font color='#979000'>8</font>]<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+    <font color='#009900'>/* Codes 286 and 287 do not exist, but we must include them in the
+     * tree construction to get a canonical Huffman tree (longest code
+     * all ones)
+     */</font>
+    <font color='#BB00BB'>gen_codes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>ct_data <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>static_ltree, L_CODES<font color='#5555FF'>+</font><font color='#979000'>1</font>, bl_count<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/* The static distance tree is trivial: */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> D_CODES; n<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+        static_dtree[n].Len <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+        static_dtree[n].Code <font color='#5555FF'>=</font> <font color='#BB00BB'>bi_reverse</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font>n, <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    static_init_done <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+#  ifdef GEN_TREES_H
+    <font color='#BB00BB'>gen_trees_header</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+#  endif
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* defined(GEN_TREES_H) || !defined(STDC) */</font>
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Genererate the file trees.h describing the static trees.
+ */</font>
+<font color='#0000FF'>#ifdef</font> GEN_TREES_H
+#  ifndef DEBUG
+#    include <font color='#5555FF'>&lt;</font>stdio.h<font color='#5555FF'>&gt;</font>
+#  endif
+
+#  define <b><a name='SEPARATOR'></a>SEPARATOR</b><font face='Lucida Console'>(</font>i, last, width<font face='Lucida Console'>)</font> \
+      <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>last<font face='Lucida Console'>)</font>? "<font color='#CC0000'>\n};\n\n</font>" :    \
+       <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>%</font> <font face='Lucida Console'>(</font>width<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>width<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font> ? "<font color='#CC0000'>,\n</font>" : "<font color='#CC0000'>, </font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+<font color='#0000FF'><u>void</u></font> <b><a name='gen_trees_header'></a>gen_trees_header</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    FILE <font color='#5555FF'>*</font>header <font color='#5555FF'>=</font> <font color='#BB00BB'>fopen</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>trees.h</font>", "<font color='#CC0000'>w</font>"<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>int</u></font> i;
+
+    <font color='#BB00BB'>Assert</font> <font face='Lucida Console'>(</font>header <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL, "<font color='#CC0000'>Can't open trees.h</font>"<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>header,
+            "<font color='#CC0000'>/* header created automatically with -DGEN_TREES_H */\n\n</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>header, "<font color='#CC0000'>local const ct_data static_ltree[L_CODES+2] = {\n</font>"<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> L_CODES<font color='#5555FF'>+</font><font color='#979000'>2</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>header, "<font color='#CC0000'>{{%3u},{%3u}}%s</font>", static_ltree[i].Code,
+                static_ltree[i].Len, <font color='#BB00BB'>SEPARATOR</font><font face='Lucida Console'>(</font>i, L_CODES<font color='#5555FF'>+</font><font color='#979000'>1</font>, <font color='#979000'>5</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>header, "<font color='#CC0000'>local const ct_data static_dtree[D_CODES] = {\n</font>"<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> D_CODES; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>header, "<font color='#CC0000'>{{%2u},{%2u}}%s</font>", static_dtree[i].Code,
+                static_dtree[i].Len, <font color='#BB00BB'>SEPARATOR</font><font face='Lucida Console'>(</font>i, D_CODES<font color='#5555FF'>-</font><font color='#979000'>1</font>, <font color='#979000'>5</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>header, "<font color='#CC0000'>const uch ZLIB_INTERNAL _dist_code[DIST_CODE_LEN] = {\n</font>"<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> DIST_CODE_LEN; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>header, "<font color='#CC0000'>%2u%s</font>", _dist_code[i],
+                <font color='#BB00BB'>SEPARATOR</font><font face='Lucida Console'>(</font>i, DIST_CODE_LEN<font color='#5555FF'>-</font><font color='#979000'>1</font>, <font color='#979000'>20</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>header,
+        "<font color='#CC0000'>const uch ZLIB_INTERNAL _length_code[MAX_MATCH-MIN_MATCH+1]= {\n</font>"<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> MAX_MATCH<font color='#5555FF'>-</font>MIN_MATCH<font color='#5555FF'>+</font><font color='#979000'>1</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>header, "<font color='#CC0000'>%2u%s</font>", _length_code[i],
+                <font color='#BB00BB'>SEPARATOR</font><font face='Lucida Console'>(</font>i, MAX_MATCH<font color='#5555FF'>-</font>MIN_MATCH, <font color='#979000'>20</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>header, "<font color='#CC0000'>local const int base_length[LENGTH_CODES] = {\n</font>"<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> LENGTH_CODES; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>header, "<font color='#CC0000'>%1u%s</font>", base_length[i],
+                <font color='#BB00BB'>SEPARATOR</font><font face='Lucida Console'>(</font>i, LENGTH_CODES<font color='#5555FF'>-</font><font color='#979000'>1</font>, <font color='#979000'>20</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>header, "<font color='#CC0000'>local const int base_dist[D_CODES] = {\n</font>"<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> D_CODES; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>header, "<font color='#CC0000'>%5u%s</font>", base_dist[i],
+                <font color='#BB00BB'>SEPARATOR</font><font face='Lucida Console'>(</font>i, D_CODES<font color='#5555FF'>-</font><font color='#979000'>1</font>, <font color='#979000'>10</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#BB00BB'>fclose</font><font face='Lucida Console'>(</font>header<font face='Lucida Console'>)</font>;
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* GEN_TREES_H */</font>
+
+<font color='#009900'>/* ===========================================================================
+ * Initialize the tree data structures for a new zlib stream.
+ */</font>
+<font color='#0000FF'><u>void</u></font> ZLIB_INTERNAL <b><a name='_tr_init'></a>_tr_init</b><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>
+    deflate_state <font color='#5555FF'>*</font>s;
+<b>{</b>
+    <font color='#BB00BB'>tr_static_init</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>l_desc.dyn_tree <font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_ltree;
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>l_desc.stat_desc <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>static_l_desc;
+
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d_desc.dyn_tree <font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_dtree;
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d_desc.stat_desc <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>static_d_desc;
+
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_desc.dyn_tree <font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_tree;
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_desc.stat_desc <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>static_bl_desc;
+
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_buf <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_valid <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<font color='#0000FF'>#ifdef</font> DEBUG
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>compressed_len <font color='#5555FF'>=</font> <font color='#979000'>0</font>L;
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bits_sent <font color='#5555FF'>=</font> <font color='#979000'>0</font>L;
+<font color='#0000FF'>#endif</font>
+
+    <font color='#009900'>/* Initialize the first block of the first file: */</font>
+    <font color='#BB00BB'>init_block</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Initialize a new block.
+ */</font>
+local <font color='#0000FF'><u>void</u></font> <b><a name='init_block'></a>init_block</b><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>
+    deflate_state <font color='#5555FF'>*</font>s;
+<b>{</b>
+    <font color='#0000FF'><u>int</u></font> n; <font color='#009900'>/* iterates over tree elements */</font>
+
+    <font color='#009900'>/* Initialize the trees. */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> L_CODES;  n<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_ltree[n].Freq <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> D_CODES;  n<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_dtree[n].Freq <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> BL_CODES; n<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_tree[n].Freq <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_ltree[END_BLOCK].Freq <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>opt_len <font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>static_len <font color='#5555FF'>=</font> <font color='#979000'>0</font>L;
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_lit <font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>matches <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<b>}</b>
+
+<font color='#0000FF'>#define</font> SMALLEST <font color='#979000'>1</font>
+<font color='#009900'>/* Index within the heap array of least frequent node in the Huffman tree */</font>
+
+
+<font color='#009900'>/* ===========================================================================
+ * Remove the smallest element from the heap and recreate the heap with
+ * one less element. Updates heap and heap_len.
+ */</font>
+<font color='#0000FF'>#define</font> pqremove<font face='Lucida Console'>(</font>s, tree, top<font face='Lucida Console'>)</font> \
+<b>{</b>\
+    top <font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[SMALLEST]; \
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[SMALLEST] <font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap_len<font color='#5555FF'>-</font><font color='#5555FF'>-</font>]; \
+    <font color='#BB00BB'>pqdownheap</font><font face='Lucida Console'>(</font>s, tree, SMALLEST<font face='Lucida Console'>)</font>; \
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Compares to subtrees, using the tree depth as tie breaker when
+ * the subtrees have equal frequency. This minimizes the worst case length.
+ */</font>
+<font color='#0000FF'>#define</font> smaller<font face='Lucida Console'>(</font>tree, n, m, depth<font face='Lucida Console'>)</font> \
+   <font face='Lucida Console'>(</font>tree[n].Freq <font color='#5555FF'>&lt;</font> tree[m].Freq <font color='#5555FF'>|</font><font color='#5555FF'>|</font> \
+   <font face='Lucida Console'>(</font>tree[n].Freq <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tree[m].Freq <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> depth[n] <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> depth[m]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>/* ===========================================================================
+ * Restore the heap property by moving down the tree starting at node k,
+ * exchanging a node with the smallest of its two sons if necessary, stopping
+ * when the heap property is re-established (each father smaller than its
+ * two sons).
+ */</font>
+local <font color='#0000FF'><u>void</u></font> <b><a name='pqdownheap'></a>pqdownheap</b><font face='Lucida Console'>(</font>s, tree, k<font face='Lucida Console'>)</font>
+    deflate_state <font color='#5555FF'>*</font>s;
+    ct_data <font color='#5555FF'>*</font>tree;  <font color='#009900'>/* the tree to restore */</font>
+    <font color='#0000FF'><u>int</u></font> k;               <font color='#009900'>/* node to move down */</font>
+<b>{</b>
+    <font color='#0000FF'><u>int</u></font> v <font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[k];
+    <font color='#0000FF'><u>int</u></font> j <font color='#5555FF'>=</font> k <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>1</font>;  <font color='#009900'>/* left son of k */</font>
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap_len<font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#009900'>/* Set j to the smallest of the two sons: */</font>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>&lt;</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap_len <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            <font color='#BB00BB'>smaller</font><font face='Lucida Console'>(</font>tree, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[j<font color='#5555FF'>+</font><font color='#979000'>1</font>], s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[j], s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>depth<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+            j<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+        <b>}</b>
+        <font color='#009900'>/* Exit if v is smaller than both sons */</font>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>smaller</font><font face='Lucida Console'>(</font>tree, v, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[j], s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>depth<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#0000FF'>break</font>;
+
+        <font color='#009900'>/* Exchange v with the smallest son */</font>
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[k] <font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[j];  k <font color='#5555FF'>=</font> j;
+
+        <font color='#009900'>/* And continue down the tree, setting j to the left son of k */</font>
+        j <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <b>}</b>
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[k] <font color='#5555FF'>=</font> v;
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Compute the optimal bit lengths for a tree and update the total bit length
+ * for the current block.
+ * IN assertion: the fields freq and dad are set, heap[heap_max] and
+ *    above are the tree nodes sorted by increasing frequency.
+ * OUT assertions: the field len is set to the optimal bit length, the
+ *     array bl_count contains the frequencies for each bit length.
+ *     The length opt_len is updated; static_len is also updated if stree is
+ *     not null.
+ */</font>
+local <font color='#0000FF'><u>void</u></font> <b><a name='gen_bitlen'></a>gen_bitlen</b><font face='Lucida Console'>(</font>s, desc<font face='Lucida Console'>)</font>
+    deflate_state <font color='#5555FF'>*</font>s;
+    tree_desc <font color='#5555FF'>*</font>desc;    <font color='#009900'>/* the tree descriptor */</font>
+<b>{</b>
+    ct_data <font color='#5555FF'>*</font>tree        <font color='#5555FF'>=</font> desc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_tree;
+    <font color='#0000FF'><u>int</u></font> max_code         <font color='#5555FF'>=</font> desc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_code;
+    <font color='#0000FF'>const</font> ct_data <font color='#5555FF'>*</font>stree <font color='#5555FF'>=</font> desc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stat_desc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>static_tree;
+    <font color='#0000FF'>const</font> intf <font color='#5555FF'>*</font>extra    <font color='#5555FF'>=</font> desc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stat_desc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>extra_bits;
+    <font color='#0000FF'><u>int</u></font> base             <font color='#5555FF'>=</font> desc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stat_desc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>extra_base;
+    <font color='#0000FF'><u>int</u></font> max_length       <font color='#5555FF'>=</font> desc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stat_desc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_length;
+    <font color='#0000FF'><u>int</u></font> h;              <font color='#009900'>/* heap index */</font>
+    <font color='#0000FF'><u>int</u></font> n, m;           <font color='#009900'>/* iterate over the tree elements */</font>
+    <font color='#0000FF'><u>int</u></font> bits;           <font color='#009900'>/* bit length */</font>
+    <font color='#0000FF'><u>int</u></font> xbits;          <font color='#009900'>/* extra bits */</font>
+    ush f;              <font color='#009900'>/* frequency */</font>
+    <font color='#0000FF'><u>int</u></font> overflow <font color='#5555FF'>=</font> <font color='#979000'>0</font>;   <font color='#009900'>/* number of elements with bit length too large */</font>
+
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>bits <font color='#5555FF'>=</font> <font color='#979000'>0</font>; bits <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> MAX_BITS; bits<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_count[bits] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+    <font color='#009900'>/* In a first pass, compute the optimal bit lengths (which may
+     * overflow in the case of the bit length tree).
+     */</font>
+    tree[s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap_max]].Len <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#009900'>/* root of the heap */</font>
+
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>h <font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap_max<font color='#5555FF'>+</font><font color='#979000'>1</font>; h <font color='#5555FF'>&lt;</font> HEAP_SIZE; h<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+        n <font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[h];
+        bits <font color='#5555FF'>=</font> tree[tree[n].Dad].Len <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bits <font color='#5555FF'>&gt;</font> max_length<font face='Lucida Console'>)</font> bits <font color='#5555FF'>=</font> max_length, overflow<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+        tree[n].Len <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ush<font face='Lucida Console'>)</font>bits;
+        <font color='#009900'>/* We overwrite tree[n].Dad which is no longer needed */</font>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>&gt;</font> max_code<font face='Lucida Console'>)</font> <font color='#0000FF'>continue</font>; <font color='#009900'>/* not a leaf node */</font>
+
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_count[bits]<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+        xbits <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> base<font face='Lucida Console'>)</font> xbits <font color='#5555FF'>=</font> extra[n<font color='#5555FF'>-</font>base];
+        f <font color='#5555FF'>=</font> tree[n].Freq;
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>opt_len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ulg<font face='Lucida Console'>)</font>f <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>bits <font color='#5555FF'>+</font> xbits<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>stree<font face='Lucida Console'>)</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>static_len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ulg<font face='Lucida Console'>)</font>f <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>stree[n].Len <font color='#5555FF'>+</font> xbits<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>overflow <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#0000FF'>return</font>;
+
+    <font color='#BB00BB'>Trace</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr,"<font color='#CC0000'>\nbit length overflow\n</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* This happens for example on obj2 and pic of the Calgary corpus */</font>
+
+    <font color='#009900'>/* Find the first bit length which could increase: */</font>
+    <font color='#0000FF'>do</font> <b>{</b>
+        bits <font color='#5555FF'>=</font> max_length<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_count[bits] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> bits<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_count[bits]<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;      <font color='#009900'>/* move one leaf down the tree */</font>
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_count[bits<font color='#5555FF'>+</font><font color='#979000'>1</font>] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>; <font color='#009900'>/* move one overflow item as its brother */</font>
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_count[max_length]<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+        <font color='#009900'>/* The brother of the overflow item also moves one step up,
+         * but this does not affect bl_count[max_length]
+         */</font>
+        overflow <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>overflow <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/* Now recompute all bit lengths, scanning in increasing frequency.
+     * h is still equal to HEAP_SIZE. (It is simpler to reconstruct all
+     * lengths instead of fixing only the wrong ones. This idea is taken
+     * from 'ar' written by Haruhiko Okumura.)
+     */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>bits <font color='#5555FF'>=</font> max_length; bits <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; bits<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+        n <font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_count[bits];
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+            m <font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[<font color='#5555FF'>-</font><font color='#5555FF'>-</font>h];
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>m <font color='#5555FF'>&gt;</font> max_code<font face='Lucida Console'>)</font> <font color='#0000FF'>continue</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font> tree[m].Len <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font> bits<font face='Lucida Console'>)</font> <b>{</b>
+                <font color='#BB00BB'>Trace</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr,"<font color='#CC0000'>code %d bits %d-&gt;%d\n</font>", m, tree[m].Len, bits<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>opt_len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>bits <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>tree[m].Len<font face='Lucida Console'>)</font>
+                              <font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>tree[m].Freq;
+                tree[m].Len <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ush<font face='Lucida Console'>)</font>bits;
+            <b>}</b>
+            n<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+        <b>}</b>
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Generate the codes for a given tree and bit counts (which need not be
+ * optimal).
+ * IN assertion: the array bl_count contains the bit length statistics for
+ * the given tree and the field len is set for all tree elements.
+ * OUT assertion: the field code is set for all tree elements of non
+ *     zero code length.
+ */</font>
+local <font color='#0000FF'><u>void</u></font> <b><a name='gen_codes'></a>gen_codes</b> <font face='Lucida Console'>(</font>tree, max_code, bl_count<font face='Lucida Console'>)</font>
+    ct_data <font color='#5555FF'>*</font>tree;             <font color='#009900'>/* the tree to decorate */</font>
+    <font color='#0000FF'><u>int</u></font> max_code;              <font color='#009900'>/* largest code with non zero frequency */</font>
+    ushf <font color='#5555FF'>*</font>bl_count;            <font color='#009900'>/* number of codes at each bit length */</font>
+<b>{</b>
+    ush next_code[MAX_BITS<font color='#5555FF'>+</font><font color='#979000'>1</font>]; <font color='#009900'>/* next code value for each bit length */</font>
+    ush code <font color='#5555FF'>=</font> <font color='#979000'>0</font>;              <font color='#009900'>/* running code value */</font>
+    <font color='#0000FF'><u>int</u></font> bits;                  <font color='#009900'>/* bit index */</font>
+    <font color='#0000FF'><u>int</u></font> n;                     <font color='#009900'>/* code index */</font>
+
+    <font color='#009900'>/* The distribution counts are first used to generate the code values
+     * without bit reversal.
+     */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>bits <font color='#5555FF'>=</font> <font color='#979000'>1</font>; bits <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> MAX_BITS; bits<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+        next_code[bits] <font color='#5555FF'>=</font> code <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code <font color='#5555FF'>+</font> bl_count[bits<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>1</font>;
+    <b>}</b>
+    <font color='#009900'>/* Check that the bit counts in bl_count are consistent. The last code
+     * must be all ones.
+     */</font>
+    <font color='#BB00BB'>Assert</font> <font face='Lucida Console'>(</font>code <font color='#5555FF'>+</font> bl_count[MAX_BITS]<font color='#5555FF'>-</font><font color='#979000'>1</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>MAX_BITS<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>,
+            "<font color='#CC0000'>inconsistent bit counts</font>"<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr,"<font color='#CC0000'>\ngen_codes: max_code %d </font>", max_code<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> <font color='#979000'>0</font>;  n <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> max_code; n<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#0000FF'><u>int</u></font> len <font color='#5555FF'>=</font> tree[n].Len;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#0000FF'>continue</font>;
+        <font color='#009900'>/* Now reverse the bits */</font>
+        tree[n].Code <font color='#5555FF'>=</font> <font color='#BB00BB'>bi_reverse</font><font face='Lucida Console'>(</font>next_code[len]<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, len<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>Tracecv</font><font face='Lucida Console'>(</font>tree <font color='#5555FF'>!</font><font color='#5555FF'>=</font> static_ltree, <font face='Lucida Console'>(</font>stderr,"<font color='#CC0000'>\nn %3d %c l %2d c %4x (%x) </font>",
+             n, <font face='Lucida Console'>(</font><font color='#BB00BB'>isgraph</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font> ? n : '<font color='#FF0000'> </font>'<font face='Lucida Console'>)</font>, len, tree[n].Code, next_code[len]<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Construct one Huffman tree and assigns the code bit strings and lengths.
+ * Update the total bit length for the current block.
+ * IN assertion: the field freq is set for all tree elements.
+ * OUT assertions: the fields len and code are set to the optimal bit length
+ *     and corresponding code. The length opt_len is updated; static_len is
+ *     also updated if stree is not null. The field max_code is set.
+ */</font>
+local <font color='#0000FF'><u>void</u></font> <b><a name='build_tree'></a>build_tree</b><font face='Lucida Console'>(</font>s, desc<font face='Lucida Console'>)</font>
+    deflate_state <font color='#5555FF'>*</font>s;
+    tree_desc <font color='#5555FF'>*</font>desc; <font color='#009900'>/* the tree descriptor */</font>
+<b>{</b>
+    ct_data <font color='#5555FF'>*</font>tree         <font color='#5555FF'>=</font> desc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_tree;
+    <font color='#0000FF'>const</font> ct_data <font color='#5555FF'>*</font>stree  <font color='#5555FF'>=</font> desc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stat_desc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>static_tree;
+    <font color='#0000FF'><u>int</u></font> elems             <font color='#5555FF'>=</font> desc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stat_desc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>elems;
+    <font color='#0000FF'><u>int</u></font> n, m;          <font color='#009900'>/* iterate over heap elements */</font>
+    <font color='#0000FF'><u>int</u></font> max_code <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#009900'>/* largest code with non zero frequency */</font>
+    <font color='#0000FF'><u>int</u></font> node;          <font color='#009900'>/* new node being created */</font>
+
+    <font color='#009900'>/* Construct the initial heap, with least frequent element in
+     * heap[SMALLEST]. The sons of heap[n] are heap[2*n] and heap[2*n+1].
+     * heap[0] is not used.
+     */</font>
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap_len <font color='#5555FF'>=</font> <font color='#979000'>0</font>, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap_max <font color='#5555FF'>=</font> HEAP_SIZE;
+
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> elems; n<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree[n].Freq <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+            s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap_len<font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font> max_code <font color='#5555FF'>=</font> n;
+            s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>depth[n] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+            tree[n].Len <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#009900'>/* The pkzip format requires that at least one distance code exists,
+     * and that at least one bit should be sent even if there is only one
+     * possible code. So to avoid special checks later on we force at least
+     * two codes of non zero frequency.
+     */</font>
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap_len <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font> <b>{</b>
+        node <font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap_len<font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>max_code <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font> ? <font color='#5555FF'>+</font><font color='#5555FF'>+</font>max_code : <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        tree[node].Freq <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>depth[node] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>opt_len<font color='#5555FF'>-</font><font color='#5555FF'>-</font>; <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>stree<font face='Lucida Console'>)</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>static_len <font color='#5555FF'>-</font><font color='#5555FF'>=</font> stree[node].Len;
+        <font color='#009900'>/* node is 0 or 1 so it does not have extra bits */</font>
+    <b>}</b>
+    desc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_code <font color='#5555FF'>=</font> max_code;
+
+    <font color='#009900'>/* The elements heap[heap_len/2+1 .. heap_len] are leaves of the tree,
+     * establish sub-heaps of increasing lengths:
+     */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap_len<font color='#5555FF'>/</font><font color='#979000'>2</font>; n <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>; n<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <font color='#BB00BB'>pqdownheap</font><font face='Lucida Console'>(</font>s, tree, n<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/* Construct the Huffman tree by repeatedly combining the least two
+     * frequent nodes.
+     */</font>
+    node <font color='#5555FF'>=</font> elems;              <font color='#009900'>/* next internal node of the tree */</font>
+    <font color='#0000FF'>do</font> <b>{</b>
+        <font color='#BB00BB'>pqremove</font><font face='Lucida Console'>(</font>s, tree, n<font face='Lucida Console'>)</font>;  <font color='#009900'>/* n = node of least frequency */</font>
+        m <font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[SMALLEST]; <font color='#009900'>/* m = node of next least frequency */</font>
+
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap_max<font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font> n; <font color='#009900'>/* keep the nodes sorted by frequency */</font>
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap_max<font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font> m;
+
+        <font color='#009900'>/* Create a new node father of n and m */</font>
+        tree[node].Freq <font color='#5555FF'>=</font> tree[n].Freq <font color='#5555FF'>+</font> tree[m].Freq;
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>depth[node] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>uch<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>depth[n] <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>depth[m] ?
+                                s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>depth[n] : s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>depth[m]<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        tree[n].Dad <font color='#5555FF'>=</font> tree[m].Dad <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ush<font face='Lucida Console'>)</font>node;
+<font color='#0000FF'>#ifdef</font> DUMP_BL_TREE
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree <font color='#5555FF'>=</font><font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_tree<font face='Lucida Console'>)</font> <b>{</b>
+            <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>stderr,"<font color='#CC0000'>\nnode %d(%d), sons %d(%d) %d(%d)</font>",
+                    node, tree[node].Freq, n, tree[n].Freq, m, tree[m].Freq<font face='Lucida Console'>)</font>;
+        <b>}</b>
+<font color='#0000FF'>#endif</font>
+        <font color='#009900'>/* and insert the new node in the heap */</font>
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[SMALLEST] <font color='#5555FF'>=</font> node<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+        <font color='#BB00BB'>pqdownheap</font><font face='Lucida Console'>(</font>s, tree, SMALLEST<font face='Lucida Console'>)</font>;
+
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap_len <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap_max<font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>heap[SMALLEST];
+
+    <font color='#009900'>/* At this point, the fields freq and dad are set. We can now
+     * generate the bit lengths.
+     */</font>
+    <font color='#BB00BB'>gen_bitlen</font><font face='Lucida Console'>(</font>s, <font face='Lucida Console'>(</font>tree_desc <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>desc<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/* The field len is now set, we can generate the bit codes */</font>
+    <font color='#BB00BB'>gen_codes</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>ct_data <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>tree, max_code, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_count<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Scan a literal or distance tree to determine the frequencies of the codes
+ * in the bit length tree.
+ */</font>
+local <font color='#0000FF'><u>void</u></font> <b><a name='scan_tree'></a>scan_tree</b> <font face='Lucida Console'>(</font>s, tree, max_code<font face='Lucida Console'>)</font>
+    deflate_state <font color='#5555FF'>*</font>s;
+    ct_data <font color='#5555FF'>*</font>tree;   <font color='#009900'>/* the tree to be scanned */</font>
+    <font color='#0000FF'><u>int</u></font> max_code;    <font color='#009900'>/* and its largest code of non zero frequency */</font>
+<b>{</b>
+    <font color='#0000FF'><u>int</u></font> n;                     <font color='#009900'>/* iterates over all tree elements */</font>
+    <font color='#0000FF'><u>int</u></font> prevlen <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;          <font color='#009900'>/* last emitted length */</font>
+    <font color='#0000FF'><u>int</u></font> curlen;                <font color='#009900'>/* length of current code */</font>
+    <font color='#0000FF'><u>int</u></font> nextlen <font color='#5555FF'>=</font> tree[<font color='#979000'>0</font>].Len; <font color='#009900'>/* length of next code */</font>
+    <font color='#0000FF'><u>int</u></font> count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;             <font color='#009900'>/* repeat count of the current code */</font>
+    <font color='#0000FF'><u>int</u></font> max_count <font color='#5555FF'>=</font> <font color='#979000'>7</font>;         <font color='#009900'>/* max repeat count */</font>
+    <font color='#0000FF'><u>int</u></font> min_count <font color='#5555FF'>=</font> <font color='#979000'>4</font>;         <font color='#009900'>/* min repeat count */</font>
+
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nextlen <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> max_count <font color='#5555FF'>=</font> <font color='#979000'>138</font>, min_count <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+    tree[max_code<font color='#5555FF'>+</font><font color='#979000'>1</font>].Len <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ush<font face='Lucida Console'>)</font><font color='#979000'>0xffff</font>; <font color='#009900'>/* guard */</font>
+
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> max_code; n<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+        curlen <font color='#5555FF'>=</font> nextlen; nextlen <font color='#5555FF'>=</font> tree[n<font color='#5555FF'>+</font><font color='#979000'>1</font>].Len;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font>count <font color='#5555FF'>&lt;</font> max_count <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> curlen <font color='#5555FF'>=</font><font color='#5555FF'>=</font> nextlen<font face='Lucida Console'>)</font> <b>{</b>
+            <font color='#0000FF'>continue</font>;
+        <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>&lt;</font> min_count<font face='Lucida Console'>)</font> <b>{</b>
+            s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_tree[curlen].Freq <font color='#5555FF'>+</font><font color='#5555FF'>=</font> count;
+        <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>curlen <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>curlen <font color='#5555FF'>!</font><font color='#5555FF'>=</font> prevlen<font face='Lucida Console'>)</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_tree[curlen].Freq<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+            s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_tree[REP_3_6].Freq<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+        <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font> <b>{</b>
+            s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_tree[REPZ_3_10].Freq<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+        <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+            s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_tree[REPZ_11_138].Freq<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+        <b>}</b>
+        count <font color='#5555FF'>=</font> <font color='#979000'>0</font>; prevlen <font color='#5555FF'>=</font> curlen;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nextlen <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+            max_count <font color='#5555FF'>=</font> <font color='#979000'>138</font>, min_count <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>curlen <font color='#5555FF'>=</font><font color='#5555FF'>=</font> nextlen<font face='Lucida Console'>)</font> <b>{</b>
+            max_count <font color='#5555FF'>=</font> <font color='#979000'>6</font>, min_count <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+            max_count <font color='#5555FF'>=</font> <font color='#979000'>7</font>, min_count <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+        <b>}</b>
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Send a literal or distance tree in compressed form, using the codes in
+ * bl_tree.
+ */</font>
+local <font color='#0000FF'><u>void</u></font> <b><a name='send_tree'></a>send_tree</b> <font face='Lucida Console'>(</font>s, tree, max_code<font face='Lucida Console'>)</font>
+    deflate_state <font color='#5555FF'>*</font>s;
+    ct_data <font color='#5555FF'>*</font>tree; <font color='#009900'>/* the tree to be scanned */</font>
+    <font color='#0000FF'><u>int</u></font> max_code;       <font color='#009900'>/* and its largest code of non zero frequency */</font>
+<b>{</b>
+    <font color='#0000FF'><u>int</u></font> n;                     <font color='#009900'>/* iterates over all tree elements */</font>
+    <font color='#0000FF'><u>int</u></font> prevlen <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;          <font color='#009900'>/* last emitted length */</font>
+    <font color='#0000FF'><u>int</u></font> curlen;                <font color='#009900'>/* length of current code */</font>
+    <font color='#0000FF'><u>int</u></font> nextlen <font color='#5555FF'>=</font> tree[<font color='#979000'>0</font>].Len; <font color='#009900'>/* length of next code */</font>
+    <font color='#0000FF'><u>int</u></font> count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;             <font color='#009900'>/* repeat count of the current code */</font>
+    <font color='#0000FF'><u>int</u></font> max_count <font color='#5555FF'>=</font> <font color='#979000'>7</font>;         <font color='#009900'>/* max repeat count */</font>
+    <font color='#0000FF'><u>int</u></font> min_count <font color='#5555FF'>=</font> <font color='#979000'>4</font>;         <font color='#009900'>/* min repeat count */</font>
+
+    <font color='#009900'>/* tree[max_code+1].Len = -1; */</font>  <font color='#009900'>/* guard already set */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nextlen <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> max_count <font color='#5555FF'>=</font> <font color='#979000'>138</font>, min_count <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> max_code; n<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+        curlen <font color='#5555FF'>=</font> nextlen; nextlen <font color='#5555FF'>=</font> tree[n<font color='#5555FF'>+</font><font color='#979000'>1</font>].Len;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font>count <font color='#5555FF'>&lt;</font> max_count <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> curlen <font color='#5555FF'>=</font><font color='#5555FF'>=</font> nextlen<font face='Lucida Console'>)</font> <b>{</b>
+            <font color='#0000FF'>continue</font>;
+        <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>&lt;</font> min_count<font face='Lucida Console'>)</font> <b>{</b>
+            <font color='#0000FF'>do</font> <b>{</b> <font color='#BB00BB'>send_code</font><font face='Lucida Console'>(</font>s, curlen, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_tree<font face='Lucida Console'>)</font>; <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>count <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>curlen <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>curlen <font color='#5555FF'>!</font><font color='#5555FF'>=</font> prevlen<font face='Lucida Console'>)</font> <b>{</b>
+                <font color='#BB00BB'>send_code</font><font face='Lucida Console'>(</font>s, curlen, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_tree<font face='Lucida Console'>)</font>; count<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+            <b>}</b>
+            <font color='#BB00BB'>Assert</font><font face='Lucida Console'>(</font>count <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>3</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>6</font>, "<font color='#CC0000'> 3_6?</font>"<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>send_code</font><font face='Lucida Console'>(</font>s, REP_3_6, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_tree<font face='Lucida Console'>)</font>; <font color='#BB00BB'>send_bits</font><font face='Lucida Console'>(</font>s, count<font color='#5555FF'>-</font><font color='#979000'>3</font>, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font> <b>{</b>
+            <font color='#BB00BB'>send_code</font><font face='Lucida Console'>(</font>s, REPZ_3_10, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_tree<font face='Lucida Console'>)</font>; <font color='#BB00BB'>send_bits</font><font face='Lucida Console'>(</font>s, count<font color='#5555FF'>-</font><font color='#979000'>3</font>, <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+            <font color='#BB00BB'>send_code</font><font face='Lucida Console'>(</font>s, REPZ_11_138, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_tree<font face='Lucida Console'>)</font>; <font color='#BB00BB'>send_bits</font><font face='Lucida Console'>(</font>s, count<font color='#5555FF'>-</font><font color='#979000'>11</font>, <font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        count <font color='#5555FF'>=</font> <font color='#979000'>0</font>; prevlen <font color='#5555FF'>=</font> curlen;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nextlen <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+            max_count <font color='#5555FF'>=</font> <font color='#979000'>138</font>, min_count <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>curlen <font color='#5555FF'>=</font><font color='#5555FF'>=</font> nextlen<font face='Lucida Console'>)</font> <b>{</b>
+            max_count <font color='#5555FF'>=</font> <font color='#979000'>6</font>, min_count <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+            max_count <font color='#5555FF'>=</font> <font color='#979000'>7</font>, min_count <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+        <b>}</b>
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Construct the Huffman tree for the bit lengths and return the index in
+ * bl_order of the last bit length code to send.
+ */</font>
+local <font color='#0000FF'><u>int</u></font> <b><a name='build_bl_tree'></a>build_bl_tree</b><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>
+    deflate_state <font color='#5555FF'>*</font>s;
+<b>{</b>
+    <font color='#0000FF'><u>int</u></font> max_blindex;  <font color='#009900'>/* index of last bit length code of non zero freq */</font>
+
+    <font color='#009900'>/* Determine the bit length frequencies for literal and distance trees */</font>
+    <font color='#BB00BB'>scan_tree</font><font face='Lucida Console'>(</font>s, <font face='Lucida Console'>(</font>ct_data <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_ltree, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>l_desc.max_code<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>scan_tree</font><font face='Lucida Console'>(</font>s, <font face='Lucida Console'>(</font>ct_data <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_dtree, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d_desc.max_code<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/* Build the bit length tree: */</font>
+    <font color='#BB00BB'>build_tree</font><font face='Lucida Console'>(</font>s, <font face='Lucida Console'>(</font>tree_desc <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_desc<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* opt_len now includes the length of the tree representations, except
+     * the lengths of the bit lengths codes and the 5+5+4 bits for the counts.
+     */</font>
+
+    <font color='#009900'>/* Determine the number of bit length codes to send. The pkzip format
+     * requires that at least 4 bit length codes be sent. (appnote.txt says
+     * 3 but the actual value used is 4.)
+     */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>max_blindex <font color='#5555FF'>=</font> BL_CODES<font color='#5555FF'>-</font><font color='#979000'>1</font>; max_blindex <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>3</font>; max_blindex<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_tree[bl_order[max_blindex]].Len <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#0000FF'>break</font>;
+    <b>}</b>
+    <font color='#009900'>/* Update opt_len to include the bit length tree and counts */</font>
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>opt_len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>max_blindex<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>5</font><font color='#5555FF'>+</font><font color='#979000'>5</font><font color='#5555FF'>+</font><font color='#979000'>4</font>;
+    <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>\ndyn trees: dyn %ld, stat %ld</font>",
+            s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>opt_len, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>static_len<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>return</font> max_blindex;
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Send the header for a block using dynamic Huffman trees: the counts, the
+ * lengths of the bit length codes, the literal tree and the distance tree.
+ * IN assertion: lcodes &gt;= 257, dcodes &gt;= 1, blcodes &gt;= 4.
+ */</font>
+local <font color='#0000FF'><u>void</u></font> <b><a name='send_all_trees'></a>send_all_trees</b><font face='Lucida Console'>(</font>s, lcodes, dcodes, blcodes<font face='Lucida Console'>)</font>
+    deflate_state <font color='#5555FF'>*</font>s;
+    <font color='#0000FF'><u>int</u></font> lcodes, dcodes, blcodes; <font color='#009900'>/* number of codes for each tree */</font>
+<b>{</b>
+    <font color='#0000FF'><u>int</u></font> rank;                    <font color='#009900'>/* index in bl_order */</font>
+
+    <font color='#BB00BB'>Assert</font> <font face='Lucida Console'>(</font>lcodes <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>257</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> dcodes <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> blcodes <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>, "<font color='#CC0000'>not enough codes</font>"<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>Assert</font> <font face='Lucida Console'>(</font>lcodes <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> L_CODES <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> dcodes <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> D_CODES <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> blcodes <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> BL_CODES,
+            "<font color='#CC0000'>too many codes</font>"<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>\nbl counts: </font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>send_bits</font><font face='Lucida Console'>(</font>s, lcodes<font color='#5555FF'>-</font><font color='#979000'>257</font>, <font color='#979000'>5</font><font face='Lucida Console'>)</font>; <font color='#009900'>/* not +255 as stated in appnote.txt */</font>
+    <font color='#BB00BB'>send_bits</font><font face='Lucida Console'>(</font>s, dcodes<font color='#5555FF'>-</font><font color='#979000'>1</font>,   <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>send_bits</font><font face='Lucida Console'>(</font>s, blcodes<font color='#5555FF'>-</font><font color='#979000'>4</font>,  <font color='#979000'>4</font><font face='Lucida Console'>)</font>; <font color='#009900'>/* not -3 as stated in appnote.txt */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>rank <font color='#5555FF'>=</font> <font color='#979000'>0</font>; rank <font color='#5555FF'>&lt;</font> blcodes; rank<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>\nbl code %2d </font>", bl_order[rank]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>send_bits</font><font face='Lucida Console'>(</font>s, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bl_tree[bl_order[rank]].Len, <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>\nbl tree: sent %ld</font>", s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bits_sent<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>send_tree</font><font face='Lucida Console'>(</font>s, <font face='Lucida Console'>(</font>ct_data <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_ltree, lcodes<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>; <font color='#009900'>/* literal tree */</font>
+    <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>\nlit tree: sent %ld</font>", s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bits_sent<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>send_tree</font><font face='Lucida Console'>(</font>s, <font face='Lucida Console'>(</font>ct_data <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_dtree, dcodes<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>; <font color='#009900'>/* distance tree */</font>
+    <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>\ndist tree: sent %ld</font>", s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bits_sent<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Send a stored block
+ */</font>
+<font color='#0000FF'><u>void</u></font> ZLIB_INTERNAL <b><a name='_tr_stored_block'></a>_tr_stored_block</b><font face='Lucida Console'>(</font>s, buf, stored_len, last<font face='Lucida Console'>)</font>
+    deflate_state <font color='#5555FF'>*</font>s;
+    charf <font color='#5555FF'>*</font>buf;       <font color='#009900'>/* input block */</font>
+    ulg stored_len;   <font color='#009900'>/* length of input block */</font>
+    <font color='#0000FF'><u>int</u></font> last;         <font color='#009900'>/* one if this is the last block for a file */</font>
+<b>{</b>
+    <font color='#BB00BB'>send_bits</font><font face='Lucida Console'>(</font>s, <font face='Lucida Console'>(</font>STORED_BLOCK<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>last, <font color='#979000'>3</font><font face='Lucida Console'>)</font>;    <font color='#009900'>/* send block type */</font>
+<font color='#0000FF'>#ifdef</font> DEBUG
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>compressed_len <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>compressed_len <font color='#5555FF'>+</font> <font color='#979000'>3</font> <font color='#5555FF'>+</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>ulg<font face='Lucida Console'>)</font>~<font color='#979000'>7</font>L;
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>compressed_len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>stored_len <font color='#5555FF'>+</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>3</font>;
+<font color='#0000FF'>#endif</font>
+    <font color='#BB00BB'>copy_block</font><font face='Lucida Console'>(</font>s, buf, <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font>stored_len, <font color='#979000'>1</font><font face='Lucida Console'>)</font>; <font color='#009900'>/* with header */</font>
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Flush the bits in the bit buffer to pending output (leaves at most 7 bits)
+ */</font>
+<font color='#0000FF'><u>void</u></font> ZLIB_INTERNAL <b><a name='_tr_flush_bits'></a>_tr_flush_bits</b><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>
+    deflate_state <font color='#5555FF'>*</font>s;
+<b>{</b>
+    <font color='#BB00BB'>bi_flush</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Send one empty static block to give enough lookahead for inflate.
+ * This takes 10 bits, of which 7 may remain in the bit buffer.
+ */</font>
+<font color='#0000FF'><u>void</u></font> ZLIB_INTERNAL <b><a name='_tr_align'></a>_tr_align</b><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>
+    deflate_state <font color='#5555FF'>*</font>s;
+<b>{</b>
+    <font color='#BB00BB'>send_bits</font><font face='Lucida Console'>(</font>s, STATIC_TREES<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>1</font>, <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>send_code</font><font face='Lucida Console'>(</font>s, END_BLOCK, static_ltree<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#ifdef</font> DEBUG
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>compressed_len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>L; <font color='#009900'>/* 3 for block type, 7 for EOB */</font>
+<font color='#0000FF'>#endif</font>
+    <font color='#BB00BB'>bi_flush</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Determine the best encoding for the current block: dynamic trees, static
+ * trees or store, and output the encoded block to the zip file.
+ */</font>
+<font color='#0000FF'><u>void</u></font> ZLIB_INTERNAL <b><a name='_tr_flush_block'></a>_tr_flush_block</b><font face='Lucida Console'>(</font>s, buf, stored_len, last<font face='Lucida Console'>)</font>
+    deflate_state <font color='#5555FF'>*</font>s;
+    charf <font color='#5555FF'>*</font>buf;       <font color='#009900'>/* input block, or NULL if too old */</font>
+    ulg stored_len;   <font color='#009900'>/* length of input block */</font>
+    <font color='#0000FF'><u>int</u></font> last;         <font color='#009900'>/* one if this is the last block for a file */</font>
+<b>{</b>
+    ulg opt_lenb, static_lenb; <font color='#009900'>/* opt_len and static_len in bytes */</font>
+    <font color='#0000FF'><u>int</u></font> max_blindex <font color='#5555FF'>=</font> <font color='#979000'>0</font>;  <font color='#009900'>/* index of last bit length code of non zero freq */</font>
+
+    <font color='#009900'>/* Build the Huffman trees unless a stored block is forced */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>level <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+
+        <font color='#009900'>/* Check if the file is binary or text */</font>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>data_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_UNKNOWN<font face='Lucida Console'>)</font>
+            s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>data_type <font color='#5555FF'>=</font> <font color='#BB00BB'>detect_data_type</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>/* Construct the literal and distance trees */</font>
+        <font color='#BB00BB'>build_tree</font><font face='Lucida Console'>(</font>s, <font face='Lucida Console'>(</font>tree_desc <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>l_desc<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>\nlit data: dyn %ld, stat %ld</font>", s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>opt_len,
+                s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>static_len<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>build_tree</font><font face='Lucida Console'>(</font>s, <font face='Lucida Console'>(</font>tree_desc <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d_desc<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>\ndist data: dyn %ld, stat %ld</font>", s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>opt_len,
+                s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>static_len<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>/* At this point, opt_len and static_len are the total bit lengths of
+         * the compressed block data, excluding the tree representations.
+         */</font>
+
+        <font color='#009900'>/* Build the bit length tree for the above two trees, and get the index
+         * in bl_order of the last bit length code to send.
+         */</font>
+        max_blindex <font color='#5555FF'>=</font> <font color='#BB00BB'>build_bl_tree</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>/* Determine the best encoding. Compute the block lengths in bytes. */</font>
+        opt_lenb <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>opt_len<font color='#5555FF'>+</font><font color='#979000'>3</font><font color='#5555FF'>+</font><font color='#979000'>7</font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>3</font>;
+        static_lenb <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>static_len<font color='#5555FF'>+</font><font color='#979000'>3</font><font color='#5555FF'>+</font><font color='#979000'>7</font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>3</font>;
+
+        <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>\nopt %lu(%lu) stat %lu(%lu) stored %lu lit %u </font>",
+                opt_lenb, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>opt_len, static_lenb, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>static_len, stored_len,
+                s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_lit<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>static_lenb <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> opt_lenb<font face='Lucida Console'>)</font> opt_lenb <font color='#5555FF'>=</font> static_lenb;
+
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+        <font color='#BB00BB'>Assert</font><font face='Lucida Console'>(</font>buf <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#979000'>0</font>, "<font color='#CC0000'>lost buf</font>"<font face='Lucida Console'>)</font>;
+        opt_lenb <font color='#5555FF'>=</font> static_lenb <font color='#5555FF'>=</font> stored_len <font color='#5555FF'>+</font> <font color='#979000'>5</font>; <font color='#009900'>/* force a stored block */</font>
+    <b>}</b>
+
+<font color='#0000FF'>#ifdef</font> FORCE_STORED
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buf <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#009900'>/* force stored block */</font>
+<font color='#0000FF'>#else</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>stored_len<font color='#5555FF'>+</font><font color='#979000'>4</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> opt_lenb <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> buf <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+                       <font color='#009900'>/* 4: two words for the lengths */</font>
+<font color='#0000FF'>#endif</font>
+        <font color='#009900'>/* The test buf != NULL is only necessary if LIT_BUFSIZE &gt; WSIZE.
+         * Otherwise we can't have processed more than WSIZE input bytes since
+         * the last block flush, because compression would have been
+         * successful. If LIT_BUFSIZE &lt;= WSIZE, it is never too late to
+         * transform a block into a stored block.
+         */</font>
+        <font color='#BB00BB'>_tr_stored_block</font><font face='Lucida Console'>(</font>s, buf, stored_len, last<font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#ifdef</font> FORCE_STATIC
+    <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>static_lenb <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#009900'>/* force static trees */</font>
+<font color='#0000FF'>#else</font>
+    <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strategy <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_FIXED <font color='#5555FF'>|</font><font color='#5555FF'>|</font> static_lenb <font color='#5555FF'>=</font><font color='#5555FF'>=</font> opt_lenb<font face='Lucida Console'>)</font> <b>{</b>
+<font color='#0000FF'>#endif</font>
+        <font color='#BB00BB'>send_bits</font><font face='Lucida Console'>(</font>s, <font face='Lucida Console'>(</font>STATIC_TREES<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>last, <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>compress_block</font><font face='Lucida Console'>(</font>s, <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> ct_data <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>static_ltree,
+                       <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> ct_data <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>static_dtree<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#ifdef</font> DEBUG
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>compressed_len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>3</font> <font color='#5555FF'>+</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>static_len;
+<font color='#0000FF'>#endif</font>
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+        <font color='#BB00BB'>send_bits</font><font face='Lucida Console'>(</font>s, <font face='Lucida Console'>(</font>DYN_TREES<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>last, <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>send_all_trees</font><font face='Lucida Console'>(</font>s, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>l_desc.max_code<font color='#5555FF'>+</font><font color='#979000'>1</font>, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d_desc.max_code<font color='#5555FF'>+</font><font color='#979000'>1</font>,
+                       max_blindex<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>compress_block</font><font face='Lucida Console'>(</font>s, <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> ct_data <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_ltree,
+                       <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> ct_data <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_dtree<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#ifdef</font> DEBUG
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>compressed_len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>3</font> <font color='#5555FF'>+</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>opt_len;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+    <font color='#BB00BB'>Assert</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>compressed_len <font color='#5555FF'>=</font><font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bits_sent, "<font color='#CC0000'>bad compressed size</font>"<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* The above check is made mod 2^32, for files larger than 512 MB
+     * and uLong implemented on 32 bits.
+     */</font>
+    <font color='#BB00BB'>init_block</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>last<font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>bi_windup</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#ifdef</font> DEBUG
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>compressed_len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>7</font>;  <font color='#009900'>/* align on byte boundary */</font>
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+    <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr,"<font color='#CC0000'>\ncomprlen %lu(%lu) </font>", s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>compressed_len<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>3</font>,
+           s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>compressed_len<font color='#5555FF'>-</font><font color='#979000'>7</font><font color='#5555FF'>*</font>last<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Save the match info and tally the frequency counts. Return true if
+ * the current block must be flushed.
+ */</font>
+<font color='#0000FF'><u>int</u></font> ZLIB_INTERNAL <font color='#BB00BB'>_tr_tally</font> <font face='Lucida Console'>(</font>s, dist, lc<font face='Lucida Console'>)</font>
+    deflate_state <font color='#5555FF'>*</font>s;
+    <font color='#0000FF'><u>unsigned</u></font> dist;  <font color='#009900'>/* distance of matched string */</font>
+    <font color='#0000FF'><u>unsigned</u></font> lc;    <font color='#009900'>/* match length-MIN_MATCH or unmatched char (if dist==0) */</font>
+<b>{</b>
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d_buf[s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_lit] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ush<font face='Lucida Console'>)</font>dist;
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>l_buf[s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_lit<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>uch<font face='Lucida Console'>)</font>lc;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dist <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#009900'>/* lc is the unmatched char */</font>
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_ltree[lc].Freq<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>matches<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+        <font color='#009900'>/* Here, lc is the match length - MIN_MATCH */</font>
+        dist<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;             <font color='#009900'>/* dist = match distance - 1 */</font>
+        <font color='#BB00BB'>Assert</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>ush<font face='Lucida Console'>)</font>dist <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>ush<font face='Lucida Console'>)</font><font color='#BB00BB'>MAX_DIST</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+               <font face='Lucida Console'>(</font>ush<font face='Lucida Console'>)</font>lc <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ush<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>MAX_MATCH<font color='#5555FF'>-</font>MIN_MATCH<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+               <font face='Lucida Console'>(</font>ush<font face='Lucida Console'>)</font><font color='#BB00BB'>d_code</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>ush<font face='Lucida Console'>)</font>D_CODES,  "<font color='#CC0000'>_tr_tally: bad match</font>"<font face='Lucida Console'>)</font>;
+
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_ltree[_length_code[lc]<font color='#5555FF'>+</font>LITERALS<font color='#5555FF'>+</font><font color='#979000'>1</font>].Freq<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_dtree[<font color='#BB00BB'>d_code</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font>].Freq<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+    <b>}</b>
+
+<font color='#0000FF'>#ifdef</font> TRUNCATE_BLOCK
+    <font color='#009900'>/* Try to guess if it is profitable to stop the current block here */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_lit <font color='#5555FF'>&amp;</font> <font color='#979000'>0x1fff</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>level <font color='#5555FF'>&gt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#009900'>/* Compute an upper bound for the compressed length */</font>
+        ulg out_length <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ulg<font face='Lucida Console'>)</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_lit<font color='#5555FF'>*</font><font color='#979000'>8</font>L;
+        ulg in_length <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ulg<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strstart <font color='#5555FF'>-</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>block_start<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>int</u></font> dcode;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>dcode <font color='#5555FF'>=</font> <font color='#979000'>0</font>; dcode <font color='#5555FF'>&lt;</font> D_CODES; dcode<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+            out_length <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ulg<font face='Lucida Console'>)</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_dtree[dcode].Freq <font color='#5555FF'>*</font>
+                <font face='Lucida Console'>(</font><font color='#979000'>5</font>L<font color='#5555FF'>+</font>extra_dbits[dcode]<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        out_length <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        <font color='#BB00BB'>Tracev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>stderr,"<font color='#CC0000'>\nlast_lit %u, in %ld, out ~%ld(%ld%%) </font>",
+               s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_lit, in_length, out_length,
+               <font color='#979000'>100</font>L <font color='#5555FF'>-</font> out_length<font color='#5555FF'>*</font><font color='#979000'>100</font>L<font color='#5555FF'>/</font>in_length<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>matches <font color='#5555FF'>&lt;</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_lit<font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> out_length <font color='#5555FF'>&lt;</font> in_length<font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+    <b>}</b>
+<font color='#0000FF'>#endif</font>
+    <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_lit <font color='#5555FF'>=</font><font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lit_bufsize<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* We avoid equality with lit_bufsize because of wraparound at 64K
+     * on 16 bit machines and because stored blocks are restricted to
+     * 64K-1 bytes.
+     */</font>
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Send the block data compressed using the given Huffman trees
+ */</font>
+local <font color='#0000FF'><u>void</u></font> <font color='#BB00BB'>compress_block</font><font face='Lucida Console'>(</font>s, ltree, dtree<font face='Lucida Console'>)</font>
+    deflate_state <font color='#5555FF'>*</font>s;
+    <font color='#0000FF'>const</font> ct_data <font color='#5555FF'>*</font>ltree; <font color='#009900'>/* literal tree */</font>
+    <font color='#0000FF'>const</font> ct_data <font color='#5555FF'>*</font>dtree; <font color='#009900'>/* distance tree */</font>
+<b>{</b>
+    <font color='#0000FF'><u>unsigned</u></font> dist;      <font color='#009900'>/* distance of matched string */</font>
+    <font color='#0000FF'><u>int</u></font> lc;             <font color='#009900'>/* match length or unmatched char (if dist == 0) */</font>
+    <font color='#0000FF'><u>unsigned</u></font> lx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;    <font color='#009900'>/* running index in l_buf */</font>
+    <font color='#0000FF'><u>unsigned</u></font> code;      <font color='#009900'>/* the code to send */</font>
+    <font color='#0000FF'><u>int</u></font> extra;          <font color='#009900'>/* number of extra bits to send */</font>
+
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_lit <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#0000FF'>do</font> <b>{</b>
+        dist <font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d_buf[lx];
+        lc <font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>l_buf[lx<font color='#5555FF'>+</font><font color='#5555FF'>+</font>];
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dist <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+            <font color='#BB00BB'>send_code</font><font face='Lucida Console'>(</font>s, lc, ltree<font face='Lucida Console'>)</font>; <font color='#009900'>/* send a literal byte */</font>
+            <font color='#BB00BB'>Tracecv</font><font face='Lucida Console'>(</font><font color='#BB00BB'>isgraph</font><font face='Lucida Console'>(</font>lc<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font>stderr,"<font color='#CC0000'> '%c' </font>", lc<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+            <font color='#009900'>/* Here, lc is the match length - MIN_MATCH */</font>
+            code <font color='#5555FF'>=</font> _length_code[lc];
+            <font color='#BB00BB'>send_code</font><font face='Lucida Console'>(</font>s, code<font color='#5555FF'>+</font>LITERALS<font color='#5555FF'>+</font><font color='#979000'>1</font>, ltree<font face='Lucida Console'>)</font>; <font color='#009900'>/* send the length code */</font>
+            extra <font color='#5555FF'>=</font> extra_lbits[code];
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>extra <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+                lc <font color='#5555FF'>-</font><font color='#5555FF'>=</font> base_length[code];
+                <font color='#BB00BB'>send_bits</font><font face='Lucida Console'>(</font>s, lc, extra<font face='Lucida Console'>)</font>;       <font color='#009900'>/* send the extra length bits */</font>
+            <b>}</b>
+            dist<font color='#5555FF'>-</font><font color='#5555FF'>-</font>; <font color='#009900'>/* dist is now the match distance - 1 */</font>
+            code <font color='#5555FF'>=</font> <font color='#BB00BB'>d_code</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>Assert</font> <font face='Lucida Console'>(</font>code <font color='#5555FF'>&lt;</font> D_CODES, "<font color='#CC0000'>bad d_code</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>send_code</font><font face='Lucida Console'>(</font>s, code, dtree<font face='Lucida Console'>)</font>;       <font color='#009900'>/* send the distance code */</font>
+            extra <font color='#5555FF'>=</font> extra_dbits[code];
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>extra <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+                dist <font color='#5555FF'>-</font><font color='#5555FF'>=</font> base_dist[code];
+                <font color='#BB00BB'>send_bits</font><font face='Lucida Console'>(</font>s, dist, extra<font face='Lucida Console'>)</font>;   <font color='#009900'>/* send the extra distance bits */</font>
+            <b>}</b>
+        <b>}</b> <font color='#009900'>/* literal or match pair ? */</font>
+
+        <font color='#009900'>/* Check that the overlay between pending_buf and d_buf+l_buf is ok: */</font>
+        <font color='#BB00BB'>Assert</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>uInt<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pending<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lit_bufsize <font color='#5555FF'>+</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>lx,
+               "<font color='#CC0000'>pendingBuf overflow</font>"<font face='Lucida Console'>)</font>;
+
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>lx <font color='#5555FF'>&lt;</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_lit<font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>send_code</font><font face='Lucida Console'>(</font>s, END_BLOCK, ltree<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Check if the data type is TEXT or BINARY, using the following algorithm:
+ * - TEXT if the two conditions below are satisfied:
+ *    a) There are no non-portable control characters belonging to the
+ *       "black list" (0..6, 14..25, 28..31).
+ *    b) There is at least one printable character belonging to the
+ *       "white list" (9 {TAB}, 10 {LF}, 13 {CR}, 32..255).
+ * - BINARY otherwise.
+ * - The following partially-portable control characters form a
+ *   "gray list" that is ignored in this detection algorithm:
+ *   (7 {BEL}, 8 {BS}, 11 {VT}, 12 {FF}, 26 {SUB}, 27 {ESC}).
+ * IN assertion: the fields Freq of dyn_ltree are set.
+ */</font>
+local <font color='#0000FF'><u>int</u></font> <font color='#BB00BB'>detect_data_type</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>
+    deflate_state <font color='#5555FF'>*</font>s;
+<b>{</b>
+    <font color='#009900'>/* black_mask is the bit mask of black-listed bytes
+     * set bits 0..6, 14..25, and 28..31
+     * 0xf3ffc07f = binary 11110011111111111100000001111111
+     */</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> black_mask <font color='#5555FF'>=</font> <font color='#979000'>0xf3ffc07fUL</font>;
+    <font color='#0000FF'><u>int</u></font> n;
+
+    <font color='#009900'>/* Check for non-textual ("black-listed") bytes. */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>31</font>; n<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, black_mask <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>black_mask <font color='#5555FF'>&amp;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_ltree[n].Freq <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> Z_BINARY;
+
+    <font color='#009900'>/* Check for textual ("white-listed") bytes. */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_ltree[<font color='#979000'>9</font>].Freq <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_ltree[<font color='#979000'>10</font>].Freq <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>
+            <font color='#5555FF'>|</font><font color='#5555FF'>|</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_ltree[<font color='#979000'>13</font>].Freq <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> Z_TEXT;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> <font color='#979000'>32</font>; n <font color='#5555FF'>&lt;</font> LITERALS; n<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_ltree[n].Freq <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> Z_TEXT;
+
+    <font color='#009900'>/* There are no "black-listed" or "white-listed" bytes:
+     * this stream either is empty or has tolerated ("gray-listed") bytes only.
+     */</font>
+    <font color='#0000FF'>return</font> Z_BINARY;
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Reverse the first len bits of a code, using straightforward code (a faster
+ * method would use a table)
+ * IN assertion: 1 &lt;= len &lt;= 15
+ */</font>
+local <font color='#0000FF'><u>unsigned</u></font> <font color='#BB00BB'>bi_reverse</font><font face='Lucida Console'>(</font>code, len<font face='Lucida Console'>)</font>
+    <font color='#0000FF'><u>unsigned</u></font> code; <font color='#009900'>/* the value to invert */</font>
+    <font color='#0000FF'><u>int</u></font> len;       <font color='#009900'>/* its bit length */</font>
+<b>{</b>
+    <font color='#0000FF'>register</font> <font color='#0000FF'><u>unsigned</u></font> res <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>do</font> <b>{</b>
+        res <font color='#5555FF'>|</font><font color='#5555FF'>=</font> code <font color='#5555FF'>&amp;</font> <font color='#979000'>1</font>;
+        code <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>, res <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>len <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>return</font> res <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>1</font>;
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Flush the bit buffer, keeping at most 7 bits in it.
+ */</font>
+local <font color='#0000FF'><u>void</u></font> <font color='#BB00BB'>bi_flush</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>
+    deflate_state <font color='#5555FF'>*</font>s;
+<b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_valid <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>put_short</font><font face='Lucida Console'>(</font>s, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_buf<font face='Lucida Console'>)</font>;
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_buf <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_valid <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_valid <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>put_byte</font><font face='Lucida Console'>(</font>s, <font face='Lucida Console'>(</font>Byte<font face='Lucida Console'>)</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_buf<font face='Lucida Console'>)</font>;
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_buf <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_valid <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Flush the bit buffer and align the output on a byte boundary
+ */</font>
+local <font color='#0000FF'><u>void</u></font> <font color='#BB00BB'>bi_windup</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>
+    deflate_state <font color='#5555FF'>*</font>s;
+<b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_valid <font color='#5555FF'>&gt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>put_short</font><font face='Lucida Console'>(</font>s, s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_buf<font face='Lucida Console'>)</font>;
+    <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_valid <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>put_byte</font><font face='Lucida Console'>(</font>s, <font face='Lucida Console'>(</font>Byte<font face='Lucida Console'>)</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_buf<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_buf <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bi_valid <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<font color='#0000FF'>#ifdef</font> DEBUG
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bits_sent <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bits_sent<font color='#5555FF'>+</font><font color='#979000'>7</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> ~<font color='#979000'>7</font>;
+<font color='#0000FF'>#endif</font>
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ * Copy a stored block, storing first the length and its
+ * one's complement if requested.
+ */</font>
+local <font color='#0000FF'><u>void</u></font> <font color='#BB00BB'>copy_block</font><font face='Lucida Console'>(</font>s, buf, len, header<font face='Lucida Console'>)</font>
+    deflate_state <font color='#5555FF'>*</font>s;
+    charf    <font color='#5555FF'>*</font>buf;    <font color='#009900'>/* the input data */</font>
+    <font color='#0000FF'><u>unsigned</u></font> len;     <font color='#009900'>/* its length */</font>
+    <font color='#0000FF'><u>int</u></font>      header;  <font color='#009900'>/* true if block header must be written */</font>
+<b>{</b>
+    <font color='#BB00BB'>bi_windup</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>;        <font color='#009900'>/* align on byte boundary */</font>
+
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>header<font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>put_short</font><font face='Lucida Console'>(</font>s, <font face='Lucida Console'>(</font>ush<font face='Lucida Console'>)</font>len<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>put_short</font><font face='Lucida Console'>(</font>s, <font face='Lucida Console'>(</font>ush<font face='Lucida Console'>)</font>~len<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#ifdef</font> DEBUG
+        s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bits_sent <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>16</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+<font color='#0000FF'>#ifdef</font> DEBUG
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bits_sent <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ulg<font face='Lucida Console'>)</font>len<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>3</font>;
+<font color='#0000FF'>#endif</font>
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>len<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>put_byte</font><font face='Lucida Console'>(</font>s, <font color='#5555FF'>*</font>buf<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>
+
+</pre></body></html>

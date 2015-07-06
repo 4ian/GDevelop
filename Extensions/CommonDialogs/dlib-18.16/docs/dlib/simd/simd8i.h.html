@@ -1,0 +1,342 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - simd8i.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_sIMD8I_Hh_
+<font color='#0000FF'>#define</font> DLIB_sIMD8I_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='simd_check.h.html'>simd_check.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_AVX
+    <font color='#0000FF'>class</font> <b><a name='simd8i'></a>simd8i</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> int32 type;
+
+        <font color='#0000FF'>inline</font> <b><a name='simd8i'></a>simd8i</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#0000FF'>inline</font> <b><a name='simd8i'></a>simd8i</b><font face='Lucida Console'>(</font>int32 f<font face='Lucida Console'>)</font> <b>{</b> x <font color='#5555FF'>=</font> <font color='#BB00BB'>_mm256_set1_epi32</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>inline</font> <b><a name='simd8i'></a>simd8i</b><font face='Lucida Console'>(</font>int32 r0, int32 r1, int32 r2, int32 r3,
+               int32 r4, int32 r5, int32 r6, int32 r7 <font face='Lucida Console'>)</font> 
+        <b>{</b> x <font color='#5555FF'>=</font> <font color='#BB00BB'>_mm256_setr_epi32</font><font face='Lucida Console'>(</font>r0,r1,r2,r3,r4,r5,r6,r7<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <b><a name='simd8i'></a>simd8i</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> __m256i<font color='#5555FF'>&amp;</font> val<font face='Lucida Console'>)</font>:x<font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>inline</font> <b><a name='simd8i'></a>simd8i</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> low, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> high<font face='Lucida Console'>)</font>
+        <b>{</b>
+            x <font color='#5555FF'>=</font> <font color='#BB00BB'>_mm256_insertf128_si256</font><font face='Lucida Console'>(</font><font color='#BB00BB'>_mm256_castsi128_si256</font><font face='Lucida Console'>(</font>low<font face='Lucida Console'>)</font>,high,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> simd8i<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> __m256i<font color='#5555FF'>&amp;</font> val<font face='Lucida Console'>)</font>
+        <b>{</b>
+            x <font color='#5555FF'>=</font> val;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <b><a name='operator'></a>operator</b> <b><a name='__m256i'></a>__m256i</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> x; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='load_aligned'></a>load_aligned</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> type<font color='#5555FF'>*</font> ptr<font face='Lucida Console'>)</font>  <b>{</b> x <font color='#5555FF'>=</font> <font color='#BB00BB'>_mm256_load_si256</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> __m256i<font color='#5555FF'>*</font><font face='Lucida Console'>)</font>ptr<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='store_aligned'></a>store_aligned</b><font face='Lucida Console'>(</font>type<font color='#5555FF'>*</font> ptr<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#BB00BB'>_mm256_store_si256</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>__m256i<font color='#5555FF'>*</font><font face='Lucida Console'>)</font>ptr, x<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='load'></a>load</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> type<font color='#5555FF'>*</font> ptr<font face='Lucida Console'>)</font>          <b>{</b> x <font color='#5555FF'>=</font> <font color='#BB00BB'>_mm256_loadu_si256</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> __m256i<font color='#5555FF'>*</font><font face='Lucida Console'>)</font>ptr<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='store'></a>store</b><font face='Lucida Console'>(</font>type<font color='#5555FF'>*</font> ptr<font face='Lucida Console'>)</font>         <font color='#0000FF'>const</font> <b>{</b> <font color='#BB00BB'>_mm256_storeu_si256</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>__m256i<font color='#5555FF'>*</font><font face='Lucida Console'>)</font>ptr, x<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>inline</font> simd4i <b><a name='low'></a>low</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm256_castsi256_si128</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>inline</font> simd4i <b><a name='high'></a>high</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm256_extractf128_si256</font><font face='Lucida Console'>(</font>x,<font color='#979000'>1</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> <b><a name='size'></a>size</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>4</font>; <b>}</b>
+        <font color='#0000FF'>inline</font> int32 <b><a name='operator'></a>operator</b>[]<font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> idx<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            int32 temp[<font color='#979000'>8</font>];
+            <font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> temp[idx];
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        __m256i x;
+    <b>}</b>;
+<font color='#0000FF'>#else</font>
+    <font color='#0000FF'>class</font> <b><a name='simd8i'></a>simd8i</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> int32 type;
+
+        <font color='#0000FF'>inline</font> <b><a name='simd8i'></a>simd8i</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#0000FF'>inline</font> <b><a name='simd8i'></a>simd8i</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> low_, <font color='#0000FF'>const</font> simd4i<font color='#5555FF'>&amp;</font> high_<font face='Lucida Console'>)</font>: _low<font face='Lucida Console'>(</font>low_<font face='Lucida Console'>)</font>,_high<font face='Lucida Console'>(</font>high_<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+        <font color='#0000FF'>inline</font> <b><a name='simd8i'></a>simd8i</b><font face='Lucida Console'>(</font>int32 f<font face='Lucida Console'>)</font> :_low<font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>,_high<font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#0000FF'>inline</font> <b><a name='simd8i'></a>simd8i</b><font face='Lucida Console'>(</font>int32 r0, int32 r1, int32 r2, int32 r3, int32 r4, int32 r5, int32 r6, int32 r7<font face='Lucida Console'>)</font> :
+            _low<font face='Lucida Console'>(</font>r0,r1,r2,r3<font face='Lucida Console'>)</font>, _high<font face='Lucida Console'>(</font>r4,r5,r6,r7<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>struct</font> <b><a name='rawarray'></a>rawarray</b>
+        <b>{</b>
+            simd4i low, high;
+        <b>}</b>;
+        <font color='#0000FF'>inline</font> <b><a name='simd8i'></a>simd8i</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> rawarray<font color='#5555FF'>&amp;</font> a<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            _low <font color='#5555FF'>=</font> a.low;
+            _high <font color='#5555FF'>=</font> a.high;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='load_aligned'></a>load_aligned</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> type<font color='#5555FF'>*</font> ptr<font face='Lucida Console'>)</font>  <b>{</b> _low.<font color='#BB00BB'>load_aligned</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>; _high.<font color='#BB00BB'>load_aligned</font><font face='Lucida Console'>(</font>ptr<font color='#5555FF'>+</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='store_aligned'></a>store_aligned</b><font face='Lucida Console'>(</font>type<font color='#5555FF'>*</font> ptr<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> _low.<font color='#BB00BB'>store_aligned</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>; _high.<font color='#BB00BB'>store_aligned</font><font face='Lucida Console'>(</font>ptr<font color='#5555FF'>+</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='load'></a>load</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> type<font color='#5555FF'>*</font> ptr<font face='Lucida Console'>)</font>          <b>{</b> _low.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>; _high.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>ptr<font color='#5555FF'>+</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='store'></a>store</b><font face='Lucida Console'>(</font>type<font color='#5555FF'>*</font> ptr<font face='Lucida Console'>)</font>         <font color='#0000FF'>const</font> <b>{</b> _low.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>; _high.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>ptr<font color='#5555FF'>+</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> <b><a name='size'></a>size</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>8</font>; <b>}</b>
+        <font color='#0000FF'>inline</font> int32 <b><a name='operator'></a>operator</b>[]<font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> idx<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>&lt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> _low[idx];
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> _high[idx<font color='#5555FF'>-</font><font color='#979000'>4</font>];
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> simd4i <b><a name='low'></a>low</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> _low; <b>}</b>
+        <font color='#0000FF'>inline</font> simd4i <b><a name='high'></a>high</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> _high; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        simd4i _low, _high;
+    <b>}</b>;
+
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> std::ostream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font face='Lucida Console'>(</font>std::ostream<font color='#5555FF'>&amp;</font> out, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font>
+    <b>{</b>
+        int32 temp[<font color='#979000'>8</font>];
+        item.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+        out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>(</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp[<font color='#979000'>0</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>, </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp[<font color='#979000'>1</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>, </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp[<font color='#979000'>2</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>, </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp[<font color='#979000'>3</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>, </font>"
+                   <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp[<font color='#979000'>4</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>, </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp[<font color='#979000'>5</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>, </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp[<font color='#979000'>6</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>, </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp[<font color='#979000'>7</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>)</font>";
+        <font color='#0000FF'>return</font> out;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd8i <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_AVX2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm256_add_epi32</font><font face='Lucida Console'>(</font>lhs, rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd8i</font><font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>rhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                      lhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>rhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+    <font color='#0000FF'>inline</font> simd8i<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> <font color='#0000FF'>return</font> lhs <font color='#5555FF'>=</font> lhs <font color='#5555FF'>+</font> rhs; <font color='#0000FF'>return</font> lhs;<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd8i <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_AVX2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm256_sub_epi32</font><font face='Lucida Console'>(</font>lhs, rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd8i</font><font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>rhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                      lhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>rhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+    <font color='#0000FF'>inline</font> simd8i<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> <font color='#0000FF'>return</font> lhs <font color='#5555FF'>=</font> lhs <font color='#5555FF'>-</font> rhs; <font color='#0000FF'>return</font> lhs;<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd8i <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_AVX2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm256_mullo_epi32</font><font face='Lucida Console'>(</font>lhs, rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd8i</font><font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>rhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                      lhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>rhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+    <font color='#0000FF'>inline</font> simd8i<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> <font color='#0000FF'>return</font> lhs <font color='#5555FF'>=</font> lhs <font color='#5555FF'>*</font> rhs; <font color='#0000FF'>return</font> lhs;<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd8i <b><a name='operator'></a>operator</b><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_AVX2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm256_and_si256</font><font face='Lucida Console'>(</font>lhs, rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd8i</font><font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>rhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                      lhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>rhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+    <font color='#0000FF'>inline</font> simd8i<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> <font color='#0000FF'>return</font> lhs <font color='#5555FF'>=</font> lhs <font color='#5555FF'>&amp;</font> rhs; <font color='#0000FF'>return</font> lhs;<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd8i <b><a name='operator'></a>operator</b><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_AVX2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm256_or_si256</font><font face='Lucida Console'>(</font>lhs, rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd8i</font><font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>|</font>rhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                      lhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>|</font>rhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+    <font color='#0000FF'>inline</font> simd8i<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>|</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> <font color='#0000FF'>return</font> lhs <font color='#5555FF'>=</font> lhs <font color='#5555FF'>|</font> rhs; <font color='#0000FF'>return</font> lhs;<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd8i <b><a name='operator'></a>operator</b>^ <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_AVX2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm256_xor_si256</font><font face='Lucida Console'>(</font>lhs, rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd8i</font><font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>^rhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                      lhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>^rhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+    <font color='#0000FF'>inline</font> simd8i<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>^<font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> <font color='#0000FF'>return</font> lhs <font color='#5555FF'>=</font> lhs ^ rhs; <font color='#0000FF'>return</font> lhs;<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd8i <b><a name='operator'></a>operator</b>~ <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> lhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_AVX2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm256_xor_si256</font><font face='Lucida Console'>(</font>lhs, <font color='#BB00BB'>_mm256_set1_epi32</font><font face='Lucida Console'>(</font><font color='#979000'>0xFFFFFFFF</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd8i</font><font face='Lucida Console'>(</font>~lhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, ~lhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd8i <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_AVX2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm256_sll_epi32</font><font face='Lucida Console'>(</font>lhs,<font color='#BB00BB'>_mm_cvtsi32_si128</font><font face='Lucida Console'>(</font>rhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd8i</font><font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>rhs,
+                      lhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>rhs<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+    <font color='#0000FF'>inline</font> simd8i<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> <font color='#0000FF'>return</font> lhs <font color='#5555FF'>=</font> lhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rhs; <font color='#0000FF'>return</font> lhs;<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd8i <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_AVX2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm256_sra_epi32</font><font face='Lucida Console'>(</font>lhs,<font color='#BB00BB'>_mm_cvtsi32_si128</font><font face='Lucida Console'>(</font>rhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd8i</font><font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font>rhs,
+                      lhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font>rhs<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+    <font color='#0000FF'>inline</font> simd8i<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> <font color='#0000FF'>return</font> lhs <font color='#5555FF'>=</font> lhs <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> rhs; <font color='#0000FF'>return</font> lhs;<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd8i <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_AVX2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm256_cmpeq_epi32</font><font face='Lucida Console'>(</font>lhs, rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd8i</font><font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font>rhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                      lhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font>rhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd8i <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#0000FF'>return</font> ~<font face='Lucida Console'>(</font>lhs<font color='#5555FF'>=</font><font color='#5555FF'>=</font>rhs<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd8i <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_AVX2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm256_cmpgt_epi32</font><font face='Lucida Console'>(</font>lhs, rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd8i</font><font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>rhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                      lhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>rhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd8i <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#0000FF'>return</font> rhs <font color='#5555FF'>&gt;</font> lhs;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd8i <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#0000FF'>return</font> ~<font face='Lucida Console'>(</font>lhs <font color='#5555FF'>&gt;</font> rhs<font face='Lucida Console'>)</font>; 
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd8i <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#0000FF'>return</font> rhs <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> lhs;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd8i <b><a name='min'></a>min</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_AVX2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm256_min_epi32</font><font face='Lucida Console'>(</font>lhs, rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd8i</font><font face='Lucida Console'>(</font><font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,rhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                      <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,rhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> simd8i <b><a name='max'></a>max</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> lhs, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> rhs<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_AVX2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm256_max_epi32</font><font face='Lucida Console'>(</font>lhs, rhs<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd8i</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,rhs.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                      <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,rhs.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> int32 <b><a name='sum'></a>sum</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>item.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// perform cmp ? a : b
+</font>    <font color='#0000FF'>inline</font> simd8i <b><a name='select'></a>select</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> cmp, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> simd8i<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font>
+    <b>{</b>
+<font color='#0000FF'>#ifdef</font> DLIB_HAVE_AVX2
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>_mm256_blendv_epi8</font><font face='Lucida Console'>(</font>b,a,cmp<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>simd8i</font><font face='Lucida Console'>(</font><font color='#BB00BB'>select</font><font face='Lucida Console'>(</font>cmp.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,  a.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,  b.<font color='#BB00BB'>low</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                      <font color='#BB00BB'>select</font><font face='Lucida Console'>(</font>cmp.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, a.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, b.<font color='#BB00BB'>high</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_sIMD8I_Hh_
+</font>
+
+
+</pre></body></html>

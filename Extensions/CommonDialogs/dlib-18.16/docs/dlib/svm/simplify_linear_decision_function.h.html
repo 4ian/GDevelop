@@ -1,0 +1,113 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - simplify_linear_decision_function.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SIMPLIFY_LINEAR_DECiSION_FUNCTION_Hh_
+<font color='#0000FF'>#define</font> DLIB_SIMPLIFY_LINEAR_DECiSION_FUNCTION_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='simplify_linear_decision_function_abstract.h.html'>simplify_linear_decision_function_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='function.h.html'>function.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sparse_kernel.h.html'>sparse_kernel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel.h.html'>kernel.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>map<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    decision_function<font color='#5555FF'>&lt;</font>sparse_linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='simplify_linear_decision_function'></a>simplify_linear_decision_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>sparse_linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> df
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// don't do anything if we don't have to
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> df;
+
+        decision_function<font color='#5555FF'>&lt;</font>sparse_linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> new_df;
+
+        new_df.b <font color='#5555FF'>=</font> df.b;
+        new_df.basis_vectors.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        new_df.alpha.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        new_df.<font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        <font color='#009900'>// now compute the weighted sum of all the sparse basis_vectors in df
+</font>        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::value_type pair_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> pair_type::first_type key_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> pair_type::second_type value_type;
+        std::map<font color='#5555FF'>&lt;</font>key_type, value_type<font color='#5555FF'>&gt;</font> accum;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>typename</font> T::const_iterator j <font color='#5555FF'>=</font> df.<font color='#BB00BB'>basis_vectors</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> T::const_iterator end <font color='#5555FF'>=</font> df.<font color='#BB00BB'>basis_vectors</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; j <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                accum[j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> df.<font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        new_df.<font color='#BB00BB'>basis_vectors</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>T</font><font face='Lucida Console'>(</font>accum.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, accum.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> new_df;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    decision_function<font color='#5555FF'>&lt;</font>linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='simplify_linear_decision_function'></a>simplify_linear_decision_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> df
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// don't do anything if we don't have to
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> df;
+
+        decision_function<font color='#5555FF'>&lt;</font>linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> new_df;
+
+        new_df.b <font color='#5555FF'>=</font> df.b;
+        new_df.basis_vectors.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        new_df.alpha.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        new_df.<font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        <font color='#009900'>// now compute the weighted sum of all the basis_vectors in df
+</font>        new_df.<font color='#BB00BB'>basis_vectors</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            new_df.<font color='#BB00BB'>basis_vectors</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> df.<font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> df.<font color='#BB00BB'>basis_vectors</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> new_df;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    decision_function<font color='#5555FF'>&lt;</font>linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='simplify_linear_decision_function'></a>simplify_linear_decision_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> normalized_function<font color='#5555FF'>&lt;</font>decision_function<font color='#5555FF'>&lt;</font>linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>, vector_normalizer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> df
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        decision_function<font color='#5555FF'>&lt;</font>linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> new_df <font color='#5555FF'>=</font> <font color='#BB00BB'>simplify_linear_decision_function</font><font face='Lucida Console'>(</font>df.function<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now incorporate the normalization stuff into new_df
+</font>        new_df.<font color='#BB00BB'>basis_vectors</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font>new_df.<font color='#BB00BB'>basis_vectors</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, df.normalizer.<font color='#BB00BB'>std_devs</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        new_df.b <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>new_df.<font color='#BB00BB'>basis_vectors</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, df.normalizer.<font color='#BB00BB'>means</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> new_df;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SIMPLIFY_LINEAR_DECiSION_FUNCTION_Hh_
+</font>
+
+</pre></body></html>

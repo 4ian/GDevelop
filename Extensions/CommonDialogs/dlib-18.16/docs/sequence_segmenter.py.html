@@ -1,0 +1,242 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+<head>
+  <title></title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <style type="text/css">
+td.linenos { background-color: #f0f0f0; padding-right: 10px; }
+span.lineno { background-color: #f0f0f0; padding: 0 5px 0 5px; }
+pre { line-height: 125%; }
+body .hll { background-color: #ffffcc }
+body  { background: #ffffff; }
+body .c { color: #008000 } /* Comment */
+body .err { border: 1px solid #FF0000 } /* Error */
+body .k { color: #0000ff } /* Keyword */
+body .cm { color: #008000 } /* Comment.Multiline */
+body .cp { color: #0000ff } /* Comment.Preproc */
+body .c1 { color: #008000 } /* Comment.Single */
+body .cs { color: #008000 } /* Comment.Special */
+body .ge { font-style: italic } /* Generic.Emph */
+body .gh { font-weight: bold } /* Generic.Heading */
+body .gp { font-weight: bold } /* Generic.Prompt */
+body .gs { font-weight: bold } /* Generic.Strong */
+body .gu { font-weight: bold } /* Generic.Subheading */
+body .kc { color: #0000ff } /* Keyword.Constant */
+body .kd { color: #0000ff } /* Keyword.Declaration */
+body .kn { color: #0000ff } /* Keyword.Namespace */
+body .kp { color: #0000ff } /* Keyword.Pseudo */
+body .kr { color: #0000ff } /* Keyword.Reserved */
+body .kt { color: #2b91af } /* Keyword.Type */
+body .s { color: #a31515 } /* Literal.String */
+body .nc { color: #2b91af } /* Name.Class */
+body .ow { color: #0000ff } /* Operator.Word */
+body .sb { color: #a31515 } /* Literal.String.Backtick */
+body .sc { color: #a31515 } /* Literal.String.Char */
+body .sd { color: #a31515 } /* Literal.String.Doc */
+body .s2 { color: #a31515 } /* Literal.String.Double */
+body .se { color: #a31515 } /* Literal.String.Escape */
+body .sh { color: #a31515 } /* Literal.String.Heredoc */
+body .si { color: #a31515 } /* Literal.String.Interpol */
+body .sx { color: #a31515 } /* Literal.String.Other */
+body .sr { color: #a31515 } /* Literal.String.Regex */
+body .s1 { color: #a31515 } /* Literal.String.Single */
+body .ss { color: #a31515 } /* Literal.String.Symbol */
+
+  </style>
+</head>
+<body>
+<h2></h2>
+
+<div class="highlight"><pre><span class="c">#!/usr/bin/python</span>
+<span class="c"># The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt</span>
+<span class="c">#</span>
+<span class="c"># This example shows how to use dlib to learn to do sequence segmentation.  In</span>
+<span class="c"># a sequence segmentation task we are given a sequence of objects (e.g. words in</span>
+<span class="c"># a sentence) and we are supposed to detect certain subsequences (e.g. the names</span>
+<span class="c"># of people).  Therefore, in the code below we create some very simple training</span>
+<span class="c"># sequences and use them to learn a sequence segmentation model.  In particular,</span>
+<span class="c"># our sequences will be sentences represented as arrays of words and our task</span>
+<span class="c"># will be to learn to identify person names.  Once we have our segmentation</span>
+<span class="c"># model we can use it to find names in new sentences, as we will show.</span>
+<span class="c">#</span>
+<span class="c"># COMPILING THE DLIB PYTHON INTERFACE</span>
+<span class="c">#   Dlib comes with a compiled python interface for python 2.7 on MS Windows. If</span>
+<span class="c">#   you are using another python version or operating system then you need to</span>
+<span class="c">#   compile the dlib python interface before you can use this file.  To do this,</span>
+<span class="c">#   run compile_dlib_python_module.bat.  This should work on any operating</span>
+<span class="c">#   system so long as you have CMake and boost-python installed.</span>
+<span class="c">#   On Ubuntu, this can be done easily by running the command:</span>
+<span class="c">#       sudo apt-get install libboost-python-dev cmake</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">dlib</span>
+
+
+<span class="c"># The sequence segmentation models we work with in this example are chain</span>
+<span class="c"># structured conditional random field style models.  Therefore, central to a</span>
+<span class="c"># sequence segmentation model is some method for converting the elements of a</span>
+<span class="c"># sequence into feature vectors. That is, while you might start out representing</span>
+<span class="c"># your sequence as an array of strings, the dlib interface works in terms of</span>
+<span class="c"># arrays of feature vectors.  Each feature vector should capture important</span>
+<span class="c"># information about its corresponding element in the original raw sequence.  So</span>
+<span class="c"># in this example, since we work with sequences of words and want to identify</span>
+<span class="c"># names, we will create feature vectors that tell us if the word is capitalized</span>
+<span class="c"># or not.  In our simple data, this will be enough to identify names.</span>
+<span class="c"># Therefore, we define sentence_to_vectors() which takes a sentence represented</span>
+<span class="c"># as a string and converts it into an array of words and then associates a</span>
+<span class="c"># feature vector with each word.</span>
+<span class="k">def</span> <span class="nf">sentence_to_vectors</span><span class="p">(</span><span class="n">sentence</span><span class="p">):</span>
+    <span class="c"># Create an empty array of vectors</span>
+    <span class="n">vects</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">vectors</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">sentence</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+        <span class="c"># Our vectors are very simple 1-dimensional vectors.  The value of the</span>
+        <span class="c"># single feature is 1 if the first letter of the word is capitalized and</span>
+        <span class="c"># 0 otherwise.</span>
+        <span class="k">if</span> <span class="n">word</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isupper</span><span class="p">():</span>
+            <span class="n">vects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dlib</span><span class="o">.</span><span class="n">vector</span><span class="p">([</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dlib</span><span class="o">.</span><span class="n">vector</span><span class="p">([</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">vects</span>
+
+
+<span class="c"># Dlib also supports the use of a sparse vector representation.  This is more</span>
+<span class="c"># efficient than the above form when you have very high dimensional vectors that</span>
+<span class="c"># are mostly full of zeros.  In dlib, each sparse vector is represented as an</span>
+<span class="c"># array of pair objects.  Each pair contains an index and value.  Any index not</span>
+<span class="c"># listed in the vector is implicitly associated with a value of zero.</span>
+<span class="c"># Additionally, when using sparse vectors with dlib.train_sequence_segmenter()</span>
+<span class="c"># you can use &quot;unsorted&quot; sparse vectors.  This means you can add the index/value</span>
+<span class="c"># pairs into your sparse vectors in any order you want and don&#39;t need to worry</span>
+<span class="c"># about them being in sorted order.</span>
+<span class="k">def</span> <span class="nf">sentence_to_sparse_vectors</span><span class="p">(</span><span class="n">sentence</span><span class="p">):</span>
+    <span class="n">vects</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">sparse_vectors</span><span class="p">()</span>
+    <span class="n">has_cap</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">sparse_vector</span><span class="p">()</span>
+    <span class="n">no_cap</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">sparse_vector</span><span class="p">()</span>
+    <span class="c"># make has_cap equivalent to dlib.vector([1])</span>
+    <span class="n">has_cap</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dlib</span><span class="o">.</span><span class="n">pair</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="c"># Since we didn&#39;t add anything to no_cap it is equivalent to</span>
+    <span class="c"># dlib.vector([0])</span>
+    <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">sentence</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">word</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isupper</span><span class="p">():</span>
+            <span class="n">vects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">has_cap</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">no_cap</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">vects</span>
+
+
+<span class="k">def</span> <span class="nf">print_segment</span><span class="p">(</span><span class="n">sentence</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+    <span class="n">words</span> <span class="o">=</span> <span class="n">sentence</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s">&quot; &quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+
+
+
+<span class="c"># Now let&#39;s make some training data.  Each example is a sentence as well as a</span>
+<span class="c"># set of ranges which indicate the locations of any names.   </span>
+<span class="n">names</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">ranges</span><span class="p">()</span>     <span class="c"># make an array of dlib.range objects.</span>
+<span class="n">segments</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">rangess</span><span class="p">()</span> <span class="c"># make an array of arrays of dlib.range objects.</span>
+<span class="n">sentences</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">sentences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;The other day I saw a man named Jim Smith&quot;</span><span class="p">)</span>
+<span class="c"># We want to detect person names.  So we note that the name is located within</span>
+<span class="c"># the range [8, 10).  Note that we use half open ranges to identify segments.</span>
+<span class="c"># So in this case, the segment identifies the string &quot;Jim Smith&quot;.</span>
+<span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dlib</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+<span class="n">names</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span> <span class="c"># make names empty for use again below</span>
+
+<span class="n">sentences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;Davis King is the main author of the dlib Library&quot;</span><span class="p">)</span>
+<span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dlib</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+<span class="n">names</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+<span class="n">sentences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;Bob Jones is a name and so is George Clinton&quot;</span><span class="p">)</span>
+<span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dlib</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dlib</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+<span class="n">names</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+<span class="n">sentences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;My dog is named Bob Barker&quot;</span><span class="p">)</span>
+<span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dlib</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+<span class="n">names</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+<span class="n">sentences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;ABC is an acronym but John James Smith is a name&quot;</span><span class="p">)</span>
+<span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dlib</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+<span class="n">names</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+<span class="n">sentences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;No names in this sentence at all&quot;</span><span class="p">)</span>
+<span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+<span class="n">names</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+
+<span class="c"># Now before we can pass these training sentences to the dlib tools we need to</span>
+<span class="c"># convert them into arrays of vectors as discussed above.  We can use either a</span>
+<span class="c"># sparse or dense representation depending on our needs.  In this example, we</span>
+<span class="c"># show how to do it both ways.</span>
+<span class="n">use_sparse_vects</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="k">if</span> <span class="n">use_sparse_vects</span><span class="p">:</span>
+    <span class="c"># Make an array of arrays of dlib.sparse_vector objects.</span>
+    <span class="n">training_sequences</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">sparse_vectorss</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">:</span>
+        <span class="n">training_sequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sentence_to_sparse_vectors</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="c"># Make an array of arrays of dlib.vector objects.</span>
+    <span class="n">training_sequences</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">vectorss</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">:</span>
+        <span class="n">training_sequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sentence_to_vectors</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+
+<span class="c"># Now that we have a simple training set we can train a sequence segmenter.</span>
+<span class="c"># However, the sequence segmentation trainer has some optional parameters we can</span>
+<span class="c"># set.  These parameters determine properties of the segmentation model we will</span>
+<span class="c"># learn.  See the dlib documentation for the sequence_segmenter object for a</span>
+<span class="c"># full discussion of their meanings.</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">segmenter_params</span><span class="p">()</span>
+<span class="n">params</span><span class="o">.</span><span class="n">window_size</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">params</span><span class="o">.</span><span class="n">use_high_order_features</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">params</span><span class="o">.</span><span class="n">use_BIO_model</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="c"># This is the common SVM C parameter.  Larger values encourage the trainer to</span>
+<span class="c"># attempt to fit the data exactly but might overfit.  In general, you determine</span>
+<span class="c"># this parameter by cross-validation.</span>
+<span class="n">params</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c"># Train a model.  The model object is responsible for predicting the locations</span>
+<span class="c"># of names in new sentences.</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">train_sequence_segmenter</span><span class="p">(</span><span class="n">training_sequences</span><span class="p">,</span> <span class="n">segments</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+
+<span class="c"># Let&#39;s print out the things the model thinks are names.  The output is a set</span>
+<span class="c"># of ranges which are predicted to contain names.  If you run this example</span>
+<span class="c"># program you will see that it gets them all correct.</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sentences</span><span class="p">):</span>
+    <span class="n">print_segment</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">model</span><span class="p">(</span><span class="n">training_sequences</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+<span class="c"># Let&#39;s also try segmenting a new sentence.  This will print out &quot;Bob Bucket&quot;.</span>
+<span class="c"># Note that we need to remember to use the same vector representation as we used</span>
+<span class="c"># during training.</span>
+<span class="n">test_sentence</span> <span class="o">=</span> <span class="s">&quot;There once was a man from Nantucket &quot;</span> \
+                <span class="s">&quot;whose name rhymed with Bob Bucket&quot;</span>
+<span class="k">if</span> <span class="n">use_sparse_vects</span><span class="p">:</span>
+    <span class="n">print_segment</span><span class="p">(</span><span class="n">test_sentence</span><span class="p">,</span>
+                  <span class="n">model</span><span class="p">(</span><span class="n">sentence_to_sparse_vectors</span><span class="p">(</span><span class="n">test_sentence</span><span class="p">)))</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">print_segment</span><span class="p">(</span><span class="n">test_sentence</span><span class="p">,</span> <span class="n">model</span><span class="p">(</span><span class="n">sentence_to_vectors</span><span class="p">(</span><span class="n">test_sentence</span><span class="p">)))</span>
+
+<span class="c"># We can also measure the accuracy of a model relative to some labeled data.</span>
+<span class="c"># This statement prints the precision, recall, and F1-score of the model</span>
+<span class="c"># relative to the data in training_sequences/segments.</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Test on training data: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+      <span class="n">dlib</span><span class="o">.</span><span class="n">test_sequence_segmenter</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">training_sequences</span><span class="p">,</span> <span class="n">segments</span><span class="p">)))</span>
+
+<span class="c"># We can also do 5-fold cross-validation and print the resulting precision,</span>
+<span class="c"># recall, and F1-score.</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Cross validation: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+      <span class="n">dlib</span><span class="o">.</span><span class="n">cross_validate_sequence_segmenter</span><span class="p">(</span><span class="n">training_sequences</span><span class="p">,</span> <span class="n">segments</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span>
+                                             <span class="n">params</span><span class="p">)))</span>
+</pre></div>
+</body>
+</html>

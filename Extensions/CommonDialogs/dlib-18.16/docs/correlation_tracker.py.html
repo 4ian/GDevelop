@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+<head>
+  <title></title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <style type="text/css">
+td.linenos { background-color: #f0f0f0; padding-right: 10px; }
+span.lineno { background-color: #f0f0f0; padding: 0 5px 0 5px; }
+pre { line-height: 125%; }
+body .hll { background-color: #ffffcc }
+body  { background: #ffffff; }
+body .c { color: #008000 } /* Comment */
+body .err { border: 1px solid #FF0000 } /* Error */
+body .k { color: #0000ff } /* Keyword */
+body .cm { color: #008000 } /* Comment.Multiline */
+body .cp { color: #0000ff } /* Comment.Preproc */
+body .c1 { color: #008000 } /* Comment.Single */
+body .cs { color: #008000 } /* Comment.Special */
+body .ge { font-style: italic } /* Generic.Emph */
+body .gh { font-weight: bold } /* Generic.Heading */
+body .gp { font-weight: bold } /* Generic.Prompt */
+body .gs { font-weight: bold } /* Generic.Strong */
+body .gu { font-weight: bold } /* Generic.Subheading */
+body .kc { color: #0000ff } /* Keyword.Constant */
+body .kd { color: #0000ff } /* Keyword.Declaration */
+body .kn { color: #0000ff } /* Keyword.Namespace */
+body .kp { color: #0000ff } /* Keyword.Pseudo */
+body .kr { color: #0000ff } /* Keyword.Reserved */
+body .kt { color: #2b91af } /* Keyword.Type */
+body .s { color: #a31515 } /* Literal.String */
+body .nc { color: #2b91af } /* Name.Class */
+body .ow { color: #0000ff } /* Operator.Word */
+body .sb { color: #a31515 } /* Literal.String.Backtick */
+body .sc { color: #a31515 } /* Literal.String.Char */
+body .sd { color: #a31515 } /* Literal.String.Doc */
+body .s2 { color: #a31515 } /* Literal.String.Double */
+body .se { color: #a31515 } /* Literal.String.Escape */
+body .sh { color: #a31515 } /* Literal.String.Heredoc */
+body .si { color: #a31515 } /* Literal.String.Interpol */
+body .sx { color: #a31515 } /* Literal.String.Other */
+body .sr { color: #a31515 } /* Literal.String.Regex */
+body .s1 { color: #a31515 } /* Literal.String.Single */
+body .ss { color: #a31515 } /* Literal.String.Symbol */
+
+  </style>
+</head>
+<body>
+<h2></h2>
+
+<div class="highlight"><pre><span class="c">#!/usr/bin/python</span>
+<span class="c"># The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt</span>
+<span class="c">#</span>
+<span class="c"># This example shows how to use the correlation_tracker from the dlib Python</span>
+<span class="c"># library.  This object lets you track the position of an object as it moves</span>
+<span class="c"># from frame to frame in a video sequence.  To use it, you give the</span>
+<span class="c"># correlation_tracker the bounding box of the object you want to track in the</span>
+<span class="c"># current video frame.  Then it will identify the location of the object in</span>
+<span class="c"># subsequent frames.</span>
+<span class="c">#</span>
+<span class="c"># In this particular example, we are going to run on the</span>
+<span class="c"># video sequence that comes with dlib, which can be found in the</span>
+<span class="c"># examples/video_frames folder.  This video shows a juice box sitting on a table</span>
+<span class="c"># and someone is waving the camera around.  The task is to track the position of</span>
+<span class="c"># the juice box as the camera moves around.</span>
+<span class="c">#</span>
+<span class="c"># COMPILING THE DLIB PYTHON INTERFACE</span>
+<span class="c">#   Dlib comes with a compiled python interface for python 2.7 on MS Windows. If</span>
+<span class="c">#   you are using another python version or operating system then you need to</span>
+<span class="c">#   compile the dlib python interface before you can use this file.  To do this,</span>
+<span class="c">#   run compile_dlib_python_module.bat.  This should work on any operating</span>
+<span class="c">#   system so long as you have CMake and boost-python installed.</span>
+<span class="c">#   On Ubuntu, this can be done easily by running the command:</span>
+<span class="c">#       sudo apt-get install libboost-python-dev cmake</span>
+<span class="c">#</span>
+<span class="c">#   Also note that this example requires scikit-image which can be installed</span>
+<span class="c">#   via the command:</span>
+<span class="c">#       pip install -U scikit-image</span>
+<span class="c">#   Or downloaded from http://scikit-image.org/download.html. </span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+
+<span class="kn">import</span> <span class="nn">dlib</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span>
+
+<span class="c"># Path to the video frames</span>
+<span class="n">video_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span> <span class="s">&quot;examples&quot;</span><span class="p">,</span> <span class="s">&quot;video_frames&quot;</span><span class="p">)</span>
+
+<span class="c"># Create the correlation tracker - the object needs to be initialized</span>
+<span class="c"># before it can be used</span>
+<span class="n">tracker</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">correlation_tracker</span><span class="p">()</span>
+
+<span class="n">win</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">image_window</span><span class="p">()</span>
+<span class="c"># We will track the frames as we load them off of disk</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">video_folder</span><span class="p">,</span> <span class="s">&quot;*.jpg&quot;</span><span class="p">)))):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Processing Frame {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="c"># We need to initialize the tracker on the first frame</span>
+    <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c"># Start a track on the juice box. If you look at the first frame you</span>
+        <span class="c"># will see that the juice box is contained within the bounding</span>
+        <span class="c"># box (74, 67, 112, 153).</span>
+        <span class="n">tracker</span><span class="o">.</span><span class="n">start_track</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">dlib</span><span class="o">.</span><span class="n">rectangle</span><span class="p">(</span><span class="mi">74</span><span class="p">,</span> <span class="mi">67</span><span class="p">,</span> <span class="mi">112</span><span class="p">,</span> <span class="mi">153</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c"># Else we just attempt to track from the previous frame</span>
+        <span class="n">tracker</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+
+    <span class="n">win</span><span class="o">.</span><span class="n">clear_overlay</span><span class="p">()</span>
+    <span class="n">win</span><span class="o">.</span><span class="n">set_image</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+    <span class="n">win</span><span class="o">.</span><span class="n">add_overlay</span><span class="p">(</span><span class="n">tracker</span><span class="o">.</span><span class="n">get_position</span><span class="p">())</span>
+    <span class="n">dlib</span><span class="o">.</span><span class="n">hit_enter_to_continue</span><span class="p">()</span>
+</pre></div>
+</body>
+</html>

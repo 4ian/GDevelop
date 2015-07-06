@@ -1,0 +1,525 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - kkmeans.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_KKMEANs_
+<font color='#0000FF'>#define</font> DLIB_KKMEANs_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel.h.html'>kernel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array.h.html'>../array.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kcentroid.h.html'>kcentroid.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kkmeans_abstract.h.html'>kkmeans_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../noncopyable.h.html'>../noncopyable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../smart_pointers.h.html'>../smart_pointers.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='kkmeans'></a>kkmeans</b> : <font color='#0000FF'>public</font> noncopyable
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mem_manager_type;
+
+        <b><a name='kkmeans'></a>kkmeans</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> kc_ 
+        <font face='Lucida Console'>)</font>:
+            kc<font face='Lucida Console'>(</font>kc_<font face='Lucida Console'>)</font>,
+            min_change<font face='Lucida Console'>(</font><font color='#979000'>0.01</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>set_number_of_centers</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        ~<b><a name='kkmeans'></a>kkmeans</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> <b><a name='get_kernel'></a>get_kernel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> kc.<font color='#BB00BB'>get_kernel</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_kcentroid'></a>set_kcentroid</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> kc_
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            kc <font color='#5555FF'>=</font> kc_;
+            <font color='#BB00BB'>set_number_of_centers</font><font face='Lucida Console'>(</font><font color='#BB00BB'>number_of_centers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_kcentroid'></a>get_kcentroid</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_centers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\tkcentroid kkmeans::get_kcentroid(i)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have given an invalid value for i</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\ti:                   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnumber_of_centers(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_centers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:                </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>centers[i];
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_number_of_centers'></a>set_number_of_centers</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>num <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\tvoid kkmeans::set_number_of_centers()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can't set the number of centers to zero</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            centers.<font color='#BB00BB'>set_max_size</font><font face='Lucida Console'>(</font>num<font face='Lucida Console'>)</font>;
+            centers.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>num<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> centers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                centers[i].<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>kc<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_centers'></a>number_of_centers</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> centers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> initial_centers,
+            <font color='#0000FF'><u>long</u></font> max_iter <font color='#5555FF'>=</font> <font color='#979000'>1000</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>do_train</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>,<font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>initial_centers<font face='Lucida Console'>)</font>,max_iter<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> sample
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> label <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            scalar_type best_score <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>centers[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// figure out which center the given sample is closest too
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> centers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                scalar_type temp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>centers[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&lt;</font> best_score<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    label <font color='#5555FF'>=</font> i;
+                    best_score <font color='#5555FF'>=</font> temp;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> label;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_min_change'></a>set_min_change</b> <font face='Lucida Console'>(</font>
+            scalar_type min_change_
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> min_change_ <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font>,
+                "<font color='#CC0000'>\tvoid kkmeans::set_min_change()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tmin_change_: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> min_change_ 
+                <font face='Lucida Console'>)</font>;
+            min_change <font color='#5555FF'>=</font> min_change_;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_min_change'></a>get_min_change</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> min_change;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            kkmeans<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            centers.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.centers<font face='Lucida Console'>)</font>;
+            kc.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.kc<font face='Lucida Console'>)</font>;
+            assignments.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.assignments<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>min_change, item.min_change<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> kkmeans<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.centers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> item.centers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>item.centers[i], out<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.kc, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.min_change, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>kkmeans<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>num, in<font face='Lucida Console'>)</font>;
+            item.centers.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>num<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> item.centers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                scoped_ptr<font color='#5555FF'>&lt;</font>kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>temp, in<font face='Lucida Console'>)</font>;
+                item.centers[i].<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.kc, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.min_change, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_type, <font color='#0000FF'>typename</font> matrix_type2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='do_train'></a>do_train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_type<font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> matrix_type2<font color='#5555FF'>&amp;</font> initial_centers,
+            <font color='#0000FF'><u>long</u></font> max_iter <font color='#5555FF'>=</font> <font color='#979000'>1000</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_type::type, sample_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_type2::type, sample_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> initial_centers.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                         initial_centers.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>number_of_centers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\tvoid kkmeans::train()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tsamples.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tinitial_centers.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> initial_centers.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tinitial_centers.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> initial_centers.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// clear out the old data and initialize the centers
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> centers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                centers[i]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>clear_dictionary</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                centers[i]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>train</font><font face='Lucida Console'>(</font><font color='#BB00BB'>initial_centers</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            assignments.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>bool</u></font> assignment_changed <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+            <font color='#009900'>// loop until the centers stabilize 
+</font>            <font color='#0000FF'><u>long</u></font> count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> min_num_change <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>min_change<font color='#5555FF'>*</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_changed <font color='#5555FF'>=</font> min_num_change;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>assignment_changed <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> count <font color='#5555FF'>&lt;</font> max_iter <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_changed <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> min_num_change<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+                assignment_changed <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                num_changed <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                <font color='#009900'>// loop over all the samples and assign them to their closest centers
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// find the best center
+</font>                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> best_center <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    scalar_type best_score <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>centers[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>1</font>; c <font color='#5555FF'>&lt;</font> centers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        scalar_type temp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>centers[c]<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&lt;</font> best_score<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            best_score <font color='#5555FF'>=</font> temp;
+                            best_center <font color='#5555FF'>=</font> c;
+                        <b>}</b>
+                    <b>}</b>
+
+                    <font color='#009900'>// if the current sample changed centers then make note of that
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>assignments[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> best_center<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        assignments[i] <font color='#5555FF'>=</font> best_center;
+                        assignment_changed <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>num_changed;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>assignment_changed<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// now clear out the old data 
+</font>                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> centers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                        centers[i]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>clear_dictionary</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// recalculate the cluster centers 
+</font>                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> assignments.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                        centers[assignments[i]]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>train</font><font face='Lucida Console'>(</font><font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+            <b>}</b>
+
+
+        <b>}</b>
+
+        array<font color='#5555FF'>&lt;</font>scoped_ptr<font color='#5555FF'>&lt;</font>kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> centers;
+        kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> kc;
+        scalar_type min_change;
+
+        <font color='#009900'>// temp variables
+</font>        array<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> assignments;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>kkmeans<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, kkmeans<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font>
+    <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='dlib_pick_initial_centers_data'></a>dlib_pick_initial_centers_data</b>
+    <b>{</b>
+        <b><a name='dlib_pick_initial_centers_data'></a>dlib_pick_initial_centers_data</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>:idx<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, dist<font face='Lucida Console'>(</font><font color='#979000'>1e200</font><font face='Lucida Console'>)</font><b>{</b><b>}</b>
+        <font color='#0000FF'><u>long</u></font> idx;
+        <font color='#0000FF'><u>double</u></font> dist;
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> dlib_pick_initial_centers_data<font color='#5555FF'>&amp;</font> d<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> dist <font color='#5555FF'>&lt;</font> d.dist; <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type1, 
+        <font color='#0000FF'>typename</font> vector_type2, 
+        <font color='#0000FF'>typename</font> kernel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='pick_initial_centers'></a>pick_initial_centers</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>long</u></font> num_centers, 
+        vector_type1<font color='#5555FF'>&amp;</font> centers, 
+        <font color='#0000FF'>const</font> vector_type2<font color='#5555FF'>&amp;</font> samples, 
+        <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> k, 
+        <font color='#0000FF'><u>double</u></font> percentile <font color='#5555FF'>=</font> <font color='#979000'>0.01</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>/*
+            This function is basically just a non-randomized version of the kmeans++ algorithm
+            described in the paper:
+                kmeans++: The Advantages of Careful Seeding by Arthur and Vassilvitskii
+
+        */</font>
+
+
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>num_centers <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> percentile <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> percentile <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font>,
+            "<font color='#CC0000'>\tvoid pick_initial_centers()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou passed invalid arguments to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnum_centers: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_centers 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tpercentile: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> percentile 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tsamples.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font>dlib_pick_initial_centers_data<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>scores</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        std::vector<font color='#5555FF'>&lt;</font>dlib_pick_initial_centers_data<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>scores_sorted</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        centers.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// pick the first sample as one of the centers
+</font>        centers.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>samples[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> best_idx <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>percentile <font color='#5555FF'>-</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// pick the next center
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num_centers<font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// Loop over the samples and compare them to the most recent center.  Store
+</font>            <font color='#009900'>// the distance from each sample to its closest center in scores.
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> k_cc <font color='#5555FF'>=</font> <font color='#BB00BB'>k</font><font face='Lucida Console'>(</font>centers[i], centers[i]<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> s <font color='#5555FF'>=</font> <font color='#979000'>0</font>; s <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>s<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// compute the distance between this sample and the current center
+</font>                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> dist <font color='#5555FF'>=</font> k_cc <font color='#5555FF'>+</font> <font color='#BB00BB'>k</font><font face='Lucida Console'>(</font>samples[s],samples[s]<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#BB00BB'>k</font><font face='Lucida Console'>(</font>samples[s], centers[i]<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dist <font color='#5555FF'>&lt;</font> scores[s].dist<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    scores[s].dist <font color='#5555FF'>=</font> dist;
+                    scores[s].idx <font color='#5555FF'>=</font> s;
+                <b>}</b>
+            <b>}</b>
+
+            scores_sorted <font color='#5555FF'>=</font> scores;
+
+            <font color='#009900'>// now find the winning center and add it to centers.  It is the one that is 
+</font>            <font color='#009900'>// far away from all the other centers.
+</font>            <font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>scores_sorted.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, scores_sorted.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            centers.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>samples[scores_sorted[best_idx].idx]<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type1, 
+        <font color='#0000FF'>typename</font> vector_type2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='pick_initial_centers'></a>pick_initial_centers</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>long</u></font> num_centers, 
+        vector_type1<font color='#5555FF'>&amp;</font> centers, 
+        <font color='#0000FF'>const</font> vector_type2<font color='#5555FF'>&amp;</font> samples, 
+        <font color='#0000FF'><u>double</u></font> percentile <font color='#5555FF'>=</font> <font color='#979000'>0.01</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> vector_type1::value_type sample_type;
+        linear_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> kern;
+        <font color='#BB00BB'>pick_initial_centers</font><font face='Lucida Console'>(</font>num_centers, centers, samples, kern, percentile<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> array_type, 
+        <font color='#0000FF'>typename</font> sample_type,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_clusters_using_kmeans'></a>find_clusters_using_kmeans</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> array_type<font color='#5555FF'>&amp;</font> samples,
+        std::vector<font color='#5555FF'>&lt;</font>sample_type, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> centers,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter <font color='#5555FF'>=</font> <font color='#979000'>1000</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> centers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\tvoid find_clusters_using_kmeans()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou passed invalid arguments to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t samples.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t centers.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> centers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+        <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> nr <font color='#5555FF'>=</font> samples[<font color='#979000'>0</font>].<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> nc <font color='#5555FF'>=</font> samples[<font color='#979000'>0</font>].<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> samples[i].<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> nr <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> samples[i].<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> nc,
+                "<font color='#CC0000'>\tvoid find_clusters_using_kmeans()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You passed invalid arguments to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_vector(samples[i]): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t samples[i].nr():       </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples[i].<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t nr:                    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> nr
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t samples[i].nc():       </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples[i].<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t nc:                    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> nc
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t i:                     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i
+                <font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sample_type::type scalar_type;
+
+        sample_type <font color='#BB00BB'>zero</font><font face='Lucida Console'>(</font>centers[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_all_elements</font><font face='Lucida Console'>(</font>zero, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> center_element_count;
+
+        <font color='#009900'>// tells which center a sample belongs to
+</font>        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>assignments</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> iter <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>bool</u></font> centers_changed <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>centers_changed <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> iter <font color='#5555FF'>&lt;</font> max_iter<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>iter;
+            centers_changed <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            center_element_count.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>centers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// loop over each sample and see which center it is closest to
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// find the best center for sample[i]
+</font>                scalar_type best_dist <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> best_center <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> centers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    scalar_type dist <font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>centers[j] <font color='#5555FF'>-</font> samples[i]<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dist <font color='#5555FF'>&lt;</font> best_dist<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        best_dist <font color='#5555FF'>=</font> dist;
+                        best_center <font color='#5555FF'>=</font> j;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>assignments[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> best_center<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    centers_changed <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    assignments[i] <font color='#5555FF'>=</font> best_center;
+                <b>}</b>
+
+                center_element_count[best_center] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <b>}</b>
+
+            <font color='#009900'>// now update all the centers
+</font>            centers.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>centers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, zero<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                centers[assignments[i]] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> samples[i];
+            <b>}</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> centers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>center_element_count[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    centers[i] <font color='#5555FF'>/</font><font color='#5555FF'>=</font> center_element_count[i];
+            <b>}</b>
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> array_type, 
+        <font color='#0000FF'>typename</font> EXP 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='nearest_center'></a>nearest_center</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> array_type<font color='#5555FF'>&amp;</font> centers,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> sample
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>centers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> sample.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\t unsigned long nearest_center()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You have given invalid inputs to this function.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t centers.size():    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> centers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t sample.size():     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sample.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_vector(sample): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>double</u></font> best_dist <font color='#5555FF'>=</font> <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>centers[<font color='#979000'>0</font>] <font color='#5555FF'>-</font> sample<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> best_idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> centers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> dist <font color='#5555FF'>=</font> <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>centers[i] <font color='#5555FF'>-</font> sample<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dist <font color='#5555FF'>&lt;</font> best_dist<font face='Lucida Console'>)</font>
+            <b>{</b>
+                best_dist <font color='#5555FF'>=</font> dist;
+                best_idx <font color='#5555FF'>=</font> i;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>return</font> best_idx;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_KKMEANs_
+</font>
+
+
+</pre></body></html>

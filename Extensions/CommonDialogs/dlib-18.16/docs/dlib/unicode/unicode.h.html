@@ -1,0 +1,619 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - unicode.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net), and Nils Labugt
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_UNICODe_H_
+<font color='#0000FF'>#define</font> DLIB_UNICODe_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='unicode_abstract.h.html'>unicode_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstring<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>typedef</font> uint32 unichar;
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>__GNUC__<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> __GNUC__ <font color='#5555FF'>&lt;</font> <font color='#979000'>4</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> __GNUC_MINOR__ <font color='#5555FF'>&lt;</font> <font color='#979000'>4</font>
+    <font color='#0000FF'>struct</font> <b><a name='unichar_traits'></a>unichar_traits</b> 
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> dlib::unichar    char_type;
+        <font color='#0000FF'>typedef</font> dlib::unichar    int_type;
+        <font color='#0000FF'>typedef</font> std::streamoff   off_type;
+        <font color='#0000FF'>typedef</font> std::streampos   pos_type;
+        <font color='#0000FF'>typedef</font> std::mbstate_t   state_type;
+
+        <font color='#0000FF'>static</font> <font color='#0000FF'><u>void</u></font> <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>char_type<font color='#5555FF'>&amp;</font> c1, <font color='#0000FF'>const</font> char_type<font color='#5555FF'>&amp;</font> c2<font face='Lucida Console'>)</font> <b>{</b> c1 <font color='#5555FF'>=</font> c2; <b>}</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> <b><a name='eq'></a>eq</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> char_type<font color='#5555FF'>&amp;</font> c1, <font color='#0000FF'>const</font> char_type<font color='#5555FF'>&amp;</font> c2<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> c1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> c2; <b>}</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> <b><a name='lt'></a>lt</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> char_type<font color='#5555FF'>&amp;</font> c1, <font color='#0000FF'>const</font> char_type<font color='#5555FF'>&amp;</font> c2<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> c1 <font color='#5555FF'>&lt;</font> c2; <b>}</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> <b><a name='compare'></a>compare</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> char_type<font color='#5555FF'>*</font> s1, <font color='#0000FF'>const</font> char_type<font color='#5555FF'>*</font> s2, <font color='#0000FF'><u>size_t</u></font> n<font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> n; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s1[i] <font color='#5555FF'>&lt;</font> s2[i]<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s1[i] <font color='#5555FF'>&gt;</font> s2[i]<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+            <b>}</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>static</font> <font color='#0000FF'><u>size_t</u></font> <b><a name='length'></a>length</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> char_type<font color='#5555FF'>*</font> s<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>size_t</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>s[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+            <font color='#0000FF'>return</font> i;
+        <b>}</b>
+
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> char_type<font color='#5555FF'>*</font> <b><a name='find'></a>find</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> char_type<font color='#5555FF'>*</font> s, <font color='#0000FF'><u>size_t</u></font> n,
+                                     <font color='#0000FF'>const</font> char_type<font color='#5555FF'>&amp;</font> a<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> n; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> a<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>return</font> s<font color='#5555FF'>+</font>i;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>static</font> char_type<font color='#5555FF'>*</font> <b><a name='move'></a>move</b><font face='Lucida Console'>(</font>char_type<font color='#5555FF'>*</font> s1, <font color='#0000FF'>const</font> char_type<font color='#5555FF'>*</font> s2, <font color='#0000FF'><u>size_t</u></font> n<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>char_type<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>memmove</font><font face='Lucida Console'>(</font>s1, s2, <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>char_type<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>static</font> char_type<font color='#5555FF'>*</font> <b><a name='copy'></a>copy</b><font face='Lucida Console'>(</font>char_type<font color='#5555FF'>*</font> s1, <font color='#0000FF'>const</font> char_type<font color='#5555FF'>*</font> s2, <font color='#0000FF'><u>size_t</u></font> n<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> n; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                s1[i] <font color='#5555FF'>=</font> s2[i];
+
+            <font color='#0000FF'>return</font> s1;
+        <b>}</b>
+
+        <font color='#0000FF'>static</font> char_type<font color='#5555FF'>*</font> <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>char_type<font color='#5555FF'>*</font> s, <font color='#0000FF'><u>size_t</u></font> n, char_type a<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> n; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                s[i] <font color='#5555FF'>=</font> a;
+
+            <font color='#0000FF'>return</font> s;
+        <b>}</b>
+
+
+        <font color='#0000FF'>static</font> int_type <b><a name='not_eof'></a>not_eof</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> int_type<font color='#5555FF'>&amp;</font> c<font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>eq_int_type</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>eof</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>to_int_type</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>static</font> char_type <b><a name='to_char_type'></a>to_char_type</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> int_type<font color='#5555FF'>&amp;</font> c<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>char_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>static</font> int_type <b><a name='to_int_type'></a>to_int_type</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> char_type<font color='#5555FF'>&amp;</font> c<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> zero_extend_cast<font color='#5555FF'>&lt;</font>int_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> <b><a name='eq_int_type'></a>eq_int_type</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> int_type<font color='#5555FF'>&amp;</font> c1, <font color='#0000FF'>const</font> int_type<font color='#5555FF'>&amp;</font> c2<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> c1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> c2; <b>}</b>
+
+        <font color='#0000FF'>static</font> int_type <b><a name='eof'></a>eof</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>int_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>EOF<font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>typedef</font> std::basic_string<font color='#5555FF'>&lt;</font>unichar, unichar_traits<font color='#5555FF'>&gt;</font> ustring;
+<font color='#0000FF'>#else</font>
+    <font color='#0000FF'>typedef</font> std::basic_string<font color='#5555FF'>&lt;</font>unichar<font color='#5555FF'>&gt;</font> ustring;
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> unicode_helpers
+    <b>{</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> charT
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>int</u></font> <b><a name='u8_to_u32'></a>u8_to_u32</b><font face='Lucida Console'>(</font>
+            charT<font color='#5555FF'>&amp;</font> result,
+            std::istream<font color='#5555FF'>&amp;</font> in
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            ensures
+                - if (there just wasn't any more data and we hit EOF) then
+                    - returns 0
+                - else if (we decoded another character without error) then
+                    - #result == the decoded character
+                    - returns the number of bytes consumed to make this character
+                - else
+                    - some error occurred
+                    - returns -1
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> val <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+
+            unichar ch[<font color='#979000'>4</font>];
+            ch[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> zero_extend_cast<font color='#5555FF'>&lt;</font>unichar<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch[<font color='#979000'>0</font>] <font color='#5555FF'>&lt;</font> <font color='#979000'>0x80</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                result <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>ch[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font> ch[<font color='#979000'>0</font>] <font color='#5555FF'>&amp;</font> ~<font color='#979000'>0x3F</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x80</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// invalid leading byte
+</font>                <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font> ch[<font color='#979000'>0</font>] <font color='#5555FF'>&amp;</font> ~<font color='#979000'>0x1F</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xC0</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                val <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EOF <font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                
+                ch[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> zero_extend_cast<font color='#5555FF'>&lt;</font>unichar<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>; 
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font> ch[<font color='#979000'>1</font>] <font color='#5555FF'>&amp;</font> ~<font color='#979000'>0x3F</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0x80</font> <font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#009900'>// invalid tail
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font> ch[<font color='#979000'>0</font>] <font color='#5555FF'>&amp;</font> ~<font color='#979000'>0x01</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xC0</font> <font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#009900'>// overlong form
+</font>                ch[<font color='#979000'>0</font>] <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font color='#979000'>0x1F</font>;
+                ch[<font color='#979000'>1</font>] <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font color='#979000'>0x3F</font>;
+                result <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font> ch[<font color='#979000'>0</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>6</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> ch[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>2</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font> ch[<font color='#979000'>0</font>] <font color='#5555FF'>&amp;</font> ~<font color='#979000'>0x0F</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xE0</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>1</font>;n <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font>;n<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    val <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EOF <font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                    ch[n] <font color='#5555FF'>=</font> zero_extend_cast<font color='#5555FF'>&lt;</font>unichar<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>; 
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font> ch[n] <font color='#5555FF'>&amp;</font> ~<font color='#979000'>0x3F</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0x80</font> <font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#009900'>// invalid tail
+</font>                    ch[n] <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font color='#979000'>0x3F</font>;
+                <b>}</b>
+                ch[<font color='#979000'>0</font>] <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font color='#979000'>0x0F</font>;
+                result <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font> ch[<font color='#979000'>0</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>12</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font> ch[<font color='#979000'>1</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>6</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> ch[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> result <font color='#5555FF'>&lt;</font> <font color='#979000'>0x0800</font> <font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#009900'>// overlong form
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> result <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0xD800</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> result <font color='#5555FF'>&lt;</font> <font color='#979000'>0xE000</font> <font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#009900'>// invalid character (UTF-16 surrogate pairs)
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> result <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0xFDD0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> result <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0xFDEF</font> <font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#009900'>// noncharacter
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> result <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0xFFFE</font> <font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#009900'>// noncharacter
+</font>                <font color='#0000FF'>return</font> <font color='#979000'>3</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font> ch[<font color='#979000'>0</font>] <font color='#5555FF'>&amp;</font> ~<font color='#979000'>0x07</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xF0</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>1</font>;n <font color='#5555FF'>&lt;</font> <font color='#979000'>4</font>;n<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    val <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EOF <font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                    ch[n] <font color='#5555FF'>=</font> zero_extend_cast<font color='#5555FF'>&lt;</font>unichar<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>; 
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font> ch[n] <font color='#5555FF'>&amp;</font> ~<font color='#979000'>0x3F</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0x80</font> <font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#009900'>// invalid tail
+</font>                    ch[n] <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font color='#979000'>0x3F</font>;
+                <b>}</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font> ch[<font color='#979000'>0</font>] ^ <font color='#979000'>0xF6</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>4</font> <font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                ch[<font color='#979000'>0</font>] <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font color='#979000'>0x07</font>;
+                result  <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font> ch[<font color='#979000'>0</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>18</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font> ch[<font color='#979000'>1</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>12</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font> ch[<font color='#979000'>2</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>6</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> ch[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> result <font color='#5555FF'>&lt;</font> <font color='#979000'>0x10000</font> <font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#009900'>// overlong form
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>result <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFFFF</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0xFFFE</font> <font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#009900'>// noncharacter
+</font>                <font color='#0000FF'>return</font> <font color='#979000'>4</font>;
+            <b>}</b>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> charT<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='basic_utf8_streambuf'></a>basic_utf8_streambuf</b> : <font color='#0000FF'>public</font> std::basic_streambuf<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='basic_utf8_streambuf'></a>basic_utf8_streambuf</b> <font face='Lucida Console'>(</font>
+                std::ifstream<font color='#5555FF'>&amp;</font> fin_
+            <font face='Lucida Console'>)</font> :
+                fin<font face='Lucida Console'>(</font>fin_<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>setg</font><font face='Lucida Console'>(</font>in_buffer<font color='#5555FF'>+</font>max_putback, 
+                     in_buffer<font color='#5555FF'>+</font>max_putback, 
+                     in_buffer<font color='#5555FF'>+</font>max_putback<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <font color='#0000FF'>protected</font>:
+
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> std::basic_streambuf<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font>::int_type int_type;
+
+            <font color='#009900'>// input functions
+</font>            int_type <b><a name='underflow'></a>underflow</b><font face='Lucida Console'>(</font> 
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>gptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>egptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>return</font> zero_extend_cast<font color='#5555FF'>&lt;</font>int_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>gptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#0000FF'><u>int</u></font> num_put_back <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>gptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>eback</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_put_back <font color='#5555FF'>&gt;</font> max_putback<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    num_put_back <font color='#5555FF'>=</font> max_putback;
+                <b>}</b>
+
+                <font color='#009900'>// copy the putback characters into the putback end of the in_buffer
+</font>                std::<font color='#BB00BB'>memmove</font><font face='Lucida Console'>(</font>in_buffer<font color='#5555FF'>+</font><font face='Lucida Console'>(</font>max_putback<font color='#5555FF'>-</font>num_put_back<font face='Lucida Console'>)</font>, <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>gptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>num_put_back, num_put_back<font face='Lucida Console'>)</font>;
+
+
+                <font color='#009900'>// fill the buffer with characters
+</font>                <font color='#0000FF'><u>int</u></font> n <font color='#5555FF'>=</font> in_buffer_size<font color='#5555FF'>-</font>max_putback;
+                <font color='#0000FF'><u>int</u></font> i;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> n; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    charT ch;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>unicode_helpers::<font color='#BB00BB'>u8_to_u32</font><font face='Lucida Console'>(</font>ch,fin<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font face='Lucida Console'>(</font>in_buffer<font color='#5555FF'>+</font>max_putback<font face='Lucida Console'>)</font>[i] <font color='#5555FF'>=</font> ch;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#0000FF'>break</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// an error occurred or we hit EOF
+</font>                    <font color='#0000FF'>return</font> EOF;
+                <b>}</b>
+
+                <font color='#009900'>// reset in_buffer pointers
+</font>                <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>setg</font> <font face='Lucida Console'>(</font>in_buffer<font color='#5555FF'>+</font><font face='Lucida Console'>(</font>max_putback<font color='#5555FF'>-</font>num_put_back<font face='Lucida Console'>)</font>,
+                      in_buffer<font color='#5555FF'>+</font>max_putback,
+                      in_buffer<font color='#5555FF'>+</font>max_putback<font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>return</font> zero_extend_cast<font color='#5555FF'>&lt;</font>int_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>gptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+            std::ifstream<font color='#5555FF'>&amp;</font> fin;
+            <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> max_putback <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+            <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> in_buffer_size <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+            charT in_buffer[in_buffer_size];
+        <b>}</b>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_combining_char'></a>is_combining_char</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T ch_
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> unichar ch <font color='#5555FF'>=</font> zero_extend_cast<font color='#5555FF'>&lt;</font>unichar<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>ch_<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x300</font> <font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x370</font> <font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x800</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x483</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x48A</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x591</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x5D0</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x5C0</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x5C3</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x5C6</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x610</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x616</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x64B</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x660</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x670</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x6D6</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x6EE</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x6DD</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x6E5</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x6E6</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x6E9</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x711</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x730</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x74B</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x7A6</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x7B1</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x7EB</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x7F4</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xA00</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x901</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x904</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x93C</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x955</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x93D</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x950</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x962</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x964</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x981</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x984</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x9BC</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x9D8</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x9BD</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x9CE</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x9E2</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x9E4</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xC00</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xA01</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xA04</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xA3C</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xA4E</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xA70</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xA72</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xA81</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xA84</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xABC</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xACE</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xABD</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xAE2</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xAE4</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xB01</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xB04</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xB3C</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xB58</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xB3D</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xB82</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xBBE</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xBD8</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xBF4</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xBF8</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+        <font color='#0000FF'>if</font><font face='Lucida Console'>(</font>ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xE00</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xC01</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xC04</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xC3E</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xC57</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xC82</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xC84</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xCBC</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xCD7</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xCBD</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xCE2</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xCE4</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xD02</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xD04</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xD3E</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xD58</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xD82</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xD84</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xDCA</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xDF4</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+        <font color='#0000FF'>if</font><font face='Lucida Console'>(</font>ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1000</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xE31</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xE34</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xE3B</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xE47</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xE4F</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xEB1</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xEB4</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xEBD</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xEC8</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xECE</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xF18</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xF1A</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xF35</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xF37</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xF39</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xF3E</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xF40</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xF71</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xF88</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xF85</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xF90</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xFBD</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xFC6</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1800</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x102C</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1040</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1056</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x105A</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x135F</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1712</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1715</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1732</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1735</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1752</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1754</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1772</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1774</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x17B6</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x17D4</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x17DD</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+        <font color='#0000FF'>if</font><font face='Lucida Console'>(</font>ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x2000</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x180B</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x180E</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x18A9</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1920</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x193C</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x19B0</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x19C1</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x19C8</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x19CA</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1A17</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1A1C</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1B00</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1B05</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1B34</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1B45</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1B6B</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1B74</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1DC0</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1E00</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x20D0</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x2100</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x302A</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x3030</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x3099</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x309B</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xA802</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xA806</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xA80B</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xA823</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xA828</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xFB1E</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xFE00</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xFE10</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xFE20</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xFE30</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x10A01</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x10A10</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x10A38</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x10A40</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1D165</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1D16A</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1D16D</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1D173</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1D17B</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1D183</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1D185</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1D18C</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1D1AA</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1D1AE</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1D242</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0x1D245</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xE0100</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>false</font>;<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>&lt;</font> <font color='#979000'>0xE01F0</font> <font face='Lucida Console'>)</font><font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='invalid_utf8_error'></a>invalid_utf8_error</b> : <font color='#0000FF'>public</font> error
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='invalid_utf8_error'></a>invalid_utf8_error</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>:error<font face='Lucida Console'>(</font>EUTF8_TO_UTF32<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> ustring <b><a name='convert_utf8_to_utf32'></a>convert_utf8_to_utf32</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> str
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> unicode_helpers;
+        ustring temp;
+        std::istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>str<font face='Lucida Console'>)</font>;
+
+        temp.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>str.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>int</u></font> status;
+        unichar ch;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font> <font color='#BB00BB'>u8_to_u32</font><font face='Lucida Console'>(</font>ch,sin<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            temp.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>invalid_utf8_error</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_surrogate'></a>is_surrogate</b><font face='Lucida Console'>(</font>unichar ch<font face='Lucida Console'>)</font>;
+
+    unichar <b><a name='surrogate_pair_to_unichar'></a>surrogate_pair_to_unichar</b><font face='Lucida Console'>(</font>unichar first, unichar second<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='unichar_to_surrogate_pair'></a>unichar_to_surrogate_pair</b><font face='Lucida Console'>(</font>unichar unicode, unichar <font color='#5555FF'>&amp;</font>first, unichar <font color='#5555FF'>&amp;</font>second<font face='Lucida Console'>)</font>;
+
+
+    <font color='#0000FF'>const</font> ustring <b><a name='convert_wstring_to_utf32'></a>convert_wstring_to_utf32</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::wstring <font color='#5555FF'>&amp;</font>wstr
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>const</font> std::wstring <b><a name='convert_utf32_to_wstring'></a>convert_utf32_to_wstring</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> ustring <font color='#5555FF'>&amp;</font>src
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>const</font> std::wstring <b><a name='convert_mbstring_to_wstring'></a>convert_mbstring_to_wstring</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string <font color='#5555FF'>&amp;</font>src
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>const</font> std::string <b><a name='convert_wstring_to_mbstring'></a>convert_wstring_to_mbstring</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::wstring <font color='#5555FF'>&amp;</font>src
+    <font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> charT<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='basic_utf8_ifstream'></a>basic_utf8_ifstream</b> : <font color='#0000FF'>public</font> std::basic_istream<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='basic_utf8_ifstream'></a>basic_utf8_ifstream</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> : std::basic_istream<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>buf<font face='Lucida Console'>)</font>, buf<font face='Lucida Console'>(</font>fin<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <b><a name='basic_utf8_ifstream'></a>basic_utf8_ifstream</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> file_name,
+            std::ios_base::openmode mode <font color='#5555FF'>=</font> std::ios::in 
+        <font face='Lucida Console'>)</font> : 
+            std::basic_istream<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>buf<font face='Lucida Console'>)</font>,
+            buf<font face='Lucida Console'>(</font>fin<font face='Lucida Console'>)</font>
+        <b>{</b>
+            fin.<font color='#BB00BB'>open</font><font face='Lucida Console'>(</font>file_name,mode<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// make this have the same error state as fin
+</font>            <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font>fin.<font color='#BB00BB'>rdstate</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <b><a name='basic_utf8_ifstream'></a>basic_utf8_ifstream</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name,
+            std::ios_base::openmode mode <font color='#5555FF'>=</font> std::ios::in 
+        <font face='Lucida Console'>)</font> : 
+            std::basic_istream<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>buf<font face='Lucida Console'>)</font>,
+            buf<font face='Lucida Console'>(</font>fin<font face='Lucida Console'>)</font>
+        <b>{</b>
+            fin.<font color='#BB00BB'>open</font><font face='Lucida Console'>(</font>file_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,mode<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// make this have the same error state as fin
+</font>            <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font>fin.<font color='#BB00BB'>rdstate</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='open'></a>open</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name,
+            std::ios_base::openmode mode <font color='#5555FF'>=</font> std::ios::in 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>open</font><font face='Lucida Console'>(</font>file_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,mode<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='open'></a>open</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> file_name,
+            std::ios_base::openmode mode <font color='#5555FF'>=</font> std::ios::in 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            fin.<font color='#BB00BB'>close</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            fin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            fin.<font color='#BB00BB'>open</font><font face='Lucida Console'>(</font>file_name,mode<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// make this have the same error state as fin
+</font>            <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font>fin.<font color='#BB00BB'>rdstate</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='close'></a>close</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            fin.<font color='#BB00BB'>close</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// make this have the same error state as fin
+</font>            <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font>fin.<font color='#BB00BB'>rdstate</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        std::ifstream fin;
+        unicode_helpers::basic_utf8_streambuf<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font> buf;
+    <b>}</b>;
+
+    <font color='#0000FF'>typedef</font> basic_utf8_ifstream<font color='#5555FF'>&lt;</font>unichar<font color='#5555FF'>&gt;</font> utf8_uifstream;
+    <font color='#0000FF'>typedef</font> basic_utf8_ifstream<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>wchar_t</u></font><font color='#5555FF'>&gt;</font> utf8_wifstream;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='unicode.cpp.html'>unicode.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_UNICODe_H_
+</font>
+
+</pre></body></html>

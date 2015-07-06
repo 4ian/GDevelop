@@ -1,0 +1,83 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - conditioning_class.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_CONDITIONING_CLASs_
+<font color='#0000FF'>#define</font> DLIB_CONDITIONING_CLASs_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='conditioning_class/conditioning_class_kernel_1.h.html'>conditioning_class/conditioning_class_kernel_1.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='conditioning_class/conditioning_class_kernel_2.h.html'>conditioning_class/conditioning_class_kernel_2.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='conditioning_class/conditioning_class_kernel_3.h.html'>conditioning_class/conditioning_class_kernel_3.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='conditioning_class/conditioning_class_kernel_4.h.html'>conditioning_class/conditioning_class_kernel_4.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='conditioning_class/conditioning_class_kernel_c.h.html'>conditioning_class/conditioning_class_kernel_c.h</a>"
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='memory_manager.h.html'>memory_manager.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='conditioning_class'></a>conditioning_class</b>
+    <b>{</b>
+        <b><a name='conditioning_class'></a>conditioning_class</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>typedef</font> memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2b mm;
+
+    <font color='#0000FF'>public</font>:
+        
+        <font color='#009900'>//----------- kernels ---------------
+</font>
+        <font color='#009900'>// kernel_1a        
+</font>        <font color='#0000FF'>typedef</font>      conditioning_class_kernel_1<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>&gt;</font>
+                     kernel_1a;
+        <font color='#0000FF'>typedef</font>      conditioning_class_kernel_c<font color='#5555FF'>&lt;</font>kernel_1a<font color='#5555FF'>&gt;</font>
+                     kernel_1a_c;
+
+        <font color='#009900'>// kernel_2a        
+</font>        <font color='#0000FF'>typedef</font>      conditioning_class_kernel_2<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>&gt;</font>
+                     kernel_2a;
+        <font color='#0000FF'>typedef</font>      conditioning_class_kernel_c<font color='#5555FF'>&lt;</font>kernel_2a<font color='#5555FF'>&gt;</font>
+                     kernel_2a_c;
+          
+        <font color='#009900'>// kernel_3a        
+</font>        <font color='#0000FF'>typedef</font>      conditioning_class_kernel_3<font color='#5555FF'>&lt;</font>alphabet_size<font color='#5555FF'>&gt;</font>
+                     kernel_3a;
+        <font color='#0000FF'>typedef</font>      conditioning_class_kernel_c<font color='#5555FF'>&lt;</font>kernel_3a<font color='#5555FF'>&gt;</font>
+                     kernel_3a_c;
+          
+
+        <font color='#009900'>// -------- kernel_4 ---------
+</font>
+        <font color='#009900'>// kernel_4a        
+</font>        <font color='#0000FF'>typedef</font>      conditioning_class_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,<font color='#979000'>10000</font>,mm<font color='#5555FF'>&gt;</font>
+                     kernel_4a;
+        <font color='#0000FF'>typedef</font>      conditioning_class_kernel_c<font color='#5555FF'>&lt;</font>kernel_4a<font color='#5555FF'>&gt;</font>
+                     kernel_4a_c;
+
+        <font color='#009900'>// kernel_4b        
+</font>        <font color='#0000FF'>typedef</font>      conditioning_class_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,<font color='#979000'>100000</font>,mm<font color='#5555FF'>&gt;</font>
+                     kernel_4b;
+        <font color='#0000FF'>typedef</font>      conditioning_class_kernel_c<font color='#5555FF'>&lt;</font>kernel_4b<font color='#5555FF'>&gt;</font>
+                     kernel_4b_c;
+
+        <font color='#009900'>// kernel_4c        
+</font>        <font color='#0000FF'>typedef</font>      conditioning_class_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,<font color='#979000'>1000000</font>,mm<font color='#5555FF'>&gt;</font>
+                     kernel_4c;
+        <font color='#0000FF'>typedef</font>      conditioning_class_kernel_c<font color='#5555FF'>&lt;</font>kernel_4c<font color='#5555FF'>&gt;</font>
+                     kernel_4c_c;
+
+        <font color='#009900'>// kernel_4d        
+</font>        <font color='#0000FF'>typedef</font>      conditioning_class_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,<font color='#979000'>10000000</font>,mm<font color='#5555FF'>&gt;</font>
+                     kernel_4d;
+        <font color='#0000FF'>typedef</font>      conditioning_class_kernel_c<font color='#5555FF'>&lt;</font>kernel_4d<font color='#5555FF'>&gt;</font>
+                     kernel_4d_c;
+
+    <b>}</b>;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CONDITIONING_CLASS_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,417 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - svm_struct_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use of the structural SVM solver from the dlib C++
+    Library.  Therefore, this example teaches you the central ideas needed to setup a
+    structural SVM model for your machine learning problems.  To illustrate the process, we
+    use dlib's structural SVM solver to learn the parameters of a simple multi-class
+    classifier.  We first discuss the multi-class classifier model and then walk through
+    using the structural SVM tools to find the parameters of this classification model.   
+
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm_threaded.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+
+<font color='#009900'>// Before we start, we define three typedefs we will use throughout this program.  The
+</font><font color='#009900'>// first is used to represent the parameter vector the structural SVM is learning, the
+</font><font color='#009900'>// second is used to represent the "sample type".  In this example program it is just a
+</font><font color='#009900'>// vector but in general when using a structural SVM your sample type can be anything you
+</font><font color='#009900'>// want (e.g. a string or an image).  The last typedef is the type used to represent the
+</font><font color='#009900'>// PSI vector which is part of the structural SVM model which we will explain in detail
+</font><font color='#009900'>// later on.  But the important thing to note here is that you can use either a dense
+</font><font color='#009900'>// representation (i.e. a dlib::matrix object) or a sparse representation for the PSI
+</font><font color='#009900'>// vector.  See <a href="svm_sparse_ex.cpp.html">svm_sparse_ex.cpp</a> for an introduction to sparse vectors in dlib.  Here we
+</font><font color='#009900'>// use the same type for each of these three things to keep the example program simple.
+</font><font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> column_vector;       <font color='#009900'>// Must be a dlib::matrix type.
+</font><font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample_type;         <font color='#009900'>// Can be anything you want.
+</font><font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> feature_vector_type; <font color='#009900'>// Must be dlib::matrix or some kind of sparse vector.
+</font>
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font>           <b><a name='predict_label'></a>predict_label</b>                <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> column_vector<font color='#5555FF'>&amp;</font> weights, <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> sample<font face='Lucida Console'>)</font>;
+column_vector <b><a name='train_three_class_classifier'></a>train_three_class_classifier</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples, <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels<font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// In this example, we have three types of samples: class 0, 1, or 2.  That is, each of
+</font>    <font color='#009900'>// our sample vectors falls into one of three classes.  To keep this example very
+</font>    <font color='#009900'>// simple, each sample vector is zero everywhere except at one place.  The non-zero
+</font>    <font color='#009900'>// dimension of each vector determines the class of the vector.  So for example, the
+</font>    <font color='#009900'>// first element of samples has a class of 1 because samples[0](1) is the only non-zero
+</font>    <font color='#009900'>// element of samples[0].   
+</font>    sample_type <font color='#BB00BB'>samp</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samples;
+    samp <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>2</font>,<font color='#979000'>0</font>; samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>samp<font face='Lucida Console'>)</font>;
+    samp <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>; samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>samp<font face='Lucida Console'>)</font>;
+    samp <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>4</font>,<font color='#979000'>0</font>; samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>samp<font face='Lucida Console'>)</font>;
+    samp <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>3</font>; samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>samp<font face='Lucida Console'>)</font>;
+    <font color='#009900'>// Since we want to use a machine learning method to learn a 3-class classifier we need
+</font>    <font color='#009900'>// to record the labels of our samples.  Here samples[i] has a class label of labels[i].
+</font>    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> labels;
+    labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// Now that we have some training data we can tell the structural SVM to learn the
+</font>    <font color='#009900'>// parameters of our 3-class classifier model.  The details of this will be explained
+</font>    <font color='#009900'>// later.  For now, just note that it finds the weights (i.e. a vector of real valued
+</font>    <font color='#009900'>// parameters) such that predict_label(weights, sample) always returns the correct
+</font>    <font color='#009900'>// label for a sample vector. 
+</font>    column_vector weights <font color='#5555FF'>=</font> <font color='#BB00BB'>train_three_class_classifier</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Print the weights and then evaluate predict_label() on each of our training samples.
+</font>    <font color='#009900'>// Note that the correct label is predicted for each sample.
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> weights <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>predicted label for sample[</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>]: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>predict_label</font><font face='Lucida Console'>(</font>weights, samples[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='predict_label'></a>predict_label</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> column_vector<font color='#5555FF'>&amp;</font> weights,
+    <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> sample
+<font face='Lucida Console'>)</font>
+<font color='#009900'>/*!
+    requires
+        - weights.size() == 9
+        - sample.size() == 3
+    ensures
+        - Given the 9-dimensional weight vector which defines a 3 class classifier, this
+          function predicts the class of the given 3-dimensional sample vector.
+          Therefore, the output of this function is either 0, 1, or 2 (i.e. one of the
+          three possible labels).
+!*/</font>
+<b>{</b>
+    <font color='#009900'>// Our 3-class classifier model can be thought of as containing 3 separate linear
+</font>    <font color='#009900'>// classifiers.  So to predict the class of a sample vector we evaluate each of these
+</font>    <font color='#009900'>// three classifiers and then whatever classifier has the largest output "wins" and
+</font>    <font color='#009900'>// predicts the label of the sample.  This is the popular one-vs-all multi-class
+</font>    <font color='#009900'>// classifier model.  
+</font>    <font color='#009900'>//
+</font>    <font color='#009900'>// Keeping this in mind, the code below simply pulls the three separate weight vectors
+</font>    <font color='#009900'>// out of weights and then evaluates each against sample.  The individual classifier
+</font>    <font color='#009900'>// scores are stored in scores and the highest scoring index is returned as the label.
+</font>    column_vector w0, w1, w2;
+    w0 <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>weights, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    w1 <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>weights, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>5</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    w2 <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>weights, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>6</font>,<font color='#979000'>8</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    column_vector <font color='#BB00BB'>scores</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    scores <font color='#5555FF'>=</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>w0, sample<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>w1, sample<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>w2, sample<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>return</font> <font color='#BB00BB'>index_of_max</font><font face='Lucida Console'>(</font>scores<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>class</font> <b><a name='three_class_classifier_problem'></a>three_class_classifier_problem</b> : <font color='#0000FF'>public</font> structural_svm_problem_threaded<font color='#5555FF'>&lt;</font>column_vector, feature_vector_type<font color='#5555FF'>&gt;</font>
+<b>{</b>
+    <font color='#009900'>/*!
+        Now we arrive at the meat of this example program.  To use dlib's structural SVM
+        solver you need to define an object which tells the structural SVM solver what to
+        do for your problem.  In this example, this is done by defining the three_class_classifier_problem 
+        object which inherits from structural_svm_problem_threaded.  Before we get into the
+        details, we first discuss some background information on structural SVMs.  
+        
+        A structural SVM is a supervised machine learning method for learning to predict
+        complex outputs.  This is contrasted with a binary classifier which makes only simple
+        yes/no predictions.  A structural SVM, on the other hand, can learn to predict
+        complex outputs such as entire parse trees or DNA sequence alignments.  To do this,
+        it learns a function F(x,y) which measures how well a particular data sample x
+        matches a label y, where a label is potentially a complex thing like a parse tree.
+        However, to keep this example program simple we use only a 3 category label output. 
+       
+        At test time, the best label for a new x is given by the y which maximizes F(x,y).
+        To put this into the context of the current example, F(x,y) computes the score for
+        a given sample and class label.  The predicted class label is therefore whatever
+        value of y which makes F(x,y) the biggest.  This is exactly what predict_label()
+        does.  That is, it computes F(x,0), F(x,1), and F(x,2) and then reports which label
+        has the biggest value.
+       
+        At a high level, a structural SVM can be thought of as searching the parameter space
+        of F(x,y) for the set of parameters that make the following inequality true as often
+        as possible:
+            F(x_i,y_i) &gt; max{over all incorrect labels of x_i} F(x_i, y_incorrect)
+        That is, it seeks to find the parameter vector such that F(x,y) always gives the
+        highest score to the correct output.  To define the structural SVM optimization
+        problem precisely, we first introduce some notation:
+            - let PSI(x,y)    == the joint feature vector for input x and a label y.
+            - let F(x,y|w)    == dot(w,PSI(x,y)).  
+              (we use the | notation to emphasize that F() has the parameter vector of
+              weights called w)
+            - let LOSS(idx,y) == the loss incurred for predicting that the idx-th training 
+              sample has a label of y.  Note that LOSS() should always be &gt;= 0 and should
+              become exactly 0 when y is the correct label for the idx-th sample.  Moreover,
+              it should notionally indicate how bad it is to predict y for the idx'th sample.
+            - let x_i == the i-th training sample.
+            - let y_i == the correct label for the i-th training sample.
+            - The number of data samples is N.
+       
+        Then the optimization problem solved by dlib's structural SVM solver is the following:
+            Minimize: h(w) == 0.5*dot(w,w) + C*R(w)
+       
+            Where R(w) == sum from i=1 to N: 1/N * sample_risk(i,w)
+            and sample_risk(i,w) == max over all Y: LOSS(i,Y) + F(x_i,Y|w) - F(x_i,y_i|w)
+            and C &gt; 0
+       
+        You can think of the sample_risk(i,w) as measuring the degree of error you would make
+        when predicting the label of the i-th sample using parameters w.  That is, it is zero
+        only when the correct label would be predicted and grows larger the more "wrong" the
+        predicted output becomes.  Therefore, the objective function is minimizing a balance
+        between making the weights small (typically this reduces overfitting) and fitting the
+        training data.  The degree to which you try to fit the data is controlled by the C
+        parameter.
+       
+        For a more detailed introduction to structured support vector machines you should
+        consult the following paper: 
+            Predicting Structured Objects with Support Vector Machines by 
+            Thorsten Joachims, Thomas Hofmann, Yisong Yue, and Chun-nam Yu
+       
+    !*/</font>
+
+<font color='#0000FF'>public</font>:
+
+    <font color='#009900'>// Finally, we come back to the code.  To use dlib's structural SVM solver you need to
+</font>    <font color='#009900'>// provide the things discussed above.  This is the number of training samples, the
+</font>    <font color='#009900'>// dimensionality of PSI(), as well as methods for calculating the loss values and
+</font>    <font color='#009900'>// PSI() vectors.  You will also need to write code that can compute: max over all Y:
+</font>    <font color='#009900'>// LOSS(i,Y) + F(x_i,Y|w).  In particular, the three_class_classifier_problem class is
+</font>    <font color='#009900'>// required to implement the following four virtual functions:
+</font>    <font color='#009900'>//   - get_num_dimensions()
+</font>    <font color='#009900'>//   - get_num_samples() 
+</font>    <font color='#009900'>//   - get_truth_joint_feature_vector()
+</font>    <font color='#009900'>//   - separation_oracle()
+</font>
+
+    <font color='#009900'>// But first, we declare a constructor so we can populate our three_class_classifier_problem
+</font>    <font color='#009900'>// object with the data we need to define our machine learning problem.  All we do here
+</font>    <font color='#009900'>// is take in the training samples and their labels as well as a number indicating how
+</font>    <font color='#009900'>// many threads the structural SVM solver will use.  You can declare this constructor
+</font>    <font color='#009900'>// any way you like since it is not used by any of the dlib tools.
+</font>    <b><a name='three_class_classifier_problem'></a>three_class_classifier_problem</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples_,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels_,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads
+    <font face='Lucida Console'>)</font> : 
+        structural_svm_problem_threaded<font color='#5555FF'>&lt;</font>column_vector, feature_vector_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>num_threads<font face='Lucida Console'>)</font>,
+        samples<font face='Lucida Console'>(</font>samples_<font face='Lucida Console'>)</font>,
+        labels<font face='Lucida Console'>(</font>labels_<font face='Lucida Console'>)</font>
+    <b>{</b><b>}</b>
+
+    feature_vector_type <b><a name='make_psi'></a>make_psi</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> label
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <font color='#009900'>/*!
+        ensures
+            - returns the vector PSI(x,label)
+    !*/</font>
+    <b>{</b>
+        <font color='#009900'>// All we are doing here is taking x, which is a 3 dimensional sample vector in this
+</font>        <font color='#009900'>// example program, and putting it into one of 3 places in a 9 dimensional PSI
+</font>        <font color='#009900'>// vector, which we then return.  So this function returns PSI(x,label).  To see why
+</font>        <font color='#009900'>// we setup PSI like this, recall how predict_label() works.  It takes in a 9
+</font>        <font color='#009900'>// dimensional weight vector and breaks the vector into 3 pieces.  Each piece then
+</font>        <font color='#009900'>// defines a different classifier and we use them in a one-vs-all manner to predict
+</font>        <font color='#009900'>// the label.  So now that we are in the structural SVM code we have to define the
+</font>        <font color='#009900'>// PSI vector to correspond to this usage.  That is, we need to setup PSI so that
+</font>        <font color='#009900'>// argmax_y dot(weights,PSI(x,y)) == predict_label(weights,x).  This is how we tell
+</font>        <font color='#009900'>// the structural SVM solver what kind of problem we are trying to solve.
+</font>        <font color='#009900'>//
+</font>        <font color='#009900'>// It's worth emphasizing that the single biggest step in using a structural SVM is
+</font>        <font color='#009900'>// deciding how you want to represent PSI(x,label).  It is always a vector, but
+</font>        <font color='#009900'>// deciding what to put into it to solve your problem is often not a trivial task.
+</font>        <font color='#009900'>// Part of the difficulty is that you need an efficient method for finding the label
+</font>        <font color='#009900'>// that makes dot(w,PSI(x,label)) the biggest.  Sometimes this is easy, but often
+</font>        <font color='#009900'>// finding the max scoring label turns into a difficult combinatorial optimization
+</font>        <font color='#009900'>// problem.  So you need to pick a PSI that doesn't make the label maximization step
+</font>        <font color='#009900'>// intractable but also still well models your problem.  
+</font>        <font color='#009900'>//
+</font>        <font color='#009900'>// Finally, note that make_psi() is a helper routine we define in this example.  In
+</font>        <font color='#009900'>// general, you are not required to implement it.  That is, all you must implement
+</font>        <font color='#009900'>// are the four virtual functions defined below.
+</font>
+
+        <font color='#009900'>// So let's make an empty 9-dimensional PSI vector
+</font>        feature_vector_type <font color='#BB00BB'>psi</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        psi <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#009900'>// zero initialize it
+</font>
+        <font color='#009900'>// Now put a copy of x into the right place in PSI according to its label.  So for
+</font>        <font color='#009900'>// example, if label is 1 then psi would be:  [0 0 0 x(0) x(1) x(2) 0 0 0]
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>label <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>set_rowm</font><font face='Lucida Console'>(</font>psi,<font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x;
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>label <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>set_rowm</font><font face='Lucida Console'>(</font>psi,<font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>5</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x;
+        <font color='#0000FF'>else</font> <font color='#009900'>// the label must be 2 
+</font>            <font color='#BB00BB'>set_rowm</font><font face='Lucida Console'>(</font>psi,<font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>6</font>,<font color='#979000'>8</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x;
+
+        <font color='#0000FF'>return</font> psi;
+    <b>}</b>
+
+    <font color='#009900'>// We need to declare the dimensionality of the PSI vector (this is also the
+</font>    <font color='#009900'>// dimensionality of the weight vector we are learning).  Similarly, we need to declare
+</font>    <font color='#009900'>// the number of training samples.  We do this by defining the following virtual
+</font>    <font color='#009900'>// functions.
+</font>    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_dimensions'></a>get_num_dimensions</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> samples[<font color='#979000'>0</font>].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#979000'>3</font>; <b>}</b>
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_samples'></a>get_num_samples</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>    <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#009900'>// In get_truth_joint_feature_vector(), all you have to do is output the PSI() vector
+</font>    <font color='#009900'>// for the idx-th training sample when it has its true label.  So here it outputs
+</font>    <font color='#009900'>// PSI(samples[idx], labels[idx]).
+</font>    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='get_truth_joint_feature_vector'></a>get_truth_joint_feature_vector</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>long</u></font> idx,
+        feature_vector_type<font color='#5555FF'>&amp;</font> psi 
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b>
+        psi <font color='#5555FF'>=</font> <font color='#BB00BB'>make_psi</font><font face='Lucida Console'>(</font>samples[idx], labels[idx]<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>// separation_oracle() is more interesting.  dlib's structural SVM solver will call
+</font>    <font color='#009900'>// separation_oracle() many times during the optimization.  Each time it will give it
+</font>    <font color='#009900'>// the current value of the parameter weights and separation_oracle() is supposed to
+</font>    <font color='#009900'>// find the label that most violates the structural SVM objective function for the
+</font>    <font color='#009900'>// idx-th sample.  Then the separation oracle reports the corresponding PSI vector and
+</font>    <font color='#009900'>// loss value.  To state this more precisely, the separation_oracle() member function
+</font>    <font color='#009900'>// has the following contract:
+</font>    <font color='#009900'>//   requires
+</font>    <font color='#009900'>//       - 0 &lt;= idx &lt; get_num_samples()
+</font>    <font color='#009900'>//       - current_solution.size() == get_num_dimensions()
+</font>    <font color='#009900'>//   ensures
+</font>    <font color='#009900'>//       - runs the separation oracle on the idx-th sample.  We define this as follows: 
+</font>    <font color='#009900'>//           - let X           == the idx-th training sample.
+</font>    <font color='#009900'>//           - let PSI(X,y)    == the joint feature vector for input X and an arbitrary label y.
+</font>    <font color='#009900'>//           - let F(X,y)      == dot(current_solution,PSI(X,y)).  
+</font>    <font color='#009900'>//           - let LOSS(idx,y) == the loss incurred for predicting that the idx-th sample
+</font>    <font color='#009900'>//             has a label of y.  Note that LOSS() should always be &gt;= 0 and should
+</font>    <font color='#009900'>//             become exactly 0 when y is the correct label for the idx-th sample.
+</font>    <font color='#009900'>//
+</font>    <font color='#009900'>//               Then the separation oracle finds a Y such that: 
+</font>    <font color='#009900'>//                   Y = argmax over all y: LOSS(idx,y) + F(X,y) 
+</font>    <font color='#009900'>//                   (i.e. It finds the label which maximizes the above expression.)
+</font>    <font color='#009900'>//
+</font>    <font color='#009900'>//               Finally, we can define the outputs of this function as:
+</font>    <font color='#009900'>//               - #loss == LOSS(idx,Y) 
+</font>    <font color='#009900'>//               - #psi == PSI(X,Y) 
+</font>    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='separation_oracle'></a>separation_oracle</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> idx,
+        <font color='#0000FF'>const</font> column_vector<font color='#5555FF'>&amp;</font> current_solution,
+        scalar_type<font color='#5555FF'>&amp;</font> loss,
+        feature_vector_type<font color='#5555FF'>&amp;</font> psi
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b>
+        <font color='#009900'>// Note that the solver will use multiple threads to make concurrent calls to
+</font>        <font color='#009900'>// separation_oracle(), therefore, you must implement it in a thread safe manner
+</font>        <font color='#009900'>// (or disable threading by inheriting from structural_svm_problem instead of
+</font>        <font color='#009900'>// structural_svm_problem_threaded).  However, if your separation oracle is not
+</font>        <font color='#009900'>// very fast to execute you can get a very significant speed boost by using the
+</font>        <font color='#009900'>// threaded solver.  In general, all you need to do to make your separation oracle
+</font>        <font color='#009900'>// thread safe is to make sure it does not modify any global variables or members
+</font>        <font color='#009900'>// of three_class_classifier_problem.  So it is usually easy to make thread safe.
+</font>
+        column_vector <font color='#BB00BB'>scores</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// compute scores for each of the three classifiers
+</font>        scores <font color='#5555FF'>=</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>current_solution, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,  samples[idx]<font face='Lucida Console'>)</font>,
+                 <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>current_solution, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>5</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,  samples[idx]<font face='Lucida Console'>)</font>,
+                 <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>current_solution, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>6</font>,<font color='#979000'>8</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,  samples[idx]<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Add in the loss-augmentation.  Recall that we maximize LOSS(idx,y) + F(X,y) in
+</font>        <font color='#009900'>// the separate oracle, not just F(X,y) as we normally would in predict_label().
+</font>        <font color='#009900'>// Therefore, we must add in this extra amount to account for the loss-augmentation.
+</font>        <font color='#009900'>// For our simple multi-class classifier, we incur a loss of 1 if we don't predict
+</font>        <font color='#009900'>// the correct label and a loss of 0 if we get the right label.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>labels[idx] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>scores</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>labels[idx] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>scores</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>labels[idx] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>scores</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        <font color='#009900'>// Now figure out which classifier has the largest loss-augmented score.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> max_scoring_label <font color='#5555FF'>=</font> <font color='#BB00BB'>index_of_max</font><font face='Lucida Console'>(</font>scores<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// And finally record the loss that was associated with that predicted label.
+</font>        <font color='#009900'>// Again, the loss is 1 if the label is incorrect and 0 otherwise.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>max_scoring_label <font color='#5555FF'>=</font><font color='#5555FF'>=</font> labels[idx]<font face='Lucida Console'>)</font>
+            loss <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>else</font>
+            loss <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        <font color='#009900'>// Finally, compute the PSI vector corresponding to the label we just found and
+</font>        <font color='#009900'>// store it into psi for output.
+</font>        psi <font color='#5555FF'>=</font> <font color='#BB00BB'>make_psi</font><font face='Lucida Console'>(</font>samples[idx], max_scoring_label<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#0000FF'>private</font>:
+
+    <font color='#009900'>// Here we hold onto the training data by reference.  You can hold it by value or by
+</font>    <font color='#009900'>// any other method you like.
+</font>    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples;
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels;
+<b>}</b>;
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This function puts it all together.  In here we use the three_class_classifier_problem
+</font><font color='#009900'>// along with dlib's oca cutting plane solver to find the optimal weights given our
+</font><font color='#009900'>// training data.
+</font>column_vector <b><a name='train_three_class_classifier'></a>train_three_class_classifier</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+    three_class_classifier_problem <font color='#BB00BB'>problem</font><font face='Lucida Console'>(</font>samples, labels, num_threads<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Before we run the solver we set up some general parameters.  First,
+</font>    <font color='#009900'>// you can set the C parameter of the structural SVM by calling set_c().
+</font>    problem.<font color='#BB00BB'>set_c</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// The epsilon parameter controls the stopping tolerance.  The optimizer will run until
+</font>    <font color='#009900'>// R(w) is within epsilon of its optimal value. If you don't set this then it defaults
+</font>    <font color='#009900'>// to 0.001.
+</font>    problem.<font color='#BB00BB'>set_epsilon</font><font face='Lucida Console'>(</font><font color='#979000'>0.0001</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Uncomment this and the optimizer will print its progress to standard out.  You will
+</font>    <font color='#009900'>// be able to see things like the current risk gap.  The optimizer continues until the
+</font>    <font color='#009900'>// risk gap is below epsilon.
+</font>    <font color='#009900'>//problem.be_verbose();
+</font>
+    <font color='#009900'>// The optimizer uses an internal cache to avoid unnecessary calls to your
+</font>    <font color='#009900'>// separation_oracle() routine.  This parameter controls the size of that cache.
+</font>    <font color='#009900'>// Bigger values use more RAM and might make the optimizer run faster.  You can also
+</font>    <font color='#009900'>// disable it by setting it to 0 which is good to do when your separation_oracle is
+</font>    <font color='#009900'>// very fast.  If you don't call this function it defaults to a value of 5.
+</font>    <font color='#009900'>//problem.set_max_cache_size(20);
+</font>
+    
+    column_vector weights;
+    <font color='#009900'>// Finally, we create the solver and then run it.
+</font>    oca solver;
+    <font color='#BB00BB'>solver</font><font face='Lucida Console'>(</font>problem, weights<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Alternatively, if you wanted to require that the learned weights are all
+</font>    <font color='#009900'>// non-negative then you can call the solver as follows and it will put a constraint on
+</font>    <font color='#009900'>// the optimization problem which causes all elements of weights to be &gt;= 0.  
+</font>    <font color='#009900'>//solver(problem, weights, problem.get_num_dimensions());
+</font>
+    <font color='#0000FF'>return</font> weights;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

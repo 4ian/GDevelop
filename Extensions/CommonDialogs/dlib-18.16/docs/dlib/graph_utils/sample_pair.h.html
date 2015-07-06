@@ -1,0 +1,182 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sample_pair.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SAMPLE_PaIR_Hh_
+<font color='#0000FF'>#define</font> DLIB_SAMPLE_PaIR_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sample_pair_abstract.h.html'>sample_pair_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='sample_pair'></a>sample_pair</b> 
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='sample_pair'></a>sample_pair</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> : 
+            _index1<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            _index2<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            _distance <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        <b><a name='sample_pair'></a>sample_pair</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx1,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx2
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            _distance <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idx1 <font color='#5555FF'>&lt;</font> idx2<font face='Lucida Console'>)</font>
+            <b>{</b>
+                _index1 <font color='#5555FF'>=</font> idx1;
+                _index2 <font color='#5555FF'>=</font> idx2;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                _index1 <font color='#5555FF'>=</font> idx2;
+                _index2 <font color='#5555FF'>=</font> idx1;
+            <b>}</b>
+        <b>}</b>
+
+        <b><a name='sample_pair'></a>sample_pair</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx1,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx2,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> dist
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            _distance <font color='#5555FF'>=</font> dist;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idx1 <font color='#5555FF'>&lt;</font> idx2<font face='Lucida Console'>)</font>
+            <b>{</b>
+                _index1 <font color='#5555FF'>=</font> idx1;
+                _index2 <font color='#5555FF'>=</font> idx2;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                _index1 <font color='#5555FF'>=</font> idx2;
+                _index2 <font color='#5555FF'>=</font> idx1;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> <b><a name='index1'></a>index1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> _index1; <b>}</b>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> <b><a name='index2'></a>index2</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> _index2; <b>}</b>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> <b><a name='distance'></a>distance</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> _distance; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> _index1;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> _index2;
+        <font color='#0000FF'><u>double</u></font> _distance;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='order_by_index'></a>order_by_index</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> a.<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> a.<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='order_by_distance'></a>order_by_distance</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> a.<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='order_by_descending_distance'></a>order_by_descending_distance</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> a.<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> b.<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='order_by_distance_and_index'></a>order_by_distance_and_index</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b> 
+        <font color='#0000FF'>return</font> a.<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>order_by_index</font><font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> sample_pair<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> sample_pair<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'>return</font> a.<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> a.<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> sample_pair<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> sample_pair<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b<font face='Lucida Console'>)</font>; 
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> sample_pair<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type sample_pair</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        sample_pair<font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx1, idx2;
+            <font color='#0000FF'><u>double</u></font> dist;
+
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>idx1,in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>idx2,in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>dist,in<font face='Lucida Console'>)</font>;
+            item <font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font>idx1, idx2, dist<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type sample_pair</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SAMPLE_PaIR_Hh_
+</font>
+
+</pre></body></html>

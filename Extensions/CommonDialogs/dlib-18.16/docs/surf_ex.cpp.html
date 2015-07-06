@@ -1,0 +1,85 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - surf_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is a simple example illustrating the use of the get_surf_points() function.  It
+    pulls out SURF points from an input image and displays them on the screen as an overlay
+    on the image.
+
+    For a description of the SURF algorithm you should consult the following papers:
+        This is the original paper which introduced the algorithm:
+            SURF: Speeded Up Robust Features
+            By Herbert Bay, Tinne Tuytelaars, and Luc Van Gool
+
+        This paper provides a nice detailed overview of how the algorithm works:
+            Notes on the OpenSURF Library by Christopher Evans
+
+*/</font>
+
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_keypoint<font color='#5555FF'>/</font>draw_surf_points.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_io.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_keypoint.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>//  ----------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> argc, <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>*</font> argv<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// make sure the user entered an argument to this program
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>argc <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>error, you have to enter a BMP file as an argument to this program</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#009900'>// Here we declare an image object that can store rgb_pixels.  Note that in dlib
+</font>        <font color='#009900'>// there is no explicit image object, just a 2D array and various pixel types.  
+</font>        array2d<font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font> img;
+
+        <font color='#009900'>// Now load the image file into our image.  If something is wrong then load_image()
+</font>        <font color='#009900'>// will throw an exception.  Also, if you linked with libpng and libjpeg then
+</font>        <font color='#009900'>// load_image() can load PNG and JPEG files in addition to BMP files. 
+</font>        <font color='#BB00BB'>load_image</font><font face='Lucida Console'>(</font>img, argv[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Get SURF points from the image.  Note that get_surf_points() has some optional
+</font>        <font color='#009900'>// arguments that allow you to control the number of points you get back.  Here we
+</font>        <font color='#009900'>// simply take the default.
+</font>        std::vector<font color='#5555FF'>&lt;</font>surf_point<font color='#5555FF'>&gt;</font> sp <font color='#5555FF'>=</font> <font color='#BB00BB'>get_surf_points</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>number of SURF points found: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// A surf_point object contains a lot of information describing each point.
+</font>            <font color='#009900'>// The most important fields are shown below:
+</font>            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>center of first SURF point: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sp[<font color='#979000'>0</font>].p.center <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>pyramid scale:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sp[<font color='#979000'>0</font>].p.scale <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>SURF descriptor: \n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sp[<font color='#979000'>0</font>].des <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <b>}</b>
+
+        <font color='#009900'>// Create a window to display the input image and the SURF points.  (Note that
+</font>        <font color='#009900'>// you can zoom into the window by holding CTRL and scrolling the mouse wheel)
+</font>        image_window <font color='#BB00BB'>my_window</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_surf_points</font><font face='Lucida Console'>(</font>my_window, sp<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// wait until the user closes the window before we let the program 
+</font>        <font color='#009900'>// terminate.
+</font>        my_window.<font color='#BB00BB'>wait_until_closed</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>exception thrown: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>//  ----------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

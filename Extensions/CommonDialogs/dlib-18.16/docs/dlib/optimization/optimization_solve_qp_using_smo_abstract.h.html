@@ -1,0 +1,115 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - optimization_solve_qp_using_smo_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_OPTIMIZATION_SOLVE_QP_UsING_SMO_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_OPTIMIZATION_SOLVE_QP_UsING_SMO_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> EXP1,
+        <font color='#0000FF'>typename</font> EXP2,
+        <font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR, <font color='#0000FF'><u>long</u></font> NC, <font color='#0000FF'>typename</font> MM, <font color='#0000FF'>typename</font> L
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='solve_qp_using_smo'></a>solve_qp_using_smo</b> <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> Q,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b,
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> alpha,
+        T eps,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - Q.nr() == Q.nc()
+            - is_col_vector(b) == true
+            - is_col_vector(alpha) == true
+            - b.size() == alpha.size() == Q.nr()
+            - alpha.size() &gt; 0
+            - min(alpha) &gt;= 0
+            - eps &gt; 0
+            - max_iter &gt; 0
+        ensures
+            - Let C == sum(alpha) (i.e. C is the sum of the alpha values you 
+              supply to this function)
+            - This function solves the following quadratic program:
+                Minimize: f(alpha) == 0.5*trans(alpha)*Q*alpha - trans(alpha)*b
+                subject to the following constraints:
+                    - sum(alpha) == C (i.e. the sum of alpha values doesn't change)
+                    - min(alpha) &gt;= 0 (i.e. all alpha values are nonnegative)
+                Where f is convex.  This means that Q should be positive-semidefinite.
+            - The solution to the above QP will be stored in #alpha.
+            - This function uses a simple implementation of the sequential minimal
+              optimization algorithm.  It starts the algorithm with the given alpha
+              and it works on the problem until the duality gap (i.e. how far away
+              we are from the optimum solution) is less than eps.  So eps controls 
+              how accurate the solution is and smaller values result in better solutions.
+            - At most max_iter iterations of optimization will be performed.  
+            - returns the number of iterations performed.  If this method fails to
+              converge to eps accuracy then the number returned will be max_iter+1.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> EXP1,
+        <font color='#0000FF'>typename</font> EXP2,
+        <font color='#0000FF'>typename</font> EXP3,
+        <font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR, <font color='#0000FF'><u>long</u></font> NC, <font color='#0000FF'>typename</font> MM, <font color='#0000FF'>typename</font> L
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='solve_qp4_using_smo'></a>solve_qp4_using_smo</b> <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> Q,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP3<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b,
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> alpha,
+        T eps,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - A.nc() == alpha.size()
+            - Q.nr() == Q.nc()
+            - is_col_vector(b) == true
+            - is_col_vector(alpha) == true
+            - b.size() == alpha.size() == Q.nr()
+            - alpha.size() &gt; 0
+            - min(alpha) &gt;= 0
+            - eps &gt; 0
+            - max_iter &gt; 0
+        ensures
+            - Let C == sum(alpha) (i.e. C is the sum of the alpha values you 
+              supply to this function)
+            - This function solves the following quadratic program:
+                Minimize: f(alpha,lambda) == 0.5*trans(alpha)*Q*alpha - trans(alpha)*b + 
+                                             0.5*trans(lambda)*lambda - trans(lambda)*A*alpha
+                subject to the following constraints:
+                    - sum(alpha)  == C (i.e. the sum of alpha values doesn't change)
+                    - min(alpha)  &gt;= 0 (i.e. all alpha values are nonnegative)
+                    - min(lambda) &gt;= 0 (i.e. all lambda values are nonnegative)
+                Where f is convex.  This means that Q should be positive-semidefinite.
+            - The solution to the above QP will be stored in #alpha.  The optimal
+              lambda is not output since its value is given by the following expression:
+                lowerbound(A*alpha,0)
+            - This function uses a simple implementation of the sequential minimal
+              optimization algorithm.  It starts the algorithm with the given alpha
+              and it works on the problem until the duality gap (i.e. how far away
+              we are from the optimum solution) is less than eps.  So eps controls 
+              how accurate the solution is and smaller values result in better solutions.
+            - At most max_iter iterations of optimization will be performed.  
+            - returns the number of iterations performed.  If this method fails to
+              converge to eps accuracy then the number returned will be max_iter+1.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_OPTIMIZATION_SOLVE_QP_UsING_SMO_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

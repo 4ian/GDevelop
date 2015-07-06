@@ -1,0 +1,828 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - style.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net), and Nils Labugt
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_WIDGETs_STYLE_
+<font color='#0000FF'>#define</font> DLIB_WIDGETs_STYLE_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='style_abstract.h.html'>style_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../gui_core.h.html'>../gui_core.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='canvas_drawing.h.html'>canvas_drawing.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../unicode.h.html'>../unicode.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array2d.h.html'>../array2d.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='fonts.h.html'>fonts.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// button styles  
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='button_style'></a>button_style</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='button_style'></a>button_style</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='button_style'></a>button_style</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='redraw_on_mouse_over'></a>redraw_on_mouse_over</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>false</font>; <b>}</b>
+
+        <font color='#0000FF'>virtual</font> rectangle <b><a name='get_invalidation_rect'></a>get_invalidation_rect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> rect; <b>}</b>
+
+        <font color='#0000FF'>virtual</font> rectangle <b><a name='get_min_size'></a>get_min_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_button'></a>draw_button</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lastx,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lasty,
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='button_style_default'></a>button_style_default</b> : <font color='#0000FF'>public</font> button_style
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='button_style_default'></a>button_style_default</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : padding<font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>, name_width<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_button'></a>draw_button</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lastx,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lasty,
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>virtual</font> rectangle <b><a name='get_min_size'></a>get_min_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// this is the minimum amount of padding that can separate the name from the
+</font>        <font color='#009900'>// edge of the button
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> padding;
+        <font color='#009900'>// this is the width of the name string
+</font>        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> name_width;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='button_style_toolbar1'></a>button_style_toolbar1</b> : <font color='#0000FF'>public</font> button_style
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='button_style_toolbar1'></a>button_style_toolbar1</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : padding<font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>, name_width<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_button'></a>draw_button</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lastx,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lasty,
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>virtual</font> rectangle <b><a name='get_invalidation_rect'></a>get_invalidation_rect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            rectangle <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>;
+            temp.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+            temp.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+            temp.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+            temp.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+            <font color='#0000FF'>return</font> temp; 
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='redraw_on_mouse_over'></a>redraw_on_mouse_over</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>true</font>; <b>}</b>
+
+        <font color='#0000FF'>virtual</font> rectangle <b><a name='get_min_size'></a>get_min_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// this is the minimum amount of padding that can separate the name from the
+</font>        <font color='#009900'>// edge of the button
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> padding;
+        <font color='#009900'>// this is the width of the name string
+</font>        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> name_width;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='button_style_toolbar_icon1'></a>button_style_toolbar_icon1</b> : <font color='#0000FF'>public</font> button_style
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+        <b><a name='button_style_toolbar_icon1'></a>button_style_toolbar_icon1</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img_, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pad <font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font> : padding<font face='Lucida Console'>(</font>pad<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>assign_image</font><font face='Lucida Console'>(</font>img_mouseover,img_<font face='Lucida Console'>)</font>; 
+            <font color='#BB00BB'>make_images</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;  
+        <b>}</b>
+
+        <b><a name='button_style_toolbar_icon1'></a>button_style_toolbar_icon1</b><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> button_style_toolbar_icon1<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font>: button_style<font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>, padding<font face='Lucida Console'>(</font>item.padding<font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>assign_image</font><font face='Lucida Console'>(</font>img_mouseover, item.img_mouseover<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_image</font><font face='Lucida Console'>(</font>img_normal, item.img_normal<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_image</font><font face='Lucida Console'>(</font>img_disabled, item.img_disabled<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_button'></a>draw_button</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lastx,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lasty,
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='redraw_on_mouse_over'></a>redraw_on_mouse_over</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>true</font>; <b>}</b>
+
+        <font color='#0000FF'>virtual</font> rectangle <b><a name='get_min_size'></a>get_min_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='make_images'></a>make_images</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make the disabled image grayscale and make both non-mouseover images have weaker alpha channels
+</font>            img_disabled.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>img_mouseover.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, img_mouseover.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            img_normal.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>img_mouseover.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, img_mouseover.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> img_mouseover.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> img_mouseover.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    rgb_alpha_pixel p <font color='#5555FF'>=</font> img_mouseover[r][c];
+                    <font color='#0000FF'><u>long</u></font> avg <font color='#5555FF'>=</font> p.red;
+                    avg <font color='#5555FF'>+</font><font color='#5555FF'>=</font> p.green;
+                    avg <font color='#5555FF'>+</font><font color='#5555FF'>=</font> p.blue;
+                    avg <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p.alpha <font color='#5555FF'>&gt;</font> <font color='#979000'>40</font><font face='Lucida Console'>)</font>
+                        p.alpha <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>40</font>;
+                    <font color='#0000FF'>else</font>
+                        p.alpha <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                    img_normal[r][c] <font color='#5555FF'>=</font> p;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p.alpha <font color='#5555FF'>&gt;</font> <font color='#979000'>80</font><font face='Lucida Console'>)</font>
+                        p.alpha <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>80</font>;
+                    <font color='#0000FF'>else</font>
+                        p.alpha <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                    p.red <font color='#5555FF'>=</font> avg;
+                    p.green <font color='#5555FF'>=</font> avg;
+                    p.blue <font color='#5555FF'>=</font> avg;
+                    img_disabled[r][c] <font color='#5555FF'>=</font> p;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        array2d<font color='#5555FF'>&lt;</font>rgb_alpha_pixel<font color='#5555FF'>&gt;</font> img_mouseover;
+        array2d<font color='#5555FF'>&lt;</font>rgb_alpha_pixel<font color='#5555FF'>&gt;</font> img_normal;
+        array2d<font color='#5555FF'>&lt;</font>rgb_alpha_pixel<font color='#5555FF'>&gt;</font> img_disabled;
+
+        <font color='#009900'>// this is the minimum amount of padding that can separate the name from the
+</font>        <font color='#009900'>// edge of the button
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> padding;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='button_style_arrow'></a>button_style_arrow</b> : <font color='#0000FF'>public</font> button_style
+    <b>{</b>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>enum</font> <b><a name='arrow_direction'></a>arrow_direction</b> 
+        <b>{</b>
+            UP,
+            DOWN,
+            LEFT,
+            RIGHT
+        <b>}</b>;
+
+        <b><a name='button_style_arrow'></a>button_style_arrow</b> <font face='Lucida Console'>(</font>
+            arrow_direction dir_
+        <font face='Lucida Console'>)</font> : dir<font face='Lucida Console'>(</font>dir_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_button'></a>draw_button</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lastx,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lasty,
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>virtual</font> rectangle <b><a name='get_min_size'></a>get_min_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> ,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font>  
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        arrow_direction dir;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// toggle button styles  
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='toggle_button_style'></a>toggle_button_style</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='toggle_button_style'></a>toggle_button_style</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='toggle_button_style'></a>toggle_button_style</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='redraw_on_mouse_over'></a>redraw_on_mouse_over</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>false</font>; <b>}</b>
+
+        <font color='#0000FF'>virtual</font> rectangle <b><a name='get_min_size'></a>get_min_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_toggle_button'></a>draw_toggle_button</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lastx,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lasty,
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_checked
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='toggle_button_style_default'></a>toggle_button_style_default</b> : <font color='#0000FF'>public</font> toggle_button_style
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='toggle_button_style_default'></a>toggle_button_style_default</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : padding<font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>, name_width<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_toggle_button'></a>draw_toggle_button</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lastx,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lasty,
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_checked
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>virtual</font> rectangle <b><a name='get_min_size'></a>get_min_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// this is the minimum amount of padding that can separate the name from the
+</font>        <font color='#009900'>// edge of the button
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> padding;
+        <font color='#009900'>// this is the width of the name string
+</font>        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> name_width;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='toggle_button_style_check_box'></a>toggle_button_style_check_box</b> : <font color='#0000FF'>public</font> toggle_button_style
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_toggle_button'></a>draw_toggle_button</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lastx,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lasty,
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_checked
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>virtual</font> rectangle <b><a name='get_min_size'></a>get_min_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='toggle_button_style_radio_button'></a>toggle_button_style_radio_button</b> : <font color='#0000FF'>public</font> toggle_button_style
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_toggle_button'></a>draw_toggle_button</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lastx,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lasty,
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_checked
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>virtual</font> rectangle <b><a name='get_min_size'></a>get_min_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// scroll_bar styles  
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='scroll_bar_style'></a>scroll_bar_style</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='scroll_bar_style'></a>scroll_bar_style</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='redraw_on_mouse_over_slider'></a>redraw_on_mouse_over_slider</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>false</font>; <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_width'></a>get_width</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_slider_length'></a>get_slider_length</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> total_length,
+            <font color='#0000FF'><u>long</u></font> max_pos
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_button_length'></a>get_button_length</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> total_length,
+            <font color='#0000FF'><u>long</u></font> max_pos
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_scroll_bar_background'></a>draw_scroll_bar_background</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lastx,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lasty,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_scroll_bar_slider'></a>draw_scroll_bar_slider</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lastx,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lasty,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_being_dragged
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='scroll_bar_style_default'></a>scroll_bar_style_default</b> : <font color='#0000FF'>public</font> scroll_bar_style
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        button_style_arrow <b><a name='get_up_button_style'></a>get_up_button_style</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>button_style_arrow</font><font face='Lucida Console'>(</font>button_style_arrow::UP<font face='Lucida Console'>)</font>; <b>}</b>
+
+        button_style_arrow <b><a name='get_down_button_style'></a>get_down_button_style</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>button_style_arrow</font><font face='Lucida Console'>(</font>button_style_arrow::DOWN<font face='Lucida Console'>)</font>; <b>}</b>
+
+        button_style_arrow <b><a name='get_left_button_style'></a>get_left_button_style</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>button_style_arrow</font><font face='Lucida Console'>(</font>button_style_arrow::LEFT<font face='Lucida Console'>)</font>; <b>}</b>
+
+        button_style_arrow <b><a name='get_right_button_style'></a>get_right_button_style</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>button_style_arrow</font><font face='Lucida Console'>(</font>button_style_arrow::RIGHT<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_width'></a>get_width</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>  <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>16</font>; <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_slider_length'></a>get_slider_length</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> total_length,
+            <font color='#0000FF'><u>long</u></font> max_pos
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_button_length'></a>get_button_length</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> total_length,
+            <font color='#0000FF'><u>long</u></font> max_pos
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_scroll_bar_background'></a>draw_scroll_bar_background</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lastx,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lasty,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_scroll_bar_slider'></a>draw_scroll_bar_slider</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lastx,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lasty,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_being_dragged
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// scrollable_region styles  
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='scrollable_region_style'></a>scrollable_region_style</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='scrollable_region_style'></a>scrollable_region_style</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_border_size'></a>get_border_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_scrollable_region_border'></a>draw_scrollable_region_border</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='scrollable_region_style_default'></a>scrollable_region_style_default</b> : <font color='#0000FF'>public</font> scrollable_region_style
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        scroll_bar_style_default <b><a name='get_horizontal_scroll_bar_style'></a>get_horizontal_scroll_bar_style</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>scroll_bar_style_default</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        scroll_bar_style_default <b><a name='get_vertical_scroll_bar_style'></a>get_vertical_scroll_bar_style</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>scroll_bar_style_default</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_border_size'></a>get_border_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>2</font>; <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_scrollable_region_border'></a>draw_scrollable_region_border</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>  <b>{</b> <font color='#BB00BB'>draw_sunken_rectangle</font><font face='Lucida Console'>(</font>c,rect<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// list_box styles  
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='list_box_style'></a>list_box_style</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='list_box_style'></a>list_box_style</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_list_box_background'></a>draw_list_box_background</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> display_rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_list_box_item'></a>draw_list_box_item</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> display_rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> text,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_selected
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_list_box_item'></a>draw_list_box_item</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> display_rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> std::wstring<font color='#5555FF'>&amp;</font> text,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_selected
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_list_box_item'></a>draw_list_box_item</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> display_rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> text,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_selected
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='list_box_style_default'></a>list_box_style_default</b> : <font color='#0000FF'>public</font> list_box_style
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        scrollable_region_style_default <b><a name='get_scrollable_region_style'></a>get_scrollable_region_style</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>scrollable_region_style_default</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_list_box_item'></a>draw_list_box_item</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> display_rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> text,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_selected
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#BB00BB'>draw_list_box_item_template</font><font face='Lucida Console'>(</font>c,rect,display_rect, enabled, mfont, text, is_selected<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_list_box_item'></a>draw_list_box_item</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> display_rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> std::wstring<font color='#5555FF'>&amp;</font> text,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_selected
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#BB00BB'>draw_list_box_item_template</font><font face='Lucida Console'>(</font>c,rect,display_rect, enabled, mfont, text, is_selected<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_list_box_item'></a>draw_list_box_item</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> display_rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> text,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_selected
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#BB00BB'>draw_list_box_item_template</font><font face='Lucida Console'>(</font>c,rect,display_rect, enabled, mfont, text, is_selected<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> string_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='draw_list_box_item_template'></a>draw_list_box_item_template</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> display_rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> string_type<font color='#5555FF'>&amp;</font> text,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_selected
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_selected<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>fill_rect_with_vertical_gradient</font><font face='Lucida Console'>(</font>c,rect,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>110</font>,<font color='#979000'>160</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font>,  <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>100</font>,<font color='#979000'>130</font>,<font color='#979000'>250</font><font face='Lucida Console'>)</font>,display_rect<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    <font color='#BB00BB'>fill_rect_with_vertical_gradient</font><font face='Lucida Console'>(</font>c,rect,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>140</font>,<font color='#979000'>190</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font>,  <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>130</font>,<font color='#979000'>160</font>,<font color='#979000'>250</font><font face='Lucida Console'>)</font>,display_rect<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled<font face='Lucida Console'>)</font>
+                mfont.<font color='#BB00BB'>draw_string</font><font face='Lucida Console'>(</font>c,rect,text,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,<font color='#979000'>0</font>,std::string::npos,display_rect<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                mfont.<font color='#BB00BB'>draw_string</font><font face='Lucida Console'>(</font>c,rect,text,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>128</font>,<font color='#979000'>128</font>,<font color='#979000'>128</font><font face='Lucida Console'>)</font>,<font color='#979000'>0</font>,std::string::npos,display_rect<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_list_box_background'></a>draw_list_box_background</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> display_rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// first fill our area with white
+</font>                <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>c, display_rect,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>255</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// first fill our area with gray 
+</font>                <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>c, display_rect,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>212</font>,<font color='#979000'>208</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// text_box styles  
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='text_box_style'></a>text_box_style</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='text_box_style'></a>text_box_style</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='text_box_style'></a>text_box_style</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_padding'></a>get_padding</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_text_box'></a>draw_text_box</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> display_rect,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> text_rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> text,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> cursor_rect,
+            <font color='#0000FF'>const</font> rgb_pixel<font color='#5555FF'>&amp;</font> text_color,
+            <font color='#0000FF'>const</font> rgb_pixel<font color='#5555FF'>&amp;</font> bg_color,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> has_focus,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> cursor_visible,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> highlight_start,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> highlight_end
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='text_box_style_default'></a>text_box_style_default</b> : <font color='#0000FF'>public</font> text_box_style
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='text_box_style_default'></a>text_box_style_default</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        scrollable_region_style_default <b><a name='get_scrollable_region_style'></a>get_scrollable_region_style</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>scrollable_region_style_default</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='text_box_style_default'></a>text_box_style_default</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_padding'></a>get_padding</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font>  
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>1</font>; <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_text_box'></a>draw_text_box</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> display_rect,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> text_rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> text,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> cursor_rect,
+            <font color='#0000FF'>const</font> rgb_pixel<font color='#5555FF'>&amp;</font> text_color,
+            <font color='#0000FF'>const</font> rgb_pixel<font color='#5555FF'>&amp;</font> bg_color,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> has_focus,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> cursor_visible,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> highlight_start,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> highlight_end
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// text_field styles  
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='text_field_style'></a>text_field_style</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='text_field_style'></a>text_field_style</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='text_field_style'></a>text_field_style</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_padding'></a>get_padding</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_text_field'></a>draw_text_field</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> text_rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> text,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> cursor_x,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> text_pos,
+            <font color='#0000FF'>const</font> rgb_pixel<font color='#5555FF'>&amp;</font> text_color,
+            <font color='#0000FF'>const</font> rgb_pixel<font color='#5555FF'>&amp;</font> bg_color,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> has_focus,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> cursor_visible,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> highlight_start,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> highlight_end
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='text_field_style_default'></a>text_field_style_default</b> : <font color='#0000FF'>public</font> text_field_style
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='text_field_style_default'></a>text_field_style_default</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='text_field_style_default'></a>text_field_style_default</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_padding'></a>get_padding</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_text_field'></a>draw_text_field</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> text_rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+            <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> text,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> cursor_x,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> text_pos,
+            <font color='#0000FF'>const</font> rgb_pixel<font color='#5555FF'>&amp;</font> text_color,
+            <font color='#0000FF'>const</font> rgb_pixel<font color='#5555FF'>&amp;</font> bg_color,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> has_focus,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> cursor_visible,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> highlight_start,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> highlight_end
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='style.cpp.html'>style.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_WIDGETs_STYLE_
+</font>
+
+
+</pre></body></html>

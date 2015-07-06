@@ -1,0 +1,501 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - member_function_pointer_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MEMBER_FUNCTION_POINTER_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_MEMBER_FUNCTION_POINTER_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='member_function_pointer_kernel_abstract.h.html'>member_function_pointer_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../enable_if.h.html'>../enable_if.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>new<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> PARAM1 <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font>,
+        <font color='#0000FF'>typename</font> PARAM2 <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font>,
+        <font color='#0000FF'>typename</font> PARAM3 <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font>,
+        <font color='#0000FF'>typename</font> PARAM4 <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> member_function_pointer;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#define</font> DLIB_MFP_SC DLIB_ASSERT<font face='Lucida Console'>(</font>cb <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,                                \
+                   "<font color='#CC0000'>\tvoid member_function_pointer::set</font>"                \
+                   <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthe member function pointer can't be null</font>"   \
+                   <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>   <font face='Lucida Console'>)</font>;
+
+
+<font color='#0000FF'>#define</font> DLIB_MFP_OC DLIB_ASSERT<font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>is_set<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> ,                            \
+                   "<font color='#CC0000'>\tvoid member_function_pointer::operator()</font>"                     \
+                   <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou must call set() before you can use this function</font>"    \
+                   <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_args<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='mfp_kernel_1_base_class'></a>mfp_kernel_1_base_class</b>
+    <b>{</b>
+        <font color='#009900'>/*
+            All member function pointer classes inherit from this class.  This
+            is where most of the things in a member function pointer are defined.
+
+            The reason for the num_args template argument to this class is to prevent
+            any sort of implicit casting between derived member function pointer classes
+            that take different numbers of arguments.
+        */</font>
+    <font color='#0000FF'>protected</font>:
+        <font color='#0000FF'>enum</font> <b><a name='mfp_type'></a>mfp_type</b> <b>{</b> mfp_nonconst, mfp_const, mfp_null<b>}</b>;
+
+        <font color='#0000FF'>class</font> <b><a name='mp_base_base'></a>mp_base_base</b>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='mp_base_base'></a>mp_base_base</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> ptr, mfp_type type_<font face='Lucida Console'>)</font> : o<font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>,type<font face='Lucida Console'>(</font>type_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>virtual</font> ~<b><a name='mp_base_base'></a>mp_base_base</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b><b>}</b>
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='clone'></a>clone</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> ptr<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='is_same'></a>is_same</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> mp_base_base<font color='#5555FF'>*</font> item<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'><u>bool</u></font> <b><a name='is_set'></a>is_set</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> o<font color='#5555FF'>!</font><font color='#5555FF'>=</font><font color='#979000'>0</font>; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> <font color='#0000FF'>const</font> o;
+            <font color='#0000FF'>const</font> mfp_type type;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='mp_null'></a>mp_null</b> : <font color='#0000FF'>public</font> mp_base_base 
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>mfp_pointer_type<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> ;
+
+            <b><a name='mp_null'></a>mp_null</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> , mfp_pointer_type <font face='Lucida Console'>)</font> : mp_base_base<font face='Lucida Console'>(</font><font color='#979000'>0</font>,mfp_null<font face='Lucida Console'>)</font>, callback<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <b><a name='mp_null'></a>mp_null</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : mp_base_base<font face='Lucida Console'>(</font><font color='#979000'>0</font>,mfp_null<font face='Lucida Console'>)</font>, callback<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            <font color='#0000FF'>const</font> mfp_pointer_type callback;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> mp_impl<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='mp_impl_T'></a>mp_impl_T</b> : <font color='#0000FF'>public</font> mp_impl 
+        <b>{</b>
+            <font color='#009900'>/*
+                This class supplies the implementations clone() and is_same() for any
+                classes that inherit from mp_base_base.  It does this in a very
+                roundabout way...
+            */</font>
+               
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> mp_impl::mfp_pointer_type mfp_pointer_type;
+
+            <b><a name='mp_impl_T'></a>mp_impl_T</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : mp_impl<font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <b><a name='mp_impl_T'></a>mp_impl_T</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> ptr, mfp_pointer_type cb<font face='Lucida Console'>)</font> : mp_impl<font face='Lucida Console'>(</font>ptr,cb<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> mem_size<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'><u>void</u></font> <b><a name='safe_clone'></a>safe_clone</b><font face='Lucida Console'>(</font>stack_based_memory_block<font color='#5555FF'>&lt;</font>mem_size<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> buf<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// This is here just to validate the assumption that our block of memory we have made
+</font>                <font color='#009900'>// in mp_memory is the right size to store the data for this object.  If you
+</font>                <font color='#009900'>// get a compiler error on this line then email me :)
+</font>                <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>mp_impl_T<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> mem_size<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>clone</font><font face='Lucida Console'>(</font>buf.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='clone'></a>clone</b>   <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> ptr<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>  <b>{</b> <font color='#0000FF'>new</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font> <font color='#BB00BB'>mp_impl_T</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>o,<font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>callback<font face='Lucida Console'>)</font>; <b>}</b>
+            <font color='#0000FF'><u>bool</u></font> <b><a name='is_same'></a>is_same</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> mp_base_base<font color='#5555FF'>*</font> item<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>o <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>o <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>o <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>o <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> item<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>type<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> mp_impl<font color='#5555FF'>*</font> i <font color='#5555FF'>=</font> <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> mp_impl<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>callback <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>callback<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+        <b>}</b>;
+
+        <font color='#0000FF'>struct</font> <b><a name='dummy_base'></a>dummy_base</b> <b>{</b> <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='nonnull'></a>nonnull</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>; <font color='#0000FF'>virtual</font> ~<b><a name='dummy_base'></a>dummy_base</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b><b>}</b>; <font color='#0000FF'><u>int</u></font> a; <b>}</b>;
+        <font color='#0000FF'>struct</font> <b><a name='dummy'></a>dummy</b> : <font color='#0000FF'>virtual</font> <font color='#0000FF'>public</font> dummy_base<b>{</b> <font color='#0000FF'><u>void</u></font> <b><a name='nonnull'></a>nonnull</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>; <b>}</b>;
+
+        <font color='#0000FF'>typedef</font> mp_impl_T<font color='#5555FF'>&lt;</font>mp_null<font color='#5555FF'>&lt;</font>dummy<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> mp_null_impl;
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='mfp_kernel_1_base_class'></a>mfp_kernel_1_base_class</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> mfp_kernel_1_base_class<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <b>{</b> item.<font color='#BB00BB'>mp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>clone</font><font face='Lucida Console'>(</font>mp_memory.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <b><a name='mfp_kernel_1_base_class'></a>mfp_kernel_1_base_class</b> <font face='Lucida Console'>(</font>  
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>mp_null_impl</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>mp_memory<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> mfp_kernel_1_base_class<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>mp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>is_same</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>mp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> mfp_kernel_1_base_class<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> item<font face='Lucida Console'>)</font>; <b>}</b>
+
+        mfp_kernel_1_base_class<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> mfp_kernel_1_base_class<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>mfp_kernel_1_base_class</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>; <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;  <b>}</b>
+
+        ~<b><a name='mfp_kernel_1_base_class'></a>mfp_kernel_1_base_class</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>destroy_mp_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>mfp_kernel_1_base_class</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_set'></a>is_set</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>mp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b> 
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>dummy::<font color='#5555FF'>*</font>safe_bool<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>public</font>:
+        <b><a name='operator'></a>operator</b> <b><a name='safe_bool'></a>safe_bool</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> ? <font color='#5555FF'>&amp;</font>dummy::nonnull : <font color='#979000'>0</font>; <b>}</b>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>!</font><font color='#BB00BB'>is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            mfp_kernel_1_base_class<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>  
+            <font color='#009900'>// make a temp copy of item
+</font>            mfp_kernel_1_base_class <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// destory the stuff in item
+</font>            item.<font color='#BB00BB'>destroy_mp_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// copy *this into item
+</font>            <font color='#BB00BB'>mp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>clone</font><font face='Lucida Console'>(</font>item.mp_memory.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// destory the stuff in this 
+</font>            <font color='#BB00BB'>destroy_mp_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// copy temp into *this
+</font>            temp.<font color='#BB00BB'>mp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>clone</font><font face='Lucida Console'>(</font>mp_memory.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>protected</font>:
+
+        <font color='#009900'>// The reason for adding 1 here is because visual studio 2003 will sometimes
+</font>        <font color='#009900'>// try to compile this code with sizeof(mp_null_impl) == 0 (which is a bug in visual studio).
+</font>        <font color='#009900'>// Fortunately, no actual real instances of this template seem to end up with that screwed up
+</font>        <font color='#009900'>// value so everything works fine if we just add 1 so that this degenerate case doesn't cause
+</font>        <font color='#009900'>// trouble.  Note that we know it all works fine because safe_clone() checks the size of this
+</font>        <font color='#009900'>// memory block whenever the member function pointer is used.  
+</font>        stack_based_memory_block<font color='#5555FF'>&lt;</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>mp_null_impl<font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> mp_memory;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='destroy_mp_memory'></a>destroy_mp_memory</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// Honestly this probably doesn't even do anything but I'm putting
+</font>            <font color='#009900'>// it here just for good measure.
+</font>            <font color='#BB00BB'>mp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>~<font color='#BB00BB'>mp_base_base</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        mp_base_base<font color='#5555FF'>*</font>       <b><a name='mp'></a>mp</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>       <b>{</b> <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>mp_base_base<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>mp_memory.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>const</font> mp_base_base<font color='#5555FF'>*</font> <b><a name='mp'></a>mp</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> mp_base_base<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>mp_memory.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+        
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='member_function_pointer'></a>member_function_pointer</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> mfp_kernel_1_base_class<font color='#5555FF'>&lt;</font><font color='#979000'>0</font><font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>class</font> <b><a name='mp_base'></a>mp_base</b> : <font color='#0000FF'>public</font> mp_base_base <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='mp_base'></a>mp_base</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> ptr, mfp_type type_<font face='Lucida Console'>)</font> : mp_base_base<font face='Lucida Console'>(</font>ptr,type_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='mp_impl'></a>mp_impl</b> : <font color='#0000FF'>public</font> mp_base <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>mfp_pointer_type<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> ;
+            <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>o<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font>callback<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+            <b><a name='mp_impl'></a>mp_impl</b>      <font face='Lucida Console'>(</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> object, mfp_pointer_type cb<font face='Lucida Console'>)</font> : mp_base<font face='Lucida Console'>(</font>object, mfp_nonconst<font face='Lucida Console'>)</font>, callback<font face='Lucida Console'>(</font>cb<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>const</font> mfp_pointer_type callback;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='mp_impl_const'></a>mp_impl_const</b> : <font color='#0000FF'>public</font> mp_base <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>mfp_pointer_type<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#0000FF'>const</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>  <b>{</b> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>o<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font>callback<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+            <b><a name='mp_impl_const'></a>mp_impl_const</b> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> object, mfp_pointer_type cb<font face='Lucida Console'>)</font> : mp_base<font face='Lucida Console'>(</font>object,mfp_const<font face='Lucida Console'>)</font>, callback<font face='Lucida Console'>(</font>cb<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>const</font> mfp_pointer_type callback;
+        <b>}</b>;
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> param1_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> param2_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> param3_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> param4_type;
+
+        <font color='#009900'>// These two typedefs are here for backwards compatibility with previous versions
+</font>        <font color='#009900'>// of dlib.
+</font>        <font color='#0000FF'>typedef</font> member_function_pointer kernel_1a;
+        <font color='#0000FF'>typedef</font> member_function_pointer kernel_1a_c;
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> DLIB_MFP_OC; <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> mp_base<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>mp_memory.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>call</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#009900'>// the reason for putting disable_if on this function is that it avoids an overload
+</font>        <font color='#009900'>// resolution bug in visual studio.
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_const_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>::type 
+        <b><a name='set'></a>set</b><font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font> object, <font color='#0000FF'>typename</font> mp_impl<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::mfp_pointer_type cb<font face='Lucida Console'>)</font> 
+        <b>{</b> DLIB_MFP_SC;  <font color='#BB00BB'>destroy_mp_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; mp_impl_T<font color='#5555FF'>&lt;</font>mp_impl<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>object,cb<font face='Lucida Console'>)</font>.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>mp_memory<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object, <font color='#0000FF'>typename</font> mp_impl_const<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::mfp_pointer_type cb<font face='Lucida Console'>)</font> 
+        <b>{</b> DLIB_MFP_SC;  <font color='#BB00BB'>destroy_mp_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; mp_impl_T<font color='#5555FF'>&lt;</font>mp_impl_const<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>object,cb<font face='Lucida Console'>)</font>.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>mp_memory<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <b>}</b>;    
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> PARAM1
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='member_function_pointer'></a>member_function_pointer</b><font color='#5555FF'>&lt;</font>PARAM1,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> mfp_kernel_1_base_class<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>class</font> <b><a name='mp_base'></a>mp_base</b> : <font color='#0000FF'>public</font> mp_base_base <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='mp_base'></a>mp_base</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> ptr, mfp_type type_<font face='Lucida Console'>)</font> : mp_base_base<font face='Lucida Console'>(</font>ptr,type_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b><font face='Lucida Console'>(</font>PARAM1<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='mp_impl'></a>mp_impl</b> : <font color='#0000FF'>public</font> mp_base <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>mfp_pointer_type<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>PARAM1<font face='Lucida Console'>)</font> ;
+            <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b> <font face='Lucida Console'>(</font>PARAM1 p1<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>o<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font>callback<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>p1<font face='Lucida Console'>)</font>; <b>}</b>
+
+            <b><a name='mp_impl'></a>mp_impl</b>      <font face='Lucida Console'>(</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> object, mfp_pointer_type cb<font face='Lucida Console'>)</font> : mp_base<font face='Lucida Console'>(</font>object, mfp_nonconst<font face='Lucida Console'>)</font>, callback<font face='Lucida Console'>(</font>cb<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>const</font> mfp_pointer_type callback;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='mp_impl_const'></a>mp_impl_const</b> : <font color='#0000FF'>public</font> mp_base <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>mfp_pointer_type<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>PARAM1<font face='Lucida Console'>)</font><font color='#0000FF'>const</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b> <font face='Lucida Console'>(</font>PARAM1 p1<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>  <b>{</b> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>o<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font>callback<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>p1<font face='Lucida Console'>)</font>; <b>}</b>
+
+            <b><a name='mp_impl_const'></a>mp_impl_const</b> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> object, mfp_pointer_type cb<font face='Lucida Console'>)</font> : mp_base<font face='Lucida Console'>(</font>object,mfp_const<font face='Lucida Console'>)</font>, callback<font face='Lucida Console'>(</font>cb<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>const</font> mfp_pointer_type callback;
+        <b>}</b>;
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> PARAM1 param1_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> param2_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> param3_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> param4_type;
+
+        <font color='#009900'>// These two typedefs are here for backwards compatibility with previous versions
+</font>        <font color='#009900'>// of dlib.
+</font>        <font color='#0000FF'>typedef</font> member_function_pointer kernel_1a;
+        <font color='#0000FF'>typedef</font> member_function_pointer kernel_1a_c;
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>PARAM1 p1<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> DLIB_MFP_OC;  <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> mp_base<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>mp_memory.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>call</font><font face='Lucida Console'>(</font>p1<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#009900'>// the reason for putting disable_if on this function is that it avoids an overload
+</font>        <font color='#009900'>// resolution bug in visual studio.
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_const_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>::type 
+        <b><a name='set'></a>set</b><font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font> object, <font color='#0000FF'>typename</font> mp_impl<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::mfp_pointer_type cb<font face='Lucida Console'>)</font> 
+        <b>{</b> DLIB_MFP_SC;  <font color='#BB00BB'>destroy_mp_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; mp_impl_T<font color='#5555FF'>&lt;</font>mp_impl<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>object,cb<font face='Lucida Console'>)</font>.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>mp_memory<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object, <font color='#0000FF'>typename</font> mp_impl_const<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::mfp_pointer_type cb<font face='Lucida Console'>)</font> 
+        <b>{</b> DLIB_MFP_SC;  <font color='#BB00BB'>destroy_mp_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; mp_impl_T<font color='#5555FF'>&lt;</font>mp_impl_const<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>object,cb<font face='Lucida Console'>)</font>.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>mp_memory<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <b>}</b>;    
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> PARAM1,
+        <font color='#0000FF'>typename</font> PARAM2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='member_function_pointer'></a>member_function_pointer</b><font color='#5555FF'>&lt;</font>PARAM1,PARAM2,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> mfp_kernel_1_base_class<font color='#5555FF'>&lt;</font><font color='#979000'>2</font><font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>class</font> <b><a name='mp_base'></a>mp_base</b> : <font color='#0000FF'>public</font> mp_base_base <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='mp_base'></a>mp_base</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> ptr, mfp_type type_<font face='Lucida Console'>)</font> : mp_base_base<font face='Lucida Console'>(</font>ptr,type_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b><font face='Lucida Console'>(</font>PARAM1,PARAM2<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='mp_impl'></a>mp_impl</b> : <font color='#0000FF'>public</font> mp_base <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>mfp_pointer_type<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>PARAM1,PARAM2<font face='Lucida Console'>)</font> ;
+            <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b> <font face='Lucida Console'>(</font>PARAM1 p1, PARAM2 p2<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>o<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font>callback<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>p1,p2<font face='Lucida Console'>)</font>; <b>}</b>
+
+            <b><a name='mp_impl'></a>mp_impl</b>      <font face='Lucida Console'>(</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> object, mfp_pointer_type cb<font face='Lucida Console'>)</font> : mp_base<font face='Lucida Console'>(</font>object, mfp_nonconst<font face='Lucida Console'>)</font>, callback<font face='Lucida Console'>(</font>cb<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>const</font> mfp_pointer_type callback;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='mp_impl_const'></a>mp_impl_const</b> : <font color='#0000FF'>public</font> mp_base <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>mfp_pointer_type<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>PARAM1,PARAM2<font face='Lucida Console'>)</font><font color='#0000FF'>const</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b> <font face='Lucida Console'>(</font>PARAM1 p1, PARAM2 p2<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>  <b>{</b> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>o<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font>callback<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>p1,p2<font face='Lucida Console'>)</font>; <b>}</b>
+
+            <b><a name='mp_impl_const'></a>mp_impl_const</b> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> object, mfp_pointer_type cb<font face='Lucida Console'>)</font> : mp_base<font face='Lucida Console'>(</font>object,mfp_const<font face='Lucida Console'>)</font>, callback<font face='Lucida Console'>(</font>cb<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>const</font> mfp_pointer_type callback;
+        <b>}</b>;
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> PARAM1 param1_type;
+        <font color='#0000FF'>typedef</font> PARAM2 param2_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> param3_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> param4_type;
+
+        <font color='#009900'>// These two typedefs are here for backwards compatibility with previous versions
+</font>        <font color='#009900'>// of dlib.
+</font>        <font color='#0000FF'>typedef</font> member_function_pointer kernel_1a;
+        <font color='#0000FF'>typedef</font> member_function_pointer kernel_1a_c;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>PARAM1 p1, PARAM2 p2<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> DLIB_MFP_OC;  <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> mp_base<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>mp_memory.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>call</font><font face='Lucida Console'>(</font>p1,p2<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#009900'>// the reason for putting disable_if on this function is that it avoids an overload
+</font>        <font color='#009900'>// resolution bug in visual studio.
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_const_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>::type 
+        <b><a name='set'></a>set</b><font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font> object, <font color='#0000FF'>typename</font> mp_impl<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::mfp_pointer_type cb<font face='Lucida Console'>)</font> 
+        <b>{</b> DLIB_MFP_SC;  <font color='#BB00BB'>destroy_mp_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; mp_impl_T<font color='#5555FF'>&lt;</font>mp_impl<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>object,cb<font face='Lucida Console'>)</font>.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>mp_memory<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object, <font color='#0000FF'>typename</font> mp_impl_const<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::mfp_pointer_type cb<font face='Lucida Console'>)</font> 
+        <b>{</b> DLIB_MFP_SC;  <font color='#BB00BB'>destroy_mp_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; mp_impl_T<font color='#5555FF'>&lt;</font>mp_impl_const<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>object,cb<font face='Lucida Console'>)</font>.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>mp_memory<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <b>}</b>;    
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> PARAM1,
+        <font color='#0000FF'>typename</font> PARAM2,
+        <font color='#0000FF'>typename</font> PARAM3
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='member_function_pointer'></a>member_function_pointer</b><font color='#5555FF'>&lt;</font>PARAM1,PARAM2,PARAM3,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> mfp_kernel_1_base_class<font color='#5555FF'>&lt;</font><font color='#979000'>3</font><font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>class</font> <b><a name='mp_base'></a>mp_base</b> : <font color='#0000FF'>public</font> mp_base_base <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='mp_base'></a>mp_base</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> ptr, mfp_type type_<font face='Lucida Console'>)</font> : mp_base_base<font face='Lucida Console'>(</font>ptr,type_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b><font face='Lucida Console'>(</font>PARAM1,PARAM2,PARAM3<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='mp_impl'></a>mp_impl</b> : <font color='#0000FF'>public</font> mp_base <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>mfp_pointer_type<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>PARAM1,PARAM2,PARAM3<font face='Lucida Console'>)</font> ;
+            <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b> <font face='Lucida Console'>(</font>PARAM1 p1, PARAM2 p2, PARAM3 p3<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>o<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font>callback<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>p1,p2,p3<font face='Lucida Console'>)</font>; <b>}</b>
+
+            <b><a name='mp_impl'></a>mp_impl</b>      <font face='Lucida Console'>(</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> object, mfp_pointer_type cb<font face='Lucida Console'>)</font> : mp_base<font face='Lucida Console'>(</font>object, mfp_nonconst<font face='Lucida Console'>)</font>, callback<font face='Lucida Console'>(</font>cb<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>const</font> mfp_pointer_type callback;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='mp_impl_const'></a>mp_impl_const</b> : <font color='#0000FF'>public</font> mp_base <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>mfp_pointer_type<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>PARAM1,PARAM2,PARAM3<font face='Lucida Console'>)</font><font color='#0000FF'>const</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b> <font face='Lucida Console'>(</font>PARAM1 p1, PARAM2 p2, PARAM3 p3<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>  <b>{</b> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>o<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font>callback<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>p1,p2,p3<font face='Lucida Console'>)</font>; <b>}</b>
+
+            <b><a name='mp_impl_const'></a>mp_impl_const</b> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> object, mfp_pointer_type cb<font face='Lucida Console'>)</font> : mp_base<font face='Lucida Console'>(</font>object,mfp_const<font face='Lucida Console'>)</font>, callback<font face='Lucida Console'>(</font>cb<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>const</font> mfp_pointer_type callback;
+        <b>}</b>;
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> PARAM1 param1_type;
+        <font color='#0000FF'>typedef</font> PARAM2 param2_type;
+        <font color='#0000FF'>typedef</font> PARAM3 param3_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> param4_type;
+
+        <font color='#009900'>// These two typedefs are here for backwards compatibility with previous versions
+</font>        <font color='#009900'>// of dlib.
+</font>        <font color='#0000FF'>typedef</font> member_function_pointer kernel_1a;
+        <font color='#0000FF'>typedef</font> member_function_pointer kernel_1a_c;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>PARAM1 p1, PARAM2 p2, PARAM3 p3<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> DLIB_MFP_OC;  <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> mp_base<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>mp_memory.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>call</font><font face='Lucida Console'>(</font>p1,p2,p3<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#009900'>// the reason for putting disable_if on this function is that it avoids an overload
+</font>        <font color='#009900'>// resolution bug in visual studio.
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_const_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>::type 
+        <b><a name='set'></a>set</b><font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font> object, <font color='#0000FF'>typename</font> mp_impl<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::mfp_pointer_type cb<font face='Lucida Console'>)</font> 
+        <b>{</b> DLIB_MFP_SC;  <font color='#BB00BB'>destroy_mp_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; mp_impl_T<font color='#5555FF'>&lt;</font>mp_impl<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>object,cb<font face='Lucida Console'>)</font>.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>mp_memory<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object, <font color='#0000FF'>typename</font> mp_impl_const<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::mfp_pointer_type cb<font face='Lucida Console'>)</font> 
+        <b>{</b> DLIB_MFP_SC;  <font color='#BB00BB'>destroy_mp_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; mp_impl_T<font color='#5555FF'>&lt;</font>mp_impl_const<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>object,cb<font face='Lucida Console'>)</font>.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>mp_memory<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <b>}</b>;    
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> PARAM1,
+        <font color='#0000FF'>typename</font> PARAM2,
+        <font color='#0000FF'>typename</font> PARAM3,
+        <font color='#0000FF'>typename</font> PARAM4
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='member_function_pointer'></a>member_function_pointer</b> : <font color='#0000FF'>public</font> mfp_kernel_1_base_class<font color='#5555FF'>&lt;</font><font color='#979000'>4</font><font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>class</font> <b><a name='mp_base'></a>mp_base</b> : <font color='#0000FF'>public</font> mp_base_base <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='mp_base'></a>mp_base</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> ptr, mfp_type type_<font face='Lucida Console'>)</font> : mp_base_base<font face='Lucida Console'>(</font>ptr,type_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b><font face='Lucida Console'>(</font>PARAM1,PARAM2,PARAM3,PARAM4<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='mp_impl'></a>mp_impl</b> : <font color='#0000FF'>public</font> mp_base <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>mfp_pointer_type<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>PARAM1,PARAM2,PARAM3, PARAM4<font face='Lucida Console'>)</font> ;
+            <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b> <font face='Lucida Console'>(</font>PARAM1 p1, PARAM2 p2, PARAM3 p3, PARAM4 p4<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>o<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font>callback<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>p1,p2,p3,p4<font face='Lucida Console'>)</font>; <b>}</b>
+
+            <b><a name='mp_impl'></a>mp_impl</b>      <font face='Lucida Console'>(</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> object, mfp_pointer_type cb<font face='Lucida Console'>)</font> : mp_base<font face='Lucida Console'>(</font>object, mfp_nonconst<font face='Lucida Console'>)</font>, callback<font face='Lucida Console'>(</font>cb<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>const</font> mfp_pointer_type callback;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='mp_impl_const'></a>mp_impl_const</b> : <font color='#0000FF'>public</font> mp_base <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>mfp_pointer_type<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>PARAM1,PARAM2,PARAM3,PARAM4<font face='Lucida Console'>)</font><font color='#0000FF'>const</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>void</u></font> <b><a name='call'></a>call</b> <font face='Lucida Console'>(</font>PARAM1 p1, PARAM2 p2, PARAM3 p3, PARAM4 p4<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>  <b>{</b> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>o<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font>callback<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>p1,p2,p3,p4<font face='Lucida Console'>)</font>; <b>}</b>
+
+            <b><a name='mp_impl_const'></a>mp_impl_const</b> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> object, mfp_pointer_type cb<font face='Lucida Console'>)</font> : mp_base<font face='Lucida Console'>(</font>object,mfp_const<font face='Lucida Console'>)</font>, callback<font face='Lucida Console'>(</font>cb<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>const</font> mfp_pointer_type callback;
+        <b>}</b>;
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> PARAM1 param1_type;
+        <font color='#0000FF'>typedef</font> PARAM2 param2_type;
+        <font color='#0000FF'>typedef</font> PARAM3 param3_type;
+        <font color='#0000FF'>typedef</font> PARAM4 param4_type;
+
+        <font color='#009900'>// These two typedefs are here for backwards compatibility with previous versions
+</font>        <font color='#009900'>// of dlib.
+</font>        <font color='#0000FF'>typedef</font> member_function_pointer kernel_1a;
+        <font color='#0000FF'>typedef</font> member_function_pointer kernel_1a_c;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>PARAM1 p1, PARAM2 p2, PARAM3 p3, PARAM4 p4<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> DLIB_MFP_OC;  <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> mp_base<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>mp_memory.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>call</font><font face='Lucida Console'>(</font>p1,p2,p3,p4<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#009900'>// the reason for putting disable_if on this function is that it avoids an overload
+</font>        <font color='#009900'>// resolution bug in visual studio.
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_const_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>::type 
+        <b><a name='set'></a>set</b><font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font> object, <font color='#0000FF'>typename</font> mp_impl<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::mfp_pointer_type cb<font face='Lucida Console'>)</font> 
+        <b>{</b> DLIB_MFP_SC;  <font color='#BB00BB'>destroy_mp_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; mp_impl_T<font color='#5555FF'>&lt;</font>mp_impl<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>object,cb<font face='Lucida Console'>)</font>.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>mp_memory<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object, <font color='#0000FF'>typename</font> mp_impl_const<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::mfp_pointer_type cb<font face='Lucida Console'>)</font> 
+        <b>{</b> DLIB_MFP_SC;  <font color='#BB00BB'>destroy_mp_memory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; mp_impl_T<font color='#5555FF'>&lt;</font>mp_impl_const<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>object,cb<font face='Lucida Console'>)</font>.<font color='#BB00BB'>safe_clone</font><font face='Lucida Console'>(</font>mp_memory<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <b>}</b>;    
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MEMBER_FUNCTION_POINTER_KERNEl_1_
+</font>
+
+</pre></body></html>

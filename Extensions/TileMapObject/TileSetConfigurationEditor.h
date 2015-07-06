@@ -7,6 +7,7 @@ This project is released under the MIT License.
 
 #ifndef TILESETCONFIGURATIONEDITOR_H
 #define TILESETCONFIGURATIONEDITOR_H
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "TileMapDialogs.h"
 
 #include "TileSet.h"
@@ -37,4 +38,5 @@ protected:
     virtual void OnOkButtonClicked(wxCommandEvent& event);
     virtual void OnSetTextureButtonClicked(wxCommandEvent& event);
 };
+#endif
 #endif // TILESETCONFIGURATIONEDITOR_H

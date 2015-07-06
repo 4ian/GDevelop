@@ -17,7 +17,7 @@ GroupEventDialog::GroupEventDialog(wxWindow* parent, gd::GroupEvent & event_)
 	groupNameEdit->SetValue(event.GetName());
 	backColorBt->SetBackgroundColour(wxColour(event.GetBackgroundColorR(), event.GetBackgroundColorG(), event.GetBackgroundColorB() ));
 	backColorBt->SetForegroundColour(wxColour(255-event.GetBackgroundColorR(), 255-event.GetBackgroundColorG(), 255-event.GetBackgroundColorB() ));
-    hideCheck->SetValue(event.folded);
+    hideCheck->SetValue(event.IsFolded());
 }
 
 GroupEventDialog::~GroupEventDialog()
@@ -33,7 +33,7 @@ void GroupEventDialog::onOkBtClick(wxCommandEvent& )
 	event.SetName(groupNameEdit->GetValue());
     event.SetBackgroundColor(backColorBt->GetBackgroundColour().Red(),
     	backColorBt->GetBackgroundColour().Green(), backColorBt->GetBackgroundColour().Blue());
-    event.folded = hideCheck->GetValue();
+    event.SetFolded(hideCheck->GetValue());
 	EndModal(1);
 }
 

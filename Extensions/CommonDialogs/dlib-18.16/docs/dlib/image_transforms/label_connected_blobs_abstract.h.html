@@ -1,0 +1,202 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - label_connected_blobs_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_LABEL_CONNeCTED_BLOBS_ABSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_LABEL_CONNeCTED_BLOBS_ABSTRACT_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/generic_image.h.html'>../image_processing/generic_image.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='neighbors_8'></a>neighbors_8</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a pixel neighborhood generating functor for 
+                use with the label_connected_blobs() routine defined below.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p,
+            std::vector<font color='#5555FF'>&lt;</font>point<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> neighbors
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - adds the 8 neighboring pixels surrounding p into neighbors
+        !*/</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>struct</font> <b><a name='neighbors_4'></a>neighbors_4</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a pixel neighborhood generating functor for 
+                use with the label_connected_blobs() routine defined below.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p,
+            std::vector<font color='#5555FF'>&lt;</font>point<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> neighbors
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - adds the 4 neighboring pixels of p into neighbors.  These
+                  are the ones immediately to the left, top, right, and bottom.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='connected_if_both_not_zero'></a>connected_if_both_not_zero</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a pixel connection testing functor for use
+                with the label_connected_blobs() routine defined below.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_view_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_view_type<font color='#5555FF'>&amp;</font> img,
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>img[a.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][a.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> img[b.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][b.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>struct</font> <b><a name='connected_if_equal'></a>connected_if_equal</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a pixel connection testing functor for use
+                with the label_connected_blobs() routine defined below.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_view_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_view_type<font color='#5555FF'>&amp;</font> img,
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>img[a.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][a.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> img[b.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][b.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>]<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='zero_pixels_are_background'></a>zero_pixels_are_background</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a background testing functor for use
+                with the label_connected_blobs() routine defined below.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_view_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_view_type<font color='#5555FF'>&amp;</font> img,
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> img[p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+    <b>}</b>;
+
+    <font color='#0000FF'>struct</font> <b><a name='nothing_is_background'></a>nothing_is_background</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a background testing functor for use
+                with the label_connected_blobs() routine defined below.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_view_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_view_type<font color='#5555FF'>&amp;</font>, 
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type,
+        <font color='#0000FF'>typename</font> label_image_type,
+        <font color='#0000FF'>typename</font> background_functor_type,
+        <font color='#0000FF'>typename</font> neighbors_functor_type,
+        <font color='#0000FF'>typename</font> connected_functor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='label_connected_blobs'></a>label_connected_blobs</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'>const</font> background_functor_type<font color='#5555FF'>&amp;</font> is_background,
+        <font color='#0000FF'>const</font> neighbors_functor_type<font color='#5555FF'>&amp;</font>  get_neighbors,
+        <font color='#0000FF'>const</font> connected_functor_type<font color='#5555FF'>&amp;</font>  is_connected,
+        label_image_type<font color='#5555FF'>&amp;</font> label_img
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - label_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h and it must contain integer pixels.
+            - is_background(img, point(c,r)) is a legal expression that evaluates to a bool.
+            - is_connected(img, point(c,r), point(c2,r2)) is a legal expression that
+              evaluates to a bool.
+            - get_neighbors(point(c,r), neighbors) is a legal expression where neighbors 
+              is of type std::vector&lt;point&gt;.
+            - is_same_object(img, label_img) == false
+        ensures
+            - This function labels each of the connected blobs in img with a unique integer 
+              label.  
+            - An image can be thought of as a graph where pixels A and B are connected if 
+              and only if the following two statements are satisfied:
+                - is_connected(img,A,B) == true
+                - get_neighbors(A, neighbors) results in neighbors containing B or
+                  get_neighbors(B, neighbors) results in neighbors containing A.
+              Then this function can be understood as labeling all the connected components 
+              of this pixel graph such that all pixels in a component get the same label while
+              pixels in different components get different labels.  Note that there is a 
+              special "background" component determined by is_background().  Any pixels which 
+              are "background" always get a blob id of 0 regardless of any other considerations.
+            - #label_img.nr() == img.nr()
+            - #label_img.nc() == img.nc()
+            - for all valid r and c:
+                - #label_img[r][c] == the blob label number for pixel img[r][c].  
+                - #label_img[r][c] &gt;= 0
+                - if (is_background(img, point(c,r))) then
+                    - #label_img[r][c] == 0
+                - else
+                    - #label_img[r][c] != 0
+            - if (img.size() != 0) then 
+                - returns max(mat(#label_img))+1
+                  (i.e. returns a number one greater than the maximum blob id number, 
+                  this is the number of blobs found.)
+            - else
+                - returns 0
+            - blob labels are contiguous, therefore, the number returned by this function is
+              the number of blobs in the image (including the background blob).
+            - It is guaranteed that is_connected() and is_background() will never be 
+              called with points outside the image.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LABEL_CONNeCTED_BLOBS_ABSTRACT_H_
+</font>
+
+</pre></body></html>

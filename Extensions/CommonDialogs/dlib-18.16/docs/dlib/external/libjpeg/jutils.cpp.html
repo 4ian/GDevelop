@@ -1,0 +1,182 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jutils.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jutils.c
+ *
+ * Copyright (C) 1991-1996, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains tables and miscellaneous utility routines needed
+ * for both compression and decompression.
+ * Note we prefix all global names with "j" to minimize conflicts with
+ * a surrounding application.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+
+
+<font color='#009900'>/*
+ * jpeg_zigzag_order[i] is the zigzag-order position of the i'th element
+ * of a DCT block read in natural order (left to right, top to bottom).
+ */</font>
+
+<font color='#0000FF'>#if</font> <font color='#979000'>0</font>				<font color='#009900'>/* This table is not actually needed in v6a */</font>
+
+<font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> jpeg_zigzag_order[DCTSIZE2] <font color='#5555FF'>=</font> <b>{</b>
+   <font color='#979000'>0</font>,  <font color='#979000'>1</font>,  <font color='#979000'>5</font>,  <font color='#979000'>6</font>, <font color='#979000'>14</font>, <font color='#979000'>15</font>, <font color='#979000'>27</font>, <font color='#979000'>28</font>,
+   <font color='#979000'>2</font>,  <font color='#979000'>4</font>,  <font color='#979000'>7</font>, <font color='#979000'>13</font>, <font color='#979000'>16</font>, <font color='#979000'>26</font>, <font color='#979000'>29</font>, <font color='#979000'>42</font>,
+   <font color='#979000'>3</font>,  <font color='#979000'>8</font>, <font color='#979000'>12</font>, <font color='#979000'>17</font>, <font color='#979000'>25</font>, <font color='#979000'>30</font>, <font color='#979000'>41</font>, <font color='#979000'>43</font>,
+   <font color='#979000'>9</font>, <font color='#979000'>11</font>, <font color='#979000'>18</font>, <font color='#979000'>24</font>, <font color='#979000'>31</font>, <font color='#979000'>40</font>, <font color='#979000'>44</font>, <font color='#979000'>53</font>,
+  <font color='#979000'>10</font>, <font color='#979000'>19</font>, <font color='#979000'>23</font>, <font color='#979000'>32</font>, <font color='#979000'>39</font>, <font color='#979000'>45</font>, <font color='#979000'>52</font>, <font color='#979000'>54</font>,
+  <font color='#979000'>20</font>, <font color='#979000'>22</font>, <font color='#979000'>33</font>, <font color='#979000'>38</font>, <font color='#979000'>46</font>, <font color='#979000'>51</font>, <font color='#979000'>55</font>, <font color='#979000'>60</font>,
+  <font color='#979000'>21</font>, <font color='#979000'>34</font>, <font color='#979000'>37</font>, <font color='#979000'>47</font>, <font color='#979000'>50</font>, <font color='#979000'>56</font>, <font color='#979000'>59</font>, <font color='#979000'>61</font>,
+  <font color='#979000'>35</font>, <font color='#979000'>36</font>, <font color='#979000'>48</font>, <font color='#979000'>49</font>, <font color='#979000'>57</font>, <font color='#979000'>58</font>, <font color='#979000'>62</font>, <font color='#979000'>63</font>
+<b>}</b>;
+
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/*
+ * jpeg_natural_order[i] is the natural-order position of the i'th element
+ * of zigzag order.
+ *
+ * When reading corrupted data, the Huffman decoders could attempt
+ * to reference an entry beyond the end of this array (if the decoded
+ * zero run length reaches past the end of the block).  To prevent
+ * wild stores without adding an inner-loop test, we put some extra
+ * "63"s after the real entries.  This will cause the extra coefficient
+ * to be stored in location 63 of the block, not somewhere random.
+ * The worst case would be a run-length of 15, which means we need 16
+ * fake entries.
+ */</font>
+
+<font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> jpeg_natural_order[DCTSIZE2<font color='#5555FF'>+</font><font color='#979000'>16</font>] <font color='#5555FF'>=</font> <b>{</b>
+  <font color='#979000'>0</font>,  <font color='#979000'>1</font>,  <font color='#979000'>8</font>, <font color='#979000'>16</font>,  <font color='#979000'>9</font>,  <font color='#979000'>2</font>,  <font color='#979000'>3</font>, <font color='#979000'>10</font>,
+ <font color='#979000'>17</font>, <font color='#979000'>24</font>, <font color='#979000'>32</font>, <font color='#979000'>25</font>, <font color='#979000'>18</font>, <font color='#979000'>11</font>,  <font color='#979000'>4</font>,  <font color='#979000'>5</font>,
+ <font color='#979000'>12</font>, <font color='#979000'>19</font>, <font color='#979000'>26</font>, <font color='#979000'>33</font>, <font color='#979000'>40</font>, <font color='#979000'>48</font>, <font color='#979000'>41</font>, <font color='#979000'>34</font>,
+ <font color='#979000'>27</font>, <font color='#979000'>20</font>, <font color='#979000'>13</font>,  <font color='#979000'>6</font>,  <font color='#979000'>7</font>, <font color='#979000'>14</font>, <font color='#979000'>21</font>, <font color='#979000'>28</font>,
+ <font color='#979000'>35</font>, <font color='#979000'>42</font>, <font color='#979000'>49</font>, <font color='#979000'>56</font>, <font color='#979000'>57</font>, <font color='#979000'>50</font>, <font color='#979000'>43</font>, <font color='#979000'>36</font>,
+ <font color='#979000'>29</font>, <font color='#979000'>22</font>, <font color='#979000'>15</font>, <font color='#979000'>23</font>, <font color='#979000'>30</font>, <font color='#979000'>37</font>, <font color='#979000'>44</font>, <font color='#979000'>51</font>,
+ <font color='#979000'>58</font>, <font color='#979000'>59</font>, <font color='#979000'>52</font>, <font color='#979000'>45</font>, <font color='#979000'>38</font>, <font color='#979000'>31</font>, <font color='#979000'>39</font>, <font color='#979000'>46</font>,
+ <font color='#979000'>53</font>, <font color='#979000'>60</font>, <font color='#979000'>61</font>, <font color='#979000'>54</font>, <font color='#979000'>47</font>, <font color='#979000'>55</font>, <font color='#979000'>62</font>, <font color='#979000'>63</font>,
+ <font color='#979000'>63</font>, <font color='#979000'>63</font>, <font color='#979000'>63</font>, <font color='#979000'>63</font>, <font color='#979000'>63</font>, <font color='#979000'>63</font>, <font color='#979000'>63</font>, <font color='#979000'>63</font>, <font color='#009900'>/* extra entries for safety in decoder */</font>
+ <font color='#979000'>63</font>, <font color='#979000'>63</font>, <font color='#979000'>63</font>, <font color='#979000'>63</font>, <font color='#979000'>63</font>, <font color='#979000'>63</font>, <font color='#979000'>63</font>, <font color='#979000'>63</font>
+<b>}</b>;
+
+
+<font color='#009900'>/*
+ * Arithmetic utilities
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>
+<b><a name='jdiv_round_up'></a>jdiv_round_up</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> a, <font color='#0000FF'><u>long</u></font> b<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Compute a/b rounded up to next integer, ie, ceil(a/b) */</font>
+<font color='#009900'>/* Assumes a &gt;= 0, b &gt; 0 */</font>
+<b>{</b>
+  <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>a <font color='#5555FF'>+</font> b <font color='#5555FF'>-</font> <font color='#979000'>1</font>L<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> b;
+<b>}</b>
+
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>
+<b><a name='jround_up'></a>jround_up</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> a, <font color='#0000FF'><u>long</u></font> b<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Compute a rounded up to next multiple of b, ie, ceil(a/b)*b */</font>
+<font color='#009900'>/* Assumes a &gt;= 0, b &gt; 0 */</font>
+<b>{</b>
+  a <font color='#5555FF'>+</font><font color='#5555FF'>=</font> b <font color='#5555FF'>-</font> <font color='#979000'>1</font>L;
+  <font color='#0000FF'>return</font> a <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>a <font color='#5555FF'>%</font> b<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/* On normal machines we can apply MEMCOPY() and MEMZERO() to sample arrays
+ * and coefficient-block arrays.  This won't work on 80x86 because the arrays
+ * are FAR and we're assuming a small-pointer memory model.  However, some
+ * DOS compilers provide far-pointer versions of memcpy() and memset() even
+ * in the small-model libraries.  These will be used if USE_FMEM is defined.
+ * Otherwise, the routines below do it the hard way.  (The performance cost
+ * is not all that great, because these routines aren't very heavily used.)
+ */</font>
+
+<font color='#0000FF'>#ifndef</font> NEED_FAR_POINTERS	<font color='#009900'>/* normal case, same as regular macros */</font>
+<font color='#0000FF'>#define</font> FMEMCOPY<font face='Lucida Console'>(</font>dest,src,size<font face='Lucida Console'>)</font>	MEMCOPY<font face='Lucida Console'>(</font>dest,src,size<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> FMEMZERO<font face='Lucida Console'>(</font>target,size<font face='Lucida Console'>)</font>	MEMZERO<font face='Lucida Console'>(</font>target,size<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#else</font>				<font color='#009900'>/* 80x86 case, define if we can */</font>
+<font color='#0000FF'>#ifdef</font> USE_FMEM
+<font color='#0000FF'>#define</font> FMEMCOPY<font face='Lucida Console'>(</font>dest,src,size<font face='Lucida Console'>)</font>	_fmemcpy<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> FMEMZERO<font face='Lucida Console'>(</font>target,size<font face='Lucida Console'>)</font>	_fmemset<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>target<font face='Lucida Console'>)</font>, <font color='#979000'>0</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#endif</font>
+
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jcopy_sample_rows'></a>jcopy_sample_rows</b> <font face='Lucida Console'>(</font>JSAMPARRAY input_array, <font color='#0000FF'><u>int</u></font> source_row,
+		   JSAMPARRAY output_array, <font color='#0000FF'><u>int</u></font> dest_row,
+		   <font color='#0000FF'><u>int</u></font> num_rows, JDIMENSION num_cols<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Copy some rows of samples from one place to another.
+ * num_rows rows are copied from input_array[source_row++]
+ * to output_array[dest_row++]; these areas may overlap for duplication.
+ * The source and destination arrays must be at least as wide as num_cols.
+ */</font>
+<b>{</b>
+  <font color='#0000FF'>register</font> JSAMPROW inptr, outptr;
+<font color='#0000FF'>#ifdef</font> FMEMCOPY
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>size_t</u></font> count <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>num_cols <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+  <font color='#0000FF'>register</font> JDIMENSION count;
+<font color='#0000FF'>#endif</font>
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> row;
+
+  input_array <font color='#5555FF'>+</font><font color='#5555FF'>=</font> source_row;
+  output_array <font color='#5555FF'>+</font><font color='#5555FF'>=</font> dest_row;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>row <font color='#5555FF'>=</font> num_rows; row <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; row<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+    inptr <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>input_array<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+    outptr <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>output_array<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+<font color='#0000FF'>#ifdef</font> FMEMCOPY
+    <font color='#BB00BB'>FMEMCOPY</font><font face='Lucida Console'>(</font>outptr, inptr, count<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>=</font> num_cols; count <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; count<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font>
+      <font color='#5555FF'>*</font>outptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>inptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;	<font color='#009900'>/* needn't bother with GETJSAMPLE() here */</font>
+<font color='#0000FF'>#endif</font>
+  <b>}</b>
+<b>}</b>
+
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jcopy_block_row'></a>jcopy_block_row</b> <font face='Lucida Console'>(</font>JBLOCKROW input_row, JBLOCKROW output_row,
+		 JDIMENSION num_blocks<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Copy a row of coefficient blocks from one place to another. */</font>
+<b>{</b>
+<font color='#0000FF'>#ifdef</font> FMEMCOPY
+  <font color='#BB00BB'>FMEMCOPY</font><font face='Lucida Console'>(</font>output_row, input_row, num_blocks <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>DCTSIZE2 <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JCOEF<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+  <font color='#0000FF'>register</font> JCOEFPTR inptr, outptr;
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>long</u></font> count;
+
+  inptr <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JCOEFPTR<font face='Lucida Console'>)</font> input_row;
+  outptr <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JCOEFPTR<font face='Lucida Console'>)</font> output_row;
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> num_blocks <font color='#5555FF'>*</font> DCTSIZE2; count <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; count<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#5555FF'>*</font>outptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>inptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+  <b>}</b>
+<font color='#0000FF'>#endif</font>
+<b>}</b>
+
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jzero_far'></a>jzero_far</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font> target, <font color='#0000FF'><u>size_t</u></font> bytestozero<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Zero out a chunk of FAR memory. */</font>
+<font color='#009900'>/* This might be sample-array data, block-array data, or alloc_large data. */</font>
+<b>{</b>
+<font color='#0000FF'>#ifdef</font> FMEMZERO
+  <font color='#BB00BB'>FMEMZERO</font><font face='Lucida Console'>(</font>target, bytestozero<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>char</u></font> FAR <font color='#5555FF'>*</font> ptr <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> target;
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>size_t</u></font> count;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>=</font> bytestozero; count <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; count<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#5555FF'>*</font>ptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <b>}</b>
+<font color='#0000FF'>#endif</font>
+<b>}</b>
+
+</pre></body></html>

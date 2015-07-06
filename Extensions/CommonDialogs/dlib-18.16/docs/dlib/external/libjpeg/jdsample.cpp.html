@@ -1,0 +1,481 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jdsample.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jdsample.c
+ *
+ * Copyright (C) 1991-1996, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains upsampling routines.
+ *
+ * Upsampling input data is counted in "row groups".  A row group
+ * is defined to be (v_samp_factor * DCT_scaled_size / min_DCT_scaled_size)
+ * sample rows of each component.  Upsampling will normally produce
+ * max_v_samp_factor pixel rows from each row group (but this could vary
+ * if the upsampler is applying a scale factor of its own).
+ *
+ * An excellent reference for image resampling is
+ *   Digital Image Warping, George Wolberg, 1990.
+ *   Pub. by IEEE Computer Society Press, Los Alamitos, CA. ISBN 0-8186-8944-7.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+
+
+<font color='#009900'>/* Pointer to routine to upsample a single component */</font>
+<font color='#0000FF'>typedef</font> <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, upsample1_ptr,
+		<font face='Lucida Console'>(</font>j_decompress_ptr cinfo, jpeg_component_info <font color='#5555FF'>*</font> compptr,
+		 JSAMPARRAY input_data, JSAMPARRAY <font color='#5555FF'>*</font> output_data_ptr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* Private subobject */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#0000FF'>struct</font> jpeg_upsampler pub;	<font color='#009900'>/* public fields */</font>
+
+  <font color='#009900'>/* Color conversion buffer.  When using separate upsampling and color
+   * conversion steps, this buffer holds one upsampled row group until it
+   * has been color converted and output.
+   * Note: we do not allocate any storage for component(s) which are full-size,
+   * ie do not need rescaling.  The corresponding entry of color_buf[] is
+   * simply set to point to the input data array, thereby avoiding copying.
+   */</font>
+  JSAMPARRAY color_buf[MAX_COMPONENTS];
+
+  <font color='#009900'>/* Per-component upsampling method pointers */</font>
+  upsample1_ptr methods[MAX_COMPONENTS];
+
+  <font color='#0000FF'><u>int</u></font> next_row_out;		<font color='#009900'>/* counts rows emitted from color_buf */</font>
+  JDIMENSION rows_to_go;	<font color='#009900'>/* counts rows remaining in image */</font>
+
+  <font color='#009900'>/* Height of an input row group for each component. */</font>
+  <font color='#0000FF'><u>int</u></font> rowgroup_height[MAX_COMPONENTS];
+
+  <font color='#009900'>/* These arrays save pixel expansion factors so that int_expand need not
+   * recompute them each time.  They are unused for other upsampling methods.
+   */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> h_expand[MAX_COMPONENTS];
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> v_expand[MAX_COMPONENTS];
+<b>}</b> my_upsampler;
+
+<font color='#0000FF'>typedef</font> my_upsampler <font color='#5555FF'>*</font> my_upsample_ptr;
+
+
+<font color='#009900'>/*
+ * Initialize for an upsampling pass.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='start_pass_upsample'></a>start_pass_upsample</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_upsample_ptr upsample <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_upsample_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upsample;
+
+  <font color='#009900'>/* Mark the conversion buffer empty */</font>
+  upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row_out <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor;
+  <font color='#009900'>/* Initialize total-height counter for detecting bottom of image */</font>
+  upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_to_go <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_height;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Control routine to do upsampling (and color conversion).
+ *
+ * In this version we upsample each component independently.
+ * We upsample one row group into the conversion buffer, then apply
+ * color conversion a row at a time.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='sep_upsample'></a>sep_upsample</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+	      JSAMPIMAGE input_buf, JDIMENSION <font color='#5555FF'>*</font>in_row_group_ctr,
+	      JDIMENSION ,
+	      JSAMPARRAY output_buf, JDIMENSION <font color='#5555FF'>*</font>out_row_ctr,
+	      JDIMENSION out_rows_avail<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_upsample_ptr upsample <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_upsample_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upsample;
+  <font color='#0000FF'><u>int</u></font> ci;
+  jpeg_component_info <font color='#5555FF'>*</font> compptr;
+  JDIMENSION num_rows;
+
+  <font color='#009900'>/* Fill the conversion buffer, if it's empty */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row_out <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>, compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+	 ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, compptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* Invoke per-component upsample method.  Notice we pass a POINTER
+       * to color_buf[ci], so that fullsize_upsample can change it.
+       */</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>methods[ci]<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, compptr,
+	input_buf[ci] <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>in_row_group_ctr <font color='#5555FF'>*</font> upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowgroup_height[ci]<font face='Lucida Console'>)</font>,
+	upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_buf <font color='#5555FF'>+</font> ci<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row_out <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Color-convert and emit rows */</font>
+
+  <font color='#009900'>/* How many we have in the buffer: */</font>
+  num_rows <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor <font color='#5555FF'>-</font> upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row_out<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Not more than the distance to the end of the image.  Need this test
+   * in case the image height is not a multiple of max_v_samp_factor:
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_rows <font color='#5555FF'>&gt;</font> upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_to_go<font face='Lucida Console'>)</font> 
+    num_rows <font color='#5555FF'>=</font> upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_to_go;
+  <font color='#009900'>/* And not more than what the client can accept: */</font>
+  out_rows_avail <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#5555FF'>*</font>out_row_ctr;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_rows <font color='#5555FF'>&gt;</font> out_rows_avail<font face='Lucida Console'>)</font>
+    num_rows <font color='#5555FF'>=</font> out_rows_avail;
+
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cconvert<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_convert<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_buf,
+				     <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row_out,
+				     output_buf <font color='#5555FF'>+</font> <font color='#5555FF'>*</font>out_row_ctr,
+				     <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> num_rows<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Adjust counts */</font>
+  <font color='#5555FF'>*</font>out_row_ctr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> num_rows;
+  upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_to_go <font color='#5555FF'>-</font><font color='#5555FF'>=</font> num_rows;
+  upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row_out <font color='#5555FF'>+</font><font color='#5555FF'>=</font> num_rows;
+  <font color='#009900'>/* When the buffer is emptied, declare this input row group consumed */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row_out <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>in_row_group_ctr<font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * These are the routines invoked by sep_upsample to upsample pixel values
+ * of a single component.  One row group is processed per call.
+ */</font>
+
+
+<font color='#009900'>/*
+ * For full-size components, we just make color_buf[ci] point at the
+ * input buffer, and thus avoid copying any data.  Note that this is
+ * safe only because sep_upsample doesn't declare the input row group
+ * "consumed" until we are done color converting and emitting it.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='fullsize_upsample'></a>fullsize_upsample</b> <font face='Lucida Console'>(</font>j_decompress_ptr , jpeg_component_info <font color='#5555FF'>*</font> ,
+		   JSAMPARRAY input_data, JSAMPARRAY <font color='#5555FF'>*</font> output_data_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#5555FF'>*</font>output_data_ptr <font color='#5555FF'>=</font> input_data;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * This is a no-op version used for "uninteresting" components.
+ * These components will not be referenced by color conversion.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='noop_upsample'></a>noop_upsample</b> <font face='Lucida Console'>(</font>j_decompress_ptr , jpeg_component_info <font color='#5555FF'>*</font> ,
+	       JSAMPARRAY , JSAMPARRAY <font color='#5555FF'>*</font> output_data_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#5555FF'>*</font>output_data_ptr <font color='#5555FF'>=</font> NULL;	<font color='#009900'>/* safety check */</font>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * This version handles any integral sampling ratios.
+ * This is not used for typical JPEG files, so it need not be fast.
+ * Nor, for that matter, is it particularly accurate: the algorithm is
+ * simple replication of the input pixel onto the corresponding output
+ * pixels.  The hi-falutin sampling literature refers to this as a
+ * "box filter".  A box filter tends to introduce visible artifacts,
+ * so if you are actually going to use 3:1 or 4:1 sampling ratios
+ * you would be well advised to improve this code.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='int_upsample'></a>int_upsample</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, jpeg_component_info <font color='#5555FF'>*</font> compptr,
+	      JSAMPARRAY input_data, JSAMPARRAY <font color='#5555FF'>*</font> output_data_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_upsample_ptr upsample <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_upsample_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upsample;
+  JSAMPARRAY output_data <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>output_data_ptr;
+  <font color='#0000FF'>register</font> JSAMPROW inptr, outptr;
+  <font color='#0000FF'>register</font> JSAMPLE invalue;
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> h;
+  JSAMPROW outend;
+  <font color='#0000FF'><u>int</u></font> h_expand, v_expand;
+  <font color='#0000FF'><u>int</u></font> inrow, outrow;
+
+  h_expand <font color='#5555FF'>=</font> upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>h_expand[compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>component_index];
+  v_expand <font color='#5555FF'>=</font> upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_expand[compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>component_index];
+
+  inrow <font color='#5555FF'>=</font> outrow <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>outrow <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Generate one output row with proper horizontal expansion */</font>
+    inptr <font color='#5555FF'>=</font> input_data[inrow];
+    outptr <font color='#5555FF'>=</font> output_data[outrow];
+    outend <font color='#5555FF'>=</font> outptr <font color='#5555FF'>+</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width;
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>outptr <font color='#5555FF'>&lt;</font> outend<font face='Lucida Console'>)</font> <b>{</b>
+      invalue <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>inptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;	<font color='#009900'>/* don't need GETJSAMPLE() here */</font>
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>h <font color='#5555FF'>=</font> h_expand; h <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; h<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#5555FF'>*</font>outptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> invalue;
+      <b>}</b>
+    <b>}</b>
+    <font color='#009900'>/* Generate any additional output rows by duplicating the first one */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>v_expand <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#BB00BB'>jcopy_sample_rows</font><font face='Lucida Console'>(</font>output_data, outrow, output_data, outrow<font color='#5555FF'>+</font><font color='#979000'>1</font>,
+			v_expand<font color='#5555FF'>-</font><font color='#979000'>1</font>, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    inrow<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+    outrow <font color='#5555FF'>+</font><font color='#5555FF'>=</font> v_expand;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Fast processing for the common case of 2:1 horizontal and 1:1 vertical.
+ * It's still a box filter.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='h2v1_upsample'></a>h2v1_upsample</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, jpeg_component_info <font color='#5555FF'>*</font> ,
+	       JSAMPARRAY input_data, JSAMPARRAY <font color='#5555FF'>*</font> output_data_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+  JSAMPARRAY output_data <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>output_data_ptr;
+  <font color='#0000FF'>register</font> JSAMPROW inptr, outptr;
+  <font color='#0000FF'>register</font> JSAMPLE invalue;
+  JSAMPROW outend;
+  <font color='#0000FF'><u>int</u></font> inrow;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>inrow <font color='#5555FF'>=</font> <font color='#979000'>0</font>; inrow <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor; inrow<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    inptr <font color='#5555FF'>=</font> input_data[inrow];
+    outptr <font color='#5555FF'>=</font> output_data[inrow];
+    outend <font color='#5555FF'>=</font> outptr <font color='#5555FF'>+</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width;
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>outptr <font color='#5555FF'>&lt;</font> outend<font face='Lucida Console'>)</font> <b>{</b>
+      invalue <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>inptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;	<font color='#009900'>/* don't need GETJSAMPLE() here */</font>
+      <font color='#5555FF'>*</font>outptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> invalue;
+      <font color='#5555FF'>*</font>outptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> invalue;
+    <b>}</b>
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Fast processing for the common case of 2:1 horizontal and 2:1 vertical.
+ * It's still a box filter.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='h2v2_upsample'></a>h2v2_upsample</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, jpeg_component_info <font color='#5555FF'>*</font> ,
+	       JSAMPARRAY input_data, JSAMPARRAY <font color='#5555FF'>*</font> output_data_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+  JSAMPARRAY output_data <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>output_data_ptr;
+  <font color='#0000FF'>register</font> JSAMPROW inptr, outptr;
+  <font color='#0000FF'>register</font> JSAMPLE invalue;
+  JSAMPROW outend;
+  <font color='#0000FF'><u>int</u></font> inrow, outrow;
+
+  inrow <font color='#5555FF'>=</font> outrow <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>outrow <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor<font face='Lucida Console'>)</font> <b>{</b>
+    inptr <font color='#5555FF'>=</font> input_data[inrow];
+    outptr <font color='#5555FF'>=</font> output_data[outrow];
+    outend <font color='#5555FF'>=</font> outptr <font color='#5555FF'>+</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width;
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>outptr <font color='#5555FF'>&lt;</font> outend<font face='Lucida Console'>)</font> <b>{</b>
+      invalue <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>inptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;	<font color='#009900'>/* don't need GETJSAMPLE() here */</font>
+      <font color='#5555FF'>*</font>outptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> invalue;
+      <font color='#5555FF'>*</font>outptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> invalue;
+    <b>}</b>
+    <font color='#BB00BB'>jcopy_sample_rows</font><font face='Lucida Console'>(</font>output_data, outrow, output_data, outrow<font color='#5555FF'>+</font><font color='#979000'>1</font>,
+		      <font color='#979000'>1</font>, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width<font face='Lucida Console'>)</font>;
+    inrow<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+    outrow <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Fancy processing for the common case of 2:1 horizontal and 1:1 vertical.
+ *
+ * The upsampling algorithm is linear interpolation between pixel centers,
+ * also known as a "triangle filter".  This is a good compromise between
+ * speed and visual quality.  The centers of the output pixels are 1/4 and 3/4
+ * of the way between input pixel centers.
+ *
+ * A note about the "bias" calculations: when rounding fractional values to
+ * integer, we do not want to always round 0.5 up to the next integer.
+ * If we did that, we'd introduce a noticeable bias towards larger values.
+ * Instead, this code is arranged so that 0.5 will be rounded up or down at
+ * alternate pixel locations (a simple ordered dither pattern).
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='h2v1_fancy_upsample'></a>h2v1_fancy_upsample</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, jpeg_component_info <font color='#5555FF'>*</font> compptr,
+		     JSAMPARRAY input_data, JSAMPARRAY <font color='#5555FF'>*</font> output_data_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+  JSAMPARRAY output_data <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>output_data_ptr;
+  <font color='#0000FF'>register</font> JSAMPROW inptr, outptr;
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> invalue;
+  <font color='#0000FF'>register</font> JDIMENSION colctr;
+  <font color='#0000FF'><u>int</u></font> inrow;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>inrow <font color='#5555FF'>=</font> <font color='#979000'>0</font>; inrow <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor; inrow<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    inptr <font color='#5555FF'>=</font> input_data[inrow];
+    outptr <font color='#5555FF'>=</font> output_data[inrow];
+    <font color='#009900'>/* Special case for first column */</font>
+    invalue <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>;
+    <font color='#5555FF'>*</font>outptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> invalue;
+    <font color='#5555FF'>*</font>outptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>invalue <font color='#5555FF'>*</font> <font color='#979000'>3</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>colctr <font color='#5555FF'>=</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>downsampled_width <font color='#5555FF'>-</font> <font color='#979000'>2</font>; colctr <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; colctr<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* General case: 3/4 * nearer pixel + 1/4 * further pixel */</font>
+      invalue <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#979000'>3</font>;
+      <font color='#5555FF'>*</font>outptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>invalue <font color='#5555FF'>+</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>inptr[<font color='#5555FF'>-</font><font color='#979000'>2</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+      <font color='#5555FF'>*</font>outptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>invalue <font color='#5555FF'>+</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>/* Special case for last column */</font>
+    invalue <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr<font face='Lucida Console'>)</font>;
+    <font color='#5555FF'>*</font>outptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>invalue <font color='#5555FF'>*</font> <font color='#979000'>3</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>inptr[<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    <font color='#5555FF'>*</font>outptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> invalue;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Fancy processing for the common case of 2:1 horizontal and 2:1 vertical.
+ * Again a triangle filter; see comments for h2v1 case, above.
+ *
+ * It is OK for us to reference the adjacent input rows because we demanded
+ * context from the main buffer controller (see initialization code).
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='h2v2_fancy_upsample'></a>h2v2_fancy_upsample</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, jpeg_component_info <font color='#5555FF'>*</font> compptr,
+		     JSAMPARRAY input_data, JSAMPARRAY <font color='#5555FF'>*</font> output_data_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+  JSAMPARRAY output_data <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>output_data_ptr;
+  <font color='#0000FF'>register</font> JSAMPROW inptr0, inptr1, outptr;
+<font color='#0000FF'>#if</font> BITS_IN_JSAMPLE <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> thiscolsum, lastcolsum, nextcolsum;
+<font color='#0000FF'>#else</font>
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>long</u></font> thiscolsum, lastcolsum, nextcolsum;
+<font color='#0000FF'>#endif</font>
+  <font color='#0000FF'>register</font> JDIMENSION colctr;
+  <font color='#0000FF'><u>int</u></font> inrow, outrow, v;
+
+  inrow <font color='#5555FF'>=</font> outrow <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>outrow <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>v <font color='#5555FF'>=</font> <font color='#979000'>0</font>; v <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font>; v<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* inptr0 points to nearest input row, inptr1 points to next nearest */</font>
+      inptr0 <font color='#5555FF'>=</font> input_data[inrow];
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>v <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>		<font color='#009900'>/* next nearest is row above */</font>
+	inptr1 <font color='#5555FF'>=</font> input_data[inrow<font color='#5555FF'>-</font><font color='#979000'>1</font>];
+      <font color='#0000FF'>else</font>			<font color='#009900'>/* next nearest is row below */</font>
+	inptr1 <font color='#5555FF'>=</font> input_data[inrow<font color='#5555FF'>+</font><font color='#979000'>1</font>];
+      outptr <font color='#5555FF'>=</font> output_data[outrow<font color='#5555FF'>+</font><font color='#5555FF'>+</font>];
+
+      <font color='#009900'>/* Special case for first column */</font>
+      thiscolsum <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr0<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#979000'>3</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr1<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>;
+      nextcolsum <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr0<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#979000'>3</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr1<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>;
+      <font color='#5555FF'>*</font>outptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>thiscolsum <font color='#5555FF'>*</font> <font color='#979000'>4</font> <font color='#5555FF'>+</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+      <font color='#5555FF'>*</font>outptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>thiscolsum <font color='#5555FF'>*</font> <font color='#979000'>3</font> <font color='#5555FF'>+</font> nextcolsum <font color='#5555FF'>+</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+      lastcolsum <font color='#5555FF'>=</font> thiscolsum; thiscolsum <font color='#5555FF'>=</font> nextcolsum;
+
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>colctr <font color='#5555FF'>=</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>downsampled_width <font color='#5555FF'>-</font> <font color='#979000'>2</font>; colctr <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; colctr<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#009900'>/* General case: 3/4 * nearer pixel + 1/4 * further pixel in each */</font>
+	<font color='#009900'>/* dimension, thus 9/16, 3/16, 3/16, 1/16 overall */</font>
+	nextcolsum <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr0<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#979000'>3</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr1<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>;
+	<font color='#5555FF'>*</font>outptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>thiscolsum <font color='#5555FF'>*</font> <font color='#979000'>3</font> <font color='#5555FF'>+</font> lastcolsum <font color='#5555FF'>+</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+	<font color='#5555FF'>*</font>outptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>thiscolsum <font color='#5555FF'>*</font> <font color='#979000'>3</font> <font color='#5555FF'>+</font> nextcolsum <font color='#5555FF'>+</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+	lastcolsum <font color='#5555FF'>=</font> thiscolsum; thiscolsum <font color='#5555FF'>=</font> nextcolsum;
+      <b>}</b>
+
+      <font color='#009900'>/* Special case for last column */</font>
+      <font color='#5555FF'>*</font>outptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>thiscolsum <font color='#5555FF'>*</font> <font color='#979000'>3</font> <font color='#5555FF'>+</font> lastcolsum <font color='#5555FF'>+</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+      <font color='#5555FF'>*</font>outptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>thiscolsum <font color='#5555FF'>*</font> <font color='#979000'>4</font> <font color='#5555FF'>+</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    inrow<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Module initialization routine for upsampling.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jinit_upsampler'></a>jinit_upsampler</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_upsample_ptr upsample;
+  <font color='#0000FF'><u>int</u></font> ci;
+  jpeg_component_info <font color='#5555FF'>*</font> compptr;
+  <font color='#0000FF'><u>int</u></font> need_buffer, do_fancy;
+  <font color='#0000FF'><u>int</u></font> h_in_group, v_in_group, h_out_group, v_out_group;
+
+  upsample <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_upsample_ptr<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				<font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>my_upsampler<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upsample <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> jpeg_upsampler <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> upsample;
+  upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.start_pass <font color='#5555FF'>=</font> start_pass_upsample;
+  upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.upsample <font color='#5555FF'>=</font> sep_upsample;
+  upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.need_context_rows <font color='#5555FF'>=</font> FALSE; <font color='#009900'>/* until we find out differently */</font>
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>CCIR601_sampling<font face='Lucida Console'>)</font>	<font color='#009900'>/* this isn't supported */</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_CCIR601_NOTIMPL<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* jdmainct.c doesn't support context rows when min_DCT_scaled_size = 1,
+   * so don't ask for it.
+   */</font>
+  do_fancy <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>do_fancy_upsampling <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>min_DCT_scaled_size <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font>;
+
+  <font color='#009900'>/* Verify we can handle the sampling factors, select per-component methods,
+   * and create storage as needed.
+   */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>, compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+       ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, compptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Compute size of an "input group" after IDCT scaling.  This many samples
+     * are to be converted to max_h_samp_factor * max_v_samp_factor pixels.
+     */</font>
+    h_in_group <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>h_samp_factor <font color='#5555FF'>*</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>DCT_scaled_size<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font>
+		 cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>min_DCT_scaled_size;
+    v_in_group <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor <font color='#5555FF'>*</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>DCT_scaled_size<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font>
+		 cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>min_DCT_scaled_size;
+    h_out_group <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_h_samp_factor;
+    v_out_group <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor;
+    upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowgroup_height[ci] <font color='#5555FF'>=</font> v_in_group; <font color='#009900'>/* save for use later */</font>
+    need_buffer <font color='#5555FF'>=</font> TRUE;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>component_needed<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* Don't bother to upsample an uninteresting component. */</font>
+      upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>methods[ci] <font color='#5555FF'>=</font> noop_upsample;
+      need_buffer <font color='#5555FF'>=</font> FALSE;
+    <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>h_in_group <font color='#5555FF'>=</font><font color='#5555FF'>=</font> h_out_group <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> v_in_group <font color='#5555FF'>=</font><font color='#5555FF'>=</font> v_out_group<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* Fullsize components can be processed without any work. */</font>
+      upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>methods[ci] <font color='#5555FF'>=</font> fullsize_upsample;
+      need_buffer <font color='#5555FF'>=</font> FALSE;
+    <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>h_in_group <font color='#5555FF'>*</font> <font color='#979000'>2</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> h_out_group <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+	       v_in_group <font color='#5555FF'>=</font><font color='#5555FF'>=</font> v_out_group<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* Special cases for 2h1v upsampling */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>do_fancy <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>downsampled_width <font color='#5555FF'>&gt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+	upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>methods[ci] <font color='#5555FF'>=</font> h2v1_fancy_upsample;
+      <font color='#0000FF'>else</font>
+	upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>methods[ci] <font color='#5555FF'>=</font> h2v1_upsample;
+    <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>h_in_group <font color='#5555FF'>*</font> <font color='#979000'>2</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> h_out_group <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+	       v_in_group <font color='#5555FF'>*</font> <font color='#979000'>2</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> v_out_group<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* Special cases for 2h2v upsampling */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>do_fancy <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>downsampled_width <font color='#5555FF'>&gt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font> <b>{</b>
+	upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>methods[ci] <font color='#5555FF'>=</font> h2v2_fancy_upsample;
+	upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.need_context_rows <font color='#5555FF'>=</font> TRUE;
+      <b>}</b> <font color='#0000FF'>else</font>
+	upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>methods[ci] <font color='#5555FF'>=</font> h2v2_upsample;
+    <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>h_out_group <font color='#5555FF'>%</font> h_in_group<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+	       <font face='Lucida Console'>(</font>v_out_group <font color='#5555FF'>%</font> v_in_group<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* Generic integral-factors upsampling method */</font>
+      upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>methods[ci] <font color='#5555FF'>=</font> int_upsample;
+      upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>h_expand[ci] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>h_out_group <font color='#5555FF'>/</font> h_in_group<font face='Lucida Console'>)</font>;
+      upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_expand[ci] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>v_out_group <font color='#5555FF'>/</font> v_in_group<font face='Lucida Console'>)</font>;
+    <b>}</b> <font color='#0000FF'>else</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_FRACT_SAMPLE_NOTIMPL<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>need_buffer<font face='Lucida Console'>)</font> <b>{</b>
+      upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_buf[ci] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_sarray<font face='Lucida Console'>)</font>
+	<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+	 <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font color='#BB00BB'>jround_up</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width,
+				<font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_h_samp_factor<font face='Lucida Console'>)</font>,
+	 <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor<font face='Lucida Console'>)</font>;
+    <b>}</b>
+  <b>}</b>
+<b>}</b>
+
+</pre></body></html>

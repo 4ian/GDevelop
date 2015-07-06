@@ -1,0 +1,278 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - svm_multiclass_linear_trainer_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SVm_MULTICLASS_LINEAR_TRAINER_ABSTRACT_Hh_ 
+<font color='#0000FF'>#ifdef</font> DLIB_SVm_MULTICLASS_LINEAR_TRAINER_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='function_abstract.h.html'>function_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel_abstract.h.html'>kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sparse_kernel_abstract.h.html'>sparse_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../optimization/optimization_oca_abstract.h.html'>../optimization/optimization_oca_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K,
+        <font color='#0000FF'>typename</font> label_type_ <font color='#5555FF'>=</font> <font color='#0000FF'>typename</font> K::scalar_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='svm_multiclass_linear_trainer'></a>svm_multiclass_linear_trainer</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON K 
+                Is either linear_kernel or sparse_linear_kernel.  
+
+            REQUIREMENTS ON label_type_
+                label_type_ must be default constructable, copyable, and comparable using
+                operator &lt; and ==.  It must also be possible to write it to an std::ostream
+                using operator&lt;&lt;.
+
+            INITIAL VALUE
+                - get_num_threads() == 4 
+                - learns_nonnegative_weights() == false
+                - get_epsilon() == 0.001
+                - get_max_iterations() == 10000
+                - get_c() == 1
+                - this object will not be verbose unless be_verbose() is called
+                - #get_oca() == oca() (i.e. an instance of oca with default parameters) 
+                - has_prior() == false
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a tool for training a multiclass support 
+                vector machine.  It is optimized for the case where linear kernels 
+                are used.  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> label_type_ label_type;
+        <font color='#0000FF'>typedef</font> K kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> multiclass_linear_decision_function<font color='#5555FF'>&lt;</font>kernel_type, label_type<font color='#5555FF'>&gt;</font> trained_function_type;
+
+        <b><a name='svm_multiclass_linear_trainer'></a>svm_multiclass_linear_trainer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_epsilon'></a>set_epsilon</b> <font face='Lucida Console'>(</font>
+            scalar_type eps
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - eps &gt; 0
+            ensures
+                - #get_epsilon() == eps 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_epsilon'></a>get_epsilon</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the error epsilon that determines when training should stop.
+                  Smaller values may result in a more accurate solution but take longer 
+                  to execute.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_iterations'></a>set_max_iterations</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_max_iterations() == max_iter
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_iterations'></a>get_max_iterations</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the maximum number of iterations the SVM optimizer is allowed to
+                  run before it is required to stop and return a result.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_verbose'></a>be_verbose</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object will print status messages to standard out so that a 
+                  user can observe the progress of the algorithm.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_quiet'></a>be_quiet</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object will not print anything to standard out
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_oca'></a>set_oca</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> oca<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_oca() == item 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> oca <b><a name='get_oca'></a>get_oca</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a copy of the optimizer used to solve the SVM problem.  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_num_threads'></a>set_num_threads</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_num_threads() == num
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_threads'></a>get_num_threads</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of threads used during training.  You should 
+                  usually set this equal to the number of processing cores on your
+                  machine.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> kernel_type <b><a name='get_kernel'></a>get_kernel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a copy of the kernel function in use by this object.  Since
+                  the linear kernels don't have any parameters this function just
+                  returns kernel_type()
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_c'></a>set_c</b> <font face='Lucida Console'>(</font>
+            scalar_type C
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - C &gt; 0
+            ensures
+                - #get_c() == C 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_c'></a>get_c</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the SVM regularization parameter.  It is the parameter that 
+                  determines the trade off between trying to fit the training data 
+                  exactly or allowing more errors but hopefully improving the 
+                  generalization of the resulting classifier.  Larger values encourage 
+                  exact fitting while smaller values of C may encourage better 
+                  generalization. 
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='learns_nonnegative_weights'></a>learns_nonnegative_weights</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - The output of training is a set of weights and bias values that together
+                  define the behavior of a multiclass_linear_decision_function object.  If
+                  learns_nonnegative_weights() == true then the resulting weights and bias
+                  values will always have non-negative values.  That is, if this function
+                  returns true then all the numbers in the multiclass_linear_decision_function 
+                  objects output by train() will be non-negative.
+        !*/</font>
+       
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_learns_nonnegative_weights'></a>set_learns_nonnegative_weights</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>bool</u></font> value
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #learns_nonnegative_weights() == value
+                - if (value == true) then
+                    - #has_prior() == false
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_prior'></a>set_prior</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> trained_function_type<font color='#5555FF'>&amp;</font> prior
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - Subsequent calls to train() will try to learn a function similar to the
+                  given prior.
+                - #has_prior() == true
+                - #learns_nonnegative_weights() == false
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='has_prior'></a>has_prior</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            ensures
+                - returns true if a prior has been set and false otherwise.  Having a prior
+                  set means that you have called set_prior() and supplied a previously
+                  trained function as a reference.  In this case, any call to train() will
+                  try to learn a function that matches the behavior of the prior as close
+                  as possible but also fits the supplied training data.  In more technical
+                  detail, having a prior means we replace the ||w||^2 regularizer with one
+                  of the form ||w-prior||^2 where w is the set of parameters for a learned
+                  function.
+        !*/</font>
+
+        trained_function_type <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> all_samples,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> all_labels
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_learning_problem(all_samples, all_labels)
+                - All the vectors in all_samples must have the same dimensionality.
+                - if (has_prior()) then
+                    - The vectors in all_samples must have the same dimensionality as the
+                      vectors used to train the prior given to set_prior().  
+            ensures
+                - trains a multiclass SVM to solve the given multiclass classification problem.  
+                - returns a multiclass_linear_decision_function F with the following properties:
+                    - if (new_x is a sample predicted to have a label of L) then
+                        - F(new_x) == L
+                    - F.get_labels() == select_all_distinct_labels(all_labels)
+                    - F.number_of_classes() == select_all_distinct_labels(all_labels).size()
+        !*/</font>
+
+        trained_function_type <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> all_samples,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> all_labels,
+            scalar_type<font color='#5555FF'>&amp;</font> svm_objective
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_learning_problem(all_samples, all_labels)
+                - All the vectors in all_samples must have the same dimensionality.
+                - if (has_prior()) then
+                    - The vectors in all_samples must have the same dimensionality as the
+                      vectors used to train the prior given to set_prior().  
+            ensures
+                - trains a multiclass SVM to solve the given multiclass classification problem.  
+                - returns a multiclass_linear_decision_function F with the following properties:
+                    - if (new_x is a sample predicted to have a label of L) then
+                        - F(new_x) == L
+                    - F.get_labels() == select_all_distinct_labels(all_labels)
+                    - F.number_of_classes() == select_all_distinct_labels(all_labels).size()
+                - #svm_objective == the final value of the SVM objective function
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SVm_MULTICLASS_LINEAR_TRAINER_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

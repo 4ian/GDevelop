@@ -1,0 +1,19 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - pyassert.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_PYaSSERT_Hh_
+<font color='#0000FF'>#define</font> DLIB_PYaSSERT_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>boost<font color='#5555FF'>/</font>python.hpp<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#define</font> pyassert<font face='Lucida Console'>(</font>_exp,_message<font face='Lucida Console'>)</font>                                             \
+    <b>{</b><font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>_exp<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>                                                         \
+    <b>{</b>                                                                       \
+        <font color='#BB00BB'>PyErr_SetString</font><font face='Lucida Console'>(</font> PyExc_ValueError, _message <font face='Lucida Console'>)</font>;                      \
+        boost::python::<font color='#BB00BB'>throw_error_already_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;                           \
+    <b>}</b><b>}</b>                                                                      
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_PYaSSERT_Hh_
+</font>
+
+</pre></body></html>

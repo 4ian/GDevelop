@@ -1,0 +1,198 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - train_shape_predictor_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This example program shows how to use dlib's implementation of the paper:
+        One Millisecond Face Alignment with an Ensemble of Regression Trees by
+        Vahid Kazemi and Josephine Sullivan, CVPR 2014
+    
+    In particular, we will train a face landmarking model based on a small dataset 
+    and then evaluate it.  If you want to visualize the output of the trained
+    model on some images then you can run the <a href="face_landmark_detection_ex.cpp.html">face_landmark_detection_ex.cpp</a>
+    example program with sp.dat as the input model.
+
+    It should also be noted that this kind of model, while often used for face
+    landmarking, is quite general and can be used for a variety of shape
+    prediction tasks.  But here we demonstrate it only on a simple face
+    landmarking task.
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_processing.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>data_io.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='get_interocular_distances'></a>get_interocular_distances</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> objects
+<font face='Lucida Console'>)</font>;
+<font color='#009900'>/*!
+    ensures
+        - returns an object D such that:    
+            - D[i][j] == the distance, in pixels, between the eyes for the face represented
+              by objects[i][j].
+!*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> argc, <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>*</font> argv<font face='Lucida Console'>)</font>
+<b>{</b>  
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// In this example we are going to train a shape_predictor based on the
+</font>        <font color='#009900'>// small faces dataset in the examples/faces directory.  So the first
+</font>        <font color='#009900'>// thing we do is load that dataset.  This means you need to supply the
+</font>        <font color='#009900'>// path to this faces folder as a command line argument so we will know
+</font>        <font color='#009900'>// where it is.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>argc <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Give the path to the examples/faces directory as the argument to this</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>program.  For example, if you are in the examples folder then execute </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>this program by running: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   ./train_shape_predictor_ex faces</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>const</font> std::string faces_directory <font color='#5555FF'>=</font> argv[<font color='#979000'>1</font>];
+        <font color='#009900'>// The faces directory contains a training dataset and a separate
+</font>        <font color='#009900'>// testing dataset.  The training data consists of 4 images, each
+</font>        <font color='#009900'>// annotated with rectangles that bound each human face along with 68
+</font>        <font color='#009900'>// face landmarks on each face.  The idea is to use this training data
+</font>        <font color='#009900'>// to learn to identify the position of landmarks on human faces in new
+</font>        <font color='#009900'>// images. 
+</font>        <font color='#009900'>// 
+</font>        <font color='#009900'>// Once you have trained a shape_predictor it is always important to
+</font>        <font color='#009900'>// test it on data it wasn't trained on.  Therefore, we will also load
+</font>        <font color='#009900'>// a separate testing set of 5 images.  Once we have a shape_predictor 
+</font>        <font color='#009900'>// created from the training data we will see how well it works by
+</font>        <font color='#009900'>// running it on the testing images. 
+</font>        <font color='#009900'>// 
+</font>        <font color='#009900'>// So here we create the variables that will hold our dataset.
+</font>        <font color='#009900'>// images_train will hold the 4 training images and faces_train holds
+</font>        <font color='#009900'>// the locations and poses of each face in the training images.  So for
+</font>        <font color='#009900'>// example, the image images_train[0] has the faces given by the
+</font>        <font color='#009900'>// full_object_detections in faces_train[0].
+</font>        dlib::array<font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> images_train, images_test;
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> faces_train, faces_test;
+
+        <font color='#009900'>// Now we load the data.  These XML files list the images in each
+</font>        <font color='#009900'>// dataset and also contain the positions of the face boxes and
+</font>        <font color='#009900'>// landmarks (called parts in the XML file).  Obviously you can use any
+</font>        <font color='#009900'>// kind of input format you like so long as you store the data into
+</font>        <font color='#009900'>// images_train and faces_train.  But for convenience dlib comes with
+</font>        <font color='#009900'>// tools for creating and loading XML image dataset files.  Here you see
+</font>        <font color='#009900'>// how to load the data.  To create the XML files you can use the imglab
+</font>        <font color='#009900'>// tool which can be found in the tools/imglab folder.  It is a simple
+</font>        <font color='#009900'>// graphical tool for labeling objects in images.  To see how to use it
+</font>        <font color='#009900'>// read the tools/imglab/README.txt file.
+</font>        <font color='#BB00BB'>load_image_dataset</font><font face='Lucida Console'>(</font>images_train, faces_train, faces_directory<font color='#5555FF'>+</font>"<font color='#CC0000'>/training_with_face_landmarks.xml</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>load_image_dataset</font><font face='Lucida Console'>(</font>images_test, faces_test, faces_directory<font color='#5555FF'>+</font>"<font color='#CC0000'>/testing_with_face_landmarks.xml</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now make the object responsible for training the model.  
+</font>        shape_predictor_trainer trainer;
+        <font color='#009900'>// This algorithm has a bunch of parameters you can mess with.  The
+</font>        <font color='#009900'>// documentation for the shape_predictor_trainer explains all of them.
+</font>        <font color='#009900'>// You should also read Kazemi's paper which explains all the parameters
+</font>        <font color='#009900'>// in great detail.  However, here I'm just setting three of them
+</font>        <font color='#009900'>// differently than their default values.  I'm doing this because we
+</font>        <font color='#009900'>// have a very small dataset.  In particular, setting the oversampling
+</font>        <font color='#009900'>// to a high amount (300) effectively boosts the training set size, so
+</font>        <font color='#009900'>// that helps this example.
+</font>        trainer.<font color='#BB00BB'>set_oversampling_amount</font><font face='Lucida Console'>(</font><font color='#979000'>300</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// I'm also reducing the capacity of the model by explicitly increasing
+</font>        <font color='#009900'>// the regularization (making nu smaller) and by using trees with
+</font>        <font color='#009900'>// smaller depths.  
+</font>        trainer.<font color='#BB00BB'>set_nu</font><font face='Lucida Console'>(</font><font color='#979000'>0.05</font><font face='Lucida Console'>)</font>;
+        trainer.<font color='#BB00BB'>set_tree_depth</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Tell the trainer to print status messages to the console so we can
+</font>        <font color='#009900'>// see how long the training will take.
+</font>        trainer.<font color='#BB00BB'>be_verbose</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now finally generate the shape model
+</font>        shape_predictor sp <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>images_train, faces_train<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Now that we have a model we can test it.  This function measures the
+</font>        <font color='#009900'>// average distance between a face landmark output by the
+</font>        <font color='#009900'>// shape_predictor and where it should be according to the truth data.
+</font>        <font color='#009900'>// Note that there is an optional 4th argument that lets us rescale the
+</font>        <font color='#009900'>// distances.  Here we are causing the output to scale each face's
+</font>        <font color='#009900'>// distances by the interocular distance, as is customary when
+</font>        <font color='#009900'>// evaluating face landmarking systems.
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>mean training error: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> 
+            <font color='#BB00BB'>test_shape_predictor</font><font face='Lucida Console'>(</font>sp, images_train, faces_train, <font color='#BB00BB'>get_interocular_distances</font><font face='Lucida Console'>(</font>faces_train<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        <font color='#009900'>// The real test is to see how well it does on data it wasn't trained
+</font>        <font color='#009900'>// on.  We trained it on a very small dataset so the accuracy is not
+</font>        <font color='#009900'>// extremely high, but it's still doing quite good.  Moreover, if you
+</font>        <font color='#009900'>// train it on one of the large face landmarking datasets you will
+</font>        <font color='#009900'>// obtain state-of-the-art results, as shown in the Kazemi paper.
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>mean testing error:  </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> 
+            <font color='#BB00BB'>test_shape_predictor</font><font face='Lucida Console'>(</font>sp, images_test, faces_test, <font color='#BB00BB'>get_interocular_distances</font><font face='Lucida Console'>(</font>faces_test<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        <font color='#009900'>// Finally, we save the model to disk so we can use it later.
+</font>        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>sp.dat</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sp;
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nexception thrown!</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>double</u></font> <b><a name='interocular_distance'></a>interocular_distance</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> full_object_detection<font color='#5555FF'>&amp;</font> det
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> l, r;
+    <font color='#0000FF'><u>double</u></font> cnt <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#009900'>// Find the center of the left eye by averaging the points around 
+</font>    <font color='#009900'>// the eye.
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>36</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>41</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font> 
+    <b>{</b>
+        l <font color='#5555FF'>+</font><font color='#5555FF'>=</font> det.<font color='#BB00BB'>part</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>cnt;
+    <b>}</b>
+    l <font color='#5555FF'>/</font><font color='#5555FF'>=</font> cnt;
+
+    <font color='#009900'>// Find the center of the right eye by averaging the points around 
+</font>    <font color='#009900'>// the eye.
+</font>    cnt <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>42</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>47</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font> 
+    <b>{</b>
+        r <font color='#5555FF'>+</font><font color='#5555FF'>=</font> det.<font color='#BB00BB'>part</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>cnt;
+    <b>}</b>
+    r <font color='#5555FF'>/</font><font color='#5555FF'>=</font> cnt;
+
+    <font color='#009900'>// Now return the distance between the centers of the eyes
+</font>    <font color='#0000FF'>return</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>l<font color='#5555FF'>-</font>r<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='get_interocular_distances'></a>get_interocular_distances</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> objects
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>objects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> objects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> objects[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+        <b>{</b>
+            temp[i].<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>interocular_distance</font><font face='Lucida Console'>(</font>objects[i][j]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+    <font color='#0000FF'>return</font> temp;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

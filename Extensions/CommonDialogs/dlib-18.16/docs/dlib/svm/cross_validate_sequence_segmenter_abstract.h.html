@@ -1,0 +1,83 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - cross_validate_sequence_segmenter_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_CROSS_VALIDATE_SEQUENCE_sEGMENTER_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_CROSS_VALIDATE_SEQUENCE_sEGMENTER_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sequence_segmenter_abstract.h.html'>sequence_segmenter_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sequence_segmenter_type,
+        <font color='#0000FF'>typename</font> sequence_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> <b><a name='test_sequence_segmenter'></a>test_sequence_segmenter</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> sequence_segmenter_type<font color='#5555FF'>&amp;</font> segmenter,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sequence_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> segments 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is_sequence_segmentation_problem(samples, segments) == true
+            - sequence_segmenter_type == dlib::sequence_segmenter or an object with a
+              compatible interface.
+        ensures
+            - Tests segmenter against the given samples and truth segments and returns the
+              precision, recall, and F1-score obtained by the segmenter.  That is, the goal
+              of the segmenter should be to predict segments[i] given samples[i] as input.
+              The test_sequence_segmenter() routine therefore measures how well the
+              segmenter is able to perform this task.
+            - Returns a row matrix M with the following properties:
+                - M(0) == The precision of the segmenter measured against the task of
+                  detecting the segments of each sample.  This is a number in the range 0
+                  to 1 and represents the fraction of segments output by the segmenter
+                  which correspond to true segments for each sample.
+                - M(1) == The recall of the segmenter measured against the task of
+                  detecting the segments of each sample.  This is a number in the range 0
+                  to 1 and represents the fraction of the true segments found by the
+                  segmenter. 
+                - M(2) == The F1-score for the segmenter.  This is the harmonic mean of
+                  M(0) and M(1).
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type,
+        <font color='#0000FF'>typename</font> sequence_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> <b><a name='cross_validate_sequence_segmenter'></a>cross_validate_sequence_segmenter</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sequence_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> segments,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> folds
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is_sequence_segmentation_problem(samples, segments) == true
+            - 1 &lt; folds &lt;= samples.size()
+            - trainer_type == dlib::structural_sequence_segmentation_trainer or an object
+              with a compatible interface.
+        ensures
+            - Performs k-fold cross validation by using the given trainer to solve the
+              given sequence segmentation problem for the given number of folds.  Each fold
+              is tested using the output of the trainer and the results from all folds are
+              summarized and returned. 
+            - This function returns the precision, recall, and F1-score for the trainer.
+              In particular, the output is the same as the output from the
+              test_sequence_segmenter() routine defined above.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CROSS_VALIDATE_SEQUENCE_sEGMENTER_ABSTRACT_Hh_
+</font>
+
+</pre></body></html>

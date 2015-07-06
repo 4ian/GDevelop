@@ -1,0 +1,272 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jddctmgr.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jddctmgr.c
+ *
+ * Copyright (C) 1994-1996, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains the inverse-DCT management logic.
+ * This code selects a particular IDCT implementation to be used,
+ * and it performs related housekeeping chores.  No code in this file
+ * is executed per IDCT step, only during output pass setup.
+ *
+ * Note that the IDCT routines are responsible for performing coefficient
+ * dequantization as well as the IDCT proper.  This module sets up the
+ * dequantization multiplier table needed by the IDCT routine.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jdct.h.html'>jdct.h</a>"		<font color='#009900'>/* Private declarations for DCT subsystem */</font>
+
+
+<font color='#009900'>/*
+ * The decompressor input side (jdinput.c) saves away the appropriate
+ * quantization table for each component at the start of the first scan
+ * involving that component.  (This is necessary in order to correctly
+ * decode files that reuse Q-table slots.)
+ * When we are ready to make an output pass, the saved Q-table is converted
+ * to a multiplier table that will actually be used by the IDCT routine.
+ * The multiplier table contents are IDCT-method-dependent.  To support
+ * application changes in IDCT method between scans, we can remake the
+ * multiplier tables if necessary.
+ * In buffered-image mode, the first output pass may occur before any data
+ * has been seen for some components, and thus before their Q-tables have
+ * been saved away.  To handle this case, multiplier tables are preset
+ * to zeroes; the result of the IDCT will be a neutral gray level.
+ */</font>
+
+
+<font color='#009900'>/* Private subobject for this module */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#0000FF'>struct</font> jpeg_inverse_dct pub;	<font color='#009900'>/* public fields */</font>
+
+  <font color='#009900'>/* This array contains the IDCT method code that each multiplier table
+   * is currently set up for, or -1 if it's not yet set up.
+   * The actual multiplier tables are pointed to by dct_table in the
+   * per-component comp_info structures.
+   */</font>
+  <font color='#0000FF'><u>int</u></font> cur_method[MAX_COMPONENTS];
+<b>}</b> my_idct_controller;
+
+<font color='#0000FF'>typedef</font> my_idct_controller <font color='#5555FF'>*</font> my_idct_ptr;
+
+
+<font color='#009900'>/* Allocated multiplier tables: big enough for any supported variant */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>union</font> <b>{</b>
+  ISLOW_MULT_TYPE islow_array[DCTSIZE2];
+<font color='#0000FF'>#ifdef</font> DCT_IFAST_SUPPORTED
+  IFAST_MULT_TYPE ifast_array[DCTSIZE2];
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> DCT_FLOAT_SUPPORTED
+  FLOAT_MULT_TYPE float_array[DCTSIZE2];
+<font color='#0000FF'>#endif</font>
+<b>}</b> multiplier_table;
+
+
+<font color='#009900'>/* The current scaled-IDCT routines require ISLOW-style multiplier tables,
+ * so be sure to compile that code if either ISLOW or SCALING is requested.
+ */</font>
+<font color='#0000FF'>#ifdef</font> DCT_ISLOW_SUPPORTED
+<font color='#0000FF'>#define</font> PROVIDE_ISLOW_TABLES
+<font color='#0000FF'>#else</font>
+<font color='#0000FF'>#ifdef</font> IDCT_SCALING_SUPPORTED
+<font color='#0000FF'>#define</font> PROVIDE_ISLOW_TABLES
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#009900'>/*
+ * Prepare for an output pass.
+ * Here we select the proper IDCT routine for each component and build
+ * a matching multiplier table.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='start_pass'></a>start_pass</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_idct_ptr idct <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_idct_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>idct;
+  <font color='#0000FF'><u>int</u></font> ci, i;
+  jpeg_component_info <font color='#5555FF'>*</font>compptr;
+  <font color='#0000FF'><u>int</u></font> method <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  inverse_DCT_method_ptr method_ptr <font color='#5555FF'>=</font> NULL;
+  JQUANT_TBL <font color='#5555FF'>*</font> qtbl;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>, compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+       ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, compptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Select the proper IDCT routine for this component's scaling */</font>
+    <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>DCT_scaled_size<font face='Lucida Console'>)</font> <b>{</b>
+<font color='#0000FF'>#ifdef</font> IDCT_SCALING_SUPPORTED
+    <font color='#0000FF'>case</font> <font color='#979000'>1</font>:
+      method_ptr <font color='#5555FF'>=</font> jpeg_idct_1x1;
+      method <font color='#5555FF'>=</font> JDCT_ISLOW;	<font color='#009900'>/* jidctred uses islow-style table */</font>
+      <font color='#0000FF'>break</font>;
+    <font color='#0000FF'>case</font> <font color='#979000'>2</font>:
+      method_ptr <font color='#5555FF'>=</font> jpeg_idct_2x2;
+      method <font color='#5555FF'>=</font> JDCT_ISLOW;	<font color='#009900'>/* jidctred uses islow-style table */</font>
+      <font color='#0000FF'>break</font>;
+    <font color='#0000FF'>case</font> <font color='#979000'>4</font>:
+      method_ptr <font color='#5555FF'>=</font> jpeg_idct_4x4;
+      method <font color='#5555FF'>=</font> JDCT_ISLOW;	<font color='#009900'>/* jidctred uses islow-style table */</font>
+      <font color='#0000FF'>break</font>;
+<font color='#0000FF'>#endif</font>
+    <font color='#0000FF'>case</font> DCTSIZE:
+      <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dct_method<font face='Lucida Console'>)</font> <b>{</b>
+<font color='#0000FF'>#ifdef</font> DCT_ISLOW_SUPPORTED
+      <font color='#0000FF'>case</font> JDCT_ISLOW:
+	method_ptr <font color='#5555FF'>=</font> jpeg_idct_islow;
+	method <font color='#5555FF'>=</font> JDCT_ISLOW;
+	<font color='#0000FF'>break</font>;
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> DCT_IFAST_SUPPORTED
+      <font color='#0000FF'>case</font> JDCT_IFAST:
+	method_ptr <font color='#5555FF'>=</font> jpeg_idct_ifast;
+	method <font color='#5555FF'>=</font> JDCT_IFAST;
+	<font color='#0000FF'>break</font>;
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> DCT_FLOAT_SUPPORTED
+      <font color='#0000FF'>case</font> JDCT_FLOAT:
+	method_ptr <font color='#5555FF'>=</font> jpeg_idct_float;
+	method <font color='#5555FF'>=</font> JDCT_FLOAT;
+	<font color='#0000FF'>break</font>;
+<font color='#0000FF'>#endif</font>
+      <font color='#0000FF'>default</font>:
+	<font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_NOT_COMPILED<font face='Lucida Console'>)</font>;
+	<font color='#0000FF'>break</font>;
+      <b>}</b>
+      <font color='#0000FF'>break</font>;
+    <font color='#0000FF'>default</font>:
+      <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_DCTSIZE, compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>DCT_scaled_size<font face='Lucida Console'>)</font>;
+      <font color='#0000FF'>break</font>;
+    <b>}</b>
+    idct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.inverse_DCT[ci] <font color='#5555FF'>=</font> method_ptr;
+    <font color='#009900'>/* Create multiplier table from quant table.
+     * However, we can skip this if the component is uninteresting
+     * or if we already built the table.  Also, if no quant table
+     * has yet been saved for the component, we leave the
+     * multiplier table all-zero; we'll be reading zeroes from the
+     * coefficient controller's buffer anyway.
+     */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>component_needed <font color='#5555FF'>|</font><font color='#5555FF'>|</font> idct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_method[ci] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> method<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>continue</font>;
+    qtbl <font color='#5555FF'>=</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quant_table;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>qtbl <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>		<font color='#009900'>/* happens if no data yet for component */</font>
+      <font color='#0000FF'>continue</font>;
+    idct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_method[ci] <font color='#5555FF'>=</font> method;
+    <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>method<font face='Lucida Console'>)</font> <b>{</b>
+<font color='#0000FF'>#ifdef</font> PROVIDE_ISLOW_TABLES
+    <font color='#0000FF'>case</font> JDCT_ISLOW:
+      <b>{</b>
+	<font color='#009900'>/* For LL&amp;M IDCT method, multipliers are equal to raw quantization
+	 * coefficients, but are stored as ints to ensure access efficiency.
+	 */</font>
+	ISLOW_MULT_TYPE <font color='#5555FF'>*</font> ismtbl <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ISLOW_MULT_TYPE <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dct_table;
+	<font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> DCTSIZE2; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	  ismtbl[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>ISLOW_MULT_TYPE<font face='Lucida Console'>)</font> qtbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantval[i];
+	<b>}</b>
+      <b>}</b>
+      <font color='#0000FF'>break</font>;
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> DCT_IFAST_SUPPORTED
+    <font color='#0000FF'>case</font> JDCT_IFAST:
+      <b>{</b>
+	<font color='#009900'>/* For AA&amp;N IDCT method, multipliers are equal to quantization
+	 * coefficients scaled by scalefactor[row]*scalefactor[col], where
+	 *   scalefactor[0] = 1
+	 *   scalefactor[k] = cos(k*PI/16) * sqrt(2)    for k=1..7
+	 * For integer operation, the multiplier table is to be scaled by
+	 * IFAST_SCALE_BITS.
+	 */</font>
+	IFAST_MULT_TYPE <font color='#5555FF'>*</font> ifmtbl <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>IFAST_MULT_TYPE <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dct_table;
+<font color='#0000FF'>#define</font> CONST_BITS <font color='#979000'>14</font>
+	<font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>short</u></font> aanscales[DCTSIZE2] <font color='#5555FF'>=</font> <b>{</b>
+	  <font color='#009900'>/* precomputed values scaled up by 14 bits */</font>
+	  <font color='#979000'>16384</font>, <font color='#979000'>22725</font>, <font color='#979000'>21407</font>, <font color='#979000'>19266</font>, <font color='#979000'>16384</font>, <font color='#979000'>12873</font>,  <font color='#979000'>8867</font>,  <font color='#979000'>4520</font>,
+	  <font color='#979000'>22725</font>, <font color='#979000'>31521</font>, <font color='#979000'>29692</font>, <font color='#979000'>26722</font>, <font color='#979000'>22725</font>, <font color='#979000'>17855</font>, <font color='#979000'>12299</font>,  <font color='#979000'>6270</font>,
+	  <font color='#979000'>21407</font>, <font color='#979000'>29692</font>, <font color='#979000'>27969</font>, <font color='#979000'>25172</font>, <font color='#979000'>21407</font>, <font color='#979000'>16819</font>, <font color='#979000'>11585</font>,  <font color='#979000'>5906</font>,
+	  <font color='#979000'>19266</font>, <font color='#979000'>26722</font>, <font color='#979000'>25172</font>, <font color='#979000'>22654</font>, <font color='#979000'>19266</font>, <font color='#979000'>15137</font>, <font color='#979000'>10426</font>,  <font color='#979000'>5315</font>,
+	  <font color='#979000'>16384</font>, <font color='#979000'>22725</font>, <font color='#979000'>21407</font>, <font color='#979000'>19266</font>, <font color='#979000'>16384</font>, <font color='#979000'>12873</font>,  <font color='#979000'>8867</font>,  <font color='#979000'>4520</font>,
+	  <font color='#979000'>12873</font>, <font color='#979000'>17855</font>, <font color='#979000'>16819</font>, <font color='#979000'>15137</font>, <font color='#979000'>12873</font>, <font color='#979000'>10114</font>,  <font color='#979000'>6967</font>,  <font color='#979000'>3552</font>,
+	   <font color='#979000'>8867</font>, <font color='#979000'>12299</font>, <font color='#979000'>11585</font>, <font color='#979000'>10426</font>,  <font color='#979000'>8867</font>,  <font color='#979000'>6967</font>,  <font color='#979000'>4799</font>,  <font color='#979000'>2446</font>,
+	   <font color='#979000'>4520</font>,  <font color='#979000'>6270</font>,  <font color='#979000'>5906</font>,  <font color='#979000'>5315</font>,  <font color='#979000'>4520</font>,  <font color='#979000'>3552</font>,  <font color='#979000'>2446</font>,  <font color='#979000'>1247</font>
+	<b>}</b>;
+	SHIFT_TEMPS
+
+	<font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> DCTSIZE2; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	  ifmtbl[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>IFAST_MULT_TYPE<font face='Lucida Console'>)</font>
+	    <font color='#BB00BB'>DESCALE</font><font face='Lucida Console'>(</font><font color='#BB00BB'>MULTIPLY16V16</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> qtbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantval[i],
+				  <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> aanscales[i]<font face='Lucida Console'>)</font>,
+		    CONST_BITS<font color='#5555FF'>-</font>IFAST_SCALE_BITS<font face='Lucida Console'>)</font>;
+	<b>}</b>
+      <b>}</b>
+      <font color='#0000FF'>break</font>;
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> DCT_FLOAT_SUPPORTED
+    <font color='#0000FF'>case</font> JDCT_FLOAT:
+      <b>{</b>
+	<font color='#009900'>/* For float AA&amp;N IDCT method, multipliers are equal to quantization
+	 * coefficients scaled by scalefactor[row]*scalefactor[col], where
+	 *   scalefactor[0] = 1
+	 *   scalefactor[k] = cos(k*PI/16) * sqrt(2)    for k=1..7
+	 */</font>
+	FLOAT_MULT_TYPE <font color='#5555FF'>*</font> fmtbl <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FLOAT_MULT_TYPE <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dct_table;
+	<font color='#0000FF'><u>int</u></font> row, col;
+	<font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> aanscalefactor[DCTSIZE] <font color='#5555FF'>=</font> <b>{</b>
+	  <font color='#979000'>1.0</font>, <font color='#979000'>1.387039845</font>, <font color='#979000'>1.306562965</font>, <font color='#979000'>1.175875602</font>,
+	  <font color='#979000'>1.0</font>, <font color='#979000'>0.785694958</font>, <font color='#979000'>0.541196100</font>, <font color='#979000'>0.275899379</font>
+	<b>}</b>;
+
+	i <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+	<font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>row <font color='#5555FF'>=</font> <font color='#979000'>0</font>; row <font color='#5555FF'>&lt;</font> DCTSIZE; row<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>col <font color='#5555FF'>=</font> <font color='#979000'>0</font>; col <font color='#5555FF'>&lt;</font> DCTSIZE; col<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	    fmtbl[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FLOAT_MULT_TYPE<font face='Lucida Console'>)</font>
+	      <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font> qtbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantval[i] <font color='#5555FF'>*</font>
+	       aanscalefactor[row] <font color='#5555FF'>*</font> aanscalefactor[col]<font face='Lucida Console'>)</font>;
+	    i<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+	  <b>}</b>
+	<b>}</b>
+      <b>}</b>
+      <font color='#0000FF'>break</font>;
+<font color='#0000FF'>#endif</font>
+    <font color='#0000FF'>default</font>:
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_NOT_COMPILED<font face='Lucida Console'>)</font>;
+      <font color='#0000FF'>break</font>;
+    <b>}</b>
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Initialize IDCT manager.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jinit_inverse_dct'></a>jinit_inverse_dct</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_idct_ptr idct;
+  <font color='#0000FF'><u>int</u></font> ci;
+  jpeg_component_info <font color='#5555FF'>*</font>compptr;
+
+  idct <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_idct_ptr<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				<font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>my_idct_controller<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>idct <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> jpeg_inverse_dct <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> idct;
+  idct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.start_pass <font color='#5555FF'>=</font> start_pass;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>, compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+       ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, compptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Allocate and pre-zero a multiplier table for each component */</font>
+    compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dct_table <font color='#5555FF'>=</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				  <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>multiplier_table<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>MEMZERO</font><font face='Lucida Console'>(</font>compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dct_table, <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>multiplier_table<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Mark multiplier table not yet set up for any method */</font>
+    idct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_method[ci] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+  <b>}</b>
+<b>}</b>
+
+</pre></body></html>

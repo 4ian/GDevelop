@@ -1,0 +1,629 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - pngconf.h</title></head><body bgcolor='white'><pre>
+
+<font color='#009900'>/* pngconf.h - machine configurable file for libpng
+ *
+ * libpng version 1.6.7 - November 14, 2013
+ *
+ * Copyright (c) 1998-2013 Glenn Randers-Pehrson
+ * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
+ * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
+ *
+ */</font>
+
+<font color='#009900'>/* Any machine specific code is near the front of this file, so if you
+ * are configuring libpng for a machine, you may want to read the section
+ * starting here down to where it starts to typedef png_color, png_text,
+ * and png_info.
+ */</font>
+
+<font color='#0000FF'>#ifdef</font> _MSC_VER
+<font color='#009900'>// Disable the following warnings for Visual Studio
+</font><font color='#009900'>// This is a warning you get from visual studio 2005 about things in the standard C++
+</font><font color='#009900'>// library being "deprecated."  I checked the C++ standard and it doesn't say jack 
+</font><font color='#009900'>// about any of them (I checked the searchable PDF).   So this warning is total Bunk.
+</font><font color='#0000FF'>#pragma</font> warning<font face='Lucida Console'>(</font>disable : <font color='#979000'>4996</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#0000FF'>#ifndef</font> PNGCONF_H
+<font color='#0000FF'>#define</font> PNGCONF_H
+
+<font color='#009900'>/* To do: Do all of this in scripts/pnglibconf.dfa */</font>
+<font color='#0000FF'>#ifdef</font> PNG_SAFE_LIMITS_SUPPORTED
+#  ifdef PNG_USER_WIDTH_MAX
+#    undef PNG_USER_WIDTH_MAX
+#    define PNG_USER_WIDTH_MAX <font color='#979000'>1000000</font>L
+#  endif
+#  ifdef PNG_USER_HEIGHT_MAX
+#    undef PNG_USER_HEIGHT_MAX
+#    define PNG_USER_HEIGHT_MAX <font color='#979000'>1000000</font>L
+#  endif
+#  ifdef PNG_USER_CHUNK_MALLOC_MAX
+#    undef PNG_USER_CHUNK_MALLOC_MAX
+#    define PNG_USER_CHUNK_MALLOC_MAX <font color='#979000'>4000000</font>L
+#  endif
+#  ifdef PNG_USER_CHUNK_CACHE_MAX
+#    undef PNG_USER_CHUNK_CACHE_MAX
+#    define PNG_USER_CHUNK_CACHE_MAX <font color='#979000'>128</font>
+#  endif
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifndef</font> PNG_BUILDING_SYMBOL_TABLE <font color='#009900'>/* else includes may cause problems */</font>
+
+<font color='#009900'>/* From libpng 1.6.0 libpng requires an ANSI X3.159-1989 ("ISOC90") compliant C
+ * compiler for correct compilation.  The following header files are required by
+ * the standard.  If your compiler doesn't provide these header files, or they
+ * do not match the standard, you will need to provide/improve them.
+ */</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>stddef.h<font color='#5555FF'>&gt;</font>
+
+<font color='#009900'>/* Library header files.  These header files are all defined by ISOC90; libpng
+ * expects conformant implementations, however, an ISOC90 conformant system need
+ * not provide these header files if the functionality cannot be implemented.
+ * In this case it will be necessary to disable the relevant parts of libpng in
+ * the build of pnglibconf.h.
+ *
+ * Prior to 1.6.0 string.h was included here; the API changes in 1.6.0 to not
+ * include this unnecessary header file.
+ */</font>
+
+<font color='#0000FF'>#ifdef</font> PNG_STDIO_SUPPORTED
+   <font color='#009900'>/* Required for the definition of FILE: */</font>
+#  include <font color='#5555FF'>&lt;</font>stdio.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> PNG_SETJMP_SUPPORTED
+   <font color='#009900'>/* Required for the definition of jmp_buf and the declaration of longjmp: */</font>
+#  include <font color='#5555FF'>&lt;</font>setjmp.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> PNG_CONVERT_tIME_SUPPORTED
+   <font color='#009900'>/* Required for struct tm: */</font>
+#  include <font color='#5555FF'>&lt;</font>time.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNG_BUILDING_SYMBOL_TABLE */</font>
+
+<font color='#009900'>/* Prior to 1.6.0 it was possible to turn off 'const' in declarations using
+ * PNG_NO_CONST; this is no longer supported except for data declarations which
+ * apparently still cause problems in 2011 on some compilers.
+ */</font>
+<font color='#0000FF'>#define</font> PNG_CONST <font color='#0000FF'>const</font> <font color='#009900'>/* backward compatibility only */</font>
+
+<font color='#009900'>/* This controls optimization of the reading of 16 and 32 bit values
+ * from PNG files.  It can be set on a per-app-file basis - it
+ * just changes whether a macro is used when the function is called.
+ * The library builder sets the default; if read functions are not
+ * built into the library the macro implementation is forced on.
+ */</font>
+<font color='#0000FF'>#ifndef</font> PNG_READ_INT_FUNCTIONS_SUPPORTED
+#  define PNG_USE_READ_MACROS
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#if</font> <font color='#5555FF'>!</font>defined<font face='Lucida Console'>(</font>PNG_NO_USE_READ_MACROS<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>defined<font face='Lucida Console'>(</font>PNG_USE_READ_MACROS<font face='Lucida Console'>)</font>
+#  <font color='#0000FF'>if</font> PNG_DEFAULT_READ_MACROS
+#    define PNG_USE_READ_MACROS
+#  endif
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* COMPILER SPECIFIC OPTIONS.
+ *
+ * These options are provided so that a variety of difficult compilers
+ * can be used.  Some are fixed at build time (e.g. PNG_API_RULE
+ * below) but still have compiler specific implementations, others
+ * may be changed on a per-file basis when compiling against libpng.
+ */</font>
+
+<font color='#009900'>/* The PNGARG macro was used in versions of libpng prior to 1.6.0 to protect
+ * against legacy (pre ISOC90) compilers that did not understand function
+ * prototypes.  It is not required for modern C compilers.
+ */</font>
+<font color='#0000FF'>#ifndef</font> PNGARG
+#  define <b><a name='PNGARG'></a>PNGARG</b><font face='Lucida Console'>(</font>arglist<font face='Lucida Console'>)</font> arglist
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* Function calling conventions.
+ * =============================
+ * Normally it is not necessary to specify to the compiler how to call
+ * a function - it just does it - however on x86 systems derived from
+ * Microsoft and Borland C compilers ('IBM PC', 'DOS', 'Windows' systems
+ * and some others) there are multiple ways to call a function and the
+ * default can be changed on the compiler command line.  For this reason
+ * libpng specifies the calling convention of every exported function and
+ * every function called via a user supplied function pointer.  This is
+ * done in this file by defining the following macros:
+ *
+ * PNGAPI    Calling convention for exported functions.
+ * PNGCBAPI  Calling convention for user provided (callback) functions.
+ * PNGCAPI   Calling convention used by the ANSI-C library (required
+ *           for longjmp callbacks and sometimes used internally to
+ *           specify the calling convention for zlib).
+ *
+ * These macros should never be overridden.  If it is necessary to
+ * change calling convention in a private build this can be done
+ * by setting PNG_API_RULE (which defaults to 0) to one of the values
+ * below to select the correct 'API' variants.
+ *
+ * PNG_API_RULE=0 Use PNGCAPI - the 'C' calling convention - throughout.
+ *                This is correct in every known environment.
+ * PNG_API_RULE=1 Use the operating system convention for PNGAPI and
+ *                the 'C' calling convention (from PNGCAPI) for
+ *                callbacks (PNGCBAPI).  This is no longer required
+ *                in any known environment - if it has to be used
+ *                please post an explanation of the problem to the
+ *                libpng mailing list.
+ *
+ * These cases only differ if the operating system does not use the C
+ * calling convention, at present this just means the above cases
+ * (x86 DOS/Windows sytems) and, even then, this does not apply to
+ * Cygwin running on those systems.
+ *
+ * Note that the value must be defined in pnglibconf.h so that what
+ * the application uses to call the library matches the conventions
+ * set when building the library.
+ */</font>
+
+<font color='#009900'>/* Symbol export
+ * =============
+ * When building a shared library it is almost always necessary to tell
+ * the compiler which symbols to export.  The png.h macro 'PNG_EXPORT'
+ * is used to mark the symbols.  On some systems these symbols can be
+ * extracted at link time and need no special processing by the compiler,
+ * on other systems the symbols are flagged by the compiler and just
+ * the declaration requires a special tag applied (unfortunately) in a
+ * compiler dependent way.  Some systems can do either.
+ *
+ * A small number of older systems also require a symbol from a DLL to
+ * be flagged to the program that calls it.  This is a problem because
+ * we do not know in the header file included by application code that
+ * the symbol will come from a shared library, as opposed to a statically
+ * linked one.  For this reason the application must tell us by setting
+ * the magic flag PNG_USE_DLL to turn on the special processing before
+ * it includes png.h.
+ *
+ * Four additional macros are used to make this happen:
+ *
+ * PNG_IMPEXP The magic (if any) to cause a symbol to be exported from
+ *            the build or imported if PNG_USE_DLL is set - compiler
+ *            and system specific.
+ *
+ * PNG_EXPORT_TYPE(type) A macro that pre or appends PNG_IMPEXP to
+ *                       'type', compiler specific.
+ *
+ * PNG_DLL_EXPORT Set to the magic to use during a libpng build to
+ *                make a symbol exported from the DLL.  Not used in the
+ *                public header files; see pngpriv.h for how it is used
+ *                in the libpng build.
+ *
+ * PNG_DLL_IMPORT Set to the magic to force the libpng symbols to come
+ *                from a DLL - used to define PNG_IMPEXP when
+ *                PNG_USE_DLL is set.
+ */</font>
+
+<font color='#009900'>/* System specific discovery.
+ * ==========================
+ * This code is used at build time to find PNG_IMPEXP, the API settings
+ * and PNG_EXPORT_TYPE(), it may also set a macro to indicate the DLL
+ * import processing is possible.  On Windows systems it also sets
+ * compiler-specific macros to the values required to change the calling
+ * conventions of the various functions.
+ */</font>
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>_Windows<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>_WINDOWS<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>WIN32<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>\
+    <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>_WIN32<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>__WIN32__<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>__CYGWIN__<font face='Lucida Console'>)</font>
+  <font color='#009900'>/* Windows system (DOS doesn't support DLLs).  Includes builds under Cygwin or
+   * MinGW on any architecture currently supported by Windows.  Also includes
+   * Watcom builds but these need special treatment because they are not
+   * compatible with GCC or Visual C because of different calling conventions.
+   */</font>
+#  <font color='#0000FF'>if</font> PNG_API_RULE <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>
+    <font color='#009900'>/* If this line results in an error, either because __watcall is not
+     * understood or because of a redefine just below you cannot use *this*
+     * build of the library with the compiler you are using.  *This* build was
+     * build using Watcom and applications must also be built using Watcom!
+     */</font>
+#    define PNGCAPI __watcall
+#  endif
+
+#  <font color='#0000FF'>if</font> <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>__GNUC__<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>defined</font><font face='Lucida Console'>(</font>_MSC_VER<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>_MSC_VER <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>800</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+#    define PNGCAPI __cdecl
+#    <font color='#0000FF'>if</font> PNG_API_RULE <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>
+       <font color='#009900'>/* If this line results in an error __stdcall is not understood and
+        * PNG_API_RULE should not have been set to '1'.
+        */</font>
+#      define PNGAPI __stdcall
+#    endif
+#  <font color='#0000FF'>else</font>
+    <font color='#009900'>/* An older compiler, or one not detected (erroneously) above,
+     * if necessary override on the command line to get the correct
+     * variants for the compiler.
+     */</font>
+#    ifndef PNGCAPI
+#      define PNGCAPI _cdecl
+#    endif
+#    <font color='#0000FF'>if</font> PNG_API_RULE <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font><b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>PNGAPI<font face='Lucida Console'>)</font>
+#      define PNGAPI _stdcall
+#    endif
+#  endif <font color='#009900'>/* compiler/api */</font>
+
+  <font color='#009900'>/* NOTE: PNGCBAPI always defaults to PNGCAPI. */</font>
+
+#  <font color='#0000FF'>if</font> <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>PNGAPI<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font><b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>PNG_USER_PRIVATEBUILD<font face='Lucida Console'>)</font>
+#     error "<font color='#CC0000'>PNG_USER_PRIVATEBUILD must be defined if PNGAPI is changed</font>"
+#  endif
+
+#  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>defined</font><font face='Lucida Console'>(</font>_MSC_VER<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> _MSC_VER <font color='#5555FF'>&lt;</font> <font color='#979000'>800</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>\
+      <font face='Lucida Console'>(</font><font color='#BB00BB'>defined</font><font face='Lucida Console'>(</font>__BORLANDC__<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> __BORLANDC__ <font color='#5555FF'>&lt;</font> <font color='#979000'>0x500</font><font face='Lucida Console'>)</font>
+    <font color='#009900'>/* older Borland and MSC
+     * compilers used '__export' and required this to be after
+     * the type.
+     */</font>
+#    ifndef PNG_EXPORT_TYPE
+#      define <b><a name='PNG_EXPORT_TYPE'></a>PNG_EXPORT_TYPE</b><font face='Lucida Console'>(</font>type<font face='Lucida Console'>)</font> type PNG_IMPEXP
+#    endif
+#    define PNG_DLL_EXPORT __export
+#  <font color='#0000FF'>else</font> <font color='#009900'>/* newer compiler */</font>
+#    define PNG_DLL_EXPORT <b><a name='__declspec'></a>__declspec</b><font face='Lucida Console'>(</font>dllexport<font face='Lucida Console'>)</font>
+#    ifndef PNG_DLL_IMPORT
+#      define PNG_DLL_IMPORT <b><a name='__declspec'></a>__declspec</b><font face='Lucida Console'>(</font>dllimport<font face='Lucida Console'>)</font>
+#    endif
+#  endif <font color='#009900'>/* compiler */</font>
+
+<font color='#0000FF'>#else</font> <font color='#009900'>/* !Windows */</font>
+#  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>defined</font><font face='Lucida Console'>(</font>__IBMC__<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font color='#BB00BB'>defined</font><font face='Lucida Console'>(</font>__IBMCPP__<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>__OS2__<font face='Lucida Console'>)</font>
+#    define PNGAPI _System
+#  <font color='#0000FF'>else</font> <font color='#009900'>/* !Windows/x86 &amp;&amp; !OS/2 */</font>
+    <font color='#009900'>/* Use the defaults, or define PNG*API on the command line (but
+     * this will have to be done for every compile!)
+     */</font>
+#  endif <font color='#009900'>/* other system, !OS/2 */</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* !Windows/x86 */</font>
+
+<font color='#009900'>/* Now do all the defaulting . */</font>
+<font color='#0000FF'>#ifndef</font> PNGCAPI
+#  define PNGCAPI
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifndef</font> PNGCBAPI
+#  define PNGCBAPI PNGCAPI
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifndef</font> PNGAPI
+#  define PNGAPI PNGCAPI
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* PNG_IMPEXP may be set on the compilation system command line or (if not set)
+ * then in an internal header file when building the library, otherwise (when
+ * using the library) it is set here.
+ */</font>
+<font color='#0000FF'>#ifndef</font> PNG_IMPEXP
+#  <font color='#0000FF'>if</font> <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>PNG_USE_DLL<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>PNG_DLL_IMPORT<font face='Lucida Console'>)</font>
+     <font color='#009900'>/* This forces use of a DLL, disallowing static linking */</font>
+#    define PNG_IMPEXP PNG_DLL_IMPORT
+#  endif
+
+#  ifndef PNG_IMPEXP
+#    define PNG_IMPEXP
+#  endif
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* In 1.5.2 the definition of PNG_FUNCTION has been changed to always treat
+ * 'attributes' as a storage class - the attributes go at the start of the
+ * function definition, and attributes are always appended regardless of the
+ * compiler.  This considerably simplifies these macros but may cause problems
+ * if any compilers both need function attributes and fail to handle them as
+ * a storage class (this is unlikely.)
+ */</font>
+<font color='#0000FF'>#ifndef</font> PNG_FUNCTION
+#  define <b><a name='PNG_FUNCTION'></a>PNG_FUNCTION</b><font face='Lucida Console'>(</font>type, name, args, attributes<font face='Lucida Console'>)</font> attributes type name args
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifndef</font> PNG_EXPORT_TYPE
+#  define <b><a name='PNG_EXPORT_TYPE'></a>PNG_EXPORT_TYPE</b><font face='Lucida Console'>(</font>type<font face='Lucida Console'>)</font> PNG_IMPEXP type
+<font color='#0000FF'>#endif</font>
+
+   <font color='#009900'>/* The ordinal value is only relevant when preprocessing png.h for symbol
+    * table entries, so we discard it here.  See the .dfn files in the
+    * scripts directory.
+    */</font>
+<font color='#0000FF'>#ifndef</font> PNG_EXPORTA
+
+#  define <b><a name='PNG_EXPORTA'></a>PNG_EXPORTA</b><font face='Lucida Console'>(</font>ordinal, type, name, args, attributes<font face='Lucida Console'>)</font>\
+      <b><a name='PNG_FUNCTION'></a>PNG_FUNCTION</b><font face='Lucida Console'>(</font><font color='#BB00BB'>PNG_EXPORT_TYPE</font><font face='Lucida Console'>(</font>type<font face='Lucida Console'>)</font>,<font face='Lucida Console'>(</font>PNGAPI name<font face='Lucida Console'>)</font>,<font color='#BB00BB'>PNGARG</font><font face='Lucida Console'>(</font>args<font face='Lucida Console'>)</font>, \
+        <font color='#0000FF'>extern</font> attributes<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* ANSI-C (C90) does not permit a macro to be invoked with an empty argument,
+ * so make something non-empty to satisfy the requirement:
+ */</font>
+<font color='#0000FF'>#define</font> PNG_EMPTY <font color='#009900'>/*empty list*/</font>
+
+<font color='#0000FF'>#define</font> PNG_EXPORT<font face='Lucida Console'>(</font>ordinal, type, name, args<font face='Lucida Console'>)</font>\
+   <b><a name='PNG_EXPORTA'></a>PNG_EXPORTA</b><font face='Lucida Console'>(</font>ordinal, type, name, args, PNG_EMPTY<font face='Lucida Console'>)</font>
+
+<font color='#009900'>/* Use PNG_REMOVED to comment out a removed interface. */</font>
+<font color='#0000FF'>#ifndef</font> PNG_REMOVED
+#  define <b><a name='PNG_REMOVED'></a>PNG_REMOVED</b><font face='Lucida Console'>(</font>ordinal, type, name, args, attributes<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifndef</font> PNG_CALLBACK
+#  define <b><a name='PNG_CALLBACK'></a>PNG_CALLBACK</b><font face='Lucida Console'>(</font>type, name, args<font face='Lucida Console'>)</font> <b><a name='type'></a>type</b> <font face='Lucida Console'>(</font>PNGCBAPI name<font face='Lucida Console'>)</font> <b><a name='PNGARG'></a>PNGARG</b><font face='Lucida Console'>(</font>args<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* Support for compiler specific function attributes.  These are used
+ * so that where compiler support is available incorrect use of API
+ * functions in png.h will generate compiler warnings.
+ *
+ * Added at libpng-1.2.41.
+ */</font>
+
+<font color='#0000FF'>#ifndef</font> PNG_NO_PEDANTIC_WARNINGS
+#  ifndef PNG_PEDANTIC_WARNINGS_SUPPORTED
+#    define PNG_PEDANTIC_WARNINGS_SUPPORTED
+#  endif
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> PNG_PEDANTIC_WARNINGS_SUPPORTED
+  <font color='#009900'>/* Support for compiler specific function attributes.  These are used
+   * so that where compiler support is available, incorrect use of API
+   * functions in png.h will generate compiler warnings.  Added at libpng
+   * version 1.2.41.  Disabling these removes the warnings but may also produce
+   * less efficient code.
+   */</font>
+#  <font color='#0000FF'>if</font> <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>__GNUC__<font face='Lucida Console'>)</font>
+#    ifndef PNG_USE_RESULT
+#      define PNG_USE_RESULT <b><a name='__attribute__'></a>__attribute__</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>__warn_unused_result__<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+#    endif
+#    ifndef PNG_NORETURN
+#      define PNG_NORETURN   <b><a name='__attribute__'></a>__attribute__</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>__noreturn__<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+#    endif
+#    <font color='#0000FF'>if</font> __GNUC__ <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>3</font>
+#      ifndef PNG_ALLOCATED
+#        define PNG_ALLOCATED  <b><a name='__attribute__'></a>__attribute__</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>__malloc__<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+#      endif
+#      ifndef PNG_DEPRECATED
+#        define PNG_DEPRECATED <b><a name='__attribute__'></a>__attribute__</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>__deprecated__<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+#      endif
+#      ifndef PNG_PRIVATE
+#        <font color='#0000FF'>if</font> <font color='#979000'>0</font> <font color='#009900'>/* Doesn't work so we use deprecated instead*/</font>
+#          define PNG_PRIVATE \
+            <b><a name='__attribute__'></a>__attribute__</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#BB00BB'>warning</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>This function is not exported by libpng.</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+#        <font color='#0000FF'>else</font>
+#          define PNG_PRIVATE \
+            <b><a name='__attribute__'></a>__attribute__</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>__deprecated__<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+#        endif
+#      endif
+#      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>__GNUC__ <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font color='#5555FF'>!</font><font color='#BB00BB'>defined</font><font face='Lucida Console'>(</font>__GNUC_MINOR__<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>__GNUC_MINOR__ <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+#        ifndef PNG_RESTRICT
+#          define PNG_RESTRICT __restrict
+#        endif
+#      endif <font color='#009900'>/*  __GNUC__ == 3.0 */</font>
+#    endif <font color='#009900'>/*  __GNUC__ &gt;= 3 */</font>
+
+#  elif <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>_MSC_VER<font face='Lucida Console'>)</font>  <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>_MSC_VER <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1300</font><font face='Lucida Console'>)</font>
+#    ifndef PNG_USE_RESULT
+#      define PNG_USE_RESULT <font color='#009900'>/* not supported */</font>
+#    endif
+#    ifndef PNG_NORETURN
+#      define PNG_NORETURN   <b><a name='__declspec'></a>__declspec</b><font face='Lucida Console'>(</font>noreturn<font face='Lucida Console'>)</font>
+#    endif
+#    ifndef PNG_ALLOCATED
+#      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>_MSC_VER <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1400</font><font face='Lucida Console'>)</font>
+#        define PNG_ALLOCATED <b><a name='__declspec'></a>__declspec</b><font face='Lucida Console'>(</font>restrict<font face='Lucida Console'>)</font>
+#      endif
+#    endif
+#    ifndef PNG_DEPRECATED
+#      define PNG_DEPRECATED <b><a name='__declspec'></a>__declspec</b><font face='Lucida Console'>(</font>deprecated<font face='Lucida Console'>)</font>
+#    endif
+#    ifndef PNG_PRIVATE
+#      define PNG_PRIVATE <b><a name='__declspec'></a>__declspec</b><font face='Lucida Console'>(</font>deprecated<font face='Lucida Console'>)</font>
+#    endif
+#    ifndef PNG_RESTRICT
+#      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>_MSC_VER <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1400</font><font face='Lucida Console'>)</font>
+#        define PNG_RESTRICT __restrict
+#      endif
+#    endif
+
+#  elif <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>__WATCOMC__<font face='Lucida Console'>)</font>
+#    ifndef PNG_RESTRICT
+#      define PNG_RESTRICT __restrict
+#    endif
+#  endif <font color='#009900'>/* _MSC_VER */</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNG_PEDANTIC_WARNINGS */</font>
+
+<font color='#0000FF'>#ifndef</font> PNG_DEPRECATED
+#  define PNG_DEPRECATED  <font color='#009900'>/* Use of this function is deprecated */</font>
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifndef</font> PNG_USE_RESULT
+#  define PNG_USE_RESULT  <font color='#009900'>/* The result of this function must be checked */</font>
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifndef</font> PNG_NORETURN
+#  define PNG_NORETURN    <font color='#009900'>/* This function does not return */</font>
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifndef</font> PNG_ALLOCATED
+#  define PNG_ALLOCATED   <font color='#009900'>/* The result of the function is new memory */</font>
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifndef</font> PNG_PRIVATE
+#  define PNG_PRIVATE     <font color='#009900'>/* This is a private libpng function */</font>
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifndef</font> PNG_RESTRICT
+#  define PNG_RESTRICT    <font color='#009900'>/* The C99 "restrict" feature */</font>
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifndef</font> PNG_FP_EXPORT     <font color='#009900'>/* A floating point API. */</font>
+#  ifdef PNG_FLOATING_POINT_SUPPORTED
+#     define <b><a name='PNG_FP_EXPORT'></a>PNG_FP_EXPORT</b><font face='Lucida Console'>(</font>ordinal, type, name, args<font face='Lucida Console'>)</font>\
+         <b><a name='PNG_EXPORT'></a>PNG_EXPORT</b><font face='Lucida Console'>(</font>ordinal, type, name, args<font face='Lucida Console'>)</font>;
+#  <font color='#0000FF'>else</font>                   <font color='#009900'>/* No floating point APIs */</font>
+#     define <b><a name='PNG_FP_EXPORT'></a>PNG_FP_EXPORT</b><font face='Lucida Console'>(</font>ordinal, type, name, args<font face='Lucida Console'>)</font>
+#  endif
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifndef</font> PNG_FIXED_EXPORT  <font color='#009900'>/* A fixed point API. */</font>
+#  ifdef PNG_FIXED_POINT_SUPPORTED
+#     define <b><a name='PNG_FIXED_EXPORT'></a>PNG_FIXED_EXPORT</b><font face='Lucida Console'>(</font>ordinal, type, name, args<font face='Lucida Console'>)</font>\
+         <b><a name='PNG_EXPORT'></a>PNG_EXPORT</b><font face='Lucida Console'>(</font>ordinal, type, name, args<font face='Lucida Console'>)</font>;
+#  <font color='#0000FF'>else</font>                   <font color='#009900'>/* No fixed point APIs */</font>
+#     define <b><a name='PNG_FIXED_EXPORT'></a>PNG_FIXED_EXPORT</b><font face='Lucida Console'>(</font>ordinal, type, name, args<font face='Lucida Console'>)</font>
+#  endif
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifndef</font> PNG_BUILDING_SYMBOL_TABLE
+<font color='#009900'>/* Some typedefs to get us started.  These should be safe on most of the common
+ * platforms.
+ *
+ * png_uint_32 and png_int_32 may, currently, be larger than required to hold a
+ * 32-bit value however this is not normally advisable.
+ *
+ * png_uint_16 and png_int_16 should always be two bytes in size - this is
+ * verified at library build time.
+ *
+ * png_byte must always be one byte in size.
+ *
+ * The checks below use constants from limits.h, as defined by the ISOC90
+ * standard.
+ */</font>
+<font color='#0000FF'>#if</font> CHAR_BIT <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> UCHAR_MAX <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font>
+   <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> png_byte;
+<font color='#0000FF'>#else</font>
+#  error "<font color='#CC0000'>libpng requires 8 bit bytes</font>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> INT_MIN <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>32768</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> INT_MAX <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>32767</font>
+   <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>int</u></font> png_int_16;
+<font color='#0000FF'>#elif</font> SHRT_MIN <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>32768</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> SHRT_MAX <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>32767</font>
+   <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>short</u></font> png_int_16;
+<font color='#0000FF'>#else</font>
+#  error "<font color='#CC0000'>libpng requires a signed 16 bit type</font>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> UINT_MAX <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>
+   <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> png_uint_16;
+<font color='#0000FF'>#elif</font> USHRT_MAX <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font>
+   <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> png_uint_16;
+<font color='#0000FF'>#else</font>
+#  error "<font color='#CC0000'>libpng requires an unsigned 16 bit type</font>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> INT_MIN <font color='#5555FF'>&lt;</font> <font color='#5555FF'>-</font><font color='#979000'>2147483646</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> INT_MAX <font color='#5555FF'>&gt;</font> <font color='#979000'>2147483646</font>
+   <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>int</u></font> png_int_32;
+<font color='#0000FF'>#elif</font> LONG_MIN <font color='#5555FF'>&lt;</font> <font color='#5555FF'>-</font><font color='#979000'>2147483646</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> LONG_MAX <font color='#5555FF'>&gt;</font> <font color='#979000'>2147483646</font>
+   <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>int</u></font> png_int_32;
+<font color='#0000FF'>#else</font>
+#  error "<font color='#CC0000'>libpng requires a signed 32 bit (or more) type</font>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> UINT_MAX <font color='#5555FF'>&gt;</font> <font color='#979000'>4294967294</font>
+   <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> png_uint_32;
+<font color='#0000FF'>#elif</font> ULONG_MAX <font color='#5555FF'>&gt;</font> <font color='#979000'>4294967294</font>
+   <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>int</u></font> png_uint_32;
+<font color='#0000FF'>#else</font>
+#  error "<font color='#CC0000'>libpng requires an unsigned 32 bit (or more) type</font>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* Prior to 1.6.0 it was possible to disable the use of size_t, 1.6.0, however,
+ * requires an ISOC90 compiler and relies on consistent behavior of sizeof.
+ */</font>
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>size_t</u></font> png_size_t;
+<font color='#0000FF'>typedef</font> ptrdiff_t png_ptrdiff_t;
+
+<font color='#009900'>/* libpng needs to know the maximum value of 'size_t' and this controls the
+ * definition of png_alloc_size_t, below.  This maximum value of size_t limits
+ * but does not control the maximum allocations the library makes - there is
+ * direct application control of this through png_set_user_limits().
+ */</font>
+<font color='#0000FF'>#ifndef</font> PNG_SMALL_SIZE_T
+   <font color='#009900'>/* Compiler specific tests for systems where size_t is known to be less than
+    * 32 bits (some of these systems may no longer work because of the lack of
+    * 'far' support; see above.)
+    */</font>
+#  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>defined</font><font face='Lucida Console'>(</font>__TURBOC__<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font><font color='#BB00BB'>defined</font><font face='Lucida Console'>(</font>__FLAT__<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>\
+   <font face='Lucida Console'>(</font><font color='#BB00BB'>defined</font><font face='Lucida Console'>(</font>_MSC_VER<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>defined</font><font face='Lucida Console'>(</font>MAXSEG_64K<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+#     define PNG_SMALL_SIZE_T
+#  endif
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* png_alloc_size_t is guaranteed to be no smaller than png_size_t, and no
+ * smaller than png_uint_32.  Casts from png_size_t or png_uint_32 to
+ * png_alloc_size_t are not necessary; in fact, it is recommended not to use
+ * them at all so that the compiler can complain when something turns out to be
+ * problematic.
+ *
+ * Casts in the other direction (from png_alloc_size_t to png_size_t or
+ * png_uint_32) should be explicitly applied; however, we do not expect to
+ * encounter practical situations that require such conversions.
+ *
+ * PNG_SMALL_SIZE_T must be defined if the maximum value of size_t is less than
+ * 4294967295 - i.e. less than the maximum value of png_uint_32.
+ */</font>
+<font color='#0000FF'>#ifdef</font> PNG_SMALL_SIZE_T
+   <font color='#0000FF'>typedef</font> png_uint_32 png_alloc_size_t;
+<font color='#0000FF'>#else</font>
+   <font color='#0000FF'>typedef</font> png_size_t png_alloc_size_t;
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* Prior to 1.6.0 libpng offered limited support for Microsoft C compiler
+ * implementations of Intel CPU specific support of user-mode segmented address
+ * spaces, where 16-bit pointers address more than 65536 bytes of memory using
+ * separate 'segment' registers.  The implementation requires two different
+ * types of pointer (only one of which includes the segment value.)
+ *
+ * If required this support is available in version 1.2 of libpng and may be
+ * available in versions through 1.5, although the correctness of the code has
+ * not been verified recently.
+ */</font>
+
+<font color='#009900'>/* Typedef for floating-point numbers that are converted to fixed-point with a
+ * multiple of 100,000, e.g., gamma
+ */</font>
+<font color='#0000FF'>typedef</font> png_int_32 png_fixed_point;
+
+<font color='#009900'>/* Add typedefs for pointers */</font>
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font>                  <font color='#5555FF'>*</font> png_voidp;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>void</u></font>            <font color='#5555FF'>*</font> png_const_voidp;
+<font color='#0000FF'>typedef</font> png_byte              <font color='#5555FF'>*</font> png_bytep;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>const</font> png_byte        <font color='#5555FF'>*</font> png_const_bytep;
+<font color='#0000FF'>typedef</font> png_uint_32           <font color='#5555FF'>*</font> png_uint_32p;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>const</font> png_uint_32     <font color='#5555FF'>*</font> png_const_uint_32p;
+<font color='#0000FF'>typedef</font> png_int_32            <font color='#5555FF'>*</font> png_int_32p;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>const</font> png_int_32      <font color='#5555FF'>*</font> png_const_int_32p;
+<font color='#0000FF'>typedef</font> png_uint_16           <font color='#5555FF'>*</font> png_uint_16p;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>const</font> png_uint_16     <font color='#5555FF'>*</font> png_const_uint_16p;
+<font color='#0000FF'>typedef</font> png_int_16            <font color='#5555FF'>*</font> png_int_16p;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>const</font> png_int_16      <font color='#5555FF'>*</font> png_const_int_16p;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>char</u></font>                  <font color='#5555FF'>*</font> png_charp;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font>            <font color='#5555FF'>*</font> png_const_charp;
+<font color='#0000FF'>typedef</font> png_fixed_point       <font color='#5555FF'>*</font> png_fixed_point_p;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>const</font> png_fixed_point <font color='#5555FF'>*</font> png_const_fixed_point_p;
+<font color='#0000FF'>typedef</font> png_size_t            <font color='#5555FF'>*</font> png_size_tp;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>const</font> png_size_t      <font color='#5555FF'>*</font> png_const_size_tp;
+
+<font color='#0000FF'>#ifdef</font> PNG_STDIO_SUPPORTED
+<font color='#0000FF'>typedef</font> FILE            <font color='#5555FF'>*</font> png_FILE_p;
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> PNG_FLOATING_POINT_SUPPORTED
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>double</u></font>       <font color='#5555FF'>*</font> png_doublep;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font> png_const_doublep;
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* Pointers to pointers; i.e. arrays */</font>
+<font color='#0000FF'>typedef</font> png_byte        <font color='#5555FF'>*</font> <font color='#5555FF'>*</font> png_bytepp;
+<font color='#0000FF'>typedef</font> png_uint_32     <font color='#5555FF'>*</font> <font color='#5555FF'>*</font> png_uint_32pp;
+<font color='#0000FF'>typedef</font> png_int_32      <font color='#5555FF'>*</font> <font color='#5555FF'>*</font> png_int_32pp;
+<font color='#0000FF'>typedef</font> png_uint_16     <font color='#5555FF'>*</font> <font color='#5555FF'>*</font> png_uint_16pp;
+<font color='#0000FF'>typedef</font> png_int_16      <font color='#5555FF'>*</font> <font color='#5555FF'>*</font> png_int_16pp;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font>      <font color='#5555FF'>*</font> <font color='#5555FF'>*</font> png_const_charpp;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>char</u></font>            <font color='#5555FF'>*</font> <font color='#5555FF'>*</font> png_charpp;
+<font color='#0000FF'>typedef</font> png_fixed_point <font color='#5555FF'>*</font> <font color='#5555FF'>*</font> png_fixed_point_pp;
+<font color='#0000FF'>#ifdef</font> PNG_FLOATING_POINT_SUPPORTED
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>double</u></font>          <font color='#5555FF'>*</font> <font color='#5555FF'>*</font> png_doublepp;
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* Pointers to pointers to pointers; i.e., pointer to array */</font>
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>char</u></font>            <font color='#5555FF'>*</font> <font color='#5555FF'>*</font> <font color='#5555FF'>*</font> png_charppp;
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNG_BUILDING_SYMBOL_TABLE */</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNGCONF_H */</font>
+
+</pre></body></html>

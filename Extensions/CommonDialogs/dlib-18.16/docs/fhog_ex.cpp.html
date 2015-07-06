@@ -1,0 +1,91 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - fhog_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use of the extract_fhog_features() routine from
+    the dlib C++ Library.
+
+    
+    The extract_fhog_features() routine performs the style of HOG feature extraction
+    described in the paper:
+        Object Detection with Discriminatively Trained Part Based Models by
+        P. Felzenszwalb, R. Girshick, D. McAllester, D. Ramanan
+        IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 32, No. 9, Sep. 2010
+    This means that it takes an input image and outputs Felzenszwalb's
+    31 dimensional version of HOG features.  We show its use below.
+*/</font>
+
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>gui_widgets.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_io.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_transforms.h<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>//  ----------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> argc, <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>*</font> argv<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// Make sure the user entered an argument to this program.  It should be the
+</font>        <font color='#009900'>// filename for an image.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>argc <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>error, you have to enter a BMP file as an argument to this program</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#009900'>// Here we declare an image object that can store color rgb_pixels.    
+</font>        array2d<font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font> img;
+
+        <font color='#009900'>// Now load the image file into our image.  If something is wrong then
+</font>        <font color='#009900'>// load_image() will throw an exception.  Also, if you linked with libpng
+</font>        <font color='#009900'>// and libjpeg then load_image() can load PNG and JPEG files in addition
+</font>        <font color='#009900'>// to BMP files.
+</font>        <font color='#BB00BB'>load_image</font><font face='Lucida Console'>(</font>img, argv[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Now convert the image into a FHOG feature image.  The output, hog, is a 2D array
+</font>        <font color='#009900'>// of 31 dimensional vectors.
+</font>        array2d<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>31</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> hog;
+        <font color='#BB00BB'>extract_fhog_features</font><font face='Lucida Console'>(</font>img, hog<font face='Lucida Console'>)</font>;
+
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hog image has </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> hog.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> rows and </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> hog.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> columns.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        <font color='#009900'>// Let's see what the image and FHOG features look like.
+</font>        image_window <font color='#BB00BB'>win</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+        image_window <font color='#BB00BB'>winhog</font><font face='Lucida Console'>(</font><font color='#BB00BB'>draw_fhog</font><font face='Lucida Console'>(</font>hog<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Another thing you might want to do is map between the pixels in img and the
+</font>        <font color='#009900'>// cells in the hog image.  dlib provides the image_to_fhog() and fhog_to_image()
+</font>        <font color='#009900'>// routines for this.  Their use is demonstrated in the following loop which
+</font>        <font color='#009900'>// responds to the user clicking on pixels in the image img.
+</font>        point p;  <font color='#009900'>// A 2D point, used to represent pixel locations.
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>win.<font color='#BB00BB'>get_next_double_click</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            point hp <font color='#5555FF'>=</font> <font color='#BB00BB'>image_to_fhog</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>The point </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> p <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> in the input image corresponds to </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> hp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> in hog space.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>FHOG features at this point: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>hog[hp.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][hp.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <b>}</b>
+
+        <font color='#009900'>// Finally, sometimes you want to get a planar representation of the HOG features
+</font>        <font color='#009900'>// rather than the explicit vector (i.e. interlaced) representation used above.  
+</font>        dlib::array<font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> planar_hog;
+        <font color='#BB00BB'>extract_fhog_features</font><font face='Lucida Console'>(</font>img, planar_hog<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Now we have an array of 31 float valued image planes, each representing one of
+</font>        <font color='#009900'>// the dimensions of the HOG feature vector.  
+</font>    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>exception thrown: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>//  ----------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

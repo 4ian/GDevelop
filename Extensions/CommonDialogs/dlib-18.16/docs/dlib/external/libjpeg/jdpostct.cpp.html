@@ -1,0 +1,293 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jdpostct.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jdpostct.c
+ *
+ * Copyright (C) 1994-1996, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains the decompression postprocessing controller.
+ * This controller manages the upsampling, color conversion, and color
+ * quantization/reduction steps; specifically, it controls the buffering
+ * between upsample/color conversion and color quantization/reduction.
+ *
+ * If no color quantization/reduction is required, then this module has no
+ * work to do, and it just hands off to the upsample/color conversion code.
+ * An integrated upsample/convert/quantize process would replace this module
+ * entirely.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+
+
+<font color='#009900'>/* Private buffer controller object */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#0000FF'>struct</font> jpeg_d_post_controller pub; <font color='#009900'>/* public fields */</font>
+
+  <font color='#009900'>/* Color quantization source buffer: this holds output data from
+   * the upsample/color conversion step to be passed to the quantizer.
+   * For two-pass color quantization, we need a full-image buffer;
+   * for one-pass operation, a strip buffer is sufficient.
+   */</font>
+  jvirt_sarray_ptr whole_image;	<font color='#009900'>/* virtual array, or NULL if one-pass */</font>
+  JSAMPARRAY buffer;		<font color='#009900'>/* strip buffer, or current strip of virtual */</font>
+  JDIMENSION strip_height;	<font color='#009900'>/* buffer size in rows */</font>
+  <font color='#009900'>/* for two-pass mode only: */</font>
+  JDIMENSION starting_row;	<font color='#009900'>/* row # of first row in current strip */</font>
+  JDIMENSION next_row;		<font color='#009900'>/* index of next row to fill/empty in strip */</font>
+<b>}</b> my_post_controller;
+
+<font color='#0000FF'>typedef</font> my_post_controller <font color='#5555FF'>*</font> my_post_ptr;
+
+
+<font color='#009900'>/* Forward declarations */</font>
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> post_process_1pass
+	<b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+	     JSAMPIMAGE input_buf, JDIMENSION <font color='#5555FF'>*</font>in_row_group_ctr,
+	     JDIMENSION in_row_groups_avail,
+	     JSAMPARRAY output_buf, JDIMENSION <font color='#5555FF'>*</font>out_row_ctr,
+	     JDIMENSION out_rows_avail<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#ifdef</font> QUANT_2PASS_SUPPORTED
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> post_process_prepass
+	<b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+	     JSAMPIMAGE input_buf, JDIMENSION <font color='#5555FF'>*</font>in_row_group_ctr,
+	     JDIMENSION in_row_groups_avail,
+	     JSAMPARRAY output_buf, JDIMENSION <font color='#5555FF'>*</font>out_row_ctr,
+	     JDIMENSION out_rows_avail<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> post_process_2pass
+	<b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+	     JSAMPIMAGE input_buf, JDIMENSION <font color='#5555FF'>*</font>in_row_group_ctr,
+	     JDIMENSION in_row_groups_avail,
+	     JSAMPARRAY output_buf, JDIMENSION <font color='#5555FF'>*</font>out_row_ctr,
+	     JDIMENSION out_rows_avail<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#009900'>/*
+ * Initialize for a processing pass.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='start_pass_dpost'></a>start_pass_dpost</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, J_BUF_MODE pass_mode<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_post_ptr post <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_post_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>post;
+
+  <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>pass_mode<font face='Lucida Console'>)</font> <b>{</b>
+  <font color='#0000FF'>case</font> JBUF_PASS_THRU:
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantize_colors<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* Single-pass processing with color quantization. */</font>
+      post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.post_process_data <font color='#5555FF'>=</font> post_process_1pass;
+      <font color='#009900'>/* We could be doing buffered-image output before starting a 2-pass
+       * color quantization; in that case, jinit_d_post_controller did not
+       * allocate a strip buffer.  Use the virtual-array buffer as workspace.
+       */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+	post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>access_virt_sarray<font face='Lucida Console'>)</font>
+	  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whole_image,
+	   <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font color='#979000'>0</font>, post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strip_height, TRUE<font face='Lucida Console'>)</font>;
+      <b>}</b>
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      <font color='#009900'>/* For single-pass processing without color quantization,
+       * I have no work to do; just call the upsampler directly.
+       */</font>
+      post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.post_process_data <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upsample;
+    <b>}</b>
+    <font color='#0000FF'>break</font>;
+<font color='#0000FF'>#ifdef</font> QUANT_2PASS_SUPPORTED
+  <font color='#0000FF'>case</font> JBUF_SAVE_AND_PASS:
+    <font color='#009900'>/* First pass of 2-pass quantization */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whole_image <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_BUFFER_MODE<font face='Lucida Console'>)</font>;
+    post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.post_process_data <font color='#5555FF'>=</font> post_process_prepass;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> JBUF_CRANK_DEST:
+    <font color='#009900'>/* Second pass of 2-pass quantization */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whole_image <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_BUFFER_MODE<font face='Lucida Console'>)</font>;
+    post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.post_process_data <font color='#5555FF'>=</font> post_process_2pass;
+    <font color='#0000FF'>break</font>;
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* QUANT_2PASS_SUPPORTED */</font>
+  <font color='#0000FF'>default</font>:
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_BUFFER_MODE<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>break</font>;
+  <b>}</b>
+  post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>starting_row <font color='#5555FF'>=</font> post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Process some data in the one-pass (strip buffer) case.
+ * This is used for color precision reduction as well as one-pass quantization.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='post_process_1pass'></a>post_process_1pass</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+		    JSAMPIMAGE input_buf, JDIMENSION <font color='#5555FF'>*</font>in_row_group_ctr,
+		    JDIMENSION in_row_groups_avail,
+		    JSAMPARRAY output_buf, JDIMENSION <font color='#5555FF'>*</font>out_row_ctr,
+		    JDIMENSION out_rows_avail<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_post_ptr post <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_post_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>post;
+  JDIMENSION num_rows, max_rows;
+
+  <font color='#009900'>/* Fill the buffer, but not more than what we can dump out in one go. */</font>
+  <font color='#009900'>/* Note we rely on the upsampler to detect bottom of image. */</font>
+  max_rows <font color='#5555FF'>=</font> out_rows_avail <font color='#5555FF'>-</font> <font color='#5555FF'>*</font>out_row_ctr;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>max_rows <font color='#5555FF'>&gt;</font> post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strip_height<font face='Lucida Console'>)</font>
+    max_rows <font color='#5555FF'>=</font> post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strip_height;
+  num_rows <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upsample<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo,
+		input_buf, in_row_group_ctr, in_row_groups_avail,
+		post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer, <font color='#5555FF'>&amp;</font>num_rows, max_rows<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Quantize and emit data. */</font>
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_quantize<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo,
+		post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer, output_buf <font color='#5555FF'>+</font> <font color='#5555FF'>*</font>out_row_ctr, <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> num_rows<font face='Lucida Console'>)</font>;
+  <font color='#5555FF'>*</font>out_row_ctr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> num_rows;
+<b>}</b>
+
+
+<font color='#0000FF'>#ifdef</font> QUANT_2PASS_SUPPORTED
+
+<font color='#009900'>/*
+ * Process some data in the first pass of 2-pass quantization.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='post_process_prepass'></a>post_process_prepass</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+		      JSAMPIMAGE input_buf, JDIMENSION <font color='#5555FF'>*</font>in_row_group_ctr,
+		      JDIMENSION in_row_groups_avail,
+		      JSAMPARRAY , JDIMENSION <font color='#5555FF'>*</font>out_row_ctr,
+		      JDIMENSION <font face='Lucida Console'>)</font>
+<b>{</b>
+  my_post_ptr post <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_post_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>post;
+  JDIMENSION old_next_row, num_rows;
+
+  <font color='#009900'>/* Reposition virtual buffer if at start of strip. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+    post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>access_virt_sarray<font face='Lucida Console'>)</font>
+	<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whole_image,
+	 post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>starting_row, post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strip_height, TRUE<font face='Lucida Console'>)</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Upsample some data (up to a strip height's worth). */</font>
+  old_next_row <font color='#5555FF'>=</font> post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row;
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>upsample<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo,
+		input_buf, in_row_group_ctr, in_row_groups_avail,
+		post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer, <font color='#5555FF'>&amp;</font>post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row, post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strip_height<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Allow quantizer to scan new data.  No data is emitted, */</font>
+  <font color='#009900'>/* but we advance out_row_ctr so outer loop can tell when we're done. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row <font color='#5555FF'>&gt;</font> old_next_row<font face='Lucida Console'>)</font> <b>{</b>
+    num_rows <font color='#5555FF'>=</font> post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row <font color='#5555FF'>-</font> old_next_row;
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_quantize<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer <font color='#5555FF'>+</font> old_next_row,
+					 <font face='Lucida Console'>(</font>JSAMPARRAY<font face='Lucida Console'>)</font> NULL, <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> num_rows<font face='Lucida Console'>)</font>;
+    <font color='#5555FF'>*</font>out_row_ctr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> num_rows;
+  <b>}</b>
+
+  <font color='#009900'>/* Advance if we filled the strip. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strip_height<font face='Lucida Console'>)</font> <b>{</b>
+    post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>starting_row <font color='#5555FF'>+</font><font color='#5555FF'>=</font> post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strip_height;
+    post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Process some data in the second pass of 2-pass quantization.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='post_process_2pass'></a>post_process_2pass</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+		    JSAMPIMAGE , JDIMENSION <font color='#5555FF'>*</font>,
+		    JDIMENSION ,
+		    JSAMPARRAY output_buf, JDIMENSION <font color='#5555FF'>*</font>out_row_ctr,
+		    JDIMENSION out_rows_avail<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_post_ptr post <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_post_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>post;
+  JDIMENSION num_rows, max_rows;
+
+  <font color='#009900'>/* Reposition virtual buffer if at start of strip. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+    post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>access_virt_sarray<font face='Lucida Console'>)</font>
+	<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whole_image,
+	 post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>starting_row, post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strip_height, FALSE<font face='Lucida Console'>)</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Determine number of rows to emit. */</font>
+  num_rows <font color='#5555FF'>=</font> post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strip_height <font color='#5555FF'>-</font> post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row; <font color='#009900'>/* available in strip */</font>
+  max_rows <font color='#5555FF'>=</font> out_rows_avail <font color='#5555FF'>-</font> <font color='#5555FF'>*</font>out_row_ctr; <font color='#009900'>/* available in output area */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_rows <font color='#5555FF'>&gt;</font> max_rows<font face='Lucida Console'>)</font>
+    num_rows <font color='#5555FF'>=</font> max_rows;
+  <font color='#009900'>/* We have to check bottom of image here, can't depend on upsampler. */</font>
+  max_rows <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_height <font color='#5555FF'>-</font> post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>starting_row;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_rows <font color='#5555FF'>&gt;</font> max_rows<font face='Lucida Console'>)</font>
+    num_rows <font color='#5555FF'>=</font> max_rows;
+
+  <font color='#009900'>/* Quantize and emit data. */</font>
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_quantize<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo,
+		post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer <font color='#5555FF'>+</font> post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row, output_buf <font color='#5555FF'>+</font> <font color='#5555FF'>*</font>out_row_ctr,
+		<font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> num_rows<font face='Lucida Console'>)</font>;
+  <font color='#5555FF'>*</font>out_row_ctr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> num_rows;
+
+  <font color='#009900'>/* Advance if we filled the strip. */</font>
+  post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row <font color='#5555FF'>+</font><font color='#5555FF'>=</font> num_rows;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strip_height<font face='Lucida Console'>)</font> <b>{</b>
+    post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>starting_row <font color='#5555FF'>+</font><font color='#5555FF'>=</font> post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strip_height;
+    post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_row <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* QUANT_2PASS_SUPPORTED */</font>
+
+
+<font color='#009900'>/*
+ * Initialize postprocessing controller.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jinit_d_post_controller'></a>jinit_d_post_controller</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, <font color='#0000FF'><u>int</u></font> need_full_buffer<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_post_ptr post;
+
+  post <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_post_ptr<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				<font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>my_post_controller<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>post <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> jpeg_d_post_controller <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> post;
+  post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.start_pass <font color='#5555FF'>=</font> start_pass_dpost;
+  post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whole_image <font color='#5555FF'>=</font> NULL;	<font color='#009900'>/* flag for no virtual arrays */</font>
+  post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer <font color='#5555FF'>=</font> NULL;		<font color='#009900'>/* flag for no strip buffer */</font>
+
+  <font color='#009900'>/* Create the quantization buffer, if needed */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantize_colors<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* The buffer strip height is max_v_samp_factor, which is typically
+     * an efficient number of rows for upsampling to return.
+     * (In the presence of output rescaling, we might want to be smarter?)
+     */</font>
+    post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strip_height <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>need_full_buffer<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* Two-pass color quantization: need full-image storage. */</font>
+      <font color='#009900'>/* We round up the number of rows to a multiple of the strip height. */</font>
+<font color='#0000FF'>#ifdef</font> QUANT_2PASS_SUPPORTED
+      post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whole_image <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>request_virt_sarray<font face='Lucida Console'>)</font>
+	<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE, FALSE,
+	 cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width <font color='#5555FF'>*</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components,
+	 <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font color='#BB00BB'>jround_up</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_height,
+				<font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strip_height<font face='Lucida Console'>)</font>,
+	 post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strip_height<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_BUFFER_MODE<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* QUANT_2PASS_SUPPORTED */</font>
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      <font color='#009900'>/* One-pass color quantization: just make a strip buffer. */</font>
+      post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_sarray<font face='Lucida Console'>)</font>
+	<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+	 cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width <font color='#5555FF'>*</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components,
+	 post<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strip_height<font face='Lucida Console'>)</font>;
+    <b>}</b>
+  <b>}</b>
+<b>}</b>
+
+</pre></body></html>

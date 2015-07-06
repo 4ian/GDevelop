@@ -1,0 +1,126 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - misc_api_kernel_2.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2004  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MISC_API_KERNEL_2_CPp_
+<font color='#0000FF'>#define</font> DLIB_MISC_API_KERNEL_2_CPp_
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../platform.h.html'>../platform.h</a>"
+
+<font color='#0000FF'>#ifdef</font> POSIX
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>unistd.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='misc_api_kernel_2.h.html'>misc_api_kernel_2.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sys<font color='#5555FF'>/</font>time.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sys<font color='#5555FF'>/</font>stat.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sys<font color='#5555FF'>/</font>types.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>errno.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='sleep'></a>sleep</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> milliseconds
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// in HP-UX you can only usleep for less than a second 
+</font><font color='#0000FF'>#ifdef</font> HPUX
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>milliseconds <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1000</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            ::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font>milliseconds<font color='#5555FF'>/</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> remaining <font color='#5555FF'>=</font> milliseconds<font color='#5555FF'>%</font><font color='#979000'>1000</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>remaining <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                ::<font color='#BB00BB'>usleep</font><font face='Lucida Console'>(</font>remaining<font color='#5555FF'>*</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            ::<font color='#BB00BB'>usleep</font><font face='Lucida Console'>(</font>milliseconds<font color='#5555FF'>*</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+<font color='#0000FF'>#else</font>
+        ::<font color='#BB00BB'>usleep</font><font face='Lucida Console'>(</font>milliseconds<font color='#5555FF'>*</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    std::string <b><a name='get_current_dir'></a>get_current_dir</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>char</u></font> buf[<font color='#979000'>1024</font>];
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>getcwd</font><font face='Lucida Console'>(</font>buf,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> std::<font color='#BB00BB'>string</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> std::<font color='#BB00BB'>string</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='set_current_dir'></a>set_current_dir</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> new_dir
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>chdir</font><font face='Lucida Console'>(</font>new_dir.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>set_current_dir_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error changing current dir to '</font>" <font color='#5555FF'>+</font> new_dir <font color='#5555FF'>+</font> "<font color='#CC0000'>'</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    uint64 timestamper::
+    <b><a name='get_timestamp'></a>get_timestamp</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        uint64 ts;
+        timeval curtime;
+        <font color='#BB00BB'>gettimeofday</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>curtime,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;       
+
+        ts <font color='#5555FF'>=</font> curtime.tv_sec;
+        ts <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>1000000</font>;
+        ts <font color='#5555FF'>+</font><font color='#5555FF'>=</font> curtime.tv_usec;
+        <font color='#0000FF'>return</font> ts;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='create_directory'></a>create_directory</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> dir
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>mkdir</font><font face='Lucida Console'>(</font>dir.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>0777</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// an error has occurred
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>errno <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EEXIST<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>struct</font> stat buffer;
+                <font color='#009900'>// now check that this is actually a valid directory
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>::<font color='#BB00BB'>stat</font><font face='Lucida Console'>(</font>dir.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#5555FF'>&amp;</font>buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// the directory was not found
+</font>                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>dir_create_error</font><font face='Lucida Console'>(</font>dir<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>S_ISDIR</font><font face='Lucida Console'>(</font>buffer.st_mode<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// It is not a directory
+</font>                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>dir_create_error</font><font face='Lucida Console'>(</font>dir<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>dir_create_error</font><font face='Lucida Console'>(</font>dir<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// POSIX
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MISC_API_KERNEL_2_CPp_
+</font>
+
+</pre></body></html>

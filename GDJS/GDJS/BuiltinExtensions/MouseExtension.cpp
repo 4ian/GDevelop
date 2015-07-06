@@ -28,6 +28,7 @@ MouseExtension::MouseExtension()
     GetAllConditions()["SourisX"].SetFunctionName("gdjs.evtTools.input.getMouseX").SetIncludeFile("inputtools.js");
     GetAllConditions()["SourisY"].SetFunctionName("gdjs.evtTools.input.getMouseY").SetIncludeFile("inputtools.js");
     GetAllConditions()["SourisBouton"].SetFunctionName("gdjs.evtTools.input.isMouseButtonPressed").SetIncludeFile("inputtools.js");
+    GetAllConditions()["MouseButtonReleased"].SetFunctionName("gdjs.evtTools.input.isMouseButtonReleased").SetIncludeFile("inputtools.js");
     GetAllActions()["CacheSouris"].SetFunctionName("gdjs.evtTools.input.hideCursor").SetIncludeFile("inputtools.js");
     GetAllActions()["MontreSouris"].SetFunctionName("gdjs.evtTools.input.showCursor").SetIncludeFile("inputtools.js");
     GetAllActions()["TouchSimulateMouse"].SetFunctionName("gdjs.evtTools.input.touchSimulateMouse").SetIncludeFile("inputtools.js");

@@ -1,6 +1,6 @@
 /*
  * GDevelop Core
- * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com) 
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com)
  				   and Victor Levasseur (victorlevasseur52@gmail.com).
  * This project is released under the MIT License.
  */
@@ -124,6 +124,18 @@ public:
      * \see SPtrList::Get.
      */
     const T & operator[](size_t index) const { return Get(index); };
+
+    /**
+     * \brief Alias for Get()
+     * \see SPtrList::Get.
+     */
+    T & at(size_t index) { return Get(index); };
+
+    /**
+     * \brief Alias for Get()
+     * \see SPtrList::Get.
+     */
+    const T & at(size_t index) const { return Get(index); };
     ///@}
 
 protected:

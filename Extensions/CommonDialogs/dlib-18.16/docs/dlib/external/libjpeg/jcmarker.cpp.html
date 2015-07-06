@@ -1,0 +1,667 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jcmarker.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jcmarker.c
+ *
+ * Copyright (C) 1991-1998, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains routines to write JPEG datastream markers.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>enum</font> <b>{</b>			<font color='#009900'>/* JPEG marker codes */</font>
+  M_SOF0  <font color='#5555FF'>=</font> <font color='#979000'>0xc0</font>,
+  M_SOF1  <font color='#5555FF'>=</font> <font color='#979000'>0xc1</font>,
+  M_SOF2  <font color='#5555FF'>=</font> <font color='#979000'>0xc2</font>,
+  M_SOF3  <font color='#5555FF'>=</font> <font color='#979000'>0xc3</font>,
+  
+  M_SOF5  <font color='#5555FF'>=</font> <font color='#979000'>0xc5</font>,
+  M_SOF6  <font color='#5555FF'>=</font> <font color='#979000'>0xc6</font>,
+  M_SOF7  <font color='#5555FF'>=</font> <font color='#979000'>0xc7</font>,
+  
+  M_JPG   <font color='#5555FF'>=</font> <font color='#979000'>0xc8</font>,
+  M_SOF9  <font color='#5555FF'>=</font> <font color='#979000'>0xc9</font>,
+  M_SOF10 <font color='#5555FF'>=</font> <font color='#979000'>0xca</font>,
+  M_SOF11 <font color='#5555FF'>=</font> <font color='#979000'>0xcb</font>,
+  
+  M_SOF13 <font color='#5555FF'>=</font> <font color='#979000'>0xcd</font>,
+  M_SOF14 <font color='#5555FF'>=</font> <font color='#979000'>0xce</font>,
+  M_SOF15 <font color='#5555FF'>=</font> <font color='#979000'>0xcf</font>,
+  
+  M_DHT   <font color='#5555FF'>=</font> <font color='#979000'>0xc4</font>,
+  
+  M_DAC   <font color='#5555FF'>=</font> <font color='#979000'>0xcc</font>,
+  
+  M_RST0  <font color='#5555FF'>=</font> <font color='#979000'>0xd0</font>,
+  M_RST1  <font color='#5555FF'>=</font> <font color='#979000'>0xd1</font>,
+  M_RST2  <font color='#5555FF'>=</font> <font color='#979000'>0xd2</font>,
+  M_RST3  <font color='#5555FF'>=</font> <font color='#979000'>0xd3</font>,
+  M_RST4  <font color='#5555FF'>=</font> <font color='#979000'>0xd4</font>,
+  M_RST5  <font color='#5555FF'>=</font> <font color='#979000'>0xd5</font>,
+  M_RST6  <font color='#5555FF'>=</font> <font color='#979000'>0xd6</font>,
+  M_RST7  <font color='#5555FF'>=</font> <font color='#979000'>0xd7</font>,
+  
+  M_SOI   <font color='#5555FF'>=</font> <font color='#979000'>0xd8</font>,
+  M_EOI   <font color='#5555FF'>=</font> <font color='#979000'>0xd9</font>,
+  M_SOS   <font color='#5555FF'>=</font> <font color='#979000'>0xda</font>,
+  M_DQT   <font color='#5555FF'>=</font> <font color='#979000'>0xdb</font>,
+  M_DNL   <font color='#5555FF'>=</font> <font color='#979000'>0xdc</font>,
+  M_DRI   <font color='#5555FF'>=</font> <font color='#979000'>0xdd</font>,
+  M_DHP   <font color='#5555FF'>=</font> <font color='#979000'>0xde</font>,
+  M_EXP   <font color='#5555FF'>=</font> <font color='#979000'>0xdf</font>,
+  
+  M_APP0  <font color='#5555FF'>=</font> <font color='#979000'>0xe0</font>,
+  M_APP1  <font color='#5555FF'>=</font> <font color='#979000'>0xe1</font>,
+  M_APP2  <font color='#5555FF'>=</font> <font color='#979000'>0xe2</font>,
+  M_APP3  <font color='#5555FF'>=</font> <font color='#979000'>0xe3</font>,
+  M_APP4  <font color='#5555FF'>=</font> <font color='#979000'>0xe4</font>,
+  M_APP5  <font color='#5555FF'>=</font> <font color='#979000'>0xe5</font>,
+  M_APP6  <font color='#5555FF'>=</font> <font color='#979000'>0xe6</font>,
+  M_APP7  <font color='#5555FF'>=</font> <font color='#979000'>0xe7</font>,
+  M_APP8  <font color='#5555FF'>=</font> <font color='#979000'>0xe8</font>,
+  M_APP9  <font color='#5555FF'>=</font> <font color='#979000'>0xe9</font>,
+  M_APP10 <font color='#5555FF'>=</font> <font color='#979000'>0xea</font>,
+  M_APP11 <font color='#5555FF'>=</font> <font color='#979000'>0xeb</font>,
+  M_APP12 <font color='#5555FF'>=</font> <font color='#979000'>0xec</font>,
+  M_APP13 <font color='#5555FF'>=</font> <font color='#979000'>0xed</font>,
+  M_APP14 <font color='#5555FF'>=</font> <font color='#979000'>0xee</font>,
+  M_APP15 <font color='#5555FF'>=</font> <font color='#979000'>0xef</font>,
+  
+  M_JPG0  <font color='#5555FF'>=</font> <font color='#979000'>0xf0</font>,
+  M_JPG13 <font color='#5555FF'>=</font> <font color='#979000'>0xfd</font>,
+  M_COM   <font color='#5555FF'>=</font> <font color='#979000'>0xfe</font>,
+  
+  M_TEM   <font color='#5555FF'>=</font> <font color='#979000'>0x01</font>,
+  
+  M_ERROR <font color='#5555FF'>=</font> <font color='#979000'>0x100</font>
+<b>}</b> JPEG_MARKER;
+
+
+<font color='#009900'>/* Private state */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#0000FF'>struct</font> jpeg_marker_writer pub; <font color='#009900'>/* public fields */</font>
+
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> last_restart_interval; <font color='#009900'>/* last DRI value emitted; 0 after SOI */</font>
+<b>}</b> my_marker_writer;
+
+<font color='#0000FF'>typedef</font> my_marker_writer <font color='#5555FF'>*</font> my_marker_ptr;
+
+
+<font color='#009900'>/*
+ * Basic output routines.
+ *
+ * Note that we do not support suspension while writing a marker.
+ * Therefore, an application using suspension must ensure that there is
+ * enough buffer space for the initial markers (typ. 600-700 bytes) before
+ * calling jpeg_start_compress, and enough space to write the trailing EOI
+ * (a few bytes) before calling jpeg_finish_compress.  Multipass compression
+ * modes are not supported at all with suspension, so those two are the only
+ * points where markers will be written.
+ */</font>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='emit_byte'></a>emit_byte</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> val<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Emit a byte */</font>
+<b>{</b>
+  <font color='#0000FF'>struct</font> jpeg_destination_mgr <font color='#5555FF'>*</font> dest <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dest;
+
+  <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_output_byte<font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JOCTET<font face='Lucida Console'>)</font> val;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>free_in_buffer <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>empty_output_buffer<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_CANT_SUSPEND<font face='Lucida Console'>)</font>;
+  <b>}</b>
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='emit_marker'></a>emit_marker</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, JPEG_MARKER mark<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Emit a marker code */</font>
+<b>{</b>
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> mark<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='emit_2bytes'></a>emit_2bytes</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> value<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Emit a 2-byte integer; these are always MSB first in JPEG files */</font>
+<b>{</b>
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font face='Lucida Console'>(</font>value <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, value <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Routines to write specific marker types.
+ */</font>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='emit_dqt'></a>emit_dqt</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> index<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Emit a DQT marker */</font>
+<font color='#009900'>/* Returns the precision used (0 = 8bits, 1 = 16bits) for baseline checking */</font>
+<b>{</b>
+  JQUANT_TBL <font color='#5555FF'>*</font> qtbl <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quant_tbl_ptrs[index];
+  <font color='#0000FF'><u>int</u></font> prec;
+  <font color='#0000FF'><u>int</u></font> i;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>qtbl <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_NO_QUANT_TABLE, index<font face='Lucida Console'>)</font>;
+
+  prec <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> DCTSIZE2; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>qtbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantval[i] <font color='#5555FF'>&gt;</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font>
+      prec <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+  <b>}</b>
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> qtbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sent_table<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#BB00BB'>emit_marker</font><font face='Lucida Console'>(</font>cinfo, M_DQT<font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>emit_2bytes</font><font face='Lucida Console'>(</font>cinfo, prec ? DCTSIZE2<font color='#5555FF'>*</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font> : DCTSIZE2 <font color='#5555FF'>+</font> <font color='#979000'>1</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, index <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>prec<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> DCTSIZE2; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* The table entries must be emitted in zigzag order. */</font>
+      <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> qval <font color='#5555FF'>=</font> qtbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantval[jpeg_natural_order[i]];
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>prec<font face='Lucida Console'>)</font>
+	<font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>qval <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+      <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>qval <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFF</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    qtbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sent_table <font color='#5555FF'>=</font> TRUE;
+  <b>}</b>
+
+  <font color='#0000FF'>return</font> prec;
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='emit_dht'></a>emit_dht</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> index, <font color='#0000FF'><u>int</u></font> is_ac<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Emit a DHT marker */</font>
+<b>{</b>
+  JHUFF_TBL <font color='#5555FF'>*</font> htbl;
+  <font color='#0000FF'><u>int</u></font> length, i;
+  
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_ac<font face='Lucida Console'>)</font> <b>{</b>
+    htbl <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ac_huff_tbl_ptrs[index];
+    index <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>0x10</font>;		<font color='#009900'>/* output index has AC bit set */</font>
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    htbl <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dc_huff_tbl_ptrs[index];
+  <b>}</b>
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>htbl <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_NO_HUFF_TABLE, index<font face='Lucida Console'>)</font>;
+  
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> htbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sent_table<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#BB00BB'>emit_marker</font><font face='Lucida Console'>(</font>cinfo, M_DHT<font face='Lucida Console'>)</font>;
+    
+    length <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>16</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+      length <font color='#5555FF'>+</font><font color='#5555FF'>=</font> htbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bits[i];
+    
+    <font color='#BB00BB'>emit_2bytes</font><font face='Lucida Console'>(</font>cinfo, length <font color='#5555FF'>+</font> <font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font> <font color='#5555FF'>+</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, index<font face='Lucida Console'>)</font>;
+    
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>16</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, htbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bits[i]<font face='Lucida Console'>)</font>;
+    
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> length; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, htbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>huffval[i]<font face='Lucida Console'>)</font>;
+    
+    htbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sent_table <font color='#5555FF'>=</font> TRUE;
+  <b>}</b>
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='emit_dac'></a>emit_dac</b> <font face='Lucida Console'>(</font>j_compress_ptr <font face='Lucida Console'>)</font><font color='#009900'>//cinfo)
+</font><font color='#009900'>/* Emit a DAC marker */</font>
+<font color='#009900'>/* Since the useful info is so small, we want to emit all the tables in */</font>
+<font color='#009900'>/* one DAC marker.  Therefore this routine does its own scan of the table. */</font>
+<b>{</b>
+<font color='#0000FF'>#ifdef</font> C_ARITH_CODING_SUPPORTED
+  <font color='#0000FF'><u>char</u></font> dc_in_use[NUM_ARITH_TBLS];
+  <font color='#0000FF'><u>char</u></font> ac_in_use[NUM_ARITH_TBLS];
+  <font color='#0000FF'><u>int</u></font> length, i;
+  jpeg_component_info <font color='#5555FF'>*</font>compptr;
+  
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> NUM_ARITH_TBLS; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+    dc_in_use[i] <font color='#5555FF'>=</font> ac_in_use[i] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comps_in_scan; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_comp_info[i];
+    dc_in_use[compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dc_tbl_no] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    ac_in_use[compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ac_tbl_no] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+  <b>}</b>
+  
+  length <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> NUM_ARITH_TBLS; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+    length <font color='#5555FF'>+</font><font color='#5555FF'>=</font> dc_in_use[i] <font color='#5555FF'>+</font> ac_in_use[i];
+  
+  <font color='#BB00BB'>emit_marker</font><font face='Lucida Console'>(</font>cinfo, M_DAC<font face='Lucida Console'>)</font>;
+  
+  <font color='#BB00BB'>emit_2bytes</font><font face='Lucida Console'>(</font>cinfo, length<font color='#5555FF'>*</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+  
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> NUM_ARITH_TBLS; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dc_in_use[i]<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, i<font face='Lucida Console'>)</font>;
+      <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arith_dc_L[i] <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arith_dc_U[i]<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ac_in_use[i]<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, i <font color='#5555FF'>+</font> <font color='#979000'>0x10</font><font face='Lucida Console'>)</font>;
+      <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arith_ac_K[i]<font face='Lucida Console'>)</font>;
+    <b>}</b>
+  <b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* C_ARITH_CODING_SUPPORTED */</font>
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='emit_dri'></a>emit_dri</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Emit a DRI marker */</font>
+<b>{</b>
+  <font color='#BB00BB'>emit_marker</font><font face='Lucida Console'>(</font>cinfo, M_DRI<font face='Lucida Console'>)</font>;
+  
+  <font color='#BB00BB'>emit_2bytes</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>4</font><font face='Lucida Console'>)</font>;	<font color='#009900'>/* fixed length */</font>
+
+  <font color='#BB00BB'>emit_2bytes</font><font face='Lucida Console'>(</font>cinfo, <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restart_interval<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='emit_sof'></a>emit_sof</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, JPEG_MARKER code<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Emit a SOF marker */</font>
+<b>{</b>
+  <font color='#0000FF'><u>int</u></font> ci;
+  jpeg_component_info <font color='#5555FF'>*</font>compptr;
+  
+  <font color='#BB00BB'>emit_marker</font><font face='Lucida Console'>(</font>cinfo, code<font face='Lucida Console'>)</font>;
+  
+  <font color='#BB00BB'>emit_2bytes</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>3</font> <font color='#5555FF'>*</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components <font color='#5555FF'>+</font> <font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>5</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>; <font color='#009900'>/* length */</font>
+
+  <font color='#009900'>/* Make sure image isn't bigger than SOF field can handle */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_height <font color='#5555FF'>&gt;</font> <font color='#979000'>65535</font>L <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_width <font color='#5555FF'>&gt;</font> <font color='#979000'>65535</font>L<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_IMAGE_TOO_BIG, <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#979000'>65535</font><font face='Lucida Console'>)</font>;
+
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>data_precision<font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>emit_2bytes</font><font face='Lucida Console'>(</font>cinfo, <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_height<font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>emit_2bytes</font><font face='Lucida Console'>(</font>cinfo, <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_width<font face='Lucida Console'>)</font>;
+
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components<font face='Lucida Console'>)</font>;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>, compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+       ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, compptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>component_id<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font face='Lucida Console'>(</font>compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>h_samp_factor <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quant_tbl_no<font face='Lucida Console'>)</font>;
+  <b>}</b>
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='emit_sos'></a>emit_sos</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Emit a SOS marker */</font>
+<b>{</b>
+  <font color='#0000FF'><u>int</u></font> i, td, ta;
+  jpeg_component_info <font color='#5555FF'>*</font>compptr;
+  
+  <font color='#BB00BB'>emit_marker</font><font face='Lucida Console'>(</font>cinfo, M_SOS<font face='Lucida Console'>)</font>;
+  
+  <font color='#BB00BB'>emit_2bytes</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>2</font> <font color='#5555FF'>*</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comps_in_scan <font color='#5555FF'>+</font> <font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font> <font color='#5555FF'>+</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>; <font color='#009900'>/* length */</font>
+  
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comps_in_scan<font face='Lucida Console'>)</font>;
+  
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comps_in_scan; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_comp_info[i];
+    <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>component_id<font face='Lucida Console'>)</font>;
+    td <font color='#5555FF'>=</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dc_tbl_no;
+    ta <font color='#5555FF'>=</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ac_tbl_no;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progressive_mode<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* Progressive mode: only DC or only AC tables are used in one scan;
+       * furthermore, Huffman coding of DC refinement uses no table at all.
+       * We emit 0 for unused field(s); this is recommended by the P&amp;M text
+       * but does not seem to be specified in the standard.
+       */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ss <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+	ta <font color='#5555FF'>=</font> <font color='#979000'>0</font>;			<font color='#009900'>/* DC scan */</font>
+	<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ah <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arith_code<font face='Lucida Console'>)</font>
+	  td <font color='#5555FF'>=</font> <font color='#979000'>0</font>;		<font color='#009900'>/* no DC table either */</font>
+      <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+	td <font color='#5555FF'>=</font> <font color='#979000'>0</font>;			<font color='#009900'>/* AC scan */</font>
+      <b>}</b>
+    <b>}</b>
+    <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font face='Lucida Console'>(</font>td <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> ta<font face='Lucida Console'>)</font>;
+  <b>}</b>
+
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ss<font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Se<font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ah <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Al<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='emit_jfif_app0'></a>emit_jfif_app0</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Emit a JFIF-compliant APP0 marker */</font>
+<b>{</b>
+  <font color='#009900'>/*
+   * Length of APP0 block	(2 bytes)
+   * Block ID			(4 bytes - ASCII "JFIF")
+   * Zero byte			(1 byte to terminate the ID string)
+   * Version Major, Minor	(2 bytes - major first)
+   * Units			(1 byte - 0x00 = none, 0x01 = inch, 0x02 = cm)
+   * Xdpu			(2 bytes - dots per unit horizontal)
+   * Ydpu			(2 bytes - dots per unit vertical)
+   * Thumbnail X size		(1 byte)
+   * Thumbnail Y size		(1 byte)
+   */</font>
+  
+  <font color='#BB00BB'>emit_marker</font><font face='Lucida Console'>(</font>cinfo, M_APP0<font face='Lucida Console'>)</font>;
+  
+  <font color='#BB00BB'>emit_2bytes</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>; <font color='#009900'>/* length */</font>
+
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>0x4A</font><font face='Lucida Console'>)</font>;	<font color='#009900'>/* Identifier: ASCII "JFIF" */</font>
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>0x46</font><font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>0x49</font><font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>0x46</font><font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>JFIF_major_version<font face='Lucida Console'>)</font>; <font color='#009900'>/* Version fields */</font>
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>JFIF_minor_version<font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>density_unit<font face='Lucida Console'>)</font>; <font color='#009900'>/* Pixel size information */</font>
+  <font color='#BB00BB'>emit_2bytes</font><font face='Lucida Console'>(</font>cinfo, <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>X_density<font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>emit_2bytes</font><font face='Lucida Console'>(</font>cinfo, <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Y_density<font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;		<font color='#009900'>/* No thumbnail image */</font>
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='emit_adobe_app14'></a>emit_adobe_app14</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Emit an Adobe APP14 marker */</font>
+<b>{</b>
+  <font color='#009900'>/*
+   * Length of APP14 block	(2 bytes)
+   * Block ID			(5 bytes - ASCII "Adobe")
+   * Version Number		(2 bytes - currently 100)
+   * Flags0			(2 bytes - currently 0)
+   * Flags1			(2 bytes - currently 0)
+   * Color transform		(1 byte)
+   *
+   * Although Adobe TN 5116 mentions Version = 101, all the Adobe files
+   * now in circulation seem to use Version = 100, so that's what we write.
+   *
+   * We write the color transform byte as 1 if the JPEG color space is
+   * YCbCr, 2 if it's YCCK, 0 otherwise.  Adobe's definition has to do with
+   * whether the encoder performed a transformation, which is pretty useless.
+   */</font>
+  
+  <font color='#BB00BB'>emit_marker</font><font face='Lucida Console'>(</font>cinfo, M_APP14<font face='Lucida Console'>)</font>;
+  
+  <font color='#BB00BB'>emit_2bytes</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>5</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>; <font color='#009900'>/* length */</font>
+
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>0x41</font><font face='Lucida Console'>)</font>;	<font color='#009900'>/* Identifier: ASCII "Adobe" */</font>
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>0x64</font><font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>0x6F</font><font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>0x62</font><font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>0x65</font><font face='Lucida Console'>)</font>;
+  <font color='#BB00BB'>emit_2bytes</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>100</font><font face='Lucida Console'>)</font>;	<font color='#009900'>/* Version */</font>
+  <font color='#BB00BB'>emit_2bytes</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;	<font color='#009900'>/* Flags0 */</font>
+  <font color='#BB00BB'>emit_2bytes</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;	<font color='#009900'>/* Flags1 */</font>
+  <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_color_space<font face='Lucida Console'>)</font> <b>{</b>
+  <font color='#0000FF'>case</font> JCS_YCbCr:
+    <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;	<font color='#009900'>/* Color transform = 1 */</font>
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> JCS_YCCK:
+    <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;	<font color='#009900'>/* Color transform = 2 */</font>
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>default</font>:
+    <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;	<font color='#009900'>/* Color transform = 0 */</font>
+    <font color='#0000FF'>break</font>;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * These routines allow writing an arbitrary marker with parameters.
+ * The only intended use is to emit COM or APPn markers after calling
+ * write_file_header and before calling write_frame_header.
+ * Other uses are not guaranteed to produce desirable results.
+ * Counting the parameter bytes properly is the caller's responsibility.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='write_marker_header'></a>write_marker_header</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> marker, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> datalen<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Emit an arbitrary marker header */</font>
+<b>{</b>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>datalen <font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#979000'>65533</font><font face='Lucida Console'>)</font>		<font color='#009900'>/* safety check */</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_LENGTH<font face='Lucida Console'>)</font>;
+
+  <font color='#BB00BB'>emit_marker</font><font face='Lucida Console'>(</font>cinfo, <font face='Lucida Console'>(</font>JPEG_MARKER<font face='Lucida Console'>)</font> marker<font face='Lucida Console'>)</font>;
+
+  <font color='#BB00BB'>emit_2bytes</font><font face='Lucida Console'>(</font>cinfo, <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>datalen <font color='#5555FF'>+</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;	<font color='#009900'>/* total length */</font>
+<b>}</b>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='write_marker_byte'></a>write_marker_byte</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> val<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Emit one byte of marker parameters following write_marker_header */</font>
+<b>{</b>
+  <font color='#BB00BB'>emit_byte</font><font face='Lucida Console'>(</font>cinfo, val<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Write datastream header.
+ * This consists of an SOI and optional APPn markers.
+ * We recommend use of the JFIF marker, but not the Adobe marker,
+ * when using YCbCr or grayscale data.  The JFIF marker should NOT
+ * be used for any other JPEG colorspace.  The Adobe marker is helpful
+ * to distinguish RGB, CMYK, and YCCK colorspaces.
+ * Note that an application can write additional header markers after
+ * jpeg_start_compress returns.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='write_file_header'></a>write_file_header</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_marker_ptr marker <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_marker_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>marker;
+
+  <font color='#BB00BB'>emit_marker</font><font face='Lucida Console'>(</font>cinfo, M_SOI<font face='Lucida Console'>)</font>;	<font color='#009900'>/* first the SOI */</font>
+
+  <font color='#009900'>/* SOI is defined to reset restart interval to 0 */</font>
+  marker<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_restart_interval <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_JFIF_header<font face='Lucida Console'>)</font>	<font color='#009900'>/* next an optional JFIF APP0 */</font>
+    <font color='#BB00BB'>emit_jfif_app0</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_Adobe_marker<font face='Lucida Console'>)</font> <font color='#009900'>/* next an optional Adobe APP14 */</font>
+    <font color='#BB00BB'>emit_adobe_app14</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Write frame header.
+ * This consists of DQT and SOFn markers.
+ * Note that we do not emit the SOF until we have emitted the DQT(s).
+ * This avoids compatibility problems with incorrect implementations that
+ * try to error-check the quant table numbers as soon as they see the SOF.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='write_frame_header'></a>write_frame_header</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'><u>int</u></font> ci, prec;
+  <font color='#0000FF'><u>int</u></font> is_baseline;
+  jpeg_component_info <font color='#5555FF'>*</font>compptr;
+  
+  <font color='#009900'>/* Emit DQT for each quantization table.
+   * Note that emit_dqt() suppresses any duplicate tables.
+   */</font>
+  prec <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>, compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+       ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, compptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    prec <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>emit_dqt</font><font face='Lucida Console'>(</font>cinfo, compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quant_tbl_no<font face='Lucida Console'>)</font>;
+  <b>}</b>
+  <font color='#009900'>/* now prec is nonzero iff there are any 16-bit quant tables. */</font>
+
+  <font color='#009900'>/* Check for a non-baseline specification.
+   * Note we assume that Huffman table numbers won't be changed later.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arith_code <font color='#5555FF'>|</font><font color='#5555FF'>|</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progressive_mode <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>data_precision <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font> <b>{</b>
+    is_baseline <font color='#5555FF'>=</font> FALSE;
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    is_baseline <font color='#5555FF'>=</font> TRUE;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>, compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+	 ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, compptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dc_tbl_no <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ac_tbl_no <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+	is_baseline <font color='#5555FF'>=</font> FALSE;
+    <b>}</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>prec <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> is_baseline<font face='Lucida Console'>)</font> <b>{</b>
+      is_baseline <font color='#5555FF'>=</font> FALSE;
+      <font color='#009900'>/* If it's baseline except for quantizer size, warn the user */</font>
+      <font color='#BB00BB'>TRACEMS</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>0</font>, JTRC_16BIT_TABLES<font face='Lucida Console'>)</font>;
+    <b>}</b>
+  <b>}</b>
+
+  <font color='#009900'>/* Emit the proper SOF marker */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arith_code<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#BB00BB'>emit_sof</font><font face='Lucida Console'>(</font>cinfo, M_SOF9<font face='Lucida Console'>)</font>;	<font color='#009900'>/* SOF code for arithmetic coding */</font>
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progressive_mode<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>emit_sof</font><font face='Lucida Console'>(</font>cinfo, M_SOF2<font face='Lucida Console'>)</font>;	<font color='#009900'>/* SOF code for progressive Huffman */</font>
+    <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_baseline<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>emit_sof</font><font face='Lucida Console'>(</font>cinfo, M_SOF0<font face='Lucida Console'>)</font>;	<font color='#009900'>/* SOF code for baseline implementation */</font>
+    <font color='#0000FF'>else</font>
+      <font color='#BB00BB'>emit_sof</font><font face='Lucida Console'>(</font>cinfo, M_SOF1<font face='Lucida Console'>)</font>;	<font color='#009900'>/* SOF code for non-baseline Huffman file */</font>
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Write scan header.
+ * This consists of DHT or DAC markers, optional DRI, and SOS.
+ * Compressed data will be written following the SOS.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='write_scan_header'></a>write_scan_header</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_marker_ptr marker <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_marker_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>marker;
+  <font color='#0000FF'><u>int</u></font> i;
+  jpeg_component_info <font color='#5555FF'>*</font>compptr;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arith_code<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Emit arith conditioning info.  We may have some duplication
+     * if the file has multiple scans, but it's so small it's hardly
+     * worth worrying about.
+     */</font>
+    <font color='#BB00BB'>emit_dac</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    <font color='#009900'>/* Emit Huffman tables.
+     * Note that emit_dht() suppresses any duplicate tables.
+     */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comps_in_scan; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_comp_info[i];
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progressive_mode<font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#009900'>/* Progressive mode: only DC or only AC tables are used in one scan */</font>
+	<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ss <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+	  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ah <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>	<font color='#009900'>/* DC needs no table for refinement scan */</font>
+	    <font color='#BB00BB'>emit_dht</font><font face='Lucida Console'>(</font>cinfo, compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dc_tbl_no, FALSE<font face='Lucida Console'>)</font>;
+	<b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+	  <font color='#BB00BB'>emit_dht</font><font face='Lucida Console'>(</font>cinfo, compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ac_tbl_no, TRUE<font face='Lucida Console'>)</font>;
+	<b>}</b>
+      <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+	<font color='#009900'>/* Sequential mode: need both DC and AC tables */</font>
+	<font color='#BB00BB'>emit_dht</font><font face='Lucida Console'>(</font>cinfo, compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dc_tbl_no, FALSE<font face='Lucida Console'>)</font>;
+	<font color='#BB00BB'>emit_dht</font><font face='Lucida Console'>(</font>cinfo, compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ac_tbl_no, TRUE<font face='Lucida Console'>)</font>;
+      <b>}</b>
+    <b>}</b>
+  <b>}</b>
+
+  <font color='#009900'>/* Emit DRI if required --- note that DRI value could change for each scan.
+   * We avoid wasting space with unnecessary DRIs, however.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restart_interval <font color='#5555FF'>!</font><font color='#5555FF'>=</font> marker<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_restart_interval<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#BB00BB'>emit_dri</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+    marker<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_restart_interval <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restart_interval;
+  <b>}</b>
+
+  <font color='#BB00BB'>emit_sos</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Write datastream trailer.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='write_file_trailer'></a>write_file_trailer</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#BB00BB'>emit_marker</font><font face='Lucida Console'>(</font>cinfo, M_EOI<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Write an abbreviated table-specification datastream.
+ * This consists of SOI, DQT and DHT tables, and EOI.
+ * Any table that is defined and not marked sent_table = TRUE will be
+ * emitted.  Note that all tables will be marked sent_table = TRUE at exit.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='write_tables_only'></a>write_tables_only</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'><u>int</u></font> i;
+
+  <font color='#BB00BB'>emit_marker</font><font face='Lucida Console'>(</font>cinfo, M_SOI<font face='Lucida Console'>)</font>;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> NUM_QUANT_TBLS; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quant_tbl_ptrs[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>emit_dqt</font><font face='Lucida Console'>(</font>cinfo, i<font face='Lucida Console'>)</font>;
+  <b>}</b>
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>arith_code<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> NUM_HUFF_TBLS; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dc_huff_tbl_ptrs[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+	<font color='#BB00BB'>emit_dht</font><font face='Lucida Console'>(</font>cinfo, i, FALSE<font face='Lucida Console'>)</font>;
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ac_huff_tbl_ptrs[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+	<font color='#BB00BB'>emit_dht</font><font face='Lucida Console'>(</font>cinfo, i, TRUE<font face='Lucida Console'>)</font>;
+    <b>}</b>
+  <b>}</b>
+
+  <font color='#BB00BB'>emit_marker</font><font face='Lucida Console'>(</font>cinfo, M_EOI<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Initialize the marker writer module.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jinit_marker_writer'></a>jinit_marker_writer</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_marker_ptr marker;
+
+  <font color='#009900'>/* Create the subobject */</font>
+  marker <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_marker_ptr<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				<font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>my_marker_writer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>marker <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> jpeg_marker_writer <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> marker;
+  <font color='#009900'>/* Initialize method pointers */</font>
+  marker<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.write_file_header <font color='#5555FF'>=</font> write_file_header;
+  marker<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.write_frame_header <font color='#5555FF'>=</font> write_frame_header;
+  marker<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.write_scan_header <font color='#5555FF'>=</font> write_scan_header;
+  marker<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.write_file_trailer <font color='#5555FF'>=</font> write_file_trailer;
+  marker<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.write_tables_only <font color='#5555FF'>=</font> write_tables_only;
+  marker<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.write_marker_header <font color='#5555FF'>=</font> write_marker_header;
+  marker<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.write_marker_byte <font color='#5555FF'>=</font> write_marker_byte;
+  <font color='#009900'>/* Initialize private state */</font>
+  marker<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_restart_interval <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<b>}</b>
+
+</pre></body></html>

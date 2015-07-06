@@ -1,0 +1,240 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - svm_c_trainer_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SVm_C_TRAINER_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_SVm_C_TRAINER_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='function_abstract.h.html'>function_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel_abstract.h.html'>kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../optimization/optimization_solve_qp3_using_smo_abstract.h.html'>../optimization/optimization_solve_qp3_using_smo_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='svm_c_trainer'></a>svm_c_trainer</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON K 
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+
+            WHAT THIS OBJECT REPRESENTS
+                This object implements a trainer for a C support vector machine for 
+                solving binary classification problems.  It is implemented using the SMO
+                algorithm.
+
+                The implementation of the C-SVM training algorithm used by this object is based
+                on the following paper:
+                    - Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
+                      machines, 2001. Software available at http://www.csie.ntu.edu.tw/~cjlin/libsvm
+
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> K kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> trained_function_type;
+
+        <b><a name='svm_c_trainer'></a>svm_c_trainer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object is properly initialized and ready to be used
+                  to train a support vector machine.
+                - #get_c_class1() == 1
+                - #get_c_class2() == 1
+                - #get_cache_size() == 200
+                - #get_epsilon() == 0.001
+        !*/</font>
+
+        <b><a name='svm_c_trainer'></a>svm_c_trainer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> kernel, 
+            <font color='#0000FF'>const</font> scalar_type<font color='#5555FF'>&amp;</font> C
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt; C
+            ensures
+                - This object is properly initialized and ready to be used
+                  to train a support vector machine.
+                - #get_kernel() == kernel
+                - #get_c_class1() == C
+                - #get_c_class2() == C
+                - #get_cache_size() == 200
+                - #get_epsilon() == 0.001
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_cache_size'></a>set_cache_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> cache_size
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - cache_size &gt; 0
+            ensures
+                - #get_cache_size() == cache_size 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_cache_size'></a>get_cache_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of megabytes of cache this object will use
+                  when it performs training via the this-&gt;train() function.
+                  (bigger values of this may make training go faster but won't affect 
+                  the result.  However, too big a value will cause you to run out of 
+                  memory, obviously.)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_epsilon'></a>set_epsilon</b> <font face='Lucida Console'>(</font>
+            scalar_type eps
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - eps &gt; 0
+            ensures
+                - #get_epsilon() == eps 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_epsilon'></a>get_epsilon</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the error epsilon that determines when training should stop.
+                  Generally a good value for this is 0.001.  Smaller values may result
+                  in a more accurate solution but take longer to execute.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_kernel'></a>set_kernel</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_kernel() == k 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> <b><a name='get_kernel'></a>get_kernel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a copy of the kernel function in use by this object
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_c'></a>set_c</b> <font face='Lucida Console'>(</font>
+            scalar_type C 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - C &gt; 0
+            ensures
+                - #get_c_class1() == C 
+                - #get_c_class2() == C 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_c_class1'></a>get_c_class1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the SVM regularization parameter for the +1 class.  
+                  It is the parameter that determines the trade off between
+                  trying to fit the +1 training data exactly or allowing more errors 
+                  but hopefully improving the generalization ability of the 
+                  resulting classifier.  Larger values encourage exact fitting 
+                  while smaller values of C may encourage better generalization. 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_c_class2'></a>get_c_class2</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the SVM regularization parameter for the -1 class.  
+                  It is the parameter that determines the trade off between
+                  trying to fit the -1 training data exactly or allowing more errors 
+                  but hopefully improving the generalization ability of the 
+                  resulting classifier.  Larger values encourage exact fitting 
+                  while smaller values of C may encourage better generalization. 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_c_class1'></a>set_c_class1</b> <font face='Lucida Console'>(</font>
+            scalar_type C
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - C &gt; 0
+            ensures
+                - #get_c_class1() == C
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_c_class2'></a>set_c_class2</b> <font face='Lucida Console'>(</font>
+            scalar_type C
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - C &gt; 0
+            ensures
+                - #get_c_class2() == C
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_binary_classification_problem(x,y) == true
+                - x == a matrix or something convertible to a matrix via mat().
+                  Also, x should contain sample_type objects.
+                - y == a matrix or something convertible to a matrix via mat().
+                  Also, y should contain scalar_type objects.
+            ensures
+                - trains a C support vector classifier given the training samples in x and 
+                  labels in y.  Training is done when the error is less than get_epsilon().
+                - returns a decision function F with the following properties:
+                    - if (new_x is a sample predicted have +1 label) then
+                        - F(new_x) &gt;= 0
+                    - else
+                        - F(new_x) &lt; 0
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            svm_c_trainer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font>
+    <b>}</b>; 
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> K<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        svm_c_trainer<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+        svm_c_trainer<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SVm_C_TRAINER_ABSTRACT_
+</font>
+
+
+
+</pre></body></html>

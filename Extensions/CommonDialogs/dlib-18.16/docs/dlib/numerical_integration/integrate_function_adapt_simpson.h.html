@@ -1,0 +1,96 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - integrate_function_adapt_simpson.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013 Steve Taylor (steve98654@gmail.com)
+</font><font color='#009900'>// License: Boost Software License  See LICENSE.txt for full license
+</font><font color='#0000FF'>#ifndef</font> DLIB_INTEGRATE_FUNCTION_ADAPT_SIMPSONh_
+<font color='#0000FF'>#define</font> DLIB_INTEGRATE_FUNCTION_ADAPT_SIMPSONh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='integrate_function_adapt_simpson_abstract.h.html'>integrate_function_adapt_simpson_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> funct<font color='#5555FF'>&gt;</font>
+    T <b><a name='impl_adapt_simp_stop'></a>impl_adapt_simp_stop</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, T a, T b, T fa, T fm, T fb, T is, <font color='#0000FF'><u>int</u></font> cnt<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> maxint <font color='#5555FF'>=</font> <font color='#979000'>500</font>;
+
+        T m   <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>a <font color='#5555FF'>+</font> b<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2.0</font>;
+        T h   <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>b <font color='#5555FF'>-</font> a<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>4.0</font>;
+        T fml <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>+</font> h<font face='Lucida Console'>)</font>;
+        T fmr <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>-</font> h<font face='Lucida Console'>)</font>;
+        T i1 <font color='#5555FF'>=</font> h<font color='#5555FF'>/</font><font color='#979000'>1.5</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>fa<font color='#5555FF'>+</font><font color='#979000'>4.0</font><font color='#5555FF'>*</font>fm<font color='#5555FF'>+</font>fb<font face='Lucida Console'>)</font>;
+        T i2 <font color='#5555FF'>=</font> h<font color='#5555FF'>/</font><font color='#979000'>3.0</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>fa<font color='#5555FF'>+</font><font color='#979000'>4.0</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>fml<font color='#5555FF'>+</font>fmr<font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>2.0</font><font color='#5555FF'>*</font>fm<font color='#5555FF'>+</font>fb<font face='Lucida Console'>)</font>;
+        i1 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>16.0</font><font color='#5555FF'>*</font>i2 <font color='#5555FF'>-</font> i1<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>15.0</font>;
+        T Q <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>i1<font color='#5555FF'>-</font>i2<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>is<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>m <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> a<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>b <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            Q <font color='#5555FF'>=</font> i1;
+        <b>}</b>
+        <font color='#0000FF'>else</font> 
+        <b>{</b>
+            <font color='#0000FF'>if</font><font face='Lucida Console'>(</font>cnt <font color='#5555FF'>&lt;</font> maxint<font face='Lucida Console'>)</font>
+            <b>{</b>
+                cnt <font color='#5555FF'>=</font> cnt <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+
+                Q <font color='#5555FF'>=</font> <font color='#BB00BB'>impl_adapt_simp_stop</font><font face='Lucida Console'>(</font>f,a,m,fa,fml,fm,is,cnt<font face='Lucida Console'>)</font> 
+                    <font color='#5555FF'>+</font> <font color='#BB00BB'>impl_adapt_simp_stop</font><font face='Lucida Console'>(</font>f,m,b,fm,fmr,fb,is,cnt<font face='Lucida Console'>)</font>; 
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> Q;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> funct<font color='#5555FF'>&gt;</font>
+    T <b><a name='integrate_function_adapt_simp'></a>integrate_function_adapt_simp</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f,
+        T a,
+        T b,
+        T tol <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>&gt;</font> a <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> tol <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t T integrate_function_adapt_simp()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid arguments were given to this function.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t a:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t b:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> b
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t tol: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> tol 
+            <font face='Lucida Console'>)</font>;
+
+        T eps <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font><font face='Lucida Console'>(</font>tol <font color='#5555FF'>&lt;</font> eps<font face='Lucida Console'>)</font>
+        <b>{</b>
+            tol <font color='#5555FF'>=</font> eps;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> T ba <font color='#5555FF'>=</font> b<font color='#5555FF'>-</font>a;
+        <font color='#0000FF'>const</font> T fa <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> T fb <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> T fm <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>+</font>b<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+        T is <font color='#5555FF'>=</font> ba<font color='#5555FF'>/</font><font color='#979000'>8</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>fa<font color='#5555FF'>+</font>fb<font color='#5555FF'>+</font>fm<font color='#5555FF'>+</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>+</font> <font color='#979000'>0.9501</font><font color='#5555FF'>*</font>ba<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>+</font> <font color='#979000'>0.2311</font><font color='#5555FF'>*</font>ba<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>+</font> <font color='#979000'>0.6068</font><font color='#5555FF'>*</font>ba<font face='Lucida Console'>)</font>
+            <font color='#5555FF'>+</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>+</font> <font color='#979000'>0.4860</font><font color='#5555FF'>*</font>ba<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>+</font> <font color='#979000'>0.8913</font><font color='#5555FF'>*</font>ba<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font><font face='Lucida Console'>(</font>is <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            is <font color='#5555FF'>=</font> b<font color='#5555FF'>-</font>a;
+        <b>}</b>
+
+        is <font color='#5555FF'>=</font> is<font color='#5555FF'>*</font>tol;
+
+        <font color='#0000FF'><u>int</u></font> cnt <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>impl_adapt_simp_stop</font><font face='Lucida Console'>(</font>f, a, b, fa, fm, fb, is, cnt<font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_INTEGRATE_FUNCTION_ADAPT_SIMPSONh_
+</font>
+</pre></body></html>

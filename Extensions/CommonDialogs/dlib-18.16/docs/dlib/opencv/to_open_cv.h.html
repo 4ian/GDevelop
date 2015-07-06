@@ -1,0 +1,48 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - to_open_cv.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_TO_OPEN_Cv_Hh_
+<font color='#0000FF'>#define</font> DLIB_TO_OPEN_Cv_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>opencv2<font color='#5555FF'>/</font>core<font color='#5555FF'>/</font>core.hpp<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='to_open_cv_abstract.h.html'>to_open_cv_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix.h.html'>../matrix/matrix.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    cv::Mat <b><a name='toMat'></a>toMat</b> <font face='Lucida Console'>(</font>
+        image_type<font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>image_size</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> cv::<font color='#BB00BB'>Mat</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font>::pixel_type type;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pixel_traits<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font>::num <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> cv::<font color='#BB00BB'>Mat</font><font face='Lucida Console'>(</font><font color='#BB00BB'>num_rows</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>, <font color='#BB00BB'>num_columns</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>, cv::DataType<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font>::type, <font color='#BB00BB'>image_data</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>, <font color='#BB00BB'>width_step</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> depth <font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> pixel_traits<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font>::basic_pixel_type<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>8</font>;
+            <font color='#0000FF'><u>int</u></font> channels <font color='#5555FF'>=</font> pixel_traits<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font>::num;
+            <font color='#0000FF'><u>int</u></font> thetype <font color='#5555FF'>=</font> <font color='#BB00BB'>CV_MAKETYPE</font><font face='Lucida Console'>(</font>depth, channels<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> cv::<font color='#BB00BB'>Mat</font><font face='Lucida Console'>(</font><font color='#BB00BB'>num_rows</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>, <font color='#BB00BB'>num_columns</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>, thetype, <font color='#BB00BB'>image_data</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>, <font color='#BB00BB'>width_step</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_TO_OPEN_Cv_Hh_
+</font>
+
+</pre></body></html>

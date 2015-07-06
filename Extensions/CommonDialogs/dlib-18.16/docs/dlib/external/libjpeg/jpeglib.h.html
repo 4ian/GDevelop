@@ -1,0 +1,1099 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jpeglib.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jpeglib.h
+ *
+ * Copyright (C) 1991-1998, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file defines the application interface for the JPEG library.
+ * Most applications using the library need only include this file,
+ * and perhaps jerror.h if they want to know the exact error codes.
+ */</font>
+
+<font color='#0000FF'>#ifndef</font> JPEGLIB_H
+<font color='#0000FF'>#define</font> JPEGLIB_H
+
+<font color='#009900'>/*
+ * First we include the configuration files that record how this
+ * installation of the JPEG library is set up.  jconfig.h can be
+ * generated automatically for many systems.  jmorecfg.h contains
+ * manual configuration options that most people need not worry about.
+ */</font>
+
+<font color='#0000FF'>#ifndef</font> JCONFIG_INCLUDED	<font color='#009900'>/* in case jinclude.h already did */</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jconfig.h.html'>jconfig.h</a>"		<font color='#009900'>/* widely used configuration options */</font>
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jmorecfg.h.html'>jmorecfg.h</a>"		<font color='#009900'>/* seldom changed options */</font>
+
+
+<font color='#009900'>/* Version ID for the JPEG library.
+ * Might be useful for tests like "#if JPEG_LIB_VERSION &gt;= 60".
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_LIB_VERSION  <font color='#979000'>62</font>	<font color='#009900'>/* Version 6b */</font>
+
+
+<font color='#009900'>/* Various constants determining the sizes of things.
+ * All of these are specified by the JPEG standard, so don't change them
+ * if you want to be compatible.
+ */</font>
+
+<font color='#0000FF'>#define</font> DCTSIZE		    <font color='#979000'>8</font>	<font color='#009900'>/* The basic DCT block is 8x8 samples */</font>
+<font color='#0000FF'>#define</font> DCTSIZE2	    <font color='#979000'>64</font>	<font color='#009900'>/* DCTSIZE squared; # of elements in a block */</font>
+<font color='#0000FF'>#define</font> NUM_QUANT_TBLS      <font color='#979000'>4</font>	<font color='#009900'>/* Quantization tables are numbered 0..3 */</font>
+<font color='#0000FF'>#define</font> NUM_HUFF_TBLS       <font color='#979000'>4</font>	<font color='#009900'>/* Huffman tables are numbered 0..3 */</font>
+<font color='#0000FF'>#define</font> NUM_ARITH_TBLS      <font color='#979000'>16</font>	<font color='#009900'>/* Arith-coding tables are numbered 0..15 */</font>
+<font color='#0000FF'>#define</font> MAX_COMPS_IN_SCAN   <font color='#979000'>4</font>	<font color='#009900'>/* JPEG limit on # of components in one scan */</font>
+<font color='#0000FF'>#define</font> MAX_SAMP_FACTOR     <font color='#979000'>4</font>	<font color='#009900'>/* JPEG limit on sampling factors */</font>
+<font color='#009900'>/* Unfortunately, some bozo at Adobe saw no reason to be bound by the standard;
+ * the PostScript DCT filter can emit files with many more than 10 blocks/MCU.
+ * If you happen to run across such a file, you can up D_MAX_BLOCKS_IN_MCU
+ * to handle it.  We even let you do this from the jconfig.h file.  However,
+ * we strongly discourage changing C_MAX_BLOCKS_IN_MCU; just because Adobe
+ * sometimes emits noncompliant files doesn't mean you should too.
+ */</font>
+<font color='#0000FF'>#define</font> C_MAX_BLOCKS_IN_MCU   <font color='#979000'>10</font> <font color='#009900'>/* compressor's limit on blocks per MCU */</font>
+<font color='#0000FF'>#ifndef</font> D_MAX_BLOCKS_IN_MCU
+<font color='#0000FF'>#define</font> D_MAX_BLOCKS_IN_MCU   <font color='#979000'>10</font> <font color='#009900'>/* decompressor's limit on blocks per MCU */</font>
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#009900'>/* Data structures for images (arrays of samples and of DCT coefficients).
+ * On 80x86 machines, the image arrays are too big for near pointers,
+ * but the pointer arrays can fit in near memory.
+ */</font>
+
+<font color='#0000FF'>typedef</font> JSAMPLE FAR <font color='#5555FF'>*</font>JSAMPROW;	<font color='#009900'>/* ptr to one image row of pixel samples. */</font>
+<font color='#0000FF'>typedef</font> JSAMPROW <font color='#5555FF'>*</font>JSAMPARRAY;	<font color='#009900'>/* ptr to some rows (a 2-D sample array) */</font>
+<font color='#0000FF'>typedef</font> JSAMPARRAY <font color='#5555FF'>*</font>JSAMPIMAGE;	<font color='#009900'>/* a 3-D sample array: top index is color */</font>
+
+<font color='#0000FF'>typedef</font> JCOEF JBLOCK[DCTSIZE2];	<font color='#009900'>/* one block of coefficients */</font>
+<font color='#0000FF'>typedef</font> JBLOCK FAR <font color='#5555FF'>*</font>JBLOCKROW;	<font color='#009900'>/* pointer to one row of coefficient blocks */</font>
+<font color='#0000FF'>typedef</font> JBLOCKROW <font color='#5555FF'>*</font>JBLOCKARRAY;		<font color='#009900'>/* a 2-D array of coefficient blocks */</font>
+<font color='#0000FF'>typedef</font> JBLOCKARRAY <font color='#5555FF'>*</font>JBLOCKIMAGE;	<font color='#009900'>/* a 3-D array of coefficient blocks */</font>
+
+<font color='#0000FF'>typedef</font> JCOEF FAR <font color='#5555FF'>*</font>JCOEFPTR;	<font color='#009900'>/* useful in a couple of places */</font>
+
+
+<font color='#009900'>/* Types for JPEG compression parameters and working tables. */</font>
+
+
+<font color='#009900'>/* DCT coefficient quantization tables. */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#009900'>/* This array gives the coefficient quantizers in natural array order
+   * (not the zigzag order in which they are stored in a JPEG DQT marker).
+   * CAUTION: IJG versions prior to v6a kept this array in zigzag order.
+   */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> quantval[DCTSIZE2];	<font color='#009900'>/* quantization step for each coefficient */</font>
+  <font color='#009900'>/* This field is used only during compression.  It's initialized FALSE when
+   * the table is created, and set TRUE when it's been output to the file.
+   * You could suppress output of a table by setting this to TRUE.
+   * (See jpeg_suppress_tables for an example.)
+   */</font>
+  <font color='#0000FF'><u>int</u></font> sent_table;		<font color='#009900'>/* TRUE when table has been output */</font>
+<b>}</b> JQUANT_TBL;
+
+
+<font color='#009900'>/* Huffman coding tables. */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#009900'>/* These two fields directly represent the contents of a JPEG DHT marker */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> bits[<font color='#979000'>17</font>];		<font color='#009900'>/* bits[k] = # of symbols with codes of */</font>
+				<font color='#009900'>/* length k bits; bits[0] is unused */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> huffval[<font color='#979000'>256</font>];		<font color='#009900'>/* The symbols, in order of incr code length */</font>
+  <font color='#009900'>/* This field is used only during compression.  It's initialized FALSE when
+   * the table is created, and set TRUE when it's been output to the file.
+   * You could suppress output of a table by setting this to TRUE.
+   * (See jpeg_suppress_tables for an example.)
+   */</font>
+  <font color='#0000FF'><u>int</u></font> sent_table;		<font color='#009900'>/* TRUE when table has been output */</font>
+<b>}</b> JHUFF_TBL;
+
+
+<font color='#009900'>/* Basic info about one component (color channel). */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#009900'>/* These values are fixed over the whole image. */</font>
+  <font color='#009900'>/* For compression, they must be supplied by parameter setup; */</font>
+  <font color='#009900'>/* for decompression, they are read from the SOF marker. */</font>
+  <font color='#0000FF'><u>int</u></font> component_id;		<font color='#009900'>/* identifier for this component (0..255) */</font>
+  <font color='#0000FF'><u>int</u></font> component_index;		<font color='#009900'>/* its index in SOF or cinfo-&gt;comp_info[] */</font>
+  <font color='#0000FF'><u>int</u></font> h_samp_factor;		<font color='#009900'>/* horizontal sampling factor (1..4) */</font>
+  <font color='#0000FF'><u>int</u></font> v_samp_factor;		<font color='#009900'>/* vertical sampling factor (1..4) */</font>
+  <font color='#0000FF'><u>int</u></font> quant_tbl_no;		<font color='#009900'>/* quantization table selector (0..3) */</font>
+  <font color='#009900'>/* These values may vary between scans. */</font>
+  <font color='#009900'>/* For compression, they must be supplied by parameter setup; */</font>
+  <font color='#009900'>/* for decompression, they are read from the SOS marker. */</font>
+  <font color='#009900'>/* The decompressor output side may not use these variables. */</font>
+  <font color='#0000FF'><u>int</u></font> dc_tbl_no;		<font color='#009900'>/* DC entropy table selector (0..3) */</font>
+  <font color='#0000FF'><u>int</u></font> ac_tbl_no;		<font color='#009900'>/* AC entropy table selector (0..3) */</font>
+  
+  <font color='#009900'>/* Remaining fields should be treated as private by applications. */</font>
+  
+  <font color='#009900'>/* These values are computed during compression or decompression startup: */</font>
+  <font color='#009900'>/* Component's size in DCT blocks.
+   * Any dummy blocks added to complete an MCU are not counted; therefore
+   * these values do not depend on whether a scan is interleaved or not.
+   */</font>
+  JDIMENSION width_in_blocks;
+  JDIMENSION height_in_blocks;
+  <font color='#009900'>/* Size of a DCT block in samples.  Always DCTSIZE for compression.
+   * For decompression this is the size of the output from one DCT block,
+   * reflecting any scaling we choose to apply during the IDCT step.
+   * Values of 1,2,4,8 are likely to be supported.  Note that different
+   * components may receive different IDCT scalings.
+   */</font>
+  <font color='#0000FF'><u>int</u></font> DCT_scaled_size;
+  <font color='#009900'>/* The downsampled dimensions are the component's actual, unpadded number
+   * of samples at the main buffer (preprocessing/compression interface), thus
+   * downsampled_width = ceil(image_width * Hi/Hmax)
+   * and similarly for height.  For decompression, IDCT scaling is included, so
+   * downsampled_width = ceil(image_width * Hi/Hmax * DCT_scaled_size/DCTSIZE)
+   */</font>
+  JDIMENSION downsampled_width;	 <font color='#009900'>/* actual width in samples */</font>
+  JDIMENSION downsampled_height; <font color='#009900'>/* actual height in samples */</font>
+  <font color='#009900'>/* This flag is used only for decompression.  In cases where some of the
+   * components will be ignored (eg grayscale output from YCbCr image),
+   * we can skip most computations for the unused components.
+   */</font>
+  <font color='#0000FF'><u>int</u></font> component_needed;	<font color='#009900'>/* do we need the value of this component? */</font>
+
+  <font color='#009900'>/* These values are computed before starting a scan of the component. */</font>
+  <font color='#009900'>/* The decompressor output side may not use these variables. */</font>
+  <font color='#0000FF'><u>int</u></font> MCU_width;		<font color='#009900'>/* number of blocks per MCU, horizontally */</font>
+  <font color='#0000FF'><u>int</u></font> MCU_height;		<font color='#009900'>/* number of blocks per MCU, vertically */</font>
+  <font color='#0000FF'><u>int</u></font> MCU_blocks;		<font color='#009900'>/* MCU_width * MCU_height */</font>
+  <font color='#0000FF'><u>int</u></font> MCU_sample_width;		<font color='#009900'>/* MCU width in samples, MCU_width*DCT_scaled_size */</font>
+  <font color='#0000FF'><u>int</u></font> last_col_width;		<font color='#009900'>/* # of non-dummy blocks across in last MCU */</font>
+  <font color='#0000FF'><u>int</u></font> last_row_height;		<font color='#009900'>/* # of non-dummy blocks down in last MCU */</font>
+
+  <font color='#009900'>/* Saved quantization table for component; NULL if none yet saved.
+   * See jdinput.c comments about the need for this information.
+   * This field is currently used only for decompression.
+   */</font>
+  JQUANT_TBL <font color='#5555FF'>*</font> quant_table;
+
+  <font color='#009900'>/* Private per-component storage for DCT or IDCT subsystem. */</font>
+  <font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font> dct_table;
+<b>}</b> jpeg_component_info;
+
+
+<font color='#009900'>/* The script for encoding a multiple-scan file is an array of these: */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#0000FF'><u>int</u></font> comps_in_scan;		<font color='#009900'>/* number of components encoded in this scan */</font>
+  <font color='#0000FF'><u>int</u></font> component_index[MAX_COMPS_IN_SCAN]; <font color='#009900'>/* their SOF/comp_info[] indexes */</font>
+  <font color='#0000FF'><u>int</u></font> Ss, Se;			<font color='#009900'>/* progressive JPEG spectral selection parms */</font>
+  <font color='#0000FF'><u>int</u></font> Ah, Al;			<font color='#009900'>/* progressive JPEG successive approx. parms */</font>
+<b>}</b> jpeg_scan_info;
+
+<font color='#009900'>/* The decompressor can save APPn and COM markers in a list of these: */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> jpeg_marker_struct FAR <font color='#5555FF'>*</font> jpeg_saved_marker_ptr;
+
+<font color='#0000FF'>struct</font> <b><a name='jpeg_marker_struct'></a>jpeg_marker_struct</b> <b>{</b>
+  jpeg_saved_marker_ptr next;	<font color='#009900'>/* next in list, or NULL */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> marker;			<font color='#009900'>/* marker code: JPEG_COM, or JPEG_APP0+n */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> original_length;	<font color='#009900'>/* # bytes of data in the file */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> data_length;	<font color='#009900'>/* # bytes of data saved at data[] */</font>
+  JOCTET FAR <font color='#5555FF'>*</font> data;		<font color='#009900'>/* the data contained in the marker */</font>
+  <font color='#009900'>/* the marker length word is not counted in data_length or original_length */</font>
+<b>}</b>;
+
+<font color='#009900'>/* Known color spaces. */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>enum</font> <b>{</b>
+	JCS_UNKNOWN,		<font color='#009900'>/* error/unspecified */</font>
+	JCS_GRAYSCALE,		<font color='#009900'>/* monochrome */</font>
+	JCS_RGB,		<font color='#009900'>/* red/green/blue */</font>
+	JCS_YCbCr,		<font color='#009900'>/* Y/Cb/Cr (also known as YUV) */</font>
+	JCS_CMYK,		<font color='#009900'>/* C/M/Y/K */</font>
+	JCS_YCCK		<font color='#009900'>/* Y/Cb/Cr/K */</font>
+<b>}</b> J_COLOR_SPACE;
+
+<font color='#009900'>/* DCT/IDCT algorithm options. */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>enum</font> <b>{</b>
+	JDCT_ISLOW,		<font color='#009900'>/* slow but accurate integer algorithm */</font>
+	JDCT_IFAST,		<font color='#009900'>/* faster, less accurate integer method */</font>
+	JDCT_FLOAT		<font color='#009900'>/* floating-point: accurate, fast on fast HW */</font>
+<b>}</b> J_DCT_METHOD;
+
+<font color='#0000FF'>#ifndef</font> JDCT_DEFAULT		<font color='#009900'>/* may be overridden in jconfig.h */</font>
+<font color='#0000FF'>#define</font> JDCT_DEFAULT  JDCT_ISLOW
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifndef</font> JDCT_FASTEST		<font color='#009900'>/* may be overridden in jconfig.h */</font>
+<font color='#0000FF'>#define</font> JDCT_FASTEST  JDCT_IFAST
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* Dithering options for decompression. */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>enum</font> <b>{</b>
+	JDITHER_NONE,		<font color='#009900'>/* no dithering */</font>
+	JDITHER_ORDERED,	<font color='#009900'>/* simple ordered dither */</font>
+	JDITHER_FS		<font color='#009900'>/* Floyd-Steinberg error diffusion dither */</font>
+<b>}</b> J_DITHER_MODE;
+
+
+<font color='#009900'>/* Common fields between JPEG compression and decompression master structs. */</font>
+
+<font color='#0000FF'>#define</font> jpeg_common_fields \
+  <font color='#0000FF'>struct</font> jpeg_error_mgr <font color='#5555FF'>*</font> err;	<font color='#009900'>/* Error handler module */</font>\
+  <font color='#0000FF'>struct</font> jpeg_memory_mgr <font color='#5555FF'>*</font> mem;	<font color='#009900'>/* Memory manager module */</font>\
+  <font color='#0000FF'>struct</font> jpeg_progress_mgr <font color='#5555FF'>*</font> progress; <font color='#009900'>/* Progress monitor, or NULL if none */</font>\
+  <font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font> client_data;		<font color='#009900'>/* Available for use by application */</font>\
+  <font color='#0000FF'><u>int</u></font> is_decompressor;	<font color='#009900'>/* So common code can tell which is which */</font>\
+  <font color='#0000FF'><u>int</u></font> global_state		<font color='#009900'>/* For checking call sequence validity */</font>
+
+<font color='#009900'>/* Routines that are to be used by both halves of the library are declared
+ * to receive a pointer to this structure.  There are no actual instances of
+ * jpeg_common_struct, only of jpeg_compress_struct and jpeg_decompress_struct.
+ */</font>
+<font color='#0000FF'>struct</font> <b><a name='jpeg_common_struct'></a>jpeg_common_struct</b> <b>{</b>
+  jpeg_common_fields;		<font color='#009900'>/* Fields common to both master struct types */</font>
+  <font color='#009900'>/* Additional fields follow in an actual jpeg_compress_struct or
+   * jpeg_decompress_struct.  All three structs must agree on these
+   * initial fields!  (This would be a lot cleaner in C++.)
+   */</font>
+<b>}</b>;
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> jpeg_common_struct <font color='#5555FF'>*</font> j_common_ptr;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> jpeg_compress_struct <font color='#5555FF'>*</font> j_compress_ptr;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> jpeg_decompress_struct <font color='#5555FF'>*</font> j_decompress_ptr;
+
+
+<font color='#009900'>/* Master record for a compression instance */</font>
+
+<font color='#0000FF'>struct</font> <b><a name='jpeg_compress_struct'></a>jpeg_compress_struct</b> <b>{</b>
+  jpeg_common_fields;		<font color='#009900'>/* Fields shared with jpeg_decompress_struct */</font>
+
+  <font color='#009900'>/* Destination for compressed data */</font>
+  <font color='#0000FF'>struct</font> jpeg_destination_mgr <font color='#5555FF'>*</font> dest;
+
+  <font color='#009900'>/* Description of source image --- these fields must be filled in by
+   * outer application before starting compression.  in_color_space must
+   * be correct before you can even call jpeg_set_defaults().
+   */</font>
+
+  JDIMENSION image_width;	<font color='#009900'>/* input image width */</font>
+  JDIMENSION image_height;	<font color='#009900'>/* input image height */</font>
+  <font color='#0000FF'><u>int</u></font> input_components;		<font color='#009900'>/* # of color components in input image */</font>
+  J_COLOR_SPACE in_color_space;	<font color='#009900'>/* colorspace of input image */</font>
+
+  <font color='#0000FF'><u>double</u></font> input_gamma;		<font color='#009900'>/* image gamma of input image */</font>
+
+  <font color='#009900'>/* Compression parameters --- these fields must be set before calling
+   * jpeg_start_compress().  We recommend calling jpeg_set_defaults() to
+   * initialize everything to reasonable defaults, then changing anything
+   * the application specifically wants to change.  That way you won't get
+   * burnt when new parameters are added.  Also note that there are several
+   * helper routines to simplify changing parameters.
+   */</font>
+
+  <font color='#0000FF'><u>int</u></font> data_precision;		<font color='#009900'>/* bits of precision in image data */</font>
+
+  <font color='#0000FF'><u>int</u></font> num_components;		<font color='#009900'>/* # of color components in JPEG image */</font>
+  J_COLOR_SPACE jpeg_color_space; <font color='#009900'>/* colorspace of JPEG image */</font>
+
+  jpeg_component_info <font color='#5555FF'>*</font> comp_info;
+  <font color='#009900'>/* comp_info[i] describes component that appears i'th in SOF */</font>
+  
+  JQUANT_TBL <font color='#5555FF'>*</font> quant_tbl_ptrs[NUM_QUANT_TBLS];
+  <font color='#009900'>/* ptrs to coefficient quantization tables, or NULL if not defined */</font>
+  
+  JHUFF_TBL <font color='#5555FF'>*</font> dc_huff_tbl_ptrs[NUM_HUFF_TBLS];
+  JHUFF_TBL <font color='#5555FF'>*</font> ac_huff_tbl_ptrs[NUM_HUFF_TBLS];
+  <font color='#009900'>/* ptrs to Huffman coding tables, or NULL if not defined */</font>
+  
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> arith_dc_L[NUM_ARITH_TBLS]; <font color='#009900'>/* L values for DC arith-coding tables */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> arith_dc_U[NUM_ARITH_TBLS]; <font color='#009900'>/* U values for DC arith-coding tables */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> arith_ac_K[NUM_ARITH_TBLS]; <font color='#009900'>/* Kx values for AC arith-coding tables */</font>
+
+  <font color='#0000FF'><u>int</u></font> num_scans;		<font color='#009900'>/* # of entries in scan_info array */</font>
+  <font color='#0000FF'>const</font> jpeg_scan_info <font color='#5555FF'>*</font> scan_info; <font color='#009900'>/* script for multi-scan file, or NULL */</font>
+  <font color='#009900'>/* The default value of scan_info is NULL, which causes a single-scan
+   * sequential JPEG file to be emitted.  To create a multi-scan file,
+   * set num_scans and scan_info to point to an array of scan definitions.
+   */</font>
+
+  <font color='#0000FF'><u>int</u></font> raw_data_in;		<font color='#009900'>/* TRUE=caller supplies downsampled data */</font>
+  <font color='#0000FF'><u>int</u></font> arith_code;		<font color='#009900'>/* TRUE=arithmetic coding, FALSE=Huffman */</font>
+  <font color='#0000FF'><u>int</u></font> optimize_coding;	<font color='#009900'>/* TRUE=optimize entropy encoding parms */</font>
+  <font color='#0000FF'><u>int</u></font> CCIR601_sampling;	<font color='#009900'>/* TRUE=first samples are cosited */</font>
+  <font color='#0000FF'><u>int</u></font> smoothing_factor;		<font color='#009900'>/* 1..100, or 0 for no input smoothing */</font>
+  J_DCT_METHOD dct_method;	<font color='#009900'>/* DCT algorithm selector */</font>
+
+  <font color='#009900'>/* The restart interval can be specified in absolute MCUs by setting
+   * restart_interval, or in MCU rows by setting restart_in_rows
+   * (in which case the correct restart_interval will be figured
+   * for each scan).
+   */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> restart_interval; <font color='#009900'>/* MCUs per restart, or 0 for no restart */</font>
+  <font color='#0000FF'><u>int</u></font> restart_in_rows;		<font color='#009900'>/* if &gt; 0, MCU rows per restart interval */</font>
+
+  <font color='#009900'>/* Parameters controlling emission of special markers. */</font>
+
+  <font color='#0000FF'><u>int</u></font> write_JFIF_header;	<font color='#009900'>/* should a JFIF marker be written? */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> JFIF_major_version;	<font color='#009900'>/* What to write for the JFIF version number */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> JFIF_minor_version;
+  <font color='#009900'>/* These three values are not used by the JPEG code, merely copied */</font>
+  <font color='#009900'>/* into the JFIF APP0 marker.  density_unit can be 0 for unknown, */</font>
+  <font color='#009900'>/* 1 for dots/inch, or 2 for dots/cm.  Note that the pixel aspect */</font>
+  <font color='#009900'>/* ratio is defined by X_density/Y_density even when density_unit=0. */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> density_unit;		<font color='#009900'>/* JFIF code for pixel size units */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> X_density;		<font color='#009900'>/* Horizontal pixel density */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> Y_density;		<font color='#009900'>/* Vertical pixel density */</font>
+  <font color='#0000FF'><u>int</u></font> write_Adobe_marker;	<font color='#009900'>/* should an Adobe marker be written? */</font>
+  
+  <font color='#009900'>/* State variable: index of next scanline to be written to
+   * jpeg_write_scanlines().  Application may use this to control its
+   * processing loop, e.g., "while (next_scanline &lt; image_height)".
+   */</font>
+
+  JDIMENSION next_scanline;	<font color='#009900'>/* 0 .. image_height-1  */</font>
+
+  <font color='#009900'>/* Remaining fields are known throughout compressor, but generally
+   * should not be touched by a surrounding application.
+   */</font>
+
+  <font color='#009900'>/*
+   * These fields are computed during compression startup
+   */</font>
+  <font color='#0000FF'><u>int</u></font> progressive_mode;	<font color='#009900'>/* TRUE if scan script uses progressive mode */</font>
+  <font color='#0000FF'><u>int</u></font> max_h_samp_factor;	<font color='#009900'>/* largest h_samp_factor */</font>
+  <font color='#0000FF'><u>int</u></font> max_v_samp_factor;	<font color='#009900'>/* largest v_samp_factor */</font>
+
+  JDIMENSION total_iMCU_rows;	<font color='#009900'>/* # of iMCU rows to be input to coef ctlr */</font>
+  <font color='#009900'>/* The coefficient controller receives data in units of MCU rows as defined
+   * for fully interleaved scans (whether the JPEG file is interleaved or not).
+   * There are v_samp_factor * DCTSIZE sample rows of each component in an
+   * "iMCU" (interleaved MCU) row.
+   */</font>
+  
+  <font color='#009900'>/*
+   * These fields are valid during any one scan.
+   * They describe the components and MCUs actually appearing in the scan.
+   */</font>
+  <font color='#0000FF'><u>int</u></font> comps_in_scan;		<font color='#009900'>/* # of JPEG components in this scan */</font>
+  jpeg_component_info <font color='#5555FF'>*</font> cur_comp_info[MAX_COMPS_IN_SCAN];
+  <font color='#009900'>/* *cur_comp_info[i] describes component that appears i'th in SOS */</font>
+  
+  JDIMENSION MCUs_per_row;	<font color='#009900'>/* # of MCUs across the image */</font>
+  JDIMENSION MCU_rows_in_scan;	<font color='#009900'>/* # of MCU rows in the image */</font>
+  
+  <font color='#0000FF'><u>int</u></font> blocks_in_MCU;		<font color='#009900'>/* # of DCT blocks per MCU */</font>
+  <font color='#0000FF'><u>int</u></font> MCU_membership[C_MAX_BLOCKS_IN_MCU];
+  <font color='#009900'>/* MCU_membership[i] is index in cur_comp_info of component owning */</font>
+  <font color='#009900'>/* i'th block in an MCU */</font>
+
+  <font color='#0000FF'><u>int</u></font> Ss, Se, Ah, Al;		<font color='#009900'>/* progressive JPEG parameters for scan */</font>
+
+  <font color='#009900'>/*
+   * Links to compression subobjects (methods and private variables of modules)
+   */</font>
+  <font color='#0000FF'>struct</font> jpeg_comp_master <font color='#5555FF'>*</font> master;
+  <font color='#0000FF'>struct</font> jpeg_c_main_controller <font color='#5555FF'>*</font> main;
+  <font color='#0000FF'>struct</font> jpeg_c_prep_controller <font color='#5555FF'>*</font> prep;
+  <font color='#0000FF'>struct</font> jpeg_c_coef_controller <font color='#5555FF'>*</font> coef;
+  <font color='#0000FF'>struct</font> jpeg_marker_writer <font color='#5555FF'>*</font> marker;
+  <font color='#0000FF'>struct</font> jpeg_color_converter <font color='#5555FF'>*</font> cconvert;
+  <font color='#0000FF'>struct</font> jpeg_downsampler <font color='#5555FF'>*</font> downsample;
+  <font color='#0000FF'>struct</font> jpeg_forward_dct <font color='#5555FF'>*</font> fdct;
+  <font color='#0000FF'>struct</font> jpeg_entropy_encoder <font color='#5555FF'>*</font> entropy;
+  jpeg_scan_info <font color='#5555FF'>*</font> script_space; <font color='#009900'>/* workspace for jpeg_simple_progression */</font>
+  <font color='#0000FF'><u>int</u></font> script_space_size;
+<b>}</b>;
+
+
+<font color='#009900'>/* Master record for a decompression instance */</font>
+
+<font color='#0000FF'>struct</font> <b><a name='jpeg_decompress_struct'></a>jpeg_decompress_struct</b> <b>{</b>
+  jpeg_common_fields;		<font color='#009900'>/* Fields shared with jpeg_compress_struct */</font>
+
+  <font color='#009900'>/* Source of compressed data */</font>
+  <font color='#0000FF'>struct</font> jpeg_source_mgr <font color='#5555FF'>*</font> src;
+
+  <font color='#009900'>/* Basic description of image --- filled in by jpeg_read_header(). */</font>
+  <font color='#009900'>/* Application may inspect these values to decide how to process image. */</font>
+
+  JDIMENSION image_width;	<font color='#009900'>/* nominal image width (from SOF marker) */</font>
+  JDIMENSION image_height;	<font color='#009900'>/* nominal image height */</font>
+  <font color='#0000FF'><u>int</u></font> num_components;		<font color='#009900'>/* # of color components in JPEG image */</font>
+  J_COLOR_SPACE jpeg_color_space; <font color='#009900'>/* colorspace of JPEG image */</font>
+
+  <font color='#009900'>/* Decompression processing parameters --- these fields must be set before
+   * calling jpeg_start_decompress().  Note that jpeg_read_header() initializes
+   * them to default values.
+   */</font>
+
+  J_COLOR_SPACE out_color_space; <font color='#009900'>/* colorspace for output */</font>
+
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> scale_num, scale_denom; <font color='#009900'>/* fraction by which to scale image */</font>
+
+  <font color='#0000FF'><u>double</u></font> output_gamma;		<font color='#009900'>/* image gamma wanted in output */</font>
+
+  <font color='#0000FF'><u>int</u></font> buffered_image;	<font color='#009900'>/* TRUE=multiple output passes */</font>
+  <font color='#0000FF'><u>int</u></font> raw_data_out;		<font color='#009900'>/* TRUE=downsampled data wanted */</font>
+
+  J_DCT_METHOD dct_method;	<font color='#009900'>/* IDCT algorithm selector */</font>
+  <font color='#0000FF'><u>int</u></font> do_fancy_upsampling;	<font color='#009900'>/* TRUE=apply fancy upsampling */</font>
+  <font color='#0000FF'><u>int</u></font> do_block_smoothing;	<font color='#009900'>/* TRUE=apply interblock smoothing */</font>
+
+  <font color='#0000FF'><u>int</u></font> quantize_colors;	<font color='#009900'>/* TRUE=colormapped output wanted */</font>
+  <font color='#009900'>/* the following are ignored if not quantize_colors: */</font>
+  J_DITHER_MODE dither_mode;	<font color='#009900'>/* type of color dithering to use */</font>
+  <font color='#0000FF'><u>int</u></font> two_pass_quantize;	<font color='#009900'>/* TRUE=use two-pass color quantization */</font>
+  <font color='#0000FF'><u>int</u></font> desired_number_of_colors;	<font color='#009900'>/* max # colors to use in created colormap */</font>
+  <font color='#009900'>/* these are significant only in buffered-image mode: */</font>
+  <font color='#0000FF'><u>int</u></font> enable_1pass_quant;	<font color='#009900'>/* enable future use of 1-pass quantizer */</font>
+  <font color='#0000FF'><u>int</u></font> enable_external_quant;<font color='#009900'>/* enable future use of external colormap */</font>
+  <font color='#0000FF'><u>int</u></font> enable_2pass_quant;	<font color='#009900'>/* enable future use of 2-pass quantizer */</font>
+
+  <font color='#009900'>/* Description of actual output image that will be returned to application.
+   * These fields are computed by jpeg_start_decompress().
+   * You can also use jpeg_calc_output_dimensions() to determine these values
+   * in advance of calling jpeg_start_decompress().
+   */</font>
+
+  JDIMENSION output_width;	<font color='#009900'>/* scaled image width */</font>
+  JDIMENSION output_height;	<font color='#009900'>/* scaled image height */</font>
+  <font color='#0000FF'><u>int</u></font> out_color_components;	<font color='#009900'>/* # of color components in out_color_space */</font>
+  <font color='#0000FF'><u>int</u></font> output_components;	<font color='#009900'>/* # of color components returned */</font>
+  <font color='#009900'>/* output_components is 1 (a colormap index) when quantizing colors;
+   * otherwise it equals out_color_components.
+   */</font>
+  <font color='#0000FF'><u>int</u></font> rec_outbuf_height;	<font color='#009900'>/* min recommended height of scanline buffer */</font>
+  <font color='#009900'>/* If the buffer passed to jpeg_read_scanlines() is less than this many rows
+   * high, space and time will be wasted due to unnecessary data copying.
+   * Usually rec_outbuf_height will be 1 or 2, at most 4.
+   */</font>
+
+  <font color='#009900'>/* When quantizing colors, the output colormap is described by these fields.
+   * The application can supply a colormap by setting colormap non-NULL before
+   * calling jpeg_start_decompress; otherwise a colormap is created during
+   * jpeg_start_decompress or jpeg_start_output.
+   * The map has out_color_components rows and actual_number_of_colors columns.
+   */</font>
+  <font color='#0000FF'><u>int</u></font> actual_number_of_colors;	<font color='#009900'>/* number of entries in use */</font>
+  JSAMPARRAY colormap;		<font color='#009900'>/* The color map as a 2-D pixel array */</font>
+
+  <font color='#009900'>/* State variables: these variables indicate the progress of decompression.
+   * The application may examine these but must not modify them.
+   */</font>
+
+  <font color='#009900'>/* Row index of next scanline to be read from jpeg_read_scanlines().
+   * Application may use this to control its processing loop, e.g.,
+   * "while (output_scanline &lt; output_height)".
+   */</font>
+  JDIMENSION output_scanline;	<font color='#009900'>/* 0 .. output_height-1  */</font>
+
+  <font color='#009900'>/* Current input scan number and number of iMCU rows completed in scan.
+   * These indicate the progress of the decompressor input side.
+   */</font>
+  <font color='#0000FF'><u>int</u></font> input_scan_number;	<font color='#009900'>/* Number of SOS markers seen so far */</font>
+  JDIMENSION input_iMCU_row;	<font color='#009900'>/* Number of iMCU rows completed */</font>
+
+  <font color='#009900'>/* The "output scan number" is the notional scan being displayed by the
+   * output side.  The decompressor will not allow output scan/row number
+   * to get ahead of input scan/row, but it can fall arbitrarily far behind.
+   */</font>
+  <font color='#0000FF'><u>int</u></font> output_scan_number;	<font color='#009900'>/* Nominal scan number being displayed */</font>
+  JDIMENSION output_iMCU_row;	<font color='#009900'>/* Number of iMCU rows read */</font>
+
+  <font color='#009900'>/* Current progression status.  coef_bits[c][i] indicates the precision
+   * with which component c's DCT coefficient i (in zigzag order) is known.
+   * It is -1 when no data has yet been received, otherwise it is the point
+   * transform (shift) value for the most recent scan of the coefficient
+   * (thus, 0 at completion of the progression).
+   * This pointer is NULL when reading a non-progressive file.
+   */</font>
+  <font color='#0000FF'><u>int</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>coef_bits<font face='Lucida Console'>)</font>[DCTSIZE2];	<font color='#009900'>/* -1 or current Al value for each coef */</font>
+
+  <font color='#009900'>/* Internal JPEG parameters --- the application usually need not look at
+   * these fields.  Note that the decompressor output side may not use
+   * any parameters that can change between scans.
+   */</font>
+
+  <font color='#009900'>/* Quantization and Huffman tables are carried forward across input
+   * datastreams when processing abbreviated JPEG datastreams.
+   */</font>
+
+  JQUANT_TBL <font color='#5555FF'>*</font> quant_tbl_ptrs[NUM_QUANT_TBLS];
+  <font color='#009900'>/* ptrs to coefficient quantization tables, or NULL if not defined */</font>
+
+  JHUFF_TBL <font color='#5555FF'>*</font> dc_huff_tbl_ptrs[NUM_HUFF_TBLS];
+  JHUFF_TBL <font color='#5555FF'>*</font> ac_huff_tbl_ptrs[NUM_HUFF_TBLS];
+  <font color='#009900'>/* ptrs to Huffman coding tables, or NULL if not defined */</font>
+
+  <font color='#009900'>/* These parameters are never carried across datastreams, since they
+   * are given in SOF/SOS markers or defined to be reset by SOI.
+   */</font>
+
+  <font color='#0000FF'><u>int</u></font> data_precision;		<font color='#009900'>/* bits of precision in image data */</font>
+
+  jpeg_component_info <font color='#5555FF'>*</font> comp_info;
+  <font color='#009900'>/* comp_info[i] describes component that appears i'th in SOF */</font>
+
+  <font color='#0000FF'><u>int</u></font> progressive_mode;	<font color='#009900'>/* TRUE if SOFn specifies progressive mode */</font>
+  <font color='#0000FF'><u>int</u></font> arith_code;		<font color='#009900'>/* TRUE=arithmetic coding, FALSE=Huffman */</font>
+
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> arith_dc_L[NUM_ARITH_TBLS]; <font color='#009900'>/* L values for DC arith-coding tables */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> arith_dc_U[NUM_ARITH_TBLS]; <font color='#009900'>/* U values for DC arith-coding tables */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> arith_ac_K[NUM_ARITH_TBLS]; <font color='#009900'>/* Kx values for AC arith-coding tables */</font>
+
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> restart_interval; <font color='#009900'>/* MCUs per restart interval, or 0 for no restart */</font>
+
+  <font color='#009900'>/* These fields record data obtained from optional markers recognized by
+   * the JPEG library.
+   */</font>
+  <font color='#0000FF'><u>int</u></font> saw_JFIF_marker;	<font color='#009900'>/* TRUE iff a JFIF APP0 marker was found */</font>
+  <font color='#009900'>/* Data copied from JFIF marker; only valid if saw_JFIF_marker is TRUE: */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> JFIF_major_version;	<font color='#009900'>/* JFIF version number */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> JFIF_minor_version;
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> density_unit;		<font color='#009900'>/* JFIF code for pixel size units */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> X_density;		<font color='#009900'>/* Horizontal pixel density */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> Y_density;		<font color='#009900'>/* Vertical pixel density */</font>
+  <font color='#0000FF'><u>int</u></font> saw_Adobe_marker;	<font color='#009900'>/* TRUE iff an Adobe APP14 marker was found */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> Adobe_transform;	<font color='#009900'>/* Color transform code from Adobe marker */</font>
+
+  <font color='#0000FF'><u>int</u></font> CCIR601_sampling;	<font color='#009900'>/* TRUE=first samples are cosited */</font>
+
+  <font color='#009900'>/* Aside from the specific data retained from APPn markers known to the
+   * library, the uninterpreted contents of any or all APPn and COM markers
+   * can be saved in a list for examination by the application.
+   */</font>
+  jpeg_saved_marker_ptr marker_list; <font color='#009900'>/* Head of list of saved markers */</font>
+
+  <font color='#009900'>/* Remaining fields are known throughout decompressor, but generally
+   * should not be touched by a surrounding application.
+   */</font>
+
+  <font color='#009900'>/*
+   * These fields are computed during decompression startup
+   */</font>
+  <font color='#0000FF'><u>int</u></font> max_h_samp_factor;	<font color='#009900'>/* largest h_samp_factor */</font>
+  <font color='#0000FF'><u>int</u></font> max_v_samp_factor;	<font color='#009900'>/* largest v_samp_factor */</font>
+
+  <font color='#0000FF'><u>int</u></font> min_DCT_scaled_size;	<font color='#009900'>/* smallest DCT_scaled_size of any component */</font>
+
+  JDIMENSION total_iMCU_rows;	<font color='#009900'>/* # of iMCU rows in image */</font>
+  <font color='#009900'>/* The coefficient controller's input and output progress is measured in
+   * units of "iMCU" (interleaved MCU) rows.  These are the same as MCU rows
+   * in fully interleaved JPEG scans, but are used whether the scan is
+   * interleaved or not.  We define an iMCU row as v_samp_factor DCT block
+   * rows of each component.  Therefore, the IDCT output contains
+   * v_samp_factor*DCT_scaled_size sample rows of a component per iMCU row.
+   */</font>
+
+  JSAMPLE <font color='#5555FF'>*</font> sample_range_limit; <font color='#009900'>/* table for fast range-limiting */</font>
+
+  <font color='#009900'>/*
+   * These fields are valid during any one scan.
+   * They describe the components and MCUs actually appearing in the scan.
+   * Note that the decompressor output side must not use these fields.
+   */</font>
+  <font color='#0000FF'><u>int</u></font> comps_in_scan;		<font color='#009900'>/* # of JPEG components in this scan */</font>
+  jpeg_component_info <font color='#5555FF'>*</font> cur_comp_info[MAX_COMPS_IN_SCAN];
+  <font color='#009900'>/* *cur_comp_info[i] describes component that appears i'th in SOS */</font>
+
+  JDIMENSION MCUs_per_row;	<font color='#009900'>/* # of MCUs across the image */</font>
+  JDIMENSION MCU_rows_in_scan;	<font color='#009900'>/* # of MCU rows in the image */</font>
+
+  <font color='#0000FF'><u>int</u></font> blocks_in_MCU;		<font color='#009900'>/* # of DCT blocks per MCU */</font>
+  <font color='#0000FF'><u>int</u></font> MCU_membership[D_MAX_BLOCKS_IN_MCU];
+  <font color='#009900'>/* MCU_membership[i] is index in cur_comp_info of component owning */</font>
+  <font color='#009900'>/* i'th block in an MCU */</font>
+
+  <font color='#0000FF'><u>int</u></font> Ss, Se, Ah, Al;		<font color='#009900'>/* progressive JPEG parameters for scan */</font>
+
+  <font color='#009900'>/* This field is shared between entropy decoder and marker parser.
+   * It is either zero or the code of a JPEG marker that has been
+   * read from the data source, but has not yet been processed.
+   */</font>
+  <font color='#0000FF'><u>int</u></font> unread_marker;
+
+  <font color='#009900'>/*
+   * Links to decompression subobjects (methods, private variables of modules)
+   */</font>
+  <font color='#0000FF'>struct</font> jpeg_decomp_master <font color='#5555FF'>*</font> master;
+  <font color='#0000FF'>struct</font> jpeg_d_main_controller <font color='#5555FF'>*</font> main;
+  <font color='#0000FF'>struct</font> jpeg_d_coef_controller <font color='#5555FF'>*</font> coef;
+  <font color='#0000FF'>struct</font> jpeg_d_post_controller <font color='#5555FF'>*</font> post;
+  <font color='#0000FF'>struct</font> jpeg_input_controller <font color='#5555FF'>*</font> inputctl;
+  <font color='#0000FF'>struct</font> jpeg_marker_reader <font color='#5555FF'>*</font> marker;
+  <font color='#0000FF'>struct</font> jpeg_entropy_decoder <font color='#5555FF'>*</font> entropy;
+  <font color='#0000FF'>struct</font> jpeg_inverse_dct <font color='#5555FF'>*</font> idct;
+  <font color='#0000FF'>struct</font> jpeg_upsampler <font color='#5555FF'>*</font> upsample;
+  <font color='#0000FF'>struct</font> jpeg_color_deconverter <font color='#5555FF'>*</font> cconvert;
+  <font color='#0000FF'>struct</font> jpeg_color_quantizer <font color='#5555FF'>*</font> cquantize;
+<b>}</b>;
+
+
+<font color='#009900'>/* "Object" declarations for JPEG modules that may be supplied or called
+ * directly by the surrounding application.
+ * As with all objects in the JPEG library, these structs only define the
+ * publicly visible methods and state variables of a module.  Additional
+ * private fields may exist after the public ones.
+ */</font>
+
+
+<font color='#009900'>/* Error handler object */</font>
+
+<font color='#0000FF'>struct</font> <b><a name='jpeg_error_mgr'></a>jpeg_error_mgr</b> <b>{</b>
+  <font color='#009900'>/* Error exit handler: does not return to caller */</font>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, error_exit, <font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Conditionally emit a trace or warning message */</font>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, emit_message, <font face='Lucida Console'>(</font>j_common_ptr cinfo, <font color='#0000FF'><u>int</u></font> msg_level<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Routine that actually outputs a trace or error message */</font>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, output_message, <font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Format a message string for the most recent JPEG error or message */</font>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, format_message, <font face='Lucida Console'>(</font>j_common_ptr cinfo, <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font> buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#define</font> JMSG_LENGTH_MAX  <font color='#979000'>200</font>	<font color='#009900'>/* recommended size of format_message buffer */</font>
+  <font color='#009900'>/* Reset error state variables at start of a new image */</font>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, reset_error_mgr, <font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  
+  <font color='#009900'>/* The message ID code and any parameters are saved here.
+   * A message can have one string parameter or up to 8 int parameters.
+   */</font>
+  <font color='#0000FF'><u>int</u></font> msg_code;
+<font color='#0000FF'>#define</font> JMSG_STR_PARM_MAX  <font color='#979000'>80</font>
+  <font color='#0000FF'>union</font> <b>{</b>
+    <font color='#0000FF'><u>int</u></font> i[<font color='#979000'>8</font>];
+    <font color='#0000FF'><u>char</u></font> s[JMSG_STR_PARM_MAX];
+  <b>}</b> msg_parm;
+  
+  <font color='#009900'>/* Standard state variables for error facility */</font>
+  
+  <font color='#0000FF'><u>int</u></font> trace_level;		<font color='#009900'>/* max msg_level that will be displayed */</font>
+  
+  <font color='#009900'>/* For recoverable corrupt-data errors, we emit a warning message,
+   * but keep going unless emit_message chooses to abort.  emit_message
+   * should count warnings in num_warnings.  The surrounding application
+   * can check for bad data by seeing if num_warnings is nonzero at the
+   * end of processing.
+   */</font>
+  <font color='#0000FF'><u>long</u></font> num_warnings;		<font color='#009900'>/* number of corrupt-data warnings */</font>
+
+  <font color='#009900'>/* These fields point to the table(s) of error message strings.
+   * An application can change the table pointer to switch to a different
+   * message list (typically, to change the language in which errors are
+   * reported).  Some applications may wish to add additional error codes
+   * that will be handled by the JPEG library error mechanism; the second
+   * table pointer is used for this purpose.
+   *
+   * First table includes all errors generated by JPEG library itself.
+   * Error code 0 is reserved for a "no such error string" message.
+   */</font>
+  <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font> <font color='#0000FF'>const</font> <font color='#5555FF'>*</font> jpeg_message_table; <font color='#009900'>/* Library errors */</font>
+  <font color='#0000FF'><u>int</u></font> last_jpeg_message;    <font color='#009900'>/* Table contains strings 0..last_jpeg_message */</font>
+  <font color='#009900'>/* Second table can be added by application (see cjpeg/djpeg for example).
+   * It contains strings numbered first_addon_message..last_addon_message.
+   */</font>
+  <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font> <font color='#0000FF'>const</font> <font color='#5555FF'>*</font> addon_message_table; <font color='#009900'>/* Non-library errors */</font>
+  <font color='#0000FF'><u>int</u></font> first_addon_message;	<font color='#009900'>/* code for first string in addon table */</font>
+  <font color='#0000FF'><u>int</u></font> last_addon_message;	<font color='#009900'>/* code for last string in addon table */</font>
+<b>}</b>;
+
+
+<font color='#009900'>/* Progress monitor object */</font>
+
+<font color='#0000FF'>struct</font> <b><a name='jpeg_progress_mgr'></a>jpeg_progress_mgr</b> <b>{</b>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, progress_monitor, <font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  <font color='#0000FF'><u>long</u></font> pass_counter;		<font color='#009900'>/* work units completed in this pass */</font>
+  <font color='#0000FF'><u>long</u></font> pass_limit;		<font color='#009900'>/* total number of work units in this pass */</font>
+  <font color='#0000FF'><u>int</u></font> completed_passes;		<font color='#009900'>/* passes completed so far */</font>
+  <font color='#0000FF'><u>int</u></font> total_passes;		<font color='#009900'>/* total number of passes expected */</font>
+<b>}</b>;
+
+
+<font color='#009900'>/* Data destination object for compression */</font>
+
+<font color='#0000FF'>struct</font> <b><a name='jpeg_destination_mgr'></a>jpeg_destination_mgr</b> <b>{</b>
+  JOCTET <font color='#5555FF'>*</font> next_output_byte;	<font color='#009900'>/* =&gt; next byte to write in buffer */</font>
+  <font color='#0000FF'><u>size_t</u></font> free_in_buffer;	<font color='#009900'>/* # of byte spaces remaining in buffer */</font>
+
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, init_destination, <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font>, empty_output_buffer, <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, term_destination, <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>;
+
+
+<font color='#009900'>/* Data source object for decompression */</font>
+
+<font color='#0000FF'>struct</font> <b><a name='jpeg_source_mgr'></a>jpeg_source_mgr</b> <b>{</b>
+  <font color='#0000FF'>const</font> JOCTET <font color='#5555FF'>*</font> next_input_byte; <font color='#009900'>/* =&gt; next byte to read from buffer */</font>
+  <font color='#0000FF'><u>size_t</u></font> bytes_in_buffer;	<font color='#009900'>/* # of bytes remaining in buffer */</font>
+
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, init_source, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font>, fill_input_buffer, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, skip_input_data, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, <font color='#0000FF'><u>long</u></font> num_bytes<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font>, resync_to_restart, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, <font color='#0000FF'><u>int</u></font> desired<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, term_source, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>;
+
+
+<font color='#009900'>/* Memory manager object.
+ * Allocates "small" objects (a few K total), "large" objects (tens of K),
+ * and "really big" objects (virtual arrays with backing store if needed).
+ * The memory manager does not allow individual objects to be freed; rather,
+ * each created object is assigned to a pool, and whole pools can be freed
+ * at once.  This is faster and more convenient than remembering exactly what
+ * to free, especially where malloc()/free() are not too speedy.
+ * NB: alloc routines never return NULL.  They exit to error_exit if not
+ * successful.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPOOL_PERMANENT	<font color='#979000'>0</font>	<font color='#009900'>/* lasts until master record is destroyed */</font>
+<font color='#0000FF'>#define</font> JPOOL_IMAGE	<font color='#979000'>1</font>	<font color='#009900'>/* lasts until done with image/datastream */</font>
+<font color='#0000FF'>#define</font> JPOOL_NUMPOOLS	<font color='#979000'>2</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> jvirt_sarray_control <font color='#5555FF'>*</font> jvirt_sarray_ptr;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> jvirt_barray_control <font color='#5555FF'>*</font> jvirt_barray_ptr;
+
+
+<font color='#0000FF'>struct</font> <b><a name='jpeg_memory_mgr'></a>jpeg_memory_mgr</b> <b>{</b>
+  <font color='#009900'>/* Method pointers */</font>
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font>, alloc_small, <font face='Lucida Console'>(</font>j_common_ptr cinfo, <font color='#0000FF'><u>int</u></font> pool_id,
+				<font color='#0000FF'><u>size_t</u></font> sizeofobject<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font>, alloc_large, <font face='Lucida Console'>(</font>j_common_ptr cinfo, <font color='#0000FF'><u>int</u></font> pool_id,
+				     <font color='#0000FF'><u>size_t</u></font> sizeofobject<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font>JSAMPARRAY, alloc_sarray, <font face='Lucida Console'>(</font>j_common_ptr cinfo, <font color='#0000FF'><u>int</u></font> pool_id,
+				     JDIMENSION samplesperrow,
+				     JDIMENSION numrows<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font>JBLOCKARRAY, alloc_barray, <font face='Lucida Console'>(</font>j_common_ptr cinfo, <font color='#0000FF'><u>int</u></font> pool_id,
+				      JDIMENSION blocksperrow,
+				      JDIMENSION numrows<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font>jvirt_sarray_ptr, request_virt_sarray, <font face='Lucida Console'>(</font>j_common_ptr cinfo,
+						  <font color='#0000FF'><u>int</u></font> pool_id,
+						  <font color='#0000FF'><u>int</u></font> pre_zero,
+						  JDIMENSION samplesperrow,
+						  JDIMENSION numrows,
+						  JDIMENSION maxaccess<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font>jvirt_barray_ptr, request_virt_barray, <font face='Lucida Console'>(</font>j_common_ptr cinfo,
+						  <font color='#0000FF'><u>int</u></font> pool_id,
+						  <font color='#0000FF'><u>int</u></font> pre_zero,
+						  JDIMENSION blocksperrow,
+						  JDIMENSION numrows,
+						  JDIMENSION maxaccess<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, realize_virt_arrays, <font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font>JSAMPARRAY, access_virt_sarray, <font face='Lucida Console'>(</font>j_common_ptr cinfo,
+					   jvirt_sarray_ptr ptr,
+					   JDIMENSION start_row,
+					   JDIMENSION num_rows,
+					   <font color='#0000FF'><u>int</u></font> writable<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font>JBLOCKARRAY, access_virt_barray, <font face='Lucida Console'>(</font>j_common_ptr cinfo,
+					    jvirt_barray_ptr ptr,
+					    JDIMENSION start_row,
+					    JDIMENSION num_rows,
+					    <font color='#0000FF'><u>int</u></font> writable<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, free_pool, <font face='Lucida Console'>(</font>j_common_ptr cinfo, <font color='#0000FF'><u>int</u></font> pool_id<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, self_destruct, <font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Limit on memory allocation for this JPEG object.  (Note that this is
+   * merely advisory, not a guaranteed maximum; it only affects the space
+   * used for virtual-array buffers.)  May be changed by outer application
+   * after creating the JPEG object.
+   */</font>
+  <font color='#0000FF'><u>long</u></font> max_memory_to_use;
+
+  <font color='#009900'>/* Maximum allocation request accepted by alloc_large. */</font>
+  <font color='#0000FF'><u>long</u></font> max_alloc_chunk;
+<b>}</b>;
+
+
+<font color='#009900'>/* Routine signature for application-supplied marker processing methods.
+ * Need not pass marker code since it is stored in cinfo-&gt;unread_marker.
+ */</font>
+<font color='#0000FF'>typedef</font> <b><a name='JMETHOD'></a>JMETHOD</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font>, jpeg_marker_parser_method, <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+<font color='#009900'>/* Declarations for routines called by application.
+ * The JPP macro hides prototype parameters from compilers that can't cope.
+ * Note JPP requires double parentheses.
+ */</font>
+
+<font color='#0000FF'>#ifdef</font> HAVE_PROTOTYPES
+<font color='#0000FF'>#define</font> JPP<font face='Lucida Console'>(</font>arglist<font face='Lucida Console'>)</font>	arglist
+<font color='#0000FF'>#else</font>
+<font color='#0000FF'>#define</font> JPP<font face='Lucida Console'>(</font>arglist<font face='Lucida Console'>)</font>	<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#009900'>/* Short forms of external names for systems with brain-damaged linkers.
+ * We shorten external names to be unique in the first six letters, which
+ * is good enough for all known systems.
+ * (If your compiler itself needs names to be unique in less than 15 
+ * characters, you are out of luck.  Get a better compiler.)
+ */</font>
+
+<font color='#0000FF'>#ifdef</font> NEED_SHORT_EXTERNAL_NAMES
+<font color='#0000FF'>#define</font> jpeg_std_error		jStdError
+<font color='#0000FF'>#define</font> jpeg_CreateCompress	jCreaCompress
+<font color='#0000FF'>#define</font> jpeg_CreateDecompress	jCreaDecompress
+<font color='#0000FF'>#define</font> jpeg_destroy_compress	jDestCompress
+<font color='#0000FF'>#define</font> jpeg_destroy_decompress	jDestDecompress
+<font color='#0000FF'>#define</font> jpeg_stdio_dest		jStdDest
+<font color='#0000FF'>#define</font> jpeg_stdio_src		jStdSrc
+<font color='#0000FF'>#define</font> jpeg_set_defaults	jSetDefaults
+<font color='#0000FF'>#define</font> jpeg_set_colorspace	jSetColorspace
+<font color='#0000FF'>#define</font> jpeg_default_colorspace	jDefColorspace
+<font color='#0000FF'>#define</font> jpeg_set_quality	jSetQuality
+<font color='#0000FF'>#define</font> jpeg_set_linear_quality	jSetLQuality
+<font color='#0000FF'>#define</font> jpeg_add_quant_table	jAddQuantTable
+<font color='#0000FF'>#define</font> jpeg_quality_scaling	jQualityScaling
+<font color='#0000FF'>#define</font> jpeg_simple_progression	jSimProgress
+<font color='#0000FF'>#define</font> jpeg_suppress_tables	jSuppressTables
+<font color='#0000FF'>#define</font> jpeg_alloc_quant_table	jAlcQTable
+<font color='#0000FF'>#define</font> jpeg_alloc_huff_table	jAlcHTable
+<font color='#0000FF'>#define</font> jpeg_start_compress	jStrtCompress
+<font color='#0000FF'>#define</font> jpeg_write_scanlines	jWrtScanlines
+<font color='#0000FF'>#define</font> jpeg_finish_compress	jFinCompress
+<font color='#0000FF'>#define</font> jpeg_write_raw_data	jWrtRawData
+<font color='#0000FF'>#define</font> jpeg_write_marker	jWrtMarker
+<font color='#0000FF'>#define</font> jpeg_write_m_header	jWrtMHeader
+<font color='#0000FF'>#define</font> jpeg_write_m_byte	jWrtMByte
+<font color='#0000FF'>#define</font> jpeg_write_tables	jWrtTables
+<font color='#0000FF'>#define</font> jpeg_read_header	jReadHeader
+<font color='#0000FF'>#define</font> jpeg_start_decompress	jStrtDecompress
+<font color='#0000FF'>#define</font> jpeg_read_scanlines	jReadScanlines
+<font color='#0000FF'>#define</font> jpeg_finish_decompress	jFinDecompress
+<font color='#0000FF'>#define</font> jpeg_read_raw_data	jReadRawData
+<font color='#0000FF'>#define</font> jpeg_has_multiple_scans	jHasMultScn
+<font color='#0000FF'>#define</font> jpeg_start_output	jStrtOutput
+<font color='#0000FF'>#define</font> jpeg_finish_output	jFinOutput
+<font color='#0000FF'>#define</font> jpeg_input_complete	jInComplete
+<font color='#0000FF'>#define</font> jpeg_new_colormap	jNewCMap
+<font color='#0000FF'>#define</font> jpeg_consume_input	jConsumeInput
+<font color='#0000FF'>#define</font> jpeg_calc_output_dimensions	jCalcDimensions
+<font color='#0000FF'>#define</font> jpeg_save_markers	jSaveMarkers
+<font color='#0000FF'>#define</font> jpeg_set_marker_processor	jSetMarker
+<font color='#0000FF'>#define</font> jpeg_read_coefficients	jReadCoefs
+<font color='#0000FF'>#define</font> jpeg_write_coefficients	jWrtCoefs
+<font color='#0000FF'>#define</font> jpeg_copy_critical_parameters	jCopyCrit
+<font color='#0000FF'>#define</font> jpeg_abort_compress	jAbrtCompress
+<font color='#0000FF'>#define</font> jpeg_abort_decompress	jAbrtDecompress
+<font color='#0000FF'>#define</font> jpeg_abort		jAbort
+<font color='#0000FF'>#define</font> jpeg_destroy		jDestroy
+<font color='#0000FF'>#define</font> jpeg_resync_to_restart	jResyncRestart
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* NEED_SHORT_EXTERNAL_NAMES */</font>
+
+
+<font color='#009900'>/* Default error-management setup */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> jpeg_error_mgr <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> jpeg_std_error
+	<b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> jpeg_error_mgr <font color='#5555FF'>*</font> err<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* Initialization of JPEG compression objects.
+ * jpeg_create_compress() and jpeg_create_decompress() are the exported
+ * names that applications should call.  These expand to calls on
+ * jpeg_CreateCompress and jpeg_CreateDecompress with additional information
+ * passed for version mismatch checking.
+ * NB: you must set up the error-manager BEFORE calling jpeg_create_xxx.
+ */</font>
+<font color='#0000FF'>#define</font> jpeg_create_compress<font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font> \
+    <b><a name='jpeg_CreateCompress'></a>jpeg_CreateCompress</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>, JPEG_LIB_VERSION, \
+			<font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> <b><a name='jpeg_compress_struct'></a>jpeg_compress_struct</b><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> jpeg_create_decompress<font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font> \
+    <b><a name='jpeg_CreateDecompress'></a>jpeg_CreateDecompress</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>, JPEG_LIB_VERSION, \
+			  <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> <b><a name='jpeg_decompress_struct'></a>jpeg_decompress_struct</b><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_CreateCompress <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+				      <font color='#0000FF'><u>int</u></font> version, <font color='#0000FF'><u>size_t</u></font> structsize<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_CreateDecompress <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+					<font color='#0000FF'><u>int</u></font> version, <font color='#0000FF'><u>size_t</u></font> structsize<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#009900'>/* Destruction of JPEG compression objects */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_destroy_compress <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_destroy_decompress <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* Standard data source and destination managers: stdio streams. */</font>
+<font color='#009900'>/* Caller is responsible for opening the file before and closing after. */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_stdio_dest <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo, FILE <font color='#5555FF'>*</font> outfile<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_stdio_src <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo, FILE <font color='#5555FF'>*</font> infile<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* Default parameter setup for compression */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_set_defaults <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#009900'>/* Compression parameter setup aids */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_set_colorspace <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+				      J_COLOR_SPACE colorspace<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_default_colorspace <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_set_quality <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> quality,
+				   <font color='#0000FF'><u>int</u></font> force_baseline<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_set_linear_quality <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+					  <font color='#0000FF'><u>int</u></font> scale_factor,
+					  <font color='#0000FF'><u>int</u></font> force_baseline<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_add_quant_table <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> which_tbl,
+				       <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font>basic_table,
+				       <font color='#0000FF'><u>int</u></font> scale_factor,
+				       <font color='#0000FF'><u>int</u></font> force_baseline<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> jpeg_quality_scaling <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> quality<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_simple_progression <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_suppress_tables <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+				       <font color='#0000FF'><u>int</u></font> suppress<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font>JQUANT_TBL <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> jpeg_alloc_quant_table <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font>JHUFF_TBL <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> jpeg_alloc_huff_table <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* Main entry points for compression */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_start_compress <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+				      <font color='#0000FF'><u>int</u></font> write_all_tables<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> jpeg_write_scanlines <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+					     JSAMPARRAY scanlines,
+					     JDIMENSION num_lines<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_finish_compress <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* Replaces jpeg_write_scanlines when writing raw downsampled data. */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> jpeg_write_raw_data <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+					    JSAMPIMAGE data,
+					    JDIMENSION num_lines<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* Write a special marker.  See libjpeg.doc concerning safe usage. */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_write_marker
+	<b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> marker,
+	     <font color='#0000FF'>const</font> JOCTET <font color='#5555FF'>*</font> dataptr, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> datalen<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#009900'>/* Same, but piecemeal. */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_write_m_header
+	<b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> marker, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> datalen<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_write_m_byte
+	<b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* Alternate compression function: just write an abbreviated table file */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_write_tables <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* Decompression startup: read start of JPEG datastream to see what's there */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> jpeg_read_header <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+				  <font color='#0000FF'><u>int</u></font> require_image<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#009900'>/* Return value is one of: */</font>
+<font color='#0000FF'>#define</font> JPEG_SUSPENDED		<font color='#979000'>0</font> <font color='#009900'>/* Suspended due to lack of input data */</font>
+<font color='#0000FF'>#define</font> JPEG_HEADER_OK		<font color='#979000'>1</font> <font color='#009900'>/* Found valid image datastream */</font>
+<font color='#0000FF'>#define</font> JPEG_HEADER_TABLES_ONLY	<font color='#979000'>2</font> <font color='#009900'>/* Found valid table-specs-only datastream */</font>
+<font color='#009900'>/* If you pass require_image = TRUE (normal case), you need not check for
+ * a TABLES_ONLY return code; an abbreviated file will cause an error exit.
+ * JPEG_SUSPENDED is only possible if you use a data source module that can
+ * give a suspension return (the stdio source module doesn't).
+ */</font>
+
+<font color='#009900'>/* Main entry points for decompression */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> jpeg_start_decompress <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> jpeg_read_scanlines <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+					    JSAMPARRAY scanlines,
+					    JDIMENSION max_lines<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> jpeg_finish_decompress <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* Replaces jpeg_read_scanlines when reading raw downsampled data. */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> jpeg_read_raw_data <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+					   JSAMPIMAGE data,
+					   JDIMENSION max_lines<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* Additional entry points for buffered-image mode. */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> jpeg_has_multiple_scans <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> jpeg_start_output <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+				       <font color='#0000FF'><u>int</u></font> scan_number<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> jpeg_finish_output <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> jpeg_input_complete <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_new_colormap <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> jpeg_consume_input <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#009900'>/* Return value is one of: */</font>
+<font color='#009900'>/* #define JPEG_SUSPENDED	0    Suspended due to lack of input data */</font>
+<font color='#0000FF'>#define</font> JPEG_REACHED_SOS	<font color='#979000'>1</font> <font color='#009900'>/* Reached start of new scan */</font>
+<font color='#0000FF'>#define</font> JPEG_REACHED_EOI	<font color='#979000'>2</font> <font color='#009900'>/* Reached end of image */</font>
+<font color='#0000FF'>#define</font> JPEG_ROW_COMPLETED	<font color='#979000'>3</font> <font color='#009900'>/* Completed one iMCU row */</font>
+<font color='#0000FF'>#define</font> JPEG_SCAN_COMPLETED	<font color='#979000'>4</font> <font color='#009900'>/* Completed last iMCU row of a scan */</font>
+
+<font color='#009900'>/* Precalculate output dimensions for current decompression parameters. */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_calc_output_dimensions <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* Control saving of COM and APPn markers into marker_list. */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_save_markers
+	<b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo, <font color='#0000FF'><u>int</u></font> marker_code,
+	     <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> length_limit<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* Install a special processing method for COM or APPn markers. */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_set_marker_processor
+	<b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo, <font color='#0000FF'><u>int</u></font> marker_code,
+	     jpeg_marker_parser_method routine<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* Read or write raw DCT coefficients --- useful for lossless transcoding. */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font>jvirt_barray_ptr <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> jpeg_read_coefficients <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_write_coefficients <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+					  jvirt_barray_ptr <font color='#5555FF'>*</font> coef_arrays<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_copy_critical_parameters <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr srcinfo,
+						j_compress_ptr dstinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* If you choose to abort compression or decompression before completing
+ * jpeg_finish_(de)compress, then you need to clean up to release memory,
+ * temporary files, etc.  You can just call jpeg_destroy_(de)compress
+ * if you're done with the JPEG object, but if you want to clean it up and
+ * reuse it, call this:
+ */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_abort_compress <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_abort_decompress <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* Generic versions of jpeg_abort and jpeg_destroy that work on either
+ * flavor of JPEG object.  These may be more convenient in some places.
+ */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_abort <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_destroy <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* Default restart-marker-resync procedure for use by data source modules */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> jpeg_resync_to_restart <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+					    <font color='#0000FF'><u>int</u></font> desired<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+<font color='#009900'>/* These marker codes are exported since applications and data source modules
+ * are likely to want to use them.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_RST0	<font color='#979000'>0xD0</font>	<font color='#009900'>/* RST0 marker code */</font>
+<font color='#0000FF'>#define</font> JPEG_EOI	<font color='#979000'>0xD9</font>	<font color='#009900'>/* EOI marker code */</font>
+<font color='#0000FF'>#define</font> JPEG_APP0	<font color='#979000'>0xE0</font>	<font color='#009900'>/* APP0 marker code */</font>
+<font color='#0000FF'>#define</font> JPEG_COM	<font color='#979000'>0xFE</font>	<font color='#009900'>/* COM marker code */</font>
+
+
+<font color='#009900'>/* If we have a brain-damaged compiler that emits warnings (or worse, errors)
+ * for structure definitions that are never filled in, keep it quiet by
+ * supplying dummy definitions for the various substructures.
+ */</font>
+
+<font color='#0000FF'>#ifdef</font> INCOMPLETE_TYPES_BROKEN
+<font color='#0000FF'>#ifndef</font> JPEG_INTERNALS		<font color='#009900'>/* will be defined in jpegint.h */</font>
+<font color='#0000FF'>struct</font> <b><a name='jvirt_sarray_control'></a>jvirt_sarray_control</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jvirt_barray_control'></a>jvirt_barray_control</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jpeg_comp_master'></a>jpeg_comp_master</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jpeg_c_main_controller'></a>jpeg_c_main_controller</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jpeg_c_prep_controller'></a>jpeg_c_prep_controller</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jpeg_c_coef_controller'></a>jpeg_c_coef_controller</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jpeg_marker_writer'></a>jpeg_marker_writer</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jpeg_color_converter'></a>jpeg_color_converter</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jpeg_downsampler'></a>jpeg_downsampler</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jpeg_forward_dct'></a>jpeg_forward_dct</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jpeg_entropy_encoder'></a>jpeg_entropy_encoder</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jpeg_decomp_master'></a>jpeg_decomp_master</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jpeg_d_main_controller'></a>jpeg_d_main_controller</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jpeg_d_coef_controller'></a>jpeg_d_coef_controller</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jpeg_d_post_controller'></a>jpeg_d_post_controller</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jpeg_input_controller'></a>jpeg_input_controller</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jpeg_marker_reader'></a>jpeg_marker_reader</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jpeg_entropy_decoder'></a>jpeg_entropy_decoder</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jpeg_inverse_dct'></a>jpeg_inverse_dct</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jpeg_upsampler'></a>jpeg_upsampler</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jpeg_color_deconverter'></a>jpeg_color_deconverter</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>struct</font> <b><a name='jpeg_color_quantizer'></a>jpeg_color_quantizer</b> <b>{</b> <font color='#0000FF'><u>long</u></font> dummy; <b>}</b>;
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* JPEG_INTERNALS */</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* INCOMPLETE_TYPES_BROKEN */</font>
+
+
+<font color='#009900'>/*
+ * The JPEG library modules define JPEG_INTERNALS before including this file.
+ * The internal structure declarations are read only when that is true.
+ * Applications using the library should not include jpegint.h, but may wish
+ * to include jerror.h.
+ */</font>
+
+<font color='#0000FF'>#ifdef</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpegint.h.html'>jpegint.h</a>"		<font color='#009900'>/* fetch private declarations */</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jerror.h.html'>jerror.h</a>"		<font color='#009900'>/* fetch error codes too */</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* JPEGLIB_H */</font>
+
+</pre></body></html>

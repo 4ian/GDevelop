@@ -1,0 +1,1294 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - pngpread.c</title></head><body bgcolor='white'><pre>
+
+<font color='#009900'>/* pngpread.c - read a png file in push mode
+ *
+ * Last changed in libpng 1.6.0 [February 14, 2013]
+ * Copyright (c) 1998-2013 Glenn Randers-Pehrson
+ * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
+ * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
+ */</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='pngpriv.h.html'>pngpriv.h</a>"
+
+<font color='#0000FF'>#ifdef</font> PNG_PROGRESSIVE_READ_SUPPORTED
+
+<font color='#009900'>/* Push model modes */</font>
+<font color='#0000FF'>#define</font> PNG_READ_SIG_MODE   <font color='#979000'>0</font>
+<font color='#0000FF'>#define</font> PNG_READ_CHUNK_MODE <font color='#979000'>1</font>
+<font color='#0000FF'>#define</font> PNG_READ_IDAT_MODE  <font color='#979000'>2</font>
+<font color='#0000FF'>#define</font> PNG_SKIP_MODE       <font color='#979000'>3</font>
+<font color='#0000FF'>#define</font> PNG_READ_tEXt_MODE  <font color='#979000'>4</font>
+<font color='#0000FF'>#define</font> PNG_READ_zTXt_MODE  <font color='#979000'>5</font>
+<font color='#0000FF'>#define</font> PNG_READ_DONE_MODE  <font color='#979000'>6</font>
+<font color='#0000FF'>#define</font> PNG_READ_iTXt_MODE  <font color='#979000'>7</font>
+<font color='#0000FF'>#define</font> PNG_ERROR_MODE      <font color='#979000'>8</font>
+
+<font color='#0000FF'><u>void</u></font> PNGAPI
+<b><a name='png_process_data'></a>png_process_data</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_inforp info_ptr,
+    png_bytep buffer, png_size_t buffer_size<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL <font color='#5555FF'>|</font><font color='#5555FF'>|</font> info_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+   <font color='#BB00BB'>png_push_restore_buffer</font><font face='Lucida Console'>(</font>png_ptr, buffer, buffer_size<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#BB00BB'>png_process_some_data</font><font face='Lucida Console'>(</font>png_ptr, info_ptr<font face='Lucida Console'>)</font>;
+   <b>}</b>
+<b>}</b>
+
+png_size_t PNGAPI
+<b><a name='png_process_data_pause'></a>png_process_data_pause</b><font face='Lucida Console'>(</font>png_structrp png_ptr, <font color='#0000FF'><u>int</u></font> save<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#009900'>/* It's easiest for the caller if we do the save, then the caller doesn't
+       * have to supply the same data again:
+       */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>save<font face='Lucida Console'>)</font>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+      <font color='#0000FF'>else</font>
+      <b>{</b>
+         <font color='#009900'>/* This includes any pending saved bytes: */</font>
+         png_size_t remaining <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size;
+         png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+         <font color='#009900'>/* So subtract the saved buffer size, unless all the data
+          * is actually 'saved', in which case we just return 0
+          */</font>
+         <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size <font color='#5555FF'>&lt;</font> remaining<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> remaining <font color='#5555FF'>-</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size;
+      <b>}</b>
+   <b>}</b>
+
+   <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+<b>}</b>
+
+png_uint_32 PNGAPI
+<b><a name='png_process_data_skip'></a>png_process_data_skip</b><font face='Lucida Console'>(</font>png_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   png_uint_32 remaining <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>process_mode <font color='#5555FF'>=</font><font color='#5555FF'>=</font> PNG_SKIP_MODE <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>skip_length <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#009900'>/* At the end of png_process_data the buffer size must be 0 (see the loop
+       * above) so we can detect a broken call here:
+       */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+         <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr,
+            "<font color='#CC0000'>png_process_data_skip called inside png_process_data</font>"<font face='Lucida Console'>)</font>;
+
+      <font color='#009900'>/* If is impossible for there to be a saved buffer at this point -
+       * otherwise we could not be in SKIP mode.  This will also happen if
+       * png_process_skip is called inside png_process_data (but only very
+       * rarely.)
+       */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+         <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>png_process_data_skip called with saved data</font>"<font face='Lucida Console'>)</font>;
+
+      remaining <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>skip_length;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>skip_length <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>process_mode <font color='#5555FF'>=</font> PNG_READ_CHUNK_MODE;
+   <b>}</b>
+
+   <font color='#0000FF'>return</font> remaining;
+<b>}</b>
+
+<font color='#009900'>/* What we do with the incoming data depends on what we were previously
+ * doing before we ran out of data...
+ */</font>
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_process_some_data'></a>png_process_some_data</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_inforp info_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+   <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>process_mode<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>case</font> PNG_READ_SIG_MODE:
+      <b>{</b>
+         <font color='#BB00BB'>png_push_read_sig</font><font face='Lucida Console'>(</font>png_ptr, info_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>break</font>;
+      <b>}</b>
+
+      <font color='#0000FF'>case</font> PNG_READ_CHUNK_MODE:
+      <b>{</b>
+         <font color='#BB00BB'>png_push_read_chunk</font><font face='Lucida Console'>(</font>png_ptr, info_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>break</font>;
+      <b>}</b>
+
+      <font color='#0000FF'>case</font> PNG_READ_IDAT_MODE:
+      <b>{</b>
+         <font color='#BB00BB'>png_push_read_IDAT</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>break</font>;
+      <b>}</b>
+
+      <font color='#0000FF'>case</font> PNG_SKIP_MODE:
+      <b>{</b>
+         <font color='#BB00BB'>png_push_crc_finish</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>break</font>;
+      <b>}</b>
+
+      <font color='#0000FF'>default</font>:
+      <b>{</b>
+         png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+         <font color='#0000FF'>break</font>;
+      <b>}</b>
+   <b>}</b>
+<b>}</b>
+
+<font color='#009900'>/* Read any remaining signature bytes from the stream and compare them with
+ * the correct PNG signature.  It is possible that this routine is called
+ * with bytes already read from the signature, either because they have been
+ * checked by the calling application, or because of multiple calls to this
+ * routine.
+ */</font>
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_push_read_sig'></a>png_push_read_sig</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_inforp info_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   png_size_t num_checked <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sig_bytes, <font color='#009900'>/* SAFE, does not exceed 8 */</font> 
+             num_to_check <font color='#5555FF'>=</font> <font color='#979000'>8</font> <font color='#5555FF'>-</font> num_checked;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size <font color='#5555FF'>&lt;</font> num_to_check<font face='Lucida Console'>)</font>
+   <b>{</b>
+      num_to_check <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size;
+   <b>}</b>
+
+   <font color='#BB00BB'>png_push_fill_buffer</font><font face='Lucida Console'>(</font>png_ptr, <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>info_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>signature[num_checked]<font face='Lucida Console'>)</font>,
+       num_to_check<font face='Lucida Console'>)</font>;
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sig_bytes <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>png_byte<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sig_bytes <font color='#5555FF'>+</font> num_to_check<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>png_sig_cmp</font><font face='Lucida Console'>(</font>info_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>signature, num_checked, num_to_check<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_checked <font color='#5555FF'>&lt;</font> <font color='#979000'>4</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+          <font color='#BB00BB'>png_sig_cmp</font><font face='Lucida Console'>(</font>info_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>signature, num_checked, num_to_check <font color='#5555FF'>-</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+         <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>Not a PNG file</font>"<font face='Lucida Console'>)</font>;
+
+      <font color='#0000FF'>else</font>
+         <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>PNG file corrupted by ASCII conversion</font>"<font face='Lucida Console'>)</font>;
+   <b>}</b>
+   <font color='#0000FF'>else</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sig_bytes <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+      <b>{</b>
+         png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>process_mode <font color='#5555FF'>=</font> PNG_READ_CHUNK_MODE;
+      <b>}</b>
+   <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_push_read_chunk'></a>png_push_read_chunk</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_inforp info_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   png_uint_32 chunk_name;
+<font color='#0000FF'>#ifdef</font> PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+   <font color='#0000FF'><u>int</u></font> keep; <font color='#009900'>/* unknown handling method */</font>
+<font color='#0000FF'>#endif</font>
+
+   <font color='#009900'>/* First we make sure we have enough data for the 4 byte chunk name
+    * and the 4 byte chunk length before proceeding with decoding the
+    * chunk data.  To fully decode each of these chunks, we also make
+    * sure we have enough data in the buffer for the 4 byte CRC at the
+    * end of every chunk (except IDAT, which is handled separately).
+    */</font>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>&amp;</font> PNG_HAVE_CHUNK_HEADER<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_byte chunk_length[<font color='#979000'>4</font>];
+      png_byte chunk_tag[<font color='#979000'>4</font>];
+
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_push_fill_buffer</font><font face='Lucida Console'>(</font>png_ptr, chunk_length, <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>=</font> <font color='#BB00BB'>png_get_uint_31</font><font face='Lucida Console'>(</font>png_ptr, chunk_length<font face='Lucida Console'>)</font>;
+      <font color='#BB00BB'>png_reset_crc</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+      <font color='#BB00BB'>png_crc_read</font><font face='Lucida Console'>(</font>png_ptr, chunk_tag, <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>chunk_name <font color='#5555FF'>=</font> <font color='#BB00BB'>PNG_CHUNK_FROM_STRING</font><font face='Lucida Console'>(</font>chunk_tag<font face='Lucida Console'>)</font>;
+      <font color='#BB00BB'>png_check_chunk_name</font><font face='Lucida Console'>(</font>png_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>chunk_name<font face='Lucida Console'>)</font>;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_HAVE_CHUNK_HEADER;
+   <b>}</b>
+
+   chunk_name <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>chunk_name;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_IDAT<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>&amp;</font> PNG_AFTER_IDAT<font face='Lucida Console'>)</font>
+         png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_HAVE_CHUNK_AFTER_IDAT;
+
+      <font color='#009900'>/* If we reach an IDAT chunk, this means we have read all of the
+       * header chunks, and we can start reading the image (or if this
+       * is called after the image has been read - we have an error).
+       */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>&amp;</font> PNG_HAVE_IHDR<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+         <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>Missing IHDR before IDAT</font>"<font face='Lucida Console'>)</font>;
+
+      <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> PNG_COLOR_TYPE_PALETTE <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+          <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>&amp;</font> PNG_HAVE_PLTE<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+         <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>Missing PLTE before IDAT</font>"<font face='Lucida Console'>)</font>;
+
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_HAVE_IDAT;
+
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>&amp;</font> PNG_HAVE_CHUNK_AFTER_IDAT<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+         <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>&amp;</font> PNG_AFTER_IDAT<font face='Lucida Console'>)</font>
+         <font color='#BB00BB'>png_benign_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>Too many IDATs found</font>"<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_IHDR<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>13</font><font face='Lucida Console'>)</font>
+         <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>Invalid IHDR length</font>"<font face='Lucida Console'>)</font>;
+
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_handle_IHDR</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_IEND<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_handle_IEND</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length<font face='Lucida Console'>)</font>;
+
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>process_mode <font color='#5555FF'>=</font> PNG_READ_DONE_MODE;
+      <font color='#BB00BB'>png_push_have_end</font><font face='Lucida Console'>(</font>png_ptr, info_ptr<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+<font color='#0000FF'>#ifdef</font> PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>keep <font color='#5555FF'>=</font> <font color='#BB00BB'>png_chunk_unknown_handling</font><font face='Lucida Console'>(</font>png_ptr, chunk_name<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_handle_unknown</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length, keep<font face='Lucida Console'>)</font>;
+
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_PLTE<font face='Lucida Console'>)</font>
+         png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_HAVE_PLTE;
+   <b>}</b>
+
+<font color='#0000FF'>#endif</font>
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_PLTE<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+      <font color='#BB00BB'>png_handle_PLTE</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_IDAT<font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>idat_size <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>process_mode <font color='#5555FF'>=</font> PNG_READ_IDAT_MODE;
+      <font color='#BB00BB'>png_push_have_info</font><font face='Lucida Console'>(</font>png_ptr, info_ptr<font face='Lucida Console'>)</font>;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zstream.avail_out <font color='#5555FF'>=</font>
+          <font face='Lucida Console'>(</font>uInt<font face='Lucida Console'>)</font> <font color='#BB00BB'>PNG_ROWBYTES</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pixel_depth,
+          png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>iwidth<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zstream.next_out <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf;
+      <font color='#0000FF'>return</font>;
+   <b>}</b>
+
+<font color='#0000FF'>#ifdef</font> PNG_READ_gAMA_SUPPORTED
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_gAMA<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_handle_gAMA</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> PNG_READ_sBIT_SUPPORTED
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_sBIT<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_handle_sBIT</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> PNG_READ_cHRM_SUPPORTED
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_cHRM<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_handle_cHRM</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> PNG_READ_sRGB_SUPPORTED
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_sRGB<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_handle_sRGB</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> PNG_READ_iCCP_SUPPORTED
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_iCCP<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_handle_iCCP</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> PNG_READ_sPLT_SUPPORTED
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_sPLT<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_handle_sPLT</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> PNG_READ_tRNS_SUPPORTED
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_tRNS<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_handle_tRNS</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> PNG_READ_bKGD_SUPPORTED
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_bKGD<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_handle_bKGD</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> PNG_READ_hIST_SUPPORTED
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_hIST<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_handle_hIST</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> PNG_READ_pHYs_SUPPORTED
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_pHYs<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_handle_pHYs</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> PNG_READ_oFFs_SUPPORTED
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_oFFs<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_handle_oFFs</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length<font face='Lucida Console'>)</font>;
+   <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> PNG_READ_pCAL_SUPPORTED
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_pCAL<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_handle_pCAL</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> PNG_READ_sCAL_SUPPORTED
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_sCAL<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_handle_sCAL</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> PNG_READ_tIME_SUPPORTED
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_tIME<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_handle_tIME</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> PNG_READ_tEXt_SUPPORTED
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_tEXt<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_handle_tEXt</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> PNG_READ_zTXt_SUPPORTED
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_zTXt<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_handle_zTXt</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> PNG_READ_iTXt_SUPPORTED
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>chunk_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> png_iTXt<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_handle_iTXt</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+<font color='#0000FF'>#endif</font>
+   <font color='#0000FF'>else</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>+</font> <font color='#979000'>4</font> <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+      <font color='#BB00BB'>png_handle_unknown</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length,
+         PNG_HANDLE_CHUNK_AS_DEFAULT<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> ~PNG_HAVE_CHUNK_HEADER;
+<b>}</b>
+
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_push_crc_skip'></a>png_push_crc_skip</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_uint_32 skip<font face='Lucida Console'>)</font>
+<b>{</b>
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>process_mode <font color='#5555FF'>=</font> PNG_SKIP_MODE;
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>skip_length <font color='#5555FF'>=</font> skip;
+<b>}</b>
+
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_push_crc_finish'></a>png_push_crc_finish</b><font face='Lucida Console'>(</font>png_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>skip_length <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size<font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_size_t save_size <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size;
+      png_uint_32 skip_length <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>skip_length;
+
+      <font color='#009900'>/* We want the smaller of 'skip_length' and 'save_buffer_size', but
+       * they are of different types and we don't know which variable has the
+       * fewest bits.  Carefully select the smaller and cast it to the type of
+       * the larger - this cannot overflow.  Do not cast in the following test
+       * - it will break on either 16 or 64 bit platforms.
+       */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>skip_length <font color='#5555FF'>&lt;</font> save_size<font face='Lucida Console'>)</font>
+         save_size <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>png_size_t<font face='Lucida Console'>)</font>skip_length;
+
+      <font color='#0000FF'>else</font>
+         skip_length <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>png_uint_32<font face='Lucida Console'>)</font>save_size;
+
+      <font color='#BB00BB'>png_calculate_crc</font><font face='Lucida Console'>(</font>png_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_ptr, save_size<font face='Lucida Console'>)</font>;
+
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>skip_length <font color='#5555FF'>-</font><font color='#5555FF'>=</font> skip_length;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size <font color='#5555FF'>-</font><font color='#5555FF'>=</font> save_size;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size <font color='#5555FF'>-</font><font color='#5555FF'>=</font> save_size;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_ptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> save_size;
+   <b>}</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>skip_length <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_size<font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_size_t save_size <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_size;
+      png_uint_32 skip_length <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>skip_length;
+
+      <font color='#009900'>/* We want the smaller of 'skip_length' and 'current_buffer_size', here,
+       * the same problem exists as above and the same solution.
+       */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>skip_length <font color='#5555FF'>&lt;</font> save_size<font face='Lucida Console'>)</font>
+         save_size <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>png_size_t<font face='Lucida Console'>)</font>skip_length;
+
+      <font color='#0000FF'>else</font>
+         skip_length <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>png_uint_32<font face='Lucida Console'>)</font>save_size;
+
+      <font color='#BB00BB'>png_calculate_crc</font><font face='Lucida Console'>(</font>png_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_ptr, save_size<font face='Lucida Console'>)</font>;
+
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>skip_length <font color='#5555FF'>-</font><font color='#5555FF'>=</font> skip_length;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size <font color='#5555FF'>-</font><font color='#5555FF'>=</font> save_size;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_size <font color='#5555FF'>-</font><font color='#5555FF'>=</font> save_size;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_ptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> save_size;
+   <b>}</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>skip_length<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size <font color='#5555FF'>&lt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_crc_finish</font><font face='Lucida Console'>(</font>png_ptr, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>process_mode <font color='#5555FF'>=</font> PNG_READ_CHUNK_MODE;
+   <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'><u>void</u></font> PNGCBAPI
+<b><a name='png_push_fill_buffer'></a>png_push_fill_buffer</b><font face='Lucida Console'>(</font>png_structp png_ptr, png_bytep buffer, png_size_t length<font face='Lucida Console'>)</font>
+<b>{</b>
+   png_bytep ptr;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+   ptr <font color='#5555FF'>=</font> buffer;
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size<font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_size_t save_size;
+
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>length <font color='#5555FF'>&lt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size<font face='Lucida Console'>)</font>
+         save_size <font color='#5555FF'>=</font> length;
+
+      <font color='#0000FF'>else</font>
+         save_size <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size;
+
+      <font color='#BB00BB'>memcpy</font><font face='Lucida Console'>(</font>ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_ptr, save_size<font face='Lucida Console'>)</font>;
+      length <font color='#5555FF'>-</font><font color='#5555FF'>=</font> save_size;
+      ptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> save_size;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size <font color='#5555FF'>-</font><font color='#5555FF'>=</font> save_size;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size <font color='#5555FF'>-</font><font color='#5555FF'>=</font> save_size;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_ptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> save_size;
+   <b>}</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>length <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_size<font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_size_t save_size;
+
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>length <font color='#5555FF'>&lt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_size<font face='Lucida Console'>)</font>
+         save_size <font color='#5555FF'>=</font> length;
+
+      <font color='#0000FF'>else</font>
+         save_size <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_size;
+
+      <font color='#BB00BB'>memcpy</font><font face='Lucida Console'>(</font>ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_ptr, save_size<font face='Lucida Console'>)</font>;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size <font color='#5555FF'>-</font><font color='#5555FF'>=</font> save_size;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_size <font color='#5555FF'>-</font><font color='#5555FF'>=</font> save_size;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_ptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> save_size;
+   <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_push_save_buffer'></a>png_push_save_buffer</b><font face='Lucida Console'>(</font>png_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_ptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer<font face='Lucida Console'>)</font>
+      <b>{</b>
+         png_size_t i, istop;
+         png_bytep sp;
+         png_bytep dp;
+
+         istop <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size;
+         <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>, sp <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_ptr, dp <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer;
+             i <font color='#5555FF'>&lt;</font> istop; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, sp<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, dp<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+         <b>{</b>
+            <font color='#5555FF'>*</font>dp <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>sp;
+         <b>}</b>
+      <b>}</b>
+   <b>}</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size <font color='#5555FF'>+</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_size <font color='#5555FF'>&gt;</font>
+       png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_max<font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_size_t new_max;
+      png_bytep old_buffer;
+
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size <font color='#5555FF'>&gt;</font> PNG_SIZE_MAX <font color='#5555FF'>-</font>
+          <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_size <font color='#5555FF'>+</font> <font color='#979000'>256</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>Potential overflow of save_buffer</font>"<font face='Lucida Console'>)</font>;
+      <b>}</b>
+
+      new_max <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size <font color='#5555FF'>+</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_size <font color='#5555FF'>+</font> <font color='#979000'>256</font>;
+      old_buffer <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>png_bytep<font face='Lucida Console'>)</font><font color='#BB00BB'>png_malloc_warn</font><font face='Lucida Console'>(</font>png_ptr,
+          <font face='Lucida Console'>(</font>png_size_t<font face='Lucida Console'>)</font>new_max<font face='Lucida Console'>)</font>;
+
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_free</font><font face='Lucida Console'>(</font>png_ptr, old_buffer<font face='Lucida Console'>)</font>;
+         <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>Insufficient memory for save_buffer</font>"<font face='Lucida Console'>)</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>memcpy</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer, old_buffer, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size<font face='Lucida Console'>)</font>;
+      <font color='#BB00BB'>png_free</font><font face='Lucida Console'>(</font>png_ptr, old_buffer<font face='Lucida Console'>)</font>;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_max <font color='#5555FF'>=</font> new_max;
+   <b>}</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_size<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#BB00BB'>memcpy</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer <font color='#5555FF'>+</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size,
+         png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_size<font face='Lucida Console'>)</font>;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size <font color='#5555FF'>+</font><font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_size;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+   <b>}</b>
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_ptr <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer;
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<b>}</b>
+
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_push_restore_buffer'></a>png_push_restore_buffer</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_bytep buffer,
+   png_size_t buffer_length<font face='Lucida Console'>)</font>
+<b>{</b>
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer <font color='#5555FF'>=</font> buffer;
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_size <font color='#5555FF'>=</font> buffer_length;
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size <font color='#5555FF'>=</font> buffer_length <font color='#5555FF'>+</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size;
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_ptr <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer;
+<b>}</b>
+
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_push_read_IDAT'></a>png_push_read_IDAT</b><font face='Lucida Console'>(</font>png_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>&amp;</font> PNG_HAVE_CHUNK_HEADER<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_byte chunk_length[<font color='#979000'>4</font>];
+      png_byte chunk_tag[<font color='#979000'>4</font>];
+
+      <font color='#009900'>/* TODO: this code can be commoned up with the same code in push_read */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_push_fill_buffer</font><font face='Lucida Console'>(</font>png_ptr, chunk_length, <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length <font color='#5555FF'>=</font> <font color='#BB00BB'>png_get_uint_31</font><font face='Lucida Console'>(</font>png_ptr, chunk_length<font face='Lucida Console'>)</font>;
+      <font color='#BB00BB'>png_reset_crc</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+      <font color='#BB00BB'>png_crc_read</font><font face='Lucida Console'>(</font>png_ptr, chunk_tag, <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>chunk_name <font color='#5555FF'>=</font> <font color='#BB00BB'>PNG_CHUNK_FROM_STRING</font><font face='Lucida Console'>(</font>chunk_tag<font face='Lucida Console'>)</font>;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_HAVE_CHUNK_HEADER;
+
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>chunk_name <font color='#5555FF'>!</font><font color='#5555FF'>=</font> png_IDAT<font face='Lucida Console'>)</font>
+      <b>{</b>
+         png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>process_mode <font color='#5555FF'>=</font> PNG_READ_CHUNK_MODE;
+
+         <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>flags <font color='#5555FF'>&amp;</font> PNG_FLAG_ZSTREAM_ENDED<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>Not enough compressed data</font>"<font face='Lucida Console'>)</font>;
+
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>idat_size <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>push_length;
+   <b>}</b>
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>idat_size <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size<font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_size_t save_size <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size;
+      png_uint_32 idat_size <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>idat_size;
+
+      <font color='#009900'>/* We want the smaller of 'idat_size' and 'current_buffer_size', but they
+       * are of different types and we don't know which variable has the fewest
+       * bits.  Carefully select the smaller and cast it to the type of the
+       * larger - this cannot overflow.  Do not cast in the following test - it
+       * will break on either 16 or 64 bit platforms.
+       */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idat_size <font color='#5555FF'>&lt;</font> save_size<font face='Lucida Console'>)</font>
+         save_size <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>png_size_t<font face='Lucida Console'>)</font>idat_size;
+
+      <font color='#0000FF'>else</font>
+         idat_size <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>png_uint_32<font face='Lucida Console'>)</font>save_size;
+
+      <font color='#BB00BB'>png_calculate_crc</font><font face='Lucida Console'>(</font>png_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_ptr, save_size<font face='Lucida Console'>)</font>;
+
+      <font color='#BB00BB'>png_process_IDAT_data</font><font face='Lucida Console'>(</font>png_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_ptr, save_size<font face='Lucida Console'>)</font>;
+
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>idat_size <font color='#5555FF'>-</font><font color='#5555FF'>=</font> idat_size;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size <font color='#5555FF'>-</font><font color='#5555FF'>=</font> save_size;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_size <font color='#5555FF'>-</font><font color='#5555FF'>=</font> save_size;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>save_buffer_ptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> save_size;
+   <b>}</b>
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>idat_size <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_size<font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_size_t save_size <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_size;
+      png_uint_32 idat_size <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>idat_size;
+
+      <font color='#009900'>/* We want the smaller of 'idat_size' and 'current_buffer_size', but they
+       * are of different types and we don't know which variable has the fewest
+       * bits.  Carefully select the smaller and cast it to the type of the
+       * larger - this cannot overflow.
+       */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idat_size <font color='#5555FF'>&lt;</font> save_size<font face='Lucida Console'>)</font>
+         save_size <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>png_size_t<font face='Lucida Console'>)</font>idat_size;
+
+      <font color='#0000FF'>else</font>
+         idat_size <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>png_uint_32<font face='Lucida Console'>)</font>save_size;
+
+      <font color='#BB00BB'>png_calculate_crc</font><font face='Lucida Console'>(</font>png_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_ptr, save_size<font face='Lucida Console'>)</font>;
+
+      <font color='#BB00BB'>png_process_IDAT_data</font><font face='Lucida Console'>(</font>png_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_ptr, save_size<font face='Lucida Console'>)</font>;
+
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>idat_size <font color='#5555FF'>-</font><font color='#5555FF'>=</font> idat_size;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size <font color='#5555FF'>-</font><font color='#5555FF'>=</font> save_size;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_size <font color='#5555FF'>-</font><font color='#5555FF'>=</font> save_size;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>current_buffer_ptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> save_size;
+   <b>}</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>idat_size<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer_size <font color='#5555FF'>&lt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#BB00BB'>png_push_save_buffer</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#BB00BB'>png_crc_finish</font><font face='Lucida Console'>(</font>png_ptr, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> ~PNG_HAVE_CHUNK_HEADER;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_AFTER_IDAT;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zowner <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+   <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_process_IDAT_data'></a>png_process_IDAT_data</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_bytep buffer,
+   png_size_t buffer_length<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#009900'>/* The caller checks for a non-zero buffer length. */</font>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>buffer_length <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> buffer <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>No IDAT data (internal error)</font>"<font face='Lucida Console'>)</font>;
+
+   <font color='#009900'>/* This routine must process all the data it has been given
+    * before returning, calling the row callback as required to
+    * handle the uncompressed results.
+    */</font>
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zstream.next_in <font color='#5555FF'>=</font> buffer;
+   <font color='#009900'>/* TODO: WARNING: TRUNCATION ERROR: DANGER WILL ROBINSON: */</font>
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zstream.avail_in <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>uInt<font face='Lucida Console'>)</font>buffer_length;
+
+   <font color='#009900'>/* Keep going until the decompressed data is all processed
+    * or the stream marked as finished.
+    */</font>
+   <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zstream.avail_in <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+      <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>flags <font color='#5555FF'>&amp;</font> PNG_FLAG_ZSTREAM_ENDED<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'><u>int</u></font> ret;
+
+      <font color='#009900'>/* We have data for zlib, but we must check that zlib
+       * has someplace to put the results.  It doesn't matter
+       * if we don't expect any results -- it may be the input
+       * data is just the LZ end code.
+       */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zstream.avail_out <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#009900'>/* TODO: WARNING: TRUNCATION ERROR: DANGER WILL ROBINSON: */</font>
+         png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zstream.avail_out <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>uInt<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#BB00BB'>PNG_ROWBYTES</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pixel_depth,
+             png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>iwidth<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+         png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zstream.next_out <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf;
+      <b>}</b>
+
+      <font color='#009900'>/* Using Z_SYNC_FLUSH here means that an unterminated
+       * LZ stream (a stream with a missing end code) can still
+       * be handled, otherwise (Z_NO_FLUSH) a future zlib
+       * implementation might defer output and therefore
+       * change the current behavior (see comments in inflate.c
+       * for why this doesn't happen at present with zlib 1.2.5).
+       */</font>
+      ret <font color='#5555FF'>=</font> <font color='#BB00BB'>inflate</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zstream, Z_SYNC_FLUSH<font face='Lucida Console'>)</font>;
+
+      <font color='#009900'>/* Check for any failure before proceeding. */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ret <font color='#5555FF'>!</font><font color='#5555FF'>=</font> Z_OK <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ret <font color='#5555FF'>!</font><font color='#5555FF'>=</font> Z_STREAM_END<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#009900'>/* Terminate the decompression. */</font>
+         png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>flags <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_FLAG_ZSTREAM_ENDED;
+         png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zowner <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+         <font color='#009900'>/* This may be a truncated stream (missing or
+          * damaged end code).  Treat that as a warning.
+          */</font>
+         <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_number <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_rows <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+             png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>&gt;</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>png_warning</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>Truncated compressed data in IDAT</font>"<font face='Lucida Console'>)</font>;
+
+         <font color='#0000FF'>else</font>
+            <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>Decompression error in IDAT</font>"<font face='Lucida Console'>)</font>;
+
+         <font color='#009900'>/* Skip the check on unprocessed input */</font>
+         <font color='#0000FF'>return</font>;
+      <b>}</b>
+
+      <font color='#009900'>/* Did inflate output any data? */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zstream.next_out <font color='#5555FF'>!</font><font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#009900'>/* Is this unexpected data after the last row?
+          * If it is, artificially terminate the LZ output
+          * here.
+          */</font>
+         <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_number <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_rows <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+             png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>&gt;</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>
+         <b>{</b>
+            <font color='#009900'>/* Extra data. */</font>
+            <font color='#BB00BB'>png_warning</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>Extra compressed data in IDAT</font>"<font face='Lucida Console'>)</font>;
+            png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>flags <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_FLAG_ZSTREAM_ENDED;
+            png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zowner <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#009900'>/* Do no more processing; skip the unprocessed
+             * input check below.
+             */</font>
+            <font color='#0000FF'>return</font>;
+         <b>}</b>
+
+         <font color='#009900'>/* Do we have a complete row? */</font>
+         <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zstream.avail_out <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>png_push_process_row</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+      <b>}</b>
+
+      <font color='#009900'>/* And check for the end of the stream. */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ret <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_STREAM_END<font face='Lucida Console'>)</font>
+         png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>flags <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_FLAG_ZSTREAM_ENDED;
+   <b>}</b>
+
+   <font color='#009900'>/* All the data should have been processed, if anything
+    * is left at this point we have bytes of IDAT data
+    * after the zlib end code.
+    */</font>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zstream.avail_in <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>png_warning</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>Extra compression data in IDAT</font>"<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_push_process_row'></a>png_push_process_row</b><font face='Lucida Console'>(</font>png_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#009900'>/* 1.5.6: row_info moved out of png_struct to a local here. */</font>
+   png_row_info row_info;
+
+   row_info.width <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>iwidth; <font color='#009900'>/* NOTE: width of current interlaced row */</font>
+   row_info.color_type <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_type;
+   row_info.bit_depth <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bit_depth;
+   row_info.channels <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>channels;
+   row_info.pixel_depth <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pixel_depth;
+   row_info.rowbytes <font color='#5555FF'>=</font> <font color='#BB00BB'>PNG_ROWBYTES</font><font face='Lucida Console'>(</font>row_info.pixel_depth, row_info.width<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf[<font color='#979000'>0</font>] <font color='#5555FF'>&gt;</font> PNG_FILTER_VALUE_NONE<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf[<font color='#979000'>0</font>] <font color='#5555FF'>&lt;</font> PNG_FILTER_VALUE_LAST<font face='Lucida Console'>)</font>
+         <font color='#BB00BB'>png_read_filter_row</font><font face='Lucida Console'>(</font>png_ptr, <font color='#5555FF'>&amp;</font>row_info, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf <font color='#5555FF'>+</font> <font color='#979000'>1</font>,
+            png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>prev_row <font color='#5555FF'>+</font> <font color='#979000'>1</font>, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+      <font color='#0000FF'>else</font>
+         <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>bad adaptive filter value</font>"<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+   <font color='#009900'>/* libpng 1.5.6: the following line was copying png_ptr-&gt;rowbytes before
+    * 1.5.6, while the buffer really is this big in current versions of libpng
+    * it may not be in the future, so this was changed just to copy the
+    * interlaced row count:
+    */</font>
+   <font color='#BB00BB'>memcpy</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>prev_row, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf, row_info.rowbytes <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#ifdef</font> PNG_READ_TRANSFORMS_SUPPORTED
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>transformations<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>png_do_read_transformations</font><font face='Lucida Console'>(</font>png_ptr, <font color='#5555FF'>&amp;</font>row_info<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+
+   <font color='#009900'>/* The transformed pixel depth should match the depth now in row_info. */</font>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>transformed_pixel_depth <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>transformed_pixel_depth <font color='#5555FF'>=</font> row_info.pixel_depth;
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info.pixel_depth <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>maximum_pixel_depth<font face='Lucida Console'>)</font>
+         <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>progressive row overflow</font>"<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>transformed_pixel_depth <font color='#5555FF'>!</font><font color='#5555FF'>=</font> row_info.pixel_depth<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>internal progressive row size calculation error</font>"<font face='Lucida Console'>)</font>;
+
+
+<font color='#0000FF'>#ifdef</font> PNG_READ_INTERLACING_SUPPORTED
+   <font color='#009900'>/* Blow up interlaced rows to full size */</font>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>interlaced <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>transformations <font color='#5555FF'>&amp;</font> PNG_INTERLACE<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>&lt;</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>
+         <font color='#BB00BB'>png_do_read_interlace</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>row_info, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf <font color='#5555FF'>+</font> <font color='#979000'>1</font>, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass,
+            png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>transformations<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass<font face='Lucida Console'>)</font>
+    <b>{</b>
+         <font color='#0000FF'>case</font> <font color='#979000'>0</font>:
+         <b>{</b>
+            <font color='#0000FF'><u>int</u></font> i;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+               <font color='#BB00BB'>png_push_have_row</font><font face='Lucida Console'>(</font>png_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+               <font color='#BB00BB'>png_read_push_finish_row</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>; <font color='#009900'>/* Updates png_ptr-&gt;pass */</font>
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#009900'>/* Pass 1 might be empty */</font>
+            <b>{</b>
+               <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>4</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+               <b>{</b>
+                  <font color='#BB00BB'>png_push_have_row</font><font face='Lucida Console'>(</font>png_ptr, NULL<font face='Lucida Console'>)</font>;
+                  <font color='#BB00BB'>png_read_push_finish_row</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+               <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>height <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+               <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+               <b>{</b>
+                  <font color='#BB00BB'>png_push_have_row</font><font face='Lucida Console'>(</font>png_ptr, NULL<font face='Lucida Console'>)</font>;
+                  <font color='#BB00BB'>png_read_push_finish_row</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+               <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>height <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>png_push_have_row</font><font face='Lucida Console'>(</font>png_ptr, NULL<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>png_read_push_finish_row</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>break</font>;
+         <b>}</b>
+
+         <font color='#0000FF'>case</font> <font color='#979000'>1</font>:
+         <b>{</b>
+            <font color='#0000FF'><u>int</u></font> i;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+               <font color='#BB00BB'>png_push_have_row</font><font face='Lucida Console'>(</font>png_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+               <font color='#BB00BB'>png_read_push_finish_row</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#009900'>/* Skip top 4 generated rows */</font>
+            <b>{</b>
+               <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>4</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+               <b>{</b>
+                  <font color='#BB00BB'>png_push_have_row</font><font face='Lucida Console'>(</font>png_ptr, NULL<font face='Lucida Console'>)</font>;
+                  <font color='#BB00BB'>png_read_push_finish_row</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+               <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>break</font>;
+         <b>}</b>
+
+         <font color='#0000FF'>case</font> <font color='#979000'>2</font>:
+         <b>{</b>
+            <font color='#0000FF'><u>int</u></font> i;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>4</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+               <font color='#BB00BB'>png_push_have_row</font><font face='Lucida Console'>(</font>png_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+               <font color='#BB00BB'>png_read_push_finish_row</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>4</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+               <font color='#BB00BB'>png_push_have_row</font><font face='Lucida Console'>(</font>png_ptr, NULL<font face='Lucida Console'>)</font>;
+               <font color='#BB00BB'>png_read_push_finish_row</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#009900'>/* Pass 3 might be empty */</font>
+            <b>{</b>
+               <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+               <b>{</b>
+                  <font color='#BB00BB'>png_push_have_row</font><font face='Lucida Console'>(</font>png_ptr, NULL<font face='Lucida Console'>)</font>;
+                  <font color='#BB00BB'>png_read_push_finish_row</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+               <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>break</font>;
+         <b>}</b>
+
+         <font color='#0000FF'>case</font> <font color='#979000'>3</font>:
+         <b>{</b>
+            <font color='#0000FF'><u>int</u></font> i;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>4</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+               <font color='#BB00BB'>png_push_have_row</font><font face='Lucida Console'>(</font>png_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+               <font color='#BB00BB'>png_read_push_finish_row</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#009900'>/* Skip top two generated rows */</font>
+            <b>{</b>
+               <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+               <b>{</b>
+                  <font color='#BB00BB'>png_push_have_row</font><font face='Lucida Console'>(</font>png_ptr, NULL<font face='Lucida Console'>)</font>;
+                  <font color='#BB00BB'>png_read_push_finish_row</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+               <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>break</font>;
+         <b>}</b>
+
+         <font color='#0000FF'>case</font> <font color='#979000'>4</font>:
+         <b>{</b>
+            <font color='#0000FF'><u>int</u></font> i;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+               <font color='#BB00BB'>png_push_have_row</font><font face='Lucida Console'>(</font>png_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+               <font color='#BB00BB'>png_read_push_finish_row</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+               <font color='#BB00BB'>png_push_have_row</font><font face='Lucida Console'>(</font>png_ptr, NULL<font face='Lucida Console'>)</font>;
+               <font color='#BB00BB'>png_read_push_finish_row</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font> <font color='#009900'>/* Pass 5 might be empty */</font>
+            <b>{</b>
+               <font color='#BB00BB'>png_push_have_row</font><font face='Lucida Console'>(</font>png_ptr, NULL<font face='Lucida Console'>)</font>;
+               <font color='#BB00BB'>png_read_push_finish_row</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>break</font>;
+         <b>}</b>
+
+         <font color='#0000FF'>case</font> <font color='#979000'>5</font>:
+         <b>{</b>
+            <font color='#0000FF'><u>int</u></font> i;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+               <font color='#BB00BB'>png_push_have_row</font><font face='Lucida Console'>(</font>png_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+               <font color='#BB00BB'>png_read_push_finish_row</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font> <font color='#009900'>/* Skip top generated row */</font>
+            <b>{</b>
+               <font color='#BB00BB'>png_push_have_row</font><font face='Lucida Console'>(</font>png_ptr, NULL<font face='Lucida Console'>)</font>;
+               <font color='#BB00BB'>png_read_push_finish_row</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>break</font>;
+         <b>}</b>
+
+         <font color='#0000FF'>default</font>:
+         <font color='#0000FF'>case</font> <font color='#979000'>6</font>:
+         <b>{</b>
+            <font color='#BB00BB'>png_push_have_row</font><font face='Lucida Console'>(</font>png_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>png_read_push_finish_row</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>
+               <font color='#0000FF'>break</font>;
+
+            <font color='#BB00BB'>png_push_have_row</font><font face='Lucida Console'>(</font>png_ptr, NULL<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>png_read_push_finish_row</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+         <b>}</b>
+      <b>}</b>
+   <b>}</b>
+   <font color='#0000FF'>else</font>
+<font color='#0000FF'>#endif</font>
+   <b>{</b>
+      <font color='#BB00BB'>png_push_have_row</font><font face='Lucida Console'>(</font>png_ptr, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+      <font color='#BB00BB'>png_read_push_finish_row</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+   <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_read_push_finish_row'></a>png_read_push_finish_row</b><font face='Lucida Console'>(</font>png_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+<font color='#0000FF'>#ifdef</font> PNG_READ_INTERLACING_SUPPORTED
+   <font color='#009900'>/* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */</font>
+
+   <font color='#009900'>/* Start of interlace block */</font>
+   <font color='#0000FF'>static</font> PNG_CONST png_byte png_pass_start[] <font color='#5555FF'>=</font> <b>{</b><font color='#979000'>0</font>, <font color='#979000'>4</font>, <font color='#979000'>0</font>, <font color='#979000'>2</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font><b>}</b>;
+
+   <font color='#009900'>/* Offset to next interlace block */</font>
+   <font color='#0000FF'>static</font> PNG_CONST png_byte png_pass_inc[] <font color='#5555FF'>=</font> <b>{</b><font color='#979000'>8</font>, <font color='#979000'>8</font>, <font color='#979000'>4</font>, <font color='#979000'>4</font>, <font color='#979000'>2</font>, <font color='#979000'>2</font>, <font color='#979000'>1</font><b>}</b>;
+
+   <font color='#009900'>/* Start of interlace block in the y direction */</font>
+   <font color='#0000FF'>static</font> PNG_CONST png_byte png_pass_ystart[] <font color='#5555FF'>=</font> <b>{</b><font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>4</font>, <font color='#979000'>0</font>, <font color='#979000'>2</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font><b>}</b>;
+
+   <font color='#009900'>/* Offset to next interlace block in the y direction */</font>
+   <font color='#0000FF'>static</font> PNG_CONST png_byte png_pass_yinc[] <font color='#5555FF'>=</font> <b>{</b><font color='#979000'>8</font>, <font color='#979000'>8</font>, <font color='#979000'>8</font>, <font color='#979000'>4</font>, <font color='#979000'>4</font>, <font color='#979000'>2</font>, <font color='#979000'>2</font><b>}</b>;
+
+   <font color='#009900'>/* Height of interlace block.  This is not currently used - if you need
+    * it, uncomment it here and in png.h
+   static PNG_CONST png_byte png_pass_height[] = {8, 8, 4, 4, 2, 2, 1};
+   */</font>
+<font color='#0000FF'>#endif</font>
+
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_number<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_number <font color='#5555FF'>&lt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_rows<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+<font color='#0000FF'>#ifdef</font> PNG_READ_INTERLACING_SUPPORTED
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>interlaced<font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_number <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+      <font color='#BB00BB'>memset</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>prev_row, <font color='#979000'>0</font>, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowbytes <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+      <font color='#0000FF'>do</font>
+      <b>{</b>
+         png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+         <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>width <font color='#5555FF'>&lt;</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+             <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>width <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+             <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>width <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+
+         <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>&gt;</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font>
+            png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+
+         <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>break</font>;
+
+         png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>iwidth <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>width <font color='#5555FF'>+</font>
+             png_pass_inc[png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass] <font color='#5555FF'>-</font> <font color='#979000'>1</font> <font color='#5555FF'>-</font>
+             png_pass_start[png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass]<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font>
+             png_pass_inc[png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass];
+
+         <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>transformations <font color='#5555FF'>&amp;</font> PNG_INTERLACE<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>break</font>;
+
+         png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_rows <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>height <font color='#5555FF'>+</font>
+             png_pass_yinc[png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass] <font color='#5555FF'>-</font> <font color='#979000'>1</font> <font color='#5555FF'>-</font>
+             png_pass_ystart[png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass]<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font>
+             png_pass_yinc[png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass];
+
+      <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>iwidth <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_rows <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+   <b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNG_READ_INTERLACING_SUPPORTED */</font>
+<b>}</b>
+
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_push_have_info'></a>png_push_have_info</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_inforp info_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>info_fn <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>info_fn<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>png_ptr, info_ptr<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_push_have_end'></a>png_push_have_end</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_inforp info_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>end_fn <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>end_fn<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>png_ptr, info_ptr<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_push_have_row'></a>png_push_have_row</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_bytep row<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_fn <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_fn<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>png_ptr, row, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_number,
+         <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> PNG_READ_INTERLACING_SUPPORTED
+<font color='#0000FF'><u>void</u></font> PNGAPI
+<b><a name='png_progressive_combine_row'></a>png_progressive_combine_row</b><font face='Lucida Console'>(</font>png_const_structrp png_ptr, png_bytep old_row,
+    png_const_bytep new_row<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+   <font color='#009900'>/* new_row is a flag here - if it is NULL then the app callback was called
+    * from an empty row (see the calls to png_struct::row_fn below), otherwise
+    * it must be png_ptr-&gt;row_buf+1
+    */</font>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>new_row <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>png_combine_row</font><font face='Lucida Console'>(</font>png_ptr, old_row, <font color='#979000'>1</font><font color='#009900'>/*display*/</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNG_READ_INTERLACING_SUPPORTED */</font>
+
+<font color='#0000FF'><u>void</u></font> PNGAPI
+<b><a name='png_set_progressive_read_fn'></a>png_set_progressive_read_fn</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_voidp progressive_ptr,
+    png_progressive_info_ptr info_fn, png_progressive_row_ptr row_fn,
+    png_progressive_end_ptr end_fn<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>info_fn <font color='#5555FF'>=</font> info_fn;
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_fn <font color='#5555FF'>=</font> row_fn;
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>end_fn <font color='#5555FF'>=</font> end_fn;
+
+   <font color='#BB00BB'>png_set_read_fn</font><font face='Lucida Console'>(</font>png_ptr, progressive_ptr, png_push_fill_buffer<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+png_voidp PNGAPI
+<b><a name='png_get_progressive_ptr'></a>png_get_progressive_ptr</b><font face='Lucida Console'>(</font>png_const_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>NULL<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>return</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>io_ptr;
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNG_PROGRESSIVE_READ_SUPPORTED */</font>
+
+</pre></body></html>

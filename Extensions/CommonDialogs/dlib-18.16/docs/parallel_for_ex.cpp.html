@@ -1,0 +1,239 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - parallel_for_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use of the parallel for loop tools from the dlib
+    C++ Library.
+
+    Normally, a for loop executes the body of the loop in a serial manner.  This means
+    that, for example, if it takes 1 second to execute the body of the loop and the body
+    needs to execute 10 times then it will take 10 seconds to execute the entire loop.
+    However, on modern multi-core computers we have the opportunity to speed this up by
+    executing multiple steps of a for loop in parallel.  This example program will walk you
+    though a few examples showing how to do just that.  
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>threads.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>misc_api.h<font color='#5555FF'>&gt;</font>  <font color='#009900'>// for dlib::sleep
+</font><font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='print'></a>print</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vect<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> vect[i] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n**************************************\n</font>";
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='example_using_regular_non_parallel_loops'></a>example_using_regular_non_parallel_loops</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'><u>void</u></font> <b><a name='example_using_lambda_functions'></a>example_using_lambda_functions</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'><u>void</u></font> <b><a name='example_without_using_lambda_functions'></a>example_without_using_lambda_functions</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// We have 3 examples, each contained in a separate function.  Each example performs
+</font>    <font color='#009900'>// exactly the same computation, however, the second two examples do so using parallel
+</font>    <font color='#009900'>// for loops.  So the first example is here to show you what we are doing in terms of
+</font>    <font color='#009900'>// classical non-parallel for loops.  Then the next two examples will illustrate two
+</font>    <font color='#009900'>// ways to parallelize for loops in C++.  The first, and simplest way, uses C++11
+</font>    <font color='#009900'>// lambda functions.  However, since lambda functions are a relatively recent addition
+</font>    <font color='#009900'>// to C++ we also show how to write parallel for loops without using lambda functions.
+</font>    <font color='#009900'>// This way, users who don't yet have access to a current C++ compiler can learn to
+</font>    <font color='#009900'>// write parallel for loops as well.
+</font>
+    <font color='#BB00BB'>example_using_regular_non_parallel_loops</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>example_using_lambda_functions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>example_without_using_lambda_functions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='example_using_regular_non_parallel_loops'></a>example_using_regular_non_parallel_loops</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nExample using regular non-parallel for loops\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> vect;
+
+    <font color='#009900'>// put 10 elements into vect which are all equal to -1
+</font>    vect.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font><font color='#979000'>10</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Now set each element equal to its index value.  We put a sleep call in here so that
+</font>    <font color='#009900'>// when we run the same thing with a parallel for loop later on you will be able to
+</font>    <font color='#009900'>// observe the speedup. 
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        vect[i] <font color='#5555FF'>=</font> i;
+        dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>; <font color='#009900'>// sleep for 1 second
+</font>    <b>}</b>
+    <font color='#BB00BB'>print</font><font face='Lucida Console'>(</font>vect<font face='Lucida Console'>)</font>;
+
+
+
+    <font color='#009900'>// Assign only part of the elements in vect.
+</font>    vect.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font><font color='#979000'>10</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>5</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        vect[i] <font color='#5555FF'>=</font> i;
+        dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#BB00BB'>print</font><font face='Lucida Console'>(</font>vect<font face='Lucida Console'>)</font>;
+
+
+
+    <font color='#009900'>// Sum all element sin vect.
+</font>    <font color='#0000FF'><u>int</u></font> sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    vect.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font><font color='#979000'>10</font>, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+        sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> vect[i];
+    <b>}</b>
+
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>sum: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sum <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='example_using_lambda_functions'></a>example_using_lambda_functions</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+<font color='#009900'>// Change the next line to #if 1 if your compiler supports the new C++11 lambda functions. 
+</font><font color='#0000FF'>#if</font> <font color='#979000'>0</font>
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nExample using parallel for loops\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>// This variable should be set to the number of processing cores on your computer since
+</font>    <font color='#009900'>// it determines the amount of parallelism in the for loop.  
+</font>    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> vect;
+
+    vect.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font><font color='#979000'>10</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font>num_threads, <font color='#979000'>0</font>, vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, [<font color='#5555FF'>&amp;</font>]<font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i<font face='Lucida Console'>)</font><b>{</b>
+        <font color='#009900'>// The i variable is the loop counter as in a normal for loop.  So we simply need
+</font>        <font color='#009900'>// to place the body of the for loop right here and we get the same behavior.  The
+</font>        <font color='#009900'>// range for the for loop is determined by the 2nd and 3rd arguments to
+</font>        <font color='#009900'>// parallel_for().
+</font>        vect[i] <font color='#5555FF'>=</font> i;
+        dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+    <b>}</b><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>print</font><font face='Lucida Console'>(</font>vect<font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// Assign only part of the elements in vect.
+</font>    vect.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font><font color='#979000'>10</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font>num_threads, <font color='#979000'>1</font>, <font color='#979000'>5</font>, [<font color='#5555FF'>&amp;</font>]<font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i<font face='Lucida Console'>)</font><b>{</b>
+        vect[i] <font color='#5555FF'>=</font> i;
+        dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+    <b>}</b><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>print</font><font face='Lucida Console'>(</font>vect<font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// Note that things become a little more complex if the loop bodies are not totally
+</font>    <font color='#009900'>// independent.  In the first two cases each iteration of the loop touched different
+</font>    <font color='#009900'>// memory locations, so we didn't need to use any kind of thread synchronization.
+</font>    <font color='#009900'>// However, in the summing loop we need to add some synchronization to protect the sum
+</font>    <font color='#009900'>// variable.  This is easily accomplished by creating a mutex and locking it before
+</font>    <font color='#009900'>// adding to sum.  More generally, you must ensure that the bodies of your parallel for
+</font>    <font color='#009900'>// loops are thread safe using whatever means is appropriate for your code.  Since a
+</font>    <font color='#009900'>// parallel for loop is implemented using threads, all the usual techniques for
+</font>    <font color='#009900'>// ensuring thread safety can be used. 
+</font>    <font color='#0000FF'><u>int</u></font> sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    dlib::mutex m;
+    vect.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font><font color='#979000'>10</font>, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font>num_threads, <font color='#979000'>0</font>, vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, [<font color='#5555FF'>&amp;</font>]<font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i<font face='Lucida Console'>)</font><b>{</b>
+        <font color='#009900'>// The sleep statements still execute in parallel.  
+</font>        dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Lock the m mutex.  The auto_mutex will automatically unlock at the closing }.
+</font>        <font color='#009900'>// This will ensure only one thread can execute the sum += vect[i] statement at
+</font>        <font color='#009900'>// a time.
+</font>        auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> vect[i];
+    <b>}</b><font face='Lucida Console'>)</font>;
+
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>sum: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sum <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+<font color='#0000FF'>#endif</font>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//    The rest of this example program shows how to create parallel for loops without
+</font><font color='#009900'>//    using lambda functions.  So the first thing we do is explicitly create function
+</font><font color='#009900'>//    objects equivalent to the lambda functions we used.  Then we call parallel_for() 
+</font><font color='#009900'>//    as done above.
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>struct</font> <b><a name='function_object'></a>function_object</b>
+<b>{</b>
+    <b><a name='function_object'></a>function_object</b><font face='Lucida Console'>(</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vect_ <font face='Lucida Console'>)</font> : vect<font face='Lucida Console'>(</font>vect_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vect;
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        vect[i] <font color='#5555FF'>=</font> i;
+        dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>; 
+    <b>}</b>
+<b>}</b>;
+
+<font color='#0000FF'>struct</font> <b><a name='function_object_sum'></a>function_object_sum</b>
+<b>{</b>
+    <b><a name='function_object_sum'></a>function_object_sum</b><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vect_, <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> sum_ <font face='Lucida Console'>)</font> : vect<font face='Lucida Console'>(</font>vect_<font face='Lucida Console'>)</font>, sum<font face='Lucida Console'>(</font>sum_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vect;
+    <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> sum;
+    dlib::mutex m;
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>; 
+        auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> vect[i];
+    <b>}</b>
+<b>}</b>;
+
+<font color='#0000FF'><u>void</u></font> <b><a name='example_without_using_lambda_functions'></a>example_without_using_lambda_functions</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// Again, note that this function does exactly the same thing as
+</font>    <font color='#009900'>// example_using_regular_non_parallel_loops() and example_using_lambda_functions().
+</font>
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nExample using parallel for loops and no lambda functions\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> vect;
+
+
+    vect.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font><font color='#979000'>10</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>; 
+    <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font>num_threads, <font color='#979000'>0</font>, vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>function_object</font><font face='Lucida Console'>(</font>vect<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>print</font><font face='Lucida Console'>(</font>vect<font face='Lucida Console'>)</font>;
+
+
+    vect.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font><font color='#979000'>10</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font>num_threads, <font color='#979000'>1</font>, <font color='#979000'>5</font>, <font color='#BB00BB'>function_object</font><font face='Lucida Console'>(</font>vect<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>print</font><font face='Lucida Console'>(</font>vect<font face='Lucida Console'>)</font>;
+
+
+    <font color='#0000FF'><u>int</u></font> sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    vect.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font><font color='#979000'>10</font>, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    function_object_sum <font color='#BB00BB'>funct</font><font face='Lucida Console'>(</font>vect, sum<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font>num_threads, <font color='#979000'>0</font>, vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, funct<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>sum: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sum <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

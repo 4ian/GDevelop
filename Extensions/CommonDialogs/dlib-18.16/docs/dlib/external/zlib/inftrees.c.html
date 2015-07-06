@@ -1,0 +1,309 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - inftrees.c</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/* inftrees.c -- generate Huffman trees for efficient decoding
+ * Copyright (C) 1995-2013 Mark Adler
+ * For conditions of distribution and use, see copyright notice in zlib.h
+ */</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='zutil.h.html'>zutil.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='inftrees.h.html'>inftrees.h</a>"
+
+<font color='#0000FF'>#define</font> MAXBITS <font color='#979000'>15</font>
+
+<font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> inflate_copyright[] <font color='#5555FF'>=</font>
+   "<font color='#CC0000'> inflate 1.2.8 Copyright 1995-2013 Mark Adler </font>";
+<font color='#009900'>/*
+  If you use the zlib library in a product, an acknowledgment is welcome
+  in the documentation of your product. If for some reason you cannot
+  include such an acknowledgment, I would appreciate that you keep this
+  copyright string in the executable of your product.
+ */</font>
+
+<font color='#009900'>/*
+   Build a set of tables to decode the provided canonical Huffman code.
+   The code lengths are lens[0..codes-1].  The result starts at *table,
+   whose indices are 0..2^bits-1.  work is a writable array of at least
+   lens shorts, which is used as a work area.  type is the type of code
+   to be generated, CODES, LENS, or DISTS.  On return, zero is success,
+   -1 is an invalid code, and +1 means that ENOUGH isn't enough.  table
+   on return points to the next available entry's address.  bits is the
+   requested root table index bits, and on return it is the actual root
+   table index bits.  It will differ if the request is greater than the
+   longest code or if it is less than the shortest code.
+ */</font>
+<font color='#0000FF'><u>int</u></font> ZLIB_INTERNAL <b><a name='inflate_table'></a>inflate_table</b><font face='Lucida Console'>(</font>type, lens, codes, table, bits, work<font face='Lucida Console'>)</font>
+codetype type;
+<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> FAR <font color='#5555FF'>*</font>lens;
+<font color='#0000FF'><u>unsigned</u></font> codes;
+code FAR <font color='#5555FF'>*</font> FAR <font color='#5555FF'>*</font>table;
+<font color='#0000FF'><u>unsigned</u></font> FAR <font color='#5555FF'>*</font>bits;
+<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> FAR <font color='#5555FF'>*</font>work;
+<b>{</b>
+    <font color='#0000FF'><u>unsigned</u></font> len;               <font color='#009900'>/* a code's length in bits */</font>
+    <font color='#0000FF'><u>unsigned</u></font> sym;               <font color='#009900'>/* index of code symbols */</font>
+    <font color='#0000FF'><u>unsigned</u></font> min, max;          <font color='#009900'>/* minimum and maximum code lengths */</font>
+    <font color='#0000FF'><u>unsigned</u></font> root;              <font color='#009900'>/* number of index bits for root table */</font>
+    <font color='#0000FF'><u>unsigned</u></font> curr;              <font color='#009900'>/* number of index bits for current table */</font>
+    <font color='#0000FF'><u>unsigned</u></font> drop;              <font color='#009900'>/* code bits to drop for sub-table */</font>
+    <font color='#0000FF'><u>int</u></font> left;                   <font color='#009900'>/* number of prefix codes available */</font>
+    <font color='#0000FF'><u>unsigned</u></font> used;              <font color='#009900'>/* code entries in table used */</font>
+    <font color='#0000FF'><u>unsigned</u></font> huff;              <font color='#009900'>/* Huffman code */</font>
+    <font color='#0000FF'><u>unsigned</u></font> incr;              <font color='#009900'>/* for incrementing code, index */</font>
+    <font color='#0000FF'><u>unsigned</u></font> fill;              <font color='#009900'>/* index for replicating entries */</font>
+    <font color='#0000FF'><u>unsigned</u></font> low;               <font color='#009900'>/* low bits for current root entry */</font>
+    <font color='#0000FF'><u>unsigned</u></font> mask;              <font color='#009900'>/* mask for low root bits */</font>
+    code here;                  <font color='#009900'>/* table entry for duplication */</font>
+    code FAR <font color='#5555FF'>*</font>next;             <font color='#009900'>/* next available space in table */</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> FAR <font color='#5555FF'>*</font>base;     <font color='#009900'>/* base value table to use */</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> FAR <font color='#5555FF'>*</font>extra;    <font color='#009900'>/* extra bits table to use */</font>
+    <font color='#0000FF'><u>int</u></font> end;                    <font color='#009900'>/* use base and extra for symbol &gt; end */</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> count[MAXBITS<font color='#5555FF'>+</font><font color='#979000'>1</font>];    <font color='#009900'>/* number of codes of each length */</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> offs[MAXBITS<font color='#5555FF'>+</font><font color='#979000'>1</font>];     <font color='#009900'>/* offsets in table for each length */</font>
+    <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> lbase[<font color='#979000'>31</font>] <font color='#5555FF'>=</font> <b>{</b> <font color='#009900'>/* Length codes 257..285 base */</font>
+        <font color='#979000'>3</font>, <font color='#979000'>4</font>, <font color='#979000'>5</font>, <font color='#979000'>6</font>, <font color='#979000'>7</font>, <font color='#979000'>8</font>, <font color='#979000'>9</font>, <font color='#979000'>10</font>, <font color='#979000'>11</font>, <font color='#979000'>13</font>, <font color='#979000'>15</font>, <font color='#979000'>17</font>, <font color='#979000'>19</font>, <font color='#979000'>23</font>, <font color='#979000'>27</font>, <font color='#979000'>31</font>,
+        <font color='#979000'>35</font>, <font color='#979000'>43</font>, <font color='#979000'>51</font>, <font color='#979000'>59</font>, <font color='#979000'>67</font>, <font color='#979000'>83</font>, <font color='#979000'>99</font>, <font color='#979000'>115</font>, <font color='#979000'>131</font>, <font color='#979000'>163</font>, <font color='#979000'>195</font>, <font color='#979000'>227</font>, <font color='#979000'>258</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font><b>}</b>;
+    <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> lext[<font color='#979000'>31</font>] <font color='#5555FF'>=</font> <b>{</b> <font color='#009900'>/* Length codes 257..285 extra */</font>
+        <font color='#979000'>16</font>, <font color='#979000'>16</font>, <font color='#979000'>16</font>, <font color='#979000'>16</font>, <font color='#979000'>16</font>, <font color='#979000'>16</font>, <font color='#979000'>16</font>, <font color='#979000'>16</font>, <font color='#979000'>17</font>, <font color='#979000'>17</font>, <font color='#979000'>17</font>, <font color='#979000'>17</font>, <font color='#979000'>18</font>, <font color='#979000'>18</font>, <font color='#979000'>18</font>, <font color='#979000'>18</font>,
+        <font color='#979000'>19</font>, <font color='#979000'>19</font>, <font color='#979000'>19</font>, <font color='#979000'>19</font>, <font color='#979000'>20</font>, <font color='#979000'>20</font>, <font color='#979000'>20</font>, <font color='#979000'>20</font>, <font color='#979000'>21</font>, <font color='#979000'>21</font>, <font color='#979000'>21</font>, <font color='#979000'>21</font>, <font color='#979000'>16</font>, <font color='#979000'>72</font>, <font color='#979000'>78</font><b>}</b>;
+    <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> dbase[<font color='#979000'>32</font>] <font color='#5555FF'>=</font> <b>{</b> <font color='#009900'>/* Distance codes 0..29 base */</font>
+        <font color='#979000'>1</font>, <font color='#979000'>2</font>, <font color='#979000'>3</font>, <font color='#979000'>4</font>, <font color='#979000'>5</font>, <font color='#979000'>7</font>, <font color='#979000'>9</font>, <font color='#979000'>13</font>, <font color='#979000'>17</font>, <font color='#979000'>25</font>, <font color='#979000'>33</font>, <font color='#979000'>49</font>, <font color='#979000'>65</font>, <font color='#979000'>97</font>, <font color='#979000'>129</font>, <font color='#979000'>193</font>,
+        <font color='#979000'>257</font>, <font color='#979000'>385</font>, <font color='#979000'>513</font>, <font color='#979000'>769</font>, <font color='#979000'>1025</font>, <font color='#979000'>1537</font>, <font color='#979000'>2049</font>, <font color='#979000'>3073</font>, <font color='#979000'>4097</font>, <font color='#979000'>6145</font>,
+        <font color='#979000'>8193</font>, <font color='#979000'>12289</font>, <font color='#979000'>16385</font>, <font color='#979000'>24577</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font><b>}</b>;
+    <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> dext[<font color='#979000'>32</font>] <font color='#5555FF'>=</font> <b>{</b> <font color='#009900'>/* Distance codes 0..29 extra */</font>
+        <font color='#979000'>16</font>, <font color='#979000'>16</font>, <font color='#979000'>16</font>, <font color='#979000'>16</font>, <font color='#979000'>17</font>, <font color='#979000'>17</font>, <font color='#979000'>18</font>, <font color='#979000'>18</font>, <font color='#979000'>19</font>, <font color='#979000'>19</font>, <font color='#979000'>20</font>, <font color='#979000'>20</font>, <font color='#979000'>21</font>, <font color='#979000'>21</font>, <font color='#979000'>22</font>, <font color='#979000'>22</font>,
+        <font color='#979000'>23</font>, <font color='#979000'>23</font>, <font color='#979000'>24</font>, <font color='#979000'>24</font>, <font color='#979000'>25</font>, <font color='#979000'>25</font>, <font color='#979000'>26</font>, <font color='#979000'>26</font>, <font color='#979000'>27</font>, <font color='#979000'>27</font>,
+        <font color='#979000'>28</font>, <font color='#979000'>28</font>, <font color='#979000'>29</font>, <font color='#979000'>29</font>, <font color='#979000'>64</font>, <font color='#979000'>64</font><b>}</b>;
+
+    <font color='#009900'>/*
+       Process a set of code lengths to create a canonical Huffman code.  The
+       code lengths are lens[0..codes-1].  Each length corresponds to the
+       symbols 0..codes-1.  The Huffman code is generated by first sorting the
+       symbols by length from short to long, and retaining the symbol order
+       for codes with equal lengths.  Then the code starts with all zero bits
+       for the first code of the shortest length, and the codes are integer
+       increments for the same length, and zeros are appended as the length
+       increases.  For the deflate format, these bits are stored backwards
+       from their more natural integer increment ordering, and so when the
+       decoding tables are built in the large loop below, the integer codes
+       are incremented backwards.
+
+       This routine assumes, but does not check, that all of the entries in
+       lens[] are in the range 0..MAXBITS.  The caller must assure this.
+       1..MAXBITS is interpreted as that code length.  zero means that that
+       symbol does not occur in this code.
+
+       The codes are sorted by computing a count of codes for each length,
+       creating from that a table of starting indices for each length in the
+       sorted table, and then entering the symbols in order in the sorted
+       table.  The sorted table is work[], with that space being provided by
+       the caller.
+
+       The length counts are used for other purposes as well, i.e. finding
+       the minimum and maximum length codes, determining if there are any
+       codes at all, checking for a valid set of lengths, and looking ahead
+       at length counts to determine sub-table sizes when building the
+       decoding tables.
+     */</font>
+
+    <font color='#009900'>/* accumulate lengths for codes (assumes lens[] all in 0..MAXBITS) */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>=</font> <font color='#979000'>0</font>; len <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> MAXBITS; len<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+        count[len] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>sym <font color='#5555FF'>=</font> <font color='#979000'>0</font>; sym <font color='#5555FF'>&lt;</font> codes; sym<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+        count[lens[sym]]<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+
+    <font color='#009900'>/* bound code lengths, force root to be within code lengths */</font>
+    root <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>bits;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>max <font color='#5555FF'>=</font> MAXBITS; max <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>; max<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>count[max] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#0000FF'>break</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>root <font color='#5555FF'>&gt;</font> max<font face='Lucida Console'>)</font> root <font color='#5555FF'>=</font> max;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>max <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>                     <font color='#009900'>/* no symbols to code at all */</font>
+        here.op <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font><font color='#979000'>64</font>;    <font color='#009900'>/* invalid code marker */</font>
+        here.bits <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font><font color='#979000'>1</font>;
+        here.val <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font face='Lucida Console'>)</font><font color='#979000'>0</font>;
+        <font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>table<font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> here;             <font color='#009900'>/* make a table to force an error */</font>
+        <font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>table<font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> here;
+        <font color='#5555FF'>*</font>bits <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>return</font> <font color='#979000'>0</font>;     <font color='#009900'>/* no symbols, but wait for decoding to report error */</font>
+    <b>}</b>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>min <font color='#5555FF'>=</font> <font color='#979000'>1</font>; min <font color='#5555FF'>&lt;</font> max; min<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>count[min] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#0000FF'>break</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>root <font color='#5555FF'>&lt;</font> min<font face='Lucida Console'>)</font> root <font color='#5555FF'>=</font> min;
+
+    <font color='#009900'>/* check for an over-subscribed or incomplete set of lengths */</font>
+    left <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>=</font> <font color='#979000'>1</font>; len <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> MAXBITS; len<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+        left <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        left <font color='#5555FF'>-</font><font color='#5555FF'>=</font> count[len];
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>left <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;        <font color='#009900'>/* over-subscribed */</font>
+    <b>}</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>left <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> CODES <font color='#5555FF'>|</font><font color='#5555FF'>|</font> max <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;                      <font color='#009900'>/* incomplete set */</font>
+
+    <font color='#009900'>/* generate offsets into symbol table for each length for sorting */</font>
+    offs[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>=</font> <font color='#979000'>1</font>; len <font color='#5555FF'>&lt;</font> MAXBITS; len<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+        offs[len <font color='#5555FF'>+</font> <font color='#979000'>1</font>] <font color='#5555FF'>=</font> offs[len] <font color='#5555FF'>+</font> count[len];
+
+    <font color='#009900'>/* sort symbols by length, by symbol order within each length */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>sym <font color='#5555FF'>=</font> <font color='#979000'>0</font>; sym <font color='#5555FF'>&lt;</font> codes; sym<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lens[sym] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> work[offs[lens[sym]]<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font face='Lucida Console'>)</font>sym;
+
+    <font color='#009900'>/*
+       Create and fill in decoding tables.  In this loop, the table being
+       filled is at next and has curr index bits.  The code being used is huff
+       with length len.  That code is converted to an index by dropping drop
+       bits off of the bottom.  For codes where len is less than drop + curr,
+       those top drop + curr - len bits are incremented through all values to
+       fill the table with replicated entries.
+
+       root is the number of index bits for the root table.  When len exceeds
+       root, sub-tables are created pointed to by the root entry with an index
+       of the low root bits of huff.  This is saved in low to check for when a
+       new sub-table should be started.  drop is zero when the root table is
+       being filled, and drop is root when sub-tables are being filled.
+
+       When a new sub-table is needed, it is necessary to look ahead in the
+       code lengths to determine what size sub-table is needed.  The length
+       counts are used for this, and so count[] is decremented as codes are
+       entered in the tables.
+
+       used keeps track of how many table entries have been allocated from the
+       provided *table space.  It is checked for LENS and DIST tables against
+       the constants ENOUGH_LENS and ENOUGH_DISTS to guard against changes in
+       the initial root table size constants.  See the comments in inftrees.h
+       for more information.
+
+       sym increments through all symbols, and the loop terminates when
+       all codes of length max, i.e. all codes, have been processed.  This
+       routine permits incomplete codes, so another loop after this one fills
+       in the rest of the decoding tables with invalid code markers.
+     */</font>
+
+    <font color='#009900'>/* set up for code type */</font>
+    <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>type<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>case</font> CODES:
+        base <font color='#5555FF'>=</font> extra <font color='#5555FF'>=</font> work;    <font color='#009900'>/* dummy value--not used */</font>
+        end <font color='#5555FF'>=</font> <font color='#979000'>19</font>;
+        <font color='#0000FF'>break</font>;
+    <font color='#0000FF'>case</font> LENS:
+        base <font color='#5555FF'>=</font> lbase;
+        base <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>257</font>;
+        extra <font color='#5555FF'>=</font> lext;
+        extra <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>257</font>;
+        end <font color='#5555FF'>=</font> <font color='#979000'>256</font>;
+        <font color='#0000FF'>break</font>;
+    <font color='#0000FF'>default</font>:            <font color='#009900'>/* DISTS */</font>
+        base <font color='#5555FF'>=</font> dbase;
+        extra <font color='#5555FF'>=</font> dext;
+        end <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+    <b>}</b>
+
+    <font color='#009900'>/* initialize state for loop */</font>
+    huff <font color='#5555FF'>=</font> <font color='#979000'>0</font>;                   <font color='#009900'>/* starting code */</font>
+    sym <font color='#5555FF'>=</font> <font color='#979000'>0</font>;                    <font color='#009900'>/* starting code symbol */</font>
+    len <font color='#5555FF'>=</font> min;                  <font color='#009900'>/* starting code length */</font>
+    next <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>table;              <font color='#009900'>/* current table to fill in */</font>
+    curr <font color='#5555FF'>=</font> root;                <font color='#009900'>/* current table index bits */</font>
+    drop <font color='#5555FF'>=</font> <font color='#979000'>0</font>;                   <font color='#009900'>/* current bits to drop from code for index */</font>
+    low <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;       <font color='#009900'>/* trigger new sub-table when len &gt; root */</font>
+    used <font color='#5555FF'>=</font> <font color='#979000'>1</font>U <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> root;          <font color='#009900'>/* use root table entries */</font>
+    mask <font color='#5555FF'>=</font> used <font color='#5555FF'>-</font> <font color='#979000'>1</font>;            <font color='#009900'>/* mask for comparing low */</font>
+
+    <font color='#009900'>/* check available table space */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> LENS <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> used <font color='#5555FF'>&gt;</font> ENOUGH_LENS<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+        <font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> DISTS <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> used <font color='#5555FF'>&gt;</font> ENOUGH_DISTS<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+
+    <font color='#009900'>/* process all codes and make table entries */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>;;<font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#009900'>/* create table entry */</font>
+        here.bits <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>len <font color='#5555FF'>-</font> drop<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>work[sym]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> end<font face='Lucida Console'>)</font> <b>{</b>
+            here.op <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font><font color='#979000'>0</font>;
+            here.val <font color='#5555FF'>=</font> work[sym];
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>work[sym]<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> end<font face='Lucida Console'>)</font> <b>{</b>
+            here.op <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>extra[work[sym]]<font face='Lucida Console'>)</font>;
+            here.val <font color='#5555FF'>=</font> base[work[sym]];
+        <b>}</b>
+        <font color='#0000FF'>else</font> <b>{</b>
+            here.op <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>32</font> <font color='#5555FF'>+</font> <font color='#979000'>64</font><font face='Lucida Console'>)</font>;         <font color='#009900'>/* end of block */</font>
+            here.val <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#009900'>/* replicate for those indices with low len bits equal to huff */</font>
+        incr <font color='#5555FF'>=</font> <font color='#979000'>1</font>U <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>-</font> drop<font face='Lucida Console'>)</font>;
+        fill <font color='#5555FF'>=</font> <font color='#979000'>1</font>U <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> curr;
+        min <font color='#5555FF'>=</font> fill;                 <font color='#009900'>/* save offset to next table */</font>
+        <font color='#0000FF'>do</font> <b>{</b>
+            fill <font color='#5555FF'>-</font><font color='#5555FF'>=</font> incr;
+            next[<font face='Lucida Console'>(</font>huff <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> drop<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> fill] <font color='#5555FF'>=</font> here;
+        <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>fill <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>/* backwards increment the len-bit code huff */</font>
+        incr <font color='#5555FF'>=</font> <font color='#979000'>1</font>U <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>-</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>huff <font color='#5555FF'>&amp;</font> incr<font face='Lucida Console'>)</font>
+            incr <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>incr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+            huff <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> incr <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+            huff <font color='#5555FF'>+</font><font color='#5555FF'>=</font> incr;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+            huff <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#009900'>/* go to next symbol, update count, len */</font>
+        sym<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>(</font>count[len]<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>=</font><font color='#5555FF'>=</font> max<font face='Lucida Console'>)</font> <font color='#0000FF'>break</font>;
+            len <font color='#5555FF'>=</font> lens[work[sym]];
+        <b>}</b>
+
+        <font color='#009900'>/* create new sub-table if needed */</font>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>&gt;</font> root <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>huff <font color='#5555FF'>&amp;</font> mask<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> low<font face='Lucida Console'>)</font> <b>{</b>
+            <font color='#009900'>/* if first time, transition to sub-tables */</font>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>drop <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                drop <font color='#5555FF'>=</font> root;
+
+            <font color='#009900'>/* increment past last table */</font>
+            next <font color='#5555FF'>+</font><font color='#5555FF'>=</font> min;            <font color='#009900'>/* here min is 1 &lt;&lt; curr */</font>
+
+            <font color='#009900'>/* determine length of next table */</font>
+            curr <font color='#5555FF'>=</font> len <font color='#5555FF'>-</font> drop;
+            left <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> curr<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>curr <font color='#5555FF'>+</font> drop <font color='#5555FF'>&lt;</font> max<font face='Lucida Console'>)</font> <b>{</b>
+                left <font color='#5555FF'>-</font><font color='#5555FF'>=</font> count[curr <font color='#5555FF'>+</font> drop];
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>left <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#0000FF'>break</font>;
+                curr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+                left <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <b>}</b>
+
+            <font color='#009900'>/* check for enough space */</font>
+            used <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>U <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> curr;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> LENS <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> used <font color='#5555FF'>&gt;</font> ENOUGH_LENS<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                <font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> DISTS <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> used <font color='#5555FF'>&gt;</font> ENOUGH_DISTS<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+
+            <font color='#009900'>/* point entry in root table to sub-table */</font>
+            low <font color='#5555FF'>=</font> huff <font color='#5555FF'>&amp;</font> mask;
+            <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>table<font face='Lucida Console'>)</font>[low].op <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font>curr;
+            <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>table<font face='Lucida Console'>)</font>[low].bits <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font>root;
+            <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>table<font face='Lucida Console'>)</font>[low].val <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>next <font color='#5555FF'>-</font> <font color='#5555FF'>*</font>table<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#009900'>/* fill in remaining table entry if code is incomplete (guaranteed to have
+       at most one remaining entry, since if the code is incomplete, the
+       maximum code length that was allowed to get this far is one bit) */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>huff <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+        here.op <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font><font color='#979000'>64</font>;            <font color='#009900'>/* invalid code marker */</font>
+        here.bits <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>len <font color='#5555FF'>-</font> drop<font face='Lucida Console'>)</font>;
+        here.val <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font face='Lucida Console'>)</font><font color='#979000'>0</font>;
+        next[huff] <font color='#5555FF'>=</font> here;
+    <b>}</b>
+
+    <font color='#009900'>/* set return parameters */</font>
+    <font color='#5555FF'>*</font>table <font color='#5555FF'>+</font><font color='#5555FF'>=</font> used;
+    <font color='#5555FF'>*</font>bits <font color='#5555FF'>=</font> root;
+    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+<b>}</b>
+
+</pre></body></html>

@@ -1,0 +1,172 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - integral_image_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_INTEGRAL_IMAGe_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_INTEGRAL_IMAGe_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry/rectangle_abstract.h.html'>../geometry/rectangle_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array2d/array2d_kernel_abstract.h.html'>../array2d/array2d_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../noncopyable.h.html'>../noncopyable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/generic_image.h.html'>../image_processing/generic_image.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='integral_image_generic'></a>integral_image_generic</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T
+                T should be a built in scalar type.  Moreover, it should
+                be capable of storing sums of whatever kind of pixel
+                you will be dealing with.
+
+            INITIAL VALUE
+                - nr() == 0
+                - nc() == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is an alternate way of representing image data
+                that allows for very fast computations of sums of pixels in 
+                rectangular regions.  To use this object you load it with a
+                normal image and then you can use the get_sum_of_area()
+                function to compute sums of pixels in a given area in
+                constant time.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> T value_type;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of rows in this integral image object
+        !*/</font>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of columns in this integral image object
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='load'></a>load</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+                - Let P denote the type of pixel in img, then we require:
+                    - pixel_traits&lt;P&gt;::has_alpha == false 
+            ensures
+                - #nr() == img.nr()
+                - #nc() == img.nc()
+                - #*this will now contain an "integral image" representation of the
+                  given input image.  
+        !*/</font>
+
+        value_type <b><a name='get_sum_of_area'></a>get_sum_of_area</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - rect.is_empty() == false
+                - get_rect(*this).contains(rect) == true
+                  (i.e. rect must not be outside the integral image)
+            ensures
+                - Let O denote the image this integral image was generated from.
+                  Then this function returns sum(subm(mat(O),rect)).
+                  That is, this function returns the sum of the pixels in O that
+                  are contained within the given rectangle.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+            integral_image_generic<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        integral_image_generic<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+        integral_image_generic<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font> 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>typedef</font> integral_image_generic<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> integral_image;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> integral_image_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> integral_image_type::value_type <b><a name='haar_x'></a>haar_x</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> integral_image_type<font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p,
+        <font color='#0000FF'><u>long</u></font> width
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - get_rect(img).contains(centered_rect(p,width,width)) == true
+            - integral_image_type == a type that implements the integral_image_generic 
+              interface defined above
+        ensures
+            - returns the response of a Haar wavelet centered at the point p
+              with the given width.  The wavelet is oriented along the X axis
+              and has the following shape:
+                ----++++
+                ----++++
+                ----++++
+                ----++++
+              That is, the wavelet is square and computes the sum of pixels on the
+              right minus the sum of pixels on the left.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> integral_image_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> integral_image_type::value_type <b><a name='haar_y'></a>haar_y</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> integral_image_type<font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p,
+        <font color='#0000FF'><u>long</u></font> width
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - get_rect(img).contains(centered_rect(p,width,width)) == true
+            - integral_image_type == a type that implements the integral_image_generic 
+              interface defined above
+        ensures
+            - returns the response of a Haar wavelet centered at the point p
+              with the given width in the given image.  The wavelet is oriented 
+              along the Y axis and has the following shape:
+                --------
+                --------
+                ++++++++
+                ++++++++
+              That is, the wavelet is square and computes the sum of pixels on the
+              bottom minus the sum of pixels on the top.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_INTEGRAL_IMAGe_ABSTRACT_
+</font>
+
+</pre></body></html>

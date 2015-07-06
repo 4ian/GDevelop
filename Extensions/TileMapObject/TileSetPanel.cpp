@@ -5,6 +5,7 @@ Copyright (c) 2014-2015 Victor Levasseur (victorlevasseur52@gmail.com)
 This project is released under the MIT License.
 */
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "TileSetPanel.h"
 
 #include <iostream>
@@ -154,3 +155,4 @@ void TileSetPanel::GetTileAt(wxPoint position, int &tileCol, int &tileRow)
     tileCol = (int)(position.x / (m_tileset->tileSize.x + m_tileset->tileSpacing.x));
     tileRow = (int)(position.y / (m_tileset->tileSize.y + m_tileset->tileSpacing.y));
 }
+#endif

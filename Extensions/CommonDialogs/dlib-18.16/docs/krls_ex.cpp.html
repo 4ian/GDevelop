@@ -1,0 +1,97 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - krls_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+    This is an example illustrating the use of the krls object 
+    from the dlib C++ Library.
+
+    The krls object allows you to perform online regression.  This
+    example will train an instance of it on the sinc function.
+
+*/</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// Here is the sinc function we will be trying to learn with the krls
+</font><font color='#009900'>// object.
+</font><font color='#0000FF'><u>double</u></font> <b><a name='sinc'></a>sinc</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> x<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+    <font color='#0000FF'>return</font> <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>x;
+<b>}</b>
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// Here we declare that our samples will be 1 dimensional column vectors.  In general, 
+</font>    <font color='#009900'>// you can use N dimensional vectors as inputs to the krls object.  But here we only 
+</font>    <font color='#009900'>// have 1 dimension to make the example simple.  (Note that if you don't know the 
+</font>    <font color='#009900'>// dimensionality of your vectors at compile time you can change the first number to 
+</font>    <font color='#009900'>// a 0 and then set the size at runtime)
+</font>    <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample_type;
+
+    <font color='#009900'>// Now we are making a typedef for the kind of kernel we want to use.  I picked the
+</font>    <font color='#009900'>// radial basis kernel because it only has one parameter and generally gives good
+</font>    <font color='#009900'>// results without much fiddling.
+</font>    <font color='#0000FF'>typedef</font> radial_basis_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> kernel_type;
+
+    <font color='#009900'>// Here we declare an instance of the krls object.  The first argument to the constructor
+</font>    <font color='#009900'>// is the kernel we wish to use.  The second is a parameter that determines the numerical 
+</font>    <font color='#009900'>// accuracy with which the object will perform part of the regression algorithm.  Generally
+</font>    <font color='#009900'>// smaller values give better results but cause the algorithm to run slower.  You just have
+</font>    <font color='#009900'>// to play with it to decide what balance of speed and accuracy is right for your problem.
+</font>    <font color='#009900'>// Here we have set it to 0.001.
+</font>    krls<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_type</font><font face='Lucida Console'>(</font><font color='#979000'>0.1</font><font face='Lucida Console'>)</font>,<font color='#979000'>0.001</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// now we train our object on a few samples of the sinc function.
+</font>    sample_type m;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> x <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font>; x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>; x <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x;
+        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>m, <font color='#BB00BB'>sinc</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>// now we output the value of the sinc function for a few test points as well as the 
+</font>    <font color='#009900'>// value predicted by krls object.
+</font>    <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>2.5</font>; cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>sinc</font><font face='Lucida Console'>(</font><font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>; cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>sinc</font><font face='Lucida Console'>(</font><font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>4</font>;  cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>sinc</font><font face='Lucida Console'>(</font><font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>5.0</font>; cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>sinc</font><font face='Lucida Console'>(</font><font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>// The output is as follows:
+</font>    <font color='#009900'>// 0.239389   0.239362
+</font>    <font color='#009900'>// 0.998334   0.998333
+</font>    <font color='#009900'>// -0.189201   -0.189201
+</font>    <font color='#009900'>// -0.191785   -0.197267
+</font>
+
+    <font color='#009900'>// The first column is the true value of the sinc function and the second
+</font>    <font color='#009900'>// column is the output from the krls estimate.  
+</font>
+    
+
+
+
+    <font color='#009900'>// Another thing that is worth knowing is that just about everything in dlib is serializable.
+</font>    <font color='#009900'>// So for example, you can save the test object to disk and recall it later like so:
+</font>    <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>saved_krls_object.dat</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test;
+
+    <font color='#009900'>// Now let's open that file back up and load the krls object it contains.
+</font>    <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>saved_krls_object.dat</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> test;
+
+    <font color='#009900'>// If you don't want to save the whole krls object (it might be a bit large) 
+</font>    <font color='#009900'>// you can save just the decision function it has learned so far.  You can get 
+</font>    <font color='#009900'>// the decision function out of it by calling test.get_decision_function() and
+</font>    <font color='#009900'>// then you can serialize that object instead.  E.g.
+</font>    decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> funct <font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_decision_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>saved_krls_function.dat</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> funct;
+<b>}</b>
+
+
+
+</pre></body></html>

@@ -1,0 +1,114 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - file_to_code_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+    This is an example illustrating the use of the compress_stream and
+    base64 components from the dlib C++ Library.
+
+    It reads in a file from the disk and compresses it in an in memory buffer and
+    then converts that buffer into base64 text.  The final step is to output to
+    the screen some C++ code that contains this base64 encoded text and can decompress
+    it back into its original form.
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>compress_stream.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>base64.h<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> argc, <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>*</font> argv<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>argc <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>You must give a file name as the argument to this program.\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>This program reads in a file from the disk and compresses\n</font>"
+             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>it in an in memory buffer and then converts that buffer \n</font>"
+             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>into base64 text.  The final step is to output to the screen\n</font>"
+             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>some C++ code that contains this base64 encoded text and can\n</font>"
+             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>decompress it back into its original form.\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        <font color='#0000FF'>return</font> EXIT_FAILURE;
+    <b>}</b>
+
+    <font color='#009900'>// open the file the user specified on the command line
+</font>    ifstream <font color='#BB00BB'>fin</font><font face='Lucida Console'>(</font>argv[<font color='#979000'>1</font>], ios::binary<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>fin<font face='Lucida Console'>)</font> <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>can't open file </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> argv[<font color='#979000'>1</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#0000FF'>return</font> EXIT_FAILURE;
+    <b>}</b>
+
+    ostringstream sout;
+    istringstream sin;
+
+    <font color='#009900'>// this is the object we will use to do the base64 encoding
+</font>    base64 base64_coder;
+    <font color='#009900'>// this is the object we will use to do the data compression
+</font>    compress_stream::kernel_1ea compressor;
+
+    <font color='#009900'>// compress the contents of the file and store the results in the string stream sout
+</font>    compressor.<font color='#BB00BB'>compress</font><font face='Lucida Console'>(</font>fin,sout<font face='Lucida Console'>)</font>;
+    sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    sout.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// now base64 encode the compressed data
+</font>    base64_coder.<font color='#BB00BB'>encode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+
+    sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// the following is a little funny looking but all it does is output some C++ code
+</font>    <font color='#009900'>// that contains the compressed/base64 data and the C++ code that can decode it back
+</font>    <font color='#009900'>// into its original form.
+</font>    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>#include &lt;sstream&gt;\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>#include &lt;dlib/compress_stream.h&gt;\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>#include &lt;dlib/base64.h&gt;\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>// This function returns the contents of the file '</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> argv[<font color='#979000'>1</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>'\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>const std::string get_decoded_string()\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>{\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    dlib::base64 base64_coder;\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    dlib::compress_stream::kernel_1ea compressor;\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    std::ostringstream sout;\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    std::istringstream sin;\n\n</font>";
+
+
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    // The base64 encoded data from the file '</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> argv[<font color='#979000'>1</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>' we want to decode and return.\n</font>";
+    string temp;
+    <font color='#BB00BB'>getline</font><font face='Lucida Console'>(</font>sin,temp<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>sin <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> temp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    sout &lt;&lt; \"</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\";\n</font>";
+        <font color='#BB00BB'>getline</font><font face='Lucida Console'>(</font>sin,temp<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    // Put the data into the istream sin\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    sin.str(sout.str());\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    sout.str(\"\");\n\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    // Decode the base64 text into its compressed binary form\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    base64_coder.decode(sin,sout);\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    sin.clear();\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    sin.str(sout.str());\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    sout.str(\"\");\n\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    // Decompress the data into its original form\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    compressor.decompress(sin,sout);\n\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    // Return the decoded and decompressed data\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    return sout.str();\n</font>";
+    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>}\n</font>";
+
+
+    <font color='#009900'>// finally output our encoded data and its C++ code to the screen
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+<b>}</b>
+
+
+</pre></body></html>

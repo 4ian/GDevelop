@@ -1,0 +1,256 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - zutil.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/* zutil.h -- internal interface and configuration of the compression library
+ * Copyright (C) 1995-2013 Jean-loup Gailly.
+ * For conditions of distribution and use, see copyright notice in zlib.h
+ */</font>
+
+<font color='#009900'>/* WARNING: this file should *not* be used by applications. It is
+   part of the implementation of the compression library and is
+   subject to change. Applications should only use zlib.h.
+ */</font>
+
+<font color='#009900'>/* @(#) $Id$ */</font>
+
+<font color='#0000FF'>#ifndef</font> ZUTIL_H
+<font color='#0000FF'>#define</font> ZUTIL_H
+
+<font color='#0000FF'>#ifdef</font> HAVE_HIDDEN
+#  define ZLIB_INTERNAL <b><a name='__attribute__'></a>__attribute__</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#BB00BB'>visibility</font> <font face='Lucida Console'>(</font>"<font color='#CC0000'>hidden</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#else</font>
+#  define ZLIB_INTERNAL
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='zlib.h.html'>zlib.h</a>"
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>STDC<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>defined<font face='Lucida Console'>(</font>Z_SOLO<font face='Lucida Console'>)</font>
+#  <font color='#0000FF'>if</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font><font color='#BB00BB'>defined</font><font face='Lucida Console'>(</font>_WIN32_WCE<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>defined</font><font face='Lucida Console'>(</font>_MSC_VER<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+#    include <font color='#5555FF'>&lt;</font>stddef.h<font color='#5555FF'>&gt;</font>
+#  endif
+#  include <font color='#5555FF'>&lt;</font>string.h<font color='#5555FF'>&gt;</font>
+#  include <font color='#5555FF'>&lt;</font>stdlib.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> Z_SOLO
+   <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>long</u></font> ptrdiff_t;  <font color='#009900'>/* guess -- will be caught if guess is wrong */</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifndef</font> local
+#  define local <font color='#0000FF'>static</font>
+<font color='#0000FF'>#endif</font>
+<font color='#009900'>/* compile with -Dlocal if your debugger can't find static symbols */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font>  uch;
+<font color='#0000FF'>typedef</font> uch FAR uchf;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> ush;
+<font color='#0000FF'>typedef</font> ush FAR ushf;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>  ulg;
+
+<font color='#0000FF'>extern</font> z_const <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font> <font color='#0000FF'>const</font> z_errmsg[<font color='#979000'>10</font>]; <font color='#009900'>/* indexed by 2-zlib_error */</font>
+<font color='#009900'>/* (size given to avoid silly warnings with Visual C++) */</font>
+
+<font color='#0000FF'>#define</font> ERR_MSG<font face='Lucida Console'>(</font>err<font face='Lucida Console'>)</font> z_errmsg[Z_NEED_DICT<font color='#5555FF'>-</font><font face='Lucida Console'>(</font>err<font face='Lucida Console'>)</font>]
+
+<font color='#0000FF'>#define</font> ERR_RETURN<font face='Lucida Console'>(</font>strm,err<font face='Lucida Console'>)</font> \
+  <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg <font color='#5555FF'>=</font> <font color='#BB00BB'>ERR_MSG</font><font face='Lucida Console'>(</font>err<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font>err<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#009900'>/* To be used only when the state is known to be valid */</font>
+
+        <font color='#009900'>/* common constants */</font>
+
+<font color='#0000FF'>#ifndef</font> DEF_WBITS
+#  define DEF_WBITS MAX_WBITS
+<font color='#0000FF'>#endif</font>
+<font color='#009900'>/* default windowBits for decompression. MAX_WBITS is for compression only */</font>
+
+<font color='#0000FF'>#if</font> MAX_MEM_LEVEL <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>
+#  define DEF_MEM_LEVEL <font color='#979000'>8</font>
+<font color='#0000FF'>#else</font>
+#  define DEF_MEM_LEVEL  MAX_MEM_LEVEL
+<font color='#0000FF'>#endif</font>
+<font color='#009900'>/* default memLevel */</font>
+
+<font color='#0000FF'>#define</font> STORED_BLOCK <font color='#979000'>0</font>
+<font color='#0000FF'>#define</font> STATIC_TREES <font color='#979000'>1</font>
+<font color='#0000FF'>#define</font> DYN_TREES    <font color='#979000'>2</font>
+<font color='#009900'>/* The three kinds of block type */</font>
+
+<font color='#0000FF'>#define</font> MIN_MATCH  <font color='#979000'>3</font>
+<font color='#0000FF'>#define</font> MAX_MATCH  <font color='#979000'>258</font>
+<font color='#009900'>/* The minimum and maximum match lengths */</font>
+
+<font color='#0000FF'>#define</font> PRESET_DICT <font color='#979000'>0x20</font> <font color='#009900'>/* preset dictionary flag in zlib header */</font>
+
+        <font color='#009900'>/* target dependencies */</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>MSDOS<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>defined<font face='Lucida Console'>(</font>WINDOWS<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>defined<font face='Lucida Console'>(</font>WIN32<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+#  define OS_CODE  <font color='#979000'>0x00</font>
+#  ifndef Z_SOLO
+#    <font color='#0000FF'>if</font> <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>__TURBOC__<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>__BORLANDC__<font face='Lucida Console'>)</font>
+#      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>__STDC__ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>defined</font><font face='Lucida Console'>(</font>__LARGE__<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font color='#BB00BB'>defined</font><font face='Lucida Console'>(</font>__COMPACT__<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+         <font color='#009900'>/* Allow compilation with ANSI keywords only enabled */</font>
+         <font color='#0000FF'><u>void</u></font> _Cdecl <b><a name='farfree'></a>farfree</b><font face='Lucida Console'>(</font> <font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font>block <font face='Lucida Console'>)</font>;
+         <font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font>_Cdecl <b><a name='farmalloc'></a>farmalloc</b><font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> nbytes <font face='Lucida Console'>)</font>;
+#      <font color='#0000FF'>else</font>
+#        include <font color='#5555FF'>&lt;</font>alloc.h<font color='#5555FF'>&gt;</font>
+#      endif
+#    <font color='#0000FF'>else</font> <font color='#009900'>/* MSC or DJGPP */</font>
+#      include <font color='#5555FF'>&lt;</font>malloc.h<font color='#5555FF'>&gt;</font>
+#    endif
+#  endif
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> AMIGA
+#  define OS_CODE  <font color='#979000'>0x01</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>VAXC<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>VMS<font face='Lucida Console'>)</font>
+#  define OS_CODE  <font color='#979000'>0x02</font>
+#  define <b><a name='F_OPEN'></a>F_OPEN</b><font face='Lucida Console'>(</font>name, mode<font face='Lucida Console'>)</font> \
+     <b><a name='fopen'></a>fopen</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>name<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font>mode<font face='Lucida Console'>)</font>, "<font color='#CC0000'>mbc=60</font>", "<font color='#CC0000'>ctx=stm</font>", "<font color='#CC0000'>rfm=fix</font>", "<font color='#CC0000'>mrs=512</font>"<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>ATARI<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>atarist<font face='Lucida Console'>)</font>
+#  define OS_CODE  <font color='#979000'>0x05</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> OS2
+#  define OS_CODE  <font color='#979000'>0x06</font>
+#  <font color='#0000FF'>if</font> <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>M_I86<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font><b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>Z_SOLO<font face='Lucida Console'>)</font>
+#    include <font color='#5555FF'>&lt;</font>malloc.h<font color='#5555FF'>&gt;</font>
+#  endif
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>MACOS<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>TARGET_OS_MAC<font face='Lucida Console'>)</font>
+#  define OS_CODE  <font color='#979000'>0x07</font>
+#  ifndef Z_SOLO
+#    <font color='#0000FF'>if</font> <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>__MWERKS__<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> __dest_os <font color='#5555FF'>!</font><font color='#5555FF'>=</font> __be_os <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> __dest_os <font color='#5555FF'>!</font><font color='#5555FF'>=</font> __win32_os
+#      include <font color='#5555FF'>&lt;</font>unix.h<font color='#5555FF'>&gt;</font> <font color='#009900'>/* for fdopen */</font>
+#    <font color='#0000FF'>else</font>
+#      ifndef fdopen
+#        define <b><a name='fdopen'></a>fdopen</b><font face='Lucida Console'>(</font>fd,mode<font face='Lucida Console'>)</font> NULL <font color='#009900'>/* No fdopen() */</font>
+#      endif
+#    endif
+#  endif
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> TOPS20
+#  define OS_CODE  <font color='#979000'>0x0a</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> WIN32
+#  ifndef __CYGWIN__  <font color='#009900'>/* Cygwin is Unix, not Win32 */</font>
+#    define OS_CODE  <font color='#979000'>0x0b</font>
+#  endif
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> __50SERIES <font color='#009900'>/* Prime/PRIMOS */</font>
+#  define OS_CODE  <font color='#979000'>0x0f</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>_BEOS_<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>RISCOS<font face='Lucida Console'>)</font>
+#  define <b><a name='fdopen'></a>fdopen</b><font face='Lucida Console'>(</font>fd,mode<font face='Lucida Console'>)</font> NULL <font color='#009900'>/* No fdopen() */</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> <font face='Lucida Console'>(</font>defined<font face='Lucida Console'>(</font>_MSC_VER<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>_MSC_VER <font color='#5555FF'>&gt;</font> <font color='#979000'>600</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>defined __INTERIX
+#  <font color='#0000FF'>if</font> <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>_WIN32_WCE<font face='Lucida Console'>)</font>
+#    define <b><a name='fdopen'></a>fdopen</b><font face='Lucida Console'>(</font>fd,mode<font face='Lucida Console'>)</font> NULL <font color='#009900'>/* No fdopen() */</font>
+#    ifndef _PTRDIFF_T_DEFINED
+       <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>int</u></font> ptrdiff_t;
+#      define _PTRDIFF_T_DEFINED
+#    endif
+#  <font color='#0000FF'>else</font>
+#    define <b><a name='fdopen'></a>fdopen</b><font face='Lucida Console'>(</font>fd,type<font face='Lucida Console'>)</font>  <b><a name='_fdopen'></a>_fdopen</b><font face='Lucida Console'>(</font>fd,type<font face='Lucida Console'>)</font>
+#  endif
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>__BORLANDC__<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>defined<font face='Lucida Console'>(</font>MSDOS<font face='Lucida Console'>)</font>
+  <font color='#0000FF'>#pragma</font> warn <font color='#5555FF'>-</font><font color='#979000'>8004</font>
+  <font color='#0000FF'>#pragma</font> warn <font color='#5555FF'>-</font><font color='#979000'>8008</font>
+  <font color='#0000FF'>#pragma</font> warn <font color='#5555FF'>-</font><font color='#979000'>8066</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* provide prototypes for these when building zlib without LFS */</font>
+<font color='#0000FF'>#if</font> <font color='#5555FF'>!</font>defined<font face='Lucida Console'>(</font>_WIN32<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> \
+    <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>defined</font><font face='Lucida Console'>(</font>_LARGEFILE64_SOURCE<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> _LFS64_LARGEFILE<font color='#5555FF'>-</font><font color='#979000'>0</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    ZEXTERN uLong ZEXPORT adler32_combine64 <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>uLong, uLong, z_off_t<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    ZEXTERN uLong ZEXPORT crc32_combine64 <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>uLong, uLong, z_off_t<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+
+        <font color='#009900'>/* common defaults */</font>
+
+<font color='#0000FF'>#ifndef</font> OS_CODE
+#  define OS_CODE  <font color='#979000'>0x03</font>  <font color='#009900'>/* assume Unix */</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifndef</font> F_OPEN
+#  define <b><a name='F_OPEN'></a>F_OPEN</b><font face='Lucida Console'>(</font>name, mode<font face='Lucida Console'>)</font> <b><a name='fopen'></a>fopen</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>name<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font>mode<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+         <font color='#009900'>/* functions */</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>pyr<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>Z_SOLO<font face='Lucida Console'>)</font>
+#  define NO_MEMCPY
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>SMALL_MEDIUM<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>defined<font face='Lucida Console'>(</font>_MSC_VER<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>defined<font face='Lucida Console'>(</font>__SC__<font face='Lucida Console'>)</font>
+ <font color='#009900'>/* Use our own functions for small and medium model with MSC &lt;= 5.0.
+  * You may have to use the same strategy for Borland C (untested).
+  * The __SC__ check is for Symantec.
+  */</font>
+#  define NO_MEMCPY
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>STDC<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>defined<font face='Lucida Console'>(</font>HAVE_MEMCPY<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>defined<font face='Lucida Console'>(</font>NO_MEMCPY<font face='Lucida Console'>)</font>
+#  define HAVE_MEMCPY
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> HAVE_MEMCPY
+#  ifdef SMALL_MEDIUM <font color='#009900'>/* MSDOS small or medium model */</font>
+#    define zmemcpy _fmemcpy
+#    define zmemcmp _fmemcmp
+#    define <b><a name='zmemzero'></a>zmemzero</b><font face='Lucida Console'>(</font>dest, len<font face='Lucida Console'>)</font> <b><a name='_fmemset'></a>_fmemset</b><font face='Lucida Console'>(</font>dest, <font color='#979000'>0</font>, len<font face='Lucida Console'>)</font>
+#  <font color='#0000FF'>else</font>
+#    define zmemcpy memcpy
+#    define zmemcmp memcmp
+#    define <b><a name='zmemzero'></a>zmemzero</b><font face='Lucida Console'>(</font>dest, len<font face='Lucida Console'>)</font> <b><a name='memset'></a>memset</b><font face='Lucida Console'>(</font>dest, <font color='#979000'>0</font>, len<font face='Lucida Console'>)</font>
+#  endif
+<font color='#0000FF'>#else</font>
+   <font color='#0000FF'><u>void</u></font> ZLIB_INTERNAL zmemcpy <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>Bytef<font color='#5555FF'>*</font> dest, <font color='#0000FF'>const</font> Bytef<font color='#5555FF'>*</font> source, uInt len<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+   <font color='#0000FF'><u>int</u></font> ZLIB_INTERNAL zmemcmp <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> Bytef<font color='#5555FF'>*</font> s1, <font color='#0000FF'>const</font> Bytef<font color='#5555FF'>*</font> s2, uInt len<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+   <font color='#0000FF'><u>void</u></font> ZLIB_INTERNAL zmemzero <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>Bytef<font color='#5555FF'>*</font> dest, uInt len<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* Diagnostic functions */</font>
+<font color='#0000FF'>#ifdef</font> DEBUG
+#  include <font color='#5555FF'>&lt;</font>stdio.h<font color='#5555FF'>&gt;</font>
+   <font color='#0000FF'>extern</font> <font color='#0000FF'><u>int</u></font> ZLIB_INTERNAL z_verbose;
+   <font color='#0000FF'>extern</font> <font color='#0000FF'><u>void</u></font> ZLIB_INTERNAL z_error <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+#  define <b><a name='Assert'></a>Assert</b><font face='Lucida Console'>(</font>cond,msg<font face='Lucida Console'>)</font> <b>{</b><font color='#0000FF'>if</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>cond<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#BB00BB'>z_error</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;<b>}</b>
+#  define <b><a name='Trace'></a>Trace</b><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <b>{</b><font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>z_verbose<font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> fprintf x ;<b>}</b>
+#  define <b><a name='Tracev'></a>Tracev</b><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <b>{</b><font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>z_verbose<font color='#5555FF'>&gt;</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> fprintf x ;<b>}</b>
+#  define <b><a name='Tracevv'></a>Tracevv</b><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <b>{</b><font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>z_verbose<font color='#5555FF'>&gt;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> fprintf x ;<b>}</b>
+#  define <b><a name='Tracec'></a>Tracec</b><font face='Lucida Console'>(</font>c,x<font face='Lucida Console'>)</font> <b>{</b><font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>z_verbose<font color='#5555FF'>&gt;</font><font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> fprintf x ;<b>}</b>
+#  define <b><a name='Tracecv'></a>Tracecv</b><font face='Lucida Console'>(</font>c,x<font face='Lucida Console'>)</font> <b>{</b><font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>z_verbose<font color='#5555FF'>&gt;</font><font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> fprintf x ;<b>}</b>
+<font color='#0000FF'>#else</font>
+#  define <b><a name='Assert'></a>Assert</b><font face='Lucida Console'>(</font>cond,msg<font face='Lucida Console'>)</font>
+#  define <b><a name='Trace'></a>Trace</b><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>
+#  define <b><a name='Tracev'></a>Tracev</b><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>
+#  define <b><a name='Tracevv'></a>Tracevv</b><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>
+#  define <b><a name='Tracec'></a>Tracec</b><font face='Lucida Console'>(</font>c,x<font face='Lucida Console'>)</font>
+#  define <b><a name='Tracecv'></a>Tracecv</b><font face='Lucida Console'>(</font>c,x<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifndef</font> Z_SOLO
+   voidpf ZLIB_INTERNAL zcalloc <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>voidpf opaque, <font color='#0000FF'><u>unsigned</u></font> items,
+                                    <font color='#0000FF'><u>unsigned</u></font> size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+   <font color='#0000FF'><u>void</u></font> ZLIB_INTERNAL zcfree  <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>voidpf opaque, voidpf ptr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#define</font> ZALLOC<font face='Lucida Console'>(</font>strm, items, size<font face='Lucida Console'>)</font> \
+           <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>strm<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zalloc<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>strm<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>opaque, <font face='Lucida Console'>(</font>items<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> ZFREE<font face='Lucida Console'>(</font>strm, addr<font face='Lucida Console'>)</font>  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>strm<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>zfree<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>strm<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>opaque, <font face='Lucida Console'>(</font>voidpf<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>addr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> TRY_FREE<font face='Lucida Console'>(</font>s, p<font face='Lucida Console'>)</font> <b>{</b><font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font> ZFREE<font face='Lucida Console'>(</font>s, p<font face='Lucida Console'>)</font>;<b>}</b>
+
+<font color='#009900'>/* Reverse the bytes in a 32-bit value */</font>
+<font color='#0000FF'>#define</font> ZSWAP32<font face='Lucida Console'>(</font>q<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>q<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>24</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xff</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>q<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xff00</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> \
+                    <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>q<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xff00</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>q<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xff</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>24</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* ZUTIL_H */</font>
+
+</pre></body></html>

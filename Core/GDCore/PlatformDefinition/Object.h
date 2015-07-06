@@ -182,7 +182,6 @@ public:
      */
     ///@{
 
-    #if defined(GD_IDE_ONLY)
     /**
      * \brief Return a vector containing the names of all the automatisms used by the object
      */
@@ -214,6 +213,7 @@ public:
      */
     bool RenameAutomatism(const gd::String & name, const gd::String & newName);
 
+    #if defined(GD_IDE_ONLY)
     /**
      * \brief Add the automatism of the specified \a type with the specified \a name.
      *
@@ -223,6 +223,13 @@ public:
      */
     gd::Automatism * AddNewAutomatism(gd::Project & project, const gd::String & type, const gd::String & name);
     #endif
+
+    /**
+     * \brief Add the specified automatism to the object
+     * \note The object takes ownership of the automatims.
+     * \return true if the automatism was added, false otherwise (automatism with the same name already in the object)
+     */
+    bool AddAutomatism(gd::Automatism * automatism);
 
     /**
      * \brief Get a read-only access to the map containing the automatisms.

@@ -1,0 +1,230 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sliding_buffer_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2004  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SLIDING_BUFFER_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_SLIDING_BUFFER_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sliding_buffer_kernel_abstract.h.html'>sliding_buffer_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/enumerable.h.html'>../interfaces/enumerable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='sliding_buffer_kernel_1'></a>sliding_buffer_kernel_1</b> : <font color='#0000FF'>public</font> enumerable<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - buffer_size == 0
+                - buffer == 0
+                - buffer_start == 0
+                - current == 0
+                - at_start_ == true
+
+            CONVENTION
+                - buffer_size == size()
+                
+                - element() == (*this)[current]
+                - current_element_valid() == (current &lt; buffer_size) &amp;&amp; at_start_ == false
+                - at_start() == at_start_
+
+                - if (buffer_size != 0) then                    
+                    - buffer[(buffer_start+i)&amp;(mask)] == operator[](i)   
+                    - mask == buffer_size-1
+                - else
+                    - buffer == 0
+                    - buffer_size == 0
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> T type;
+
+        <b><a name='sliding_buffer_kernel_1'></a>sliding_buffer_kernel_1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            buffer_start<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            buffer_size<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            buffer<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            current<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            at_start_<font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='sliding_buffer_kernel_1'></a>sliding_buffer_kernel_1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buffer<font face='Lucida Console'>)</font> <font color='#0000FF'>delete</font> [] buffer; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            buffer_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>; 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buffer<font face='Lucida Console'>)</font> <font color='#0000FF'>delete</font> [] buffer;
+            buffer <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            at_start_ <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            current <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> exp_size
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            at_start_ <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buffer<font face='Lucida Console'>)</font> <font color='#0000FF'>delete</font> [] buffer;
+            buffer_size <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>exp_size <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#5555FF'>-</font><font color='#5555FF'>-</font>exp_size;
+                buffer_size <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;            
+            <b>}</b>
+            mask <font color='#5555FF'>=</font> buffer_size<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            <font color='#0000FF'>try</font> <b>{</b> buffer <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> T[buffer_size]; <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> buffer <font color='#5555FF'>=</font> <font color='#979000'>0</font>; buffer_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#0000FF'>throw</font>; <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> buffer_size; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='rotate_left'></a>rotate_left</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> amount
+        <font face='Lucida Console'>)</font> <b>{</b> buffer_start <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>buffer_start<font color='#5555FF'>-</font>amount<font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>mask<font face='Lucida Console'>)</font>; at_start_ <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='rotate_right'></a>rotate_right</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> amount
+        <font face='Lucida Console'>)</font> <b>{</b> buffer_start <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>buffer_start<font color='#5555FF'>+</font>amount<font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>mask<font face='Lucida Console'>)</font>; at_start_ <font color='#5555FF'>=</font> <font color='#979000'>true</font>;<b>}</b>
+
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> buffer[<font face='Lucida Console'>(</font>buffer_start<font color='#5555FF'>+</font>index<font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>mask]; <b>}</b>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> buffer[<font face='Lucida Console'>(</font>buffer_start<font color='#5555FF'>+</font>index<font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>mask]; <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_element_id'></a>get_element_id</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>buffer_start<font color='#5555FF'>+</font>index<font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>mask<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_element_index'></a>get_element_index</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> element_id 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>element_id<font color='#5555FF'>-</font>buffer_start<font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>mask<font face='Lucida Console'>)</font>;<b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            sliding_buffer_kernel_1<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>buffer_start,item.buffer_start<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>buffer_size,item.buffer_size<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>buffer,item.buffer<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>mask,item.mask<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>current,item.current<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>at_start_,item.at_start_<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='at_start'></a>at_start</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> at_start_; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> at_start_ <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='current_element_valid'></a>current_element_valid</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>current <font color='#5555FF'>&lt;</font> buffer_size<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>at_start_ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>[current]; <b>}</b>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>[current]; <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='move_next'></a>move_next</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>at_start_ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>current<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font> buffer_size<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>current;
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    current <font color='#5555FF'>=</font> buffer_size;
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font> 
+            <b>{</b>
+                at_start_ <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                current <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>buffer_size <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// data members
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> buffer_start;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> buffer_size;
+        T<font color='#5555FF'>*</font> buffer;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> mask;
+
+
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> current;
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>bool</u></font> at_start_;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='sliding_buffer_kernel_1'></a>sliding_buffer_kernel_1</b><font face='Lucida Console'>(</font>sliding_buffer_kernel_1<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        sliding_buffer_kernel_1<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>sliding_buffer_kernel_1<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;      
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        sliding_buffer_kernel_1<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        sliding_buffer_kernel_1<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        sliding_buffer_kernel_1<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>   
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            item.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>size,in<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>int</u></font> count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>size <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    size <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+                <b>}</b>
+                item.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>count<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item[i],in<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            item.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type sliding_buffer_kernel_1</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SLIDING_BUFFER_KERNEl_1_
+</font>
+
+</pre></body></html>

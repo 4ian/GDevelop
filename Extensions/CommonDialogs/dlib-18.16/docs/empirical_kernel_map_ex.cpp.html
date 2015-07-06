@@ -1,0 +1,358 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - empirical_kernel_map_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use of the empirical_kernel_map 
+    from the dlib C++ Library.
+
+    This example program assumes you are familiar with some general elements of 
+    the library.  In particular, you should have at least read the <a href="svm_ex.cpp.html">svm_ex.cpp</a> 
+    and <a href="matrix_ex.cpp.html">matrix_ex.cpp</a> examples.   
+
+
+    Most of the machine learning algorithms in dlib are some flavor of "kernel machine".
+    This means they are all simple linear algorithms that have been formulated such 
+    that the only way they look at the data given by a user is via dot products between
+    the data samples.  These algorithms are made more useful via the application of the
+    so-called kernel trick.  This trick is to replace the dot product with a user 
+    supplied function which takes two samples and returns a real number.  This function 
+    is the kernel that is required by so many algorithms.  The most basic kernel is the 
+    linear_kernel which is simply a normal dot product.  More interesting, however,
+    are kernels which first apply some nonlinear transformation to the user's data samples 
+    and then compute a dot product.  In this way, a simple algorithm that finds a linear
+    plane to separate data (e.g. the SVM algorithm) can be made to solve complex 
+    nonlinear learning problems.  
+    
+    An important element of the kernel trick is that these kernel functions perform 
+    the nonlinear transformation implicitly.  That is, if you look at the implementations
+    of these kernel functions you won't see code that transforms two input vectors in 
+    some way and then computes their dot products.  Instead you will see a simple function
+    that takes two input vectors and just computes a single real number via some simple
+    process.  You can basically think of this as an optimization.  Imagine that originally 
+    we wrote out the entire procedure to perform the nonlinear transformation and then
+    compute the dot product but then noticed we could cancel a few terms here and there 
+    and simplify the whole thing down into a more compact and easily evaluated form.
+    The result is a nice function that computes what we want but we no longer get to see
+    what those nonlinearly transformed input vectors are.  
+
+    The empirical_kernel_map is a tool that undoes this.  It allows you to obtain these 
+    nonlinearly transformed vectors.  It does this by taking a set of data samples from 
+    the user (referred to as basis samples), applying the nonlinear transformation to all 
+    of them, and then constructing a set of orthonormal basis vectors which spans the space 
+    occupied by those transformed input samples.  Then if we wish to obtain the nonlinear 
+    version of any data sample we can simply project it onto this orthonormal basis and 
+    we obtain a regular vector of real numbers which represents the nonlinearly transformed 
+    version of the data sample.  The empirical_kernel_map has been formulated to use only 
+    dot products between data samples so it is capable of performing this service for any 
+    user supplied kernel function. 
+    
+    The empirical_kernel_map is useful because it is often difficult to formulate an 
+    algorithm in a way that uses only dot products.  So the empirical_kernel_map lets 
+    us easily kernelize any algorithm we like by using this object during a preprocessing 
+    step.  However, it should be noted that the algorithm is only practical when used 
+    with at most a few thousand basis samples.  Fortunately, most datasets live in 
+    subspaces that are relatively low dimensional.  So for these datasets, using the 
+    empirical_kernel_map is practical assuming an appropriate set of basis samples can be 
+    selected by the user.  To help with this dlib supplies the linearly_independent_subset_finder.  
+    I also often find that just picking a random subset of the data as a basis works well.
+
+
+
+    In what follows, we walk through the process of creating an empirical_kernel_map,
+    projecting data to obtain the nonlinearly transformed vectors, and then doing a 
+    few interesting things with the data.
+*/</font>
+
+
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>rand.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// First let's make a typedef for the kind of samples we will be using. 
+</font><font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, <font color='#979000'>0</font>, <font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample_type;
+
+<font color='#009900'>// We will be using the radial_basis_kernel in this example program.
+</font><font color='#0000FF'>typedef</font> radial_basis_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> kernel_type;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='generate_concentric_circles'></a>generate_concentric_circles</b> <font face='Lucida Console'>(</font>
+    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels,
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> num_points
+<font face='Lucida Console'>)</font>;
+<font color='#009900'>/*!
+    requires
+        - num_points &gt; 0
+    ensures
+        - generates two circles centered at the point (0,0), one of radius 1 and
+          the other of radius 5.  These points are stored into samples.  labels will
+          tell you if a given samples is from the smaller circle (its label will be 1)
+          or from the larger circle (its label will be 2).
+        - each circle will be made up of num_points
+!*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='test_empirical_kernel_map'></a>test_empirical_kernel_map</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels,
+    <font color='#0000FF'>const</font> empirical_kernel_map<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> ekm
+<font face='Lucida Console'>)</font>;
+<font color='#009900'>/*!
+    This function computes various interesting things with the empirical_kernel_map.  
+    See its implementation below for details.
+!*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samples;
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> labels;
+
+    <font color='#009900'>// Declare an instance of the kernel we will be using.  
+</font>    <font color='#0000FF'>const</font> kernel_type <font color='#BB00BB'>kern</font><font face='Lucida Console'>(</font><font color='#979000'>0.1</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// create a dataset with two concentric circles.  There will be 100 points on each circle.
+</font>    <font color='#BB00BB'>generate_concentric_circles</font><font face='Lucida Console'>(</font>samples, labels, <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+
+    empirical_kernel_map<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> ekm;
+
+
+    <font color='#009900'>// Here we create an empirical_kernel_map using all of our data samples as basis samples.  
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\nBuilding an empirical_kernel_map with </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> basis samples.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    ekm.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>kern, samples<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Test the empirical_kernel_map when loaded with every sample.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#BB00BB'>test_empirical_kernel_map</font><font face='Lucida Console'>(</font>samples, labels, ekm<font face='Lucida Console'>)</font>;
+
+
+
+
+
+
+    <font color='#009900'>// create a new dataset with two concentric circles.  There will be 1000 points on each circle.
+</font>    <font color='#BB00BB'>generate_concentric_circles</font><font face='Lucida Console'>(</font>samples, labels, <font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// Rather than use all 2000 samples as basis samples we are going to use the 
+</font>    <font color='#009900'>// linearly_independent_subset_finder to pick out a good basis set.  The idea behind this 
+</font>    <font color='#009900'>// object is to try and find the 40 or so samples that best spans the subspace containing all the 
+</font>    <font color='#009900'>// data.  
+</font>    linearly_independent_subset_finder<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>lisf</font><font face='Lucida Console'>(</font>kern, <font color='#979000'>40</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// populate lisf with samples.  We have configured it to allow at most 40 samples but this function 
+</font>    <font color='#009900'>// may determine that fewer samples are necessary to form a good basis.  In this example program
+</font>    <font color='#009900'>// it will select only 26.
+</font>    <font color='#BB00BB'>fill_lisf</font><font face='Lucida Console'>(</font>lisf, samples<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Now reload the empirical_kernel_map but this time using only our small basis  
+</font>    <font color='#009900'>// selected using the linearly_independent_subset_finder.
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\nBuilding an empirical_kernel_map with </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> lisf.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> basis samples.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    ekm.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>lisf<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Test the empirical_kernel_map when loaded with samples from the lisf object.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#BB00BB'>test_empirical_kernel_map</font><font face='Lucida Console'>(</font>samples, labels, ekm<font face='Lucida Console'>)</font>;
+
+
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='test_empirical_kernel_map'></a>test_empirical_kernel_map</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels,
+    <font color='#0000FF'>const</font> empirical_kernel_map<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> ekm
+<font face='Lucida Console'>)</font>
+<b>{</b>
+
+    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> projected_samples;
+
+    <font color='#009900'>// The first thing we do is compute the nonlinearly projected vectors using the 
+</font>    <font color='#009900'>// empirical_kernel_map.  
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        projected_samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>ekm.<font color='#BB00BB'>project</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>// Note that a kernel matrix is just a matrix M such that M(i,j) == kernel(samples[i],samples[j]).
+</font>    <font color='#009900'>// So below we are computing the normal kernel matrix as given by the radial_basis_kernel and the
+</font>    <font color='#009900'>// input samples.  We also compute the kernel matrix for all the projected_samples as given by the 
+</font>    <font color='#009900'>// linear_kernel.  Note that the linear_kernel just computes normal dot products.  So what we want to
+</font>    <font color='#009900'>// see is that the dot products between all the projected_samples samples are the same as the outputs
+</font>    <font color='#009900'>// of the kernel function for their respective untransformed input samples.  If they match then
+</font>    <font color='#009900'>// we know that the empirical_kernel_map is working properly.
+</font>    <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> normal_kernel_matrix <font color='#5555FF'>=</font> <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>ekm.<font color='#BB00BB'>get_kernel</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, samples<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> new_kernel_matrix <font color='#5555FF'>=</font> <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>linear_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, projected_samples<font face='Lucida Console'>)</font>;
+
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Max kernel matrix error: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>normal_kernel_matrix <font color='#5555FF'>-</font> new_kernel_matrix<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Mean kernel matrix error: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>normal_kernel_matrix <font color='#5555FF'>-</font> new_kernel_matrix<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#009900'>/*
+        Example outputs from these cout statements.
+        For the case where we use all samples as basis samples:
+            Max kernel matrix error: 7.32747e-15
+            Mean kernel matrix error: 7.47789e-16
+
+        For the case where we use only 26 samples as basis samples:
+            Max kernel matrix error: 0.000953573
+            Mean kernel matrix error: 2.26008e-05
+
+
+        Note that if we use enough basis samples we can perfectly span the space of input samples.
+        In that case we get errors that are essentially just rounding noise (Moreover, using all the 
+        samples is always enough since they are always within their own span).  Once we start 
+        to use fewer basis samples we may begin to get approximation error.  In the second case we 
+        used 26 and we can see that the data doesn't really lay exactly in a 26 dimensional subspace.  
+        But it is pretty close.  
+    */</font>
+
+
+
+    <font color='#009900'>// Now let's do something more interesting.  The following loop finds the centroids
+</font>    <font color='#009900'>// of the two classes of data.
+</font>    sample_type class1_center; 
+    sample_type class2_center; 
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> projected_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>labels[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            class1_center <font color='#5555FF'>+</font><font color='#5555FF'>=</font> projected_samples[i];
+        <font color='#0000FF'>else</font>
+            class2_center <font color='#5555FF'>+</font><font color='#5555FF'>=</font> projected_samples[i];
+    <b>}</b>
+
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> points_per_class <font color='#5555FF'>=</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+    class1_center <font color='#5555FF'>/</font><font color='#5555FF'>=</font> points_per_class;
+    class2_center <font color='#5555FF'>/</font><font color='#5555FF'>=</font> points_per_class;
+
+
+    <font color='#009900'>// Now classify points by which center they are nearest.  Recall that the data
+</font>    <font color='#009900'>// is made up of two concentric circles.  Normally you can't separate two concentric
+</font>    <font color='#009900'>// circles by checking which points are nearest to each center since they have the same
+</font>    <font color='#009900'>// centers.  However, the kernel trick makes the data separable and the loop below will 
+</font>    <font color='#009900'>// perfectly classify each data point.
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> projected_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>double</u></font> distance_to_class1 <font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projected_samples[i] <font color='#5555FF'>-</font> class1_center<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>double</u></font> distance_to_class2 <font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projected_samples[i] <font color='#5555FF'>-</font> class2_center<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> predicted_as_class_1 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>distance_to_class1 <font color='#5555FF'>&lt;</font> distance_to_class2<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now print a message for any misclassified points.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>predicted_as_class_1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> labels[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>A point was misclassified</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>predicted_as_class_1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> labels[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>A point was misclassified</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+
+
+    <font color='#009900'>// Next, note that classifying a point based on its distance between two other 
+</font>    <font color='#009900'>// points is the same thing as using the plane that lies between those two points 
+</font>    <font color='#009900'>// as a decision boundary.  So let's compute that decision plane and use it to classify 
+</font>    <font color='#009900'>// all the points.
+</font>    
+    sample_type plane_normal_vector <font color='#5555FF'>=</font> class1_center <font color='#5555FF'>-</font> class2_center;
+    <font color='#009900'>// The point right in the center of our two classes should be on the deciding plane, not
+</font>    <font color='#009900'>// on one side or the other.  This consideration brings us to the formula for the bias.
+</font>    <font color='#0000FF'><u>double</u></font> bias <font color='#5555FF'>=</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>class1_center<font color='#5555FF'>+</font>class2_center<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>, plane_normal_vector<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Now classify points by which side of the plane they are on.
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> projected_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>double</u></font> side <font color='#5555FF'>=</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>plane_normal_vector, projected_samples[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> bias;
+
+        <font color='#0000FF'><u>bool</u></font> predicted_as_class_1 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>side <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now print a message for any misclassified points.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>predicted_as_class_1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> labels[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>A point was misclassified</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>predicted_as_class_1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> labels[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>A point was misclassified</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+
+    <font color='#009900'>// It would be nice to convert this decision rule into a normal decision_function object and
+</font>    <font color='#009900'>// dispense with the empirical_kernel_map.  Happily, it is possible to do so.  Consider the
+</font>    <font color='#009900'>// following example code:
+</font>    decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> dec_funct <font color='#5555FF'>=</font> ekm.<font color='#BB00BB'>convert_to_decision_function</font><font face='Lucida Console'>(</font>plane_normal_vector<font face='Lucida Console'>)</font>;
+    <font color='#009900'>// The dec_funct now computes dot products between plane_normal_vector and the projection
+</font>    <font color='#009900'>// of any sample point given to it.  All that remains is to account for the bias. 
+</font>    dec_funct.b <font color='#5555FF'>=</font> bias;
+
+    <font color='#009900'>// now classify points by which side of the plane they are on.
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>double</u></font> side <font color='#5555FF'>=</font> <font color='#BB00BB'>dec_funct</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// And let's just check that the dec_funct really does compute the same thing as the previous equation.
+</font>        <font color='#0000FF'><u>double</u></font> side_alternate_equation <font color='#5555FF'>=</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>plane_normal_vector, projected_samples[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> bias;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>side<font color='#5555FF'>-</font>side_alternate_equation<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>14</font><font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dec_funct error: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>side<font color='#5555FF'>-</font>side_alternate_equation<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        <font color='#0000FF'><u>bool</u></font> predicted_as_class_1 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>side <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now print a message for any misclassified points.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>predicted_as_class_1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> labels[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>A point was misclassified</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>predicted_as_class_1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> labels[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>A point was misclassified</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='generate_concentric_circles'></a>generate_concentric_circles</b> <font face='Lucida Console'>(</font>
+    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels,
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> num
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    sample_type <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    samples.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    labels.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    dlib::rand rnd;
+
+    <font color='#009900'>// make some samples near the origin
+</font>    <font color='#0000FF'><u>double</u></font> radius <font color='#5555FF'>=</font> <font color='#979000'>1.0</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>double</u></font> sign <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>
+            sign <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>radius<font color='#5555FF'>*</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>radius;
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> sign<font color='#5555FF'>*</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>radius<font color='#5555FF'>*</font>radius <font color='#5555FF'>-</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>// make some samples in a circle around the origin but far away
+</font>    radius <font color='#5555FF'>=</font> <font color='#979000'>5.0</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>double</u></font> sign <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>
+            sign <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>radius<font color='#5555FF'>*</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>radius;
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> sign<font color='#5555FF'>*</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>radius<font color='#5555FF'>*</font>radius <font color='#5555FF'>-</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

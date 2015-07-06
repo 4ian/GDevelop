@@ -1,0 +1,338 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - poly_image_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_POLY_ImAGE_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_POLY_ImAGE_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry/rectangle_abstract.h.html'>../geometry/rectangle_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/generic_image.h.html'>../image_processing/generic_image.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>long</u></font> Downsample
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='poly_image'></a>poly_image</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON TEMPLATE PARAMETERS 
+                - Downsample &gt;= 1
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for extracting local feature descriptors from an image.
+                In particular, it fits polynomials to local pixel patches and allows you to 
+                query the coefficients of these polynomials.  Additionally, the coefficients 
+                may be intensity normalized by dividing them by the constant term of the fitted 
+                polynomial and then the constant term is discarded. 
+
+                Finally, the user can specify a downsampling rate.  If the template argument
+                Downsample is set to 1 then feature extraction is performed at every pixel of
+                an input image (except for a small area around the image border).  However,
+                if Downsample is set to 2 then feature extraction is only performed at every
+                other pixel location.  More generally, if Downsample is set to N then feature
+                extraction is performed only every N pixels.  
+                
+            THREAD SAFETY
+                Concurrent access to an instance of this object is not safe and should be protected
+                by a mutex lock except for the case where you are copying the configuration 
+                (via copy_configuration()) of a poly_image object to many other threads.  
+                In this case, it is safe to copy the configuration of a shared object so long
+                as no other operations are performed on it.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, <font color='#979000'>0</font>, <font color='#979000'>1</font><font color='#5555FF'>&gt;</font> descriptor_type;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> downsample <font color='#5555FF'>=</font> Downsample;
+
+        <b><a name='poly_image'></a>poly_image</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #get_order() == 3
+                - #get_window_size() == 13
+                - #size() == 0
+                - #uses_normalization() == true
+                - #is_rotationally_invariant() == false 
+        !*/</font>
+
+        <b><a name='poly_image'></a>poly_image</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> order,
+            <font color='#0000FF'><u>long</u></font> window_size,
+            <font color='#0000FF'><u>bool</u></font> normalization <font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            <font color='#0000FF'><u>bool</u></font> rotation_invariance <font color='#5555FF'>=</font> <font color='#979000'>false</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 1 &lt;= order &lt;= 6
+                - window_size &gt;= 3 &amp;&amp; window_size is odd
+            ensures
+                - #get_order() == order
+                - #get_window_size() == window_size
+                - #size() == 0
+                - #uses_normalization() == normalization
+                - #is_rotationally_invariant() == rotation_invariance
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object will have its initial value
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='setup'></a>setup</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> order,
+            <font color='#0000FF'><u>long</u></font> window_size
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 1 &lt;= order &lt;= 6
+                - window_size &gt;= 3 &amp;&amp; window_size is odd
+            ensures
+                - #get_order() == order
+                - #get_window_size() == window_size
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='get_order'></a>get_order</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the order of the polynomial that will be fitted to 
+                  each local pixel patch during feature extraction.
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='get_window_size'></a>get_window_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the size of the window used for local feature extraction.
+                  This is the width and height of the window in pixels.
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='uses_normalization'></a>uses_normalization</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns true if the polynomial coefficients are intensity normalized
+                  and false otherwise. 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_uses_normalization'></a>set_uses_normalization</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>bool</u></font> normalization
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #uses_normalization() == normalization
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_rotationally_invariant'></a>is_rotationally_invariant</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if the feature extractor will adjust the output so that it
+                  is rotationally invariant.  This is done by rotating each patch such that
+                  the gradient vector always points in the same direction.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_is_rotationally_invariant'></a>set_is_rotationally_invariant</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>bool</u></font> rotation_invariance
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #is_rotationally_invariant() == rotation_invariance
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='copy_configuration'></a>copy_configuration</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> poly_image<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - copies all the state information of item into *this, except for state 
+                  information populated by load().  More precisely, given two poly_image 
+                  objects H1 and H2, the following sequence of instructions should always 
+                  result in both of them having the exact same state.
+                    H2.copy_configuration(H1);
+                    H1.load(img);
+                    H2.load(img);
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='load'></a>load</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+                - pixel_traits&lt;typename image_traits&lt;image_type&gt;::pixel_type&gt;::has_alpha == false
+            ensures
+                - Performs the feature extraction described in the WHAT THIS OBJECT REPRESENTS
+                  section above.  This means after load() finishes you can call (*this)(row,col) 
+                  to obtain the polynomial coefficients for an order get_order() polynomial which 
+                  was fitted to the image patch get_block_rect(row,col).
+                - #size() &gt; 0
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='unload'></a>unload</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #nr() == 0
+                - #nc() == 0
+                - clears only the state information which is populated by load().  For 
+                  example, let H be a poly_image object.  Then consider the two sequences 
+                  of instructions:
+                    Sequence 1:
+                        H.load(img);      
+                        H.unload();
+                        H.load(img);
+
+                    Sequence 2:
+                        H.load(img);
+                  Both sequence 1 and sequence 2 should have the same effect on H.  
+        !*/</font>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns nr()*nc()
+        !*/</font>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of rows in this polynomial feature image
+        !*/</font>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of columns in this polynomial feature image
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='get_num_dimensions'></a>get_num_dimensions</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of dimensions in the feature vectors generated by
+                  this object.  
+                - In this case, this will be the number of coefficients in an order 
+                  get_order() polynomial, except for the constant term of the polynomial
+                  if uses_normalization() == true.
+        !*/</font>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> descriptor_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> row,
+            <font color='#0000FF'><u>long</u></font> col
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= row &lt; nr()
+                - 0 &lt;= col &lt; nc()
+            ensures
+                - returns the descriptor for the polynomial filtering block at the given row and column.  
+                  This vector will contain the polynomial coefficients for a polynomial fitted to the
+                  image patch located at get_block_rect(row,col) in the original image given to load().
+                - The returned descriptor vector will have get_num_dimensions() elements.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> rectangle <b><a name='get_block_rect'></a>get_block_rect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> row,
+            <font color='#0000FF'><u>long</u></font> col
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a rectangle that tells you what part of the original image is associated
+                  with a particular polynomial filter block.  That is, what part of the input image 
+                  is associated with (*this)(row,col).
+                - The returned rectangle will be get_window_size() pixels wide and tall.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> point <b><a name='image_to_feat_space'></a>image_to_feat_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - Each local feature is extracted from a certain point in the input image.
+                  This function returns the identity of the local feature corresponding
+                  to the image location p.  Or in other words, let P == image_to_feat_space(p), 
+                  then (*this)(P.y(),P.x()) == the local feature closest to, or centered at, 
+                  the point p in the input image.  Note that some image points might not have 
+                  corresponding feature locations.  E.g. border points or points outside the 
+                  image.  In these cases the returned point will be outside get_rect(*this).
+        !*/</font>
+
+        <font color='#0000FF'>const</font> rectangle <b><a name='image_to_feat_space'></a>image_to_feat_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns rectangle(image_to_feat_space(rect.tl_corner()), image_to_feat_space(rect.br_corner()));
+                  (i.e. maps a rectangle from image space to feature space)
+        !*/</font>
+
+        <font color='#0000FF'>const</font> point <b><a name='feat_to_image_space'></a>feat_to_image_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the location in the input image space corresponding to the center
+                  of the local feature at point p.  In other words, this function computes
+                  the inverse of image_to_feat_space().  Note that it may only do so approximately, 
+                  since more than one image location might correspond to the same local feature.  
+                  That is, image_to_feat_space() might not be invertible so this function gives 
+                  the closest possible result.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> rectangle <b><a name='feat_to_image_space'></a>feat_to_image_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - return rectangle(feat_to_image_space(rect.tl_corner()), feat_to_image_space(rect.br_corner()));
+                  (i.e. maps a rectangle from feature space to image space)
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>long</u></font> downsample
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> poly_image<font color='#5555FF'>&lt;</font>downsample<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>long</u></font> downsample
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        poly_image<font color='#5555FF'>&lt;</font>downsample<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_POLY_ImAGE_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

@@ -1,0 +1,220 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - scoped_ptr.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SCOPED_PTr_
+<font color='#0000FF'>#define</font> DLIB_SCOPED_PTr_ 
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>algorithm<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../noncopyable.h.html'>../noncopyable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='scoped_ptr_abstract.h.html'>scoped_ptr_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='default_deleter'></a>default_deleter</b>
+    <b>{</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>T<font color='#5555FF'>*</font> item<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>delete</font> item;
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='default_deleter'></a>default_deleter</b><font color='#5555FF'>&lt;</font>T[]<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>T<font color='#5555FF'>*</font> item<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>delete</font> [] item;
+        <b>}</b>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> deleter <font color='#5555FF'>=</font> default_deleter<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>
+        <font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>class</font> <b><a name='scoped_ptr'></a>scoped_ptr</b> : noncopyable 
+    <b>{</b>
+        <font color='#009900'>/*!
+            CONVENTION
+                - get() == ptr
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> T element_type;
+        <font color='#0000FF'>typedef</font> deleter deleter_type;
+
+        <font color='#0000FF'>explicit</font> <b><a name='scoped_ptr'></a>scoped_ptr</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>*</font> p <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font> : ptr<font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font> <b>{</b> <b>}</b>
+
+        ~<b><a name='scoped_ptr'></a>scoped_ptr</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font> 
+            <b>{</b>
+                deleter del;
+                <font color='#BB00BB'>del</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>; 
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>*</font> p <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font> 
+            <b>{</b>
+                deleter del;
+                <font color='#BB00BB'>del</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>; 
+            <b>}</b>
+
+            ptr <font color='#5555FF'>=</font> p;
+        <b>}</b>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                        "<font color='#CC0000'>\tscoped_ptr::operator*()</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tget() can't be null if you are going to dereference it</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>ptr;
+        <b>}</b>
+
+        T<font color='#5555FF'>*</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                        "<font color='#CC0000'>\tscoped_ptr::operator*()</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tget() can't be null</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> ptr;
+        <b>}</b>
+
+        T<font color='#5555FF'>*</font> <b><a name='get'></a>get</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> ptr;
+        <b>}</b>
+
+        <b><a name='operator'></a>operator</b> <font color='#0000FF'><u>bool</u></font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>ptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+            scoped_ptr<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>ptr,b.ptr<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        T<font color='#5555FF'>*</font> ptr;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> deleter 
+        <font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>class</font> <b><a name='scoped_ptr'></a>scoped_ptr</b><font color='#5555FF'>&lt;</font>T[],deleter<font color='#5555FF'>&gt;</font> : noncopyable 
+    <b>{</b>
+        <font color='#009900'>/*!
+            CONVENTION
+                - get() == ptr
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> T element_type;
+
+        <font color='#0000FF'>explicit</font> <b><a name='scoped_ptr'></a>scoped_ptr</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>*</font> p <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font> : ptr<font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font> <b>{</b> <b>}</b>
+
+        ~<b><a name='scoped_ptr'></a>scoped_ptr</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font> 
+            <b>{</b>
+                deleter del;
+                <font color='#BB00BB'>del</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>; 
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>*</font> p <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font> 
+            <b>{</b>
+                deleter del;
+                <font color='#BB00BB'>del</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>; 
+            <b>}</b>
+            ptr <font color='#5555FF'>=</font> p;
+        <b>}</b>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                        "<font color='#CC0000'>\tscoped_ptr::operator[]()</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tget() can't be null if you are going to dereference it</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> ptr[idx];
+        <b>}</b>
+
+        T<font color='#5555FF'>*</font> <b><a name='get'></a>get</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> ptr;
+        <b>}</b>
+
+        <b><a name='operator'></a>operator</b> <font color='#0000FF'><u>bool</u></font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>ptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+            scoped_ptr<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>ptr,b.ptr<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        T<font color='#5555FF'>*</font> ptr;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> deleter
+        <font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+        scoped_ptr<font color='#5555FF'>&lt;</font>T,deleter<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        scoped_ptr<font color='#5555FF'>&lt;</font>T,deleter<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SCOPED_PTr_
+</font>
+
+
+</pre></body></html>

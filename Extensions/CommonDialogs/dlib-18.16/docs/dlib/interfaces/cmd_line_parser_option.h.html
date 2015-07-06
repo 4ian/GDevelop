@@ -1,0 +1,110 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - cmd_line_parser_option.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_CMD_LINE_PARSER_OPTIOn_
+<font color='#0000FF'>#define</font> DLIB_CMD_LINE_PARSER_OPTIOn_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='cmd_line_parser_option'></a>cmd_line_parser_option</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            POINTERS AND REFERENCES TO INTERNAL DATA
+                None of the functions in cmd_line_parser_option will invalidate
+                pointers or references to internal data when called.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a command line option.  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> charT char_type;
+        <font color='#0000FF'>typedef</font> std::basic_string<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font> string_type;
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='cmd_line_parser_option'></a>cmd_line_parser_option</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'>const</font> string_type<font color='#5555FF'>&amp;</font> <b><a name='name'></a>name</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the name of this option
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'>const</font> string_type<font color='#5555FF'>&amp;</font> <b><a name='group_name'></a>group_name</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the name of the group this option is in.  If no group was set for
+                  this option then this function returns "".
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'>const</font> string_type<font color='#5555FF'>&amp;</font> <b><a name='description'></a>description</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the description for this option
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_arguments'></a>number_of_arguments</b><font face='Lucida Console'>(</font> 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of arguments for this option
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='count'></a>count</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of times this option appears on the command line.
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'>const</font> string_type<font color='#5555FF'>&amp;</font> <b><a name='argument'></a>argument</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> arg <font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> N <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - arg &lt; number_of_arguments()
+                - N &lt; count()
+            ensures
+                - returns the arg-th argument to the Nth occurrence of this 
+                  option on the command line.
+        !*/</font>
+
+        <font color='#0000FF'>inline</font> <b><a name='operator'></a>operator</b> <font color='#0000FF'><u>bool</u></font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>count</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; <b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - returns true if this option appears on the command line at all
+        !*/</font>
+
+    <font color='#0000FF'>protected</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        cmd_line_parser_option<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> cmd_line_parser_option<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font><b>{</b><font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;<b>}</b>
+
+    <b>}</b>;
+
+    <font color='#009900'>// destructor does nothing
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> charT <font color='#5555FF'>&gt;</font>
+    cmd_line_parser_option<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font>::~<b><a name='cmd_line_parser_option'></a>cmd_line_parser_option</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CMD_LINE_PARSER_OPTIOn_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,880 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - optimization_line_search.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_OPTIMIZATIOn_LINE_SEARCH_H_
+<font color='#0000FF'>#define</font> DLIB_OPTIMIZATIOn_LINE_SEARCH_H_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='optimization_line_search_abstract.h.html'>optimization_line_search_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>utility<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> funct, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='line_search_funct'></a>line_search_funct</b> 
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='line_search_funct'></a>line_search_funct</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f_, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> start_, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> direction_<font face='Lucida Console'>)</font> 
+            : f<font face='Lucida Console'>(</font>f_<font face='Lucida Console'>)</font>,start<font face='Lucida Console'>(</font>start_<font face='Lucida Console'>)</font>, direction<font face='Lucida Console'>(</font>direction_<font face='Lucida Console'>)</font>, matrix_r<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, scalar_r<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <b><a name='line_search_funct'></a>line_search_funct</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f_, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> start_, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> direction_, T<font color='#5555FF'>&amp;</font> r<font face='Lucida Console'>)</font> 
+            : f<font face='Lucida Console'>(</font>f_<font face='Lucida Console'>)</font>,start<font face='Lucida Console'>(</font>start_<font face='Lucida Console'>)</font>, direction<font face='Lucida Console'>(</font>direction_<font face='Lucida Console'>)</font>, matrix_r<font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>r<font face='Lucida Console'>)</font>, scalar_r<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <b><a name='line_search_funct'></a>line_search_funct</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f_, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> start_, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> direction_, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> r<font face='Lucida Console'>)</font> 
+            : f<font face='Lucida Console'>(</font>f_<font face='Lucida Console'>)</font>,start<font face='Lucida Console'>(</font>start_<font face='Lucida Console'>)</font>, direction<font face='Lucida Console'>(</font>direction_<font face='Lucida Console'>)</font>, matrix_r<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, scalar_r<font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>r<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> x<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font><font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>start <font color='#5555FF'>+</font> x<font color='#5555FF'>*</font>direction<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_value'></a>get_value</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> r<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// save a copy of this value for later
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>scalar_r<font face='Lucida Console'>)</font>
+                <font color='#5555FF'>*</font>scalar_r <font color='#5555FF'>=</font> r;
+
+            <font color='#0000FF'>return</font> r;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_value'></a>get_value</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> r<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// U should be a matrix type
+</font>            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_matrix<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// save a copy of this value for later
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>matrix_r<font face='Lucida Console'>)</font>
+                <font color='#5555FF'>*</font>matrix_r <font color='#5555FF'>=</font> r;
+
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>r,direction<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f;
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> start;
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> direction;
+        T<font color='#5555FF'>*</font> matrix_r;
+        <font color='#0000FF'><u>double</u></font><font color='#5555FF'>*</font> scalar_r;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> funct, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> line_search_funct<font color='#5555FF'>&lt;</font>funct,T<font color='#5555FF'>&gt;</font> <b><a name='make_line_search_function'></a>make_line_search_function</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> start, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> direction<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font> <font face='Lucida Console'>(</font>
+            <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>start<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>direction<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> start.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> direction.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tline_search_funct make_line_search_function(f,start,direction)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have to supply column vectors to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tstart.nc():     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> start.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tdirection.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> direction.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tstart.nr():     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> start.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tdirection.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> direction.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> line_search_funct<font color='#5555FF'>&lt;</font>funct,T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>f,start,direction<font face='Lucida Console'>)</font>; 
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> funct, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> line_search_funct<font color='#5555FF'>&lt;</font>funct,T<font color='#5555FF'>&gt;</font> <b><a name='make_line_search_function'></a>make_line_search_function</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> start, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> direction, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> f_out<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font> <font face='Lucida Console'>(</font>
+            <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>start<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>direction<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> start.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> direction.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tline_search_funct make_line_search_function(f,start,direction)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have to supply column vectors to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tstart.nc():     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> start.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tdirection.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> direction.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tstart.nr():     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> start.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tdirection.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> direction.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> line_search_funct<font color='#5555FF'>&lt;</font>funct,T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>f,start,direction, f_out<font face='Lucida Console'>)</font>; 
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> funct, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> line_search_funct<font color='#5555FF'>&lt;</font>funct,T<font color='#5555FF'>&gt;</font> <b><a name='make_line_search_function'></a>make_line_search_function</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> start, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> direction, T<font color='#5555FF'>&amp;</font> grad_out<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font> <font face='Lucida Console'>(</font>
+            <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>start<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>direction<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> start.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> direction.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tline_search_funct make_line_search_function(f,start,direction)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have to supply column vectors to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tstart.nc():     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> start.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tdirection.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> direction.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tstart.nr():     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> start.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tdirection.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> direction.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> line_search_funct<font color='#5555FF'>&lt;</font>funct,T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>f,start,direction,grad_out<font face='Lucida Console'>)</font>; 
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>double</u></font> <b><a name='poly_min_extrap'></a>poly_min_extrap</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> f0,
+        <font color='#0000FF'><u>double</u></font> d0,
+        <font color='#0000FF'><u>double</u></font> f1,
+        <font color='#0000FF'><u>double</u></font> d1
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>3</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>f1 <font color='#5555FF'>-</font> f0<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>d0 <font color='#5555FF'>-</font> d1;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> e <font color='#5555FF'>=</font> d0 <font color='#5555FF'>+</font> d1 <font color='#5555FF'>-</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>f1 <font color='#5555FF'>-</font> f0<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// find the minimum of the derivative of the polynomial
+</font>
+        <font color='#0000FF'><u>double</u></font> temp <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>*</font>n <font color='#5555FF'>-</font> <font color='#979000'>3</font><font color='#5555FF'>*</font>e<font color='#5555FF'>*</font>d0,<font color='#979000'>0.0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>0.5</font>;
+
+        temp <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>e<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>0.5</font>;
+
+        <font color='#009900'>// figure out the two possible min values
+</font>        <font color='#0000FF'><u>double</u></font> x1 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>-</font> n<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>*</font>e<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>double</u></font> x2 <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font face='Lucida Console'>(</font>temp <font color='#5555FF'>+</font> n<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>*</font>e<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// compute the value of the interpolating polynomial at these two points
+</font>        <font color='#0000FF'><u>double</u></font> y1 <font color='#5555FF'>=</font> f0 <font color='#5555FF'>+</font> d0<font color='#5555FF'>*</font>x1 <font color='#5555FF'>+</font> n<font color='#5555FF'>*</font>x1<font color='#5555FF'>*</font>x1 <font color='#5555FF'>+</font> e<font color='#5555FF'>*</font>x1<font color='#5555FF'>*</font>x1<font color='#5555FF'>*</font>x1;
+        <font color='#0000FF'><u>double</u></font> y2 <font color='#5555FF'>=</font> f0 <font color='#5555FF'>+</font> d0<font color='#5555FF'>*</font>x2 <font color='#5555FF'>+</font> n<font color='#5555FF'>*</font>x2<font color='#5555FF'>*</font>x2 <font color='#5555FF'>+</font> e<font color='#5555FF'>*</font>x2<font color='#5555FF'>*</font>x2<font color='#5555FF'>*</font>x2;
+
+        <font color='#009900'>// pick the best point
+</font>        <font color='#0000FF'><u>double</u></font> x;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>y1 <font color='#5555FF'>&lt;</font> y2<font face='Lucida Console'>)</font>
+            x <font color='#5555FF'>=</font> x1;
+        <font color='#0000FF'>else</font>
+            x <font color='#5555FF'>=</font> x2;
+
+        <font color='#009900'>// now make sure the minimum is within the allowed range of (0,1) 
+</font>        <font color='#0000FF'>return</font> <font color='#BB00BB'>put_in_range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font>,x<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>double</u></font> <b><a name='poly_min_extrap'></a>poly_min_extrap</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> f0,
+        <font color='#0000FF'><u>double</u></font> d0,
+        <font color='#0000FF'><u>double</u></font> f1
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> temp <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>f1 <font color='#5555FF'>-</font> f0 <font color='#5555FF'>-</font> d0<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> d0<font color='#5555FF'>*</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>0.5</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> alpha <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>d0<font color='#5555FF'>/</font>temp;
+
+        <font color='#009900'>// now make sure the minimum is within the allowed range of (0,1) 
+</font>        <font color='#0000FF'>return</font> <font color='#BB00BB'>put_in_range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font>,alpha<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>double</u></font> <b><a name='poly_min_extrap'></a>poly_min_extrap</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> f0,
+        <font color='#0000FF'><u>double</u></font> d0,
+        <font color='#0000FF'><u>double</u></font> x1,
+        <font color='#0000FF'><u>double</u></font> f_x1,
+        <font color='#0000FF'><u>double</u></font> x2,
+        <font color='#0000FF'><u>double</u></font> f_x2
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font> x1 <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> x1 <font color='#5555FF'>&lt;</font> x2,"<font color='#CC0000'>Invalid inputs were given to this function</font>"<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// The contents of this function follow the equations described on page 58 of the
+</font>        <font color='#009900'>// book Numerical Optimization by Nocedal and Wright, second edition.
+</font>        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> m;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> v;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> aa2 <font color='#5555FF'>=</font> x2<font color='#5555FF'>*</font>x2;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> aa1 <font color='#5555FF'>=</font> x1<font color='#5555FF'>*</font>x1;
+        m <font color='#5555FF'>=</font>  aa2,       <font color='#5555FF'>-</font>aa1,
+            <font color='#5555FF'>-</font>aa2<font color='#5555FF'>*</font>x2, aa1<font color='#5555FF'>*</font>x1;   
+        v <font color='#5555FF'>=</font> f_x1 <font color='#5555FF'>-</font> f0 <font color='#5555FF'>-</font> d0<font color='#5555FF'>*</font>x1,
+            f_x2 <font color='#5555FF'>-</font> f0 <font color='#5555FF'>-</font> d0<font color='#5555FF'>*</font>x2;
+
+
+        <font color='#0000FF'><u>double</u></font> temp <font color='#5555FF'>=</font> aa2<font color='#5555FF'>*</font>aa1<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>x1<font color='#5555FF'>-</font>x2<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// just take a guess if this happens
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> x1<font color='#5555FF'>/</font><font color='#979000'>2.0</font>;
+        <b>}</b>
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> temp2;
+        temp2 <font color='#5555FF'>=</font> m<font color='#5555FF'>*</font>v<font color='#5555FF'>/</font>temp;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> a <font color='#5555FF'>=</font> <font color='#BB00BB'>temp2</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> b <font color='#5555FF'>=</font> <font color='#BB00BB'>temp2</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        temp <font color='#5555FF'>=</font> b<font color='#5555FF'>*</font>b <font color='#5555FF'>-</font> <font color='#979000'>3</font><font color='#5555FF'>*</font>a<font color='#5555FF'>*</font>d0;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// This is probably a line so just pick the lowest point
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>f0 <font color='#5555FF'>&lt;</font> f_x2<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> x2;
+        <b>}</b>
+        temp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font>b <font color='#5555FF'>+</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>*</font>a<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>put_in_range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, x2, temp<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>double</u></font> <b><a name='lagrange_poly_min_extrap'></a>lagrange_poly_min_extrap</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> p1, 
+        <font color='#0000FF'><u>double</u></font> p2,
+        <font color='#0000FF'><u>double</u></font> p3,
+        <font color='#0000FF'><u>double</u></font> f1,
+        <font color='#0000FF'><u>double</u></font> f2,
+        <font color='#0000FF'><u>double</u></font> f3
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>p1 <font color='#5555FF'>&lt;</font> p2 <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p2 <font color='#5555FF'>&lt;</font> p3 <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> f1 <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> f2 <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> f2 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> f3,
+                     "<font color='#CC0000'>   p1: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> p1 
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   p2: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> p2 
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   p3: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> p3  
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   f1: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> f1 
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   f2: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> f2 
+                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   f3: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> f3<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// This formula is out of the book Nonlinear Optimization by Andrzej Ruszczynski.  See section 5.2.
+</font>        <font color='#0000FF'><u>double</u></font> temp1 <font color='#5555FF'>=</font>    f1<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>p3<font color='#5555FF'>*</font>p3 <font color='#5555FF'>-</font> p2<font color='#5555FF'>*</font>p2<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> f2<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>p1<font color='#5555FF'>*</font>p1 <font color='#5555FF'>-</font> p3<font color='#5555FF'>*</font>p3<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> f3<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>p2<font color='#5555FF'>*</font>p2 <font color='#5555FF'>-</font> p1<font color='#5555FF'>*</font>p1<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>double</u></font> temp2 <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>f1<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>p3 <font color='#5555FF'>-</font> p2<font face='Lucida Console'>)</font>       <font color='#5555FF'>+</font> f2<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>p1 <font color='#5555FF'>-</font> p3<font face='Lucida Console'>)</font>       <font color='#5555FF'>+</font> f3<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>p2 <font color='#5555FF'>-</font> p1<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp2 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> p2;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> result <font color='#5555FF'>=</font> temp1<font color='#5555FF'>/</font>temp2;
+
+        <font color='#009900'>// do a final sanity check to make sure the result is in the right range
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p1 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> result <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> result <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> p3<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> result;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>p1,result<font face='Lucida Console'>)</font>,p3<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> funct_der
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='line_search'></a>line_search</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> f0,
+        <font color='#0000FF'>const</font> funct_der<font color='#5555FF'>&amp;</font> der, 
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> d0,
+        <font color='#0000FF'><u>double</u></font> rho, 
+        <font color='#0000FF'><u>double</u></font> sigma, 
+        <font color='#0000FF'><u>double</u></font> min_f,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font> <font face='Lucida Console'>(</font>
+            <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font> rho <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> rho <font color='#5555FF'>&lt;</font> sigma <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> sigma <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> max_iter <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\tdouble line_search()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have given invalid arguments to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t sigma:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sigma
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t rho:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rho 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_iter: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> max_iter 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// The bracketing phase of this function is implemented according to block 2.6.2 from
+</font>        <font color='#009900'>// the book Practical Methods of Optimization by R. Fletcher.   The sectioning 
+</font>        <font color='#009900'>// phase is an implementation of 2.6.4 from the same book.
+</font>
+        <font color='#009900'>// tau1 &gt; 1. Controls the alpha jump size during the search
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> tau1 <font color='#5555FF'>=</font> <font color='#979000'>9</font>;
+
+        <font color='#009900'>// it must be the case that 0 &lt; tau2 &lt; tau3 &lt;= 1/2 for the algorithm to function
+</font>        <font color='#009900'>// correctly but the specific values of tau2 and tau3 aren't super important.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> tau2 <font color='#5555FF'>=</font> <font color='#979000'>1.0</font><font color='#5555FF'>/</font><font color='#979000'>10.0</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> tau3 <font color='#5555FF'>=</font> <font color='#979000'>1.0</font><font color='#5555FF'>/</font><font color='#979000'>2.0</font>;
+
+
+        <font color='#009900'>// Stop right away and return a step size of 0 if the gradient is 0 at the starting point
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>d0<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+
+        <font color='#009900'>// Stop right away if the current value is good enough according to min_f
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>f0 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> min_f<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+
+        <font color='#009900'>// Figure out a reasonable upper bound on how large alpha can get.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> mu <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>min_f<font color='#5555FF'>-</font>f0<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>rho<font color='#5555FF'>*</font>d0<font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'><u>double</u></font> alpha <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>mu <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            alpha <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>alpha;
+        alpha <font color='#5555FF'>=</font> <font color='#BB00BB'>put_in_range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, <font color='#979000'>0.65</font><font color='#5555FF'>*</font>mu, alpha<font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'><u>double</u></font> last_alpha <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>double</u></font> last_val <font color='#5555FF'>=</font> f0;
+        <font color='#0000FF'><u>double</u></font> last_val_der <font color='#5555FF'>=</font> d0;
+
+        <font color='#009900'>// The bracketing stage will find a range of points [a,b]
+</font>        <font color='#009900'>// that contains a reasonable solution to the line search
+</font>        <font color='#0000FF'><u>double</u></font> a, b;
+
+        <font color='#009900'>// These variables will hold the values and derivatives of f(a) and f(b)
+</font>        <font color='#0000FF'><u>double</u></font> a_val, b_val, a_val_der, b_val_der;
+
+        <font color='#009900'>// This thresh value represents the Wolfe curvature condition
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> thresh <font color='#5555FF'>=</font> std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>sigma<font color='#5555FF'>*</font>d0<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> itr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>// do the bracketing stage to find the bracket range [a,b]
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>itr;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> val <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> val_der <font color='#5555FF'>=</font> <font color='#BB00BB'>der</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// we are done with the line search since we found a value smaller
+</font>            <font color='#009900'>// than the minimum f value
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> min_f<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> alpha;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val <font color='#5555FF'>&gt;</font> f0 <font color='#5555FF'>+</font> rho<font color='#5555FF'>*</font>alpha<font color='#5555FF'>*</font>d0 <font color='#5555FF'>|</font><font color='#5555FF'>|</font> val <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> last_val<font face='Lucida Console'>)</font>
+            <b>{</b>
+                a_val <font color='#5555FF'>=</font> last_val;
+                a_val_der <font color='#5555FF'>=</font> last_val_der;
+                b_val <font color='#5555FF'>=</font> val;
+                b_val_der <font color='#5555FF'>=</font> val_der;
+
+                a <font color='#5555FF'>=</font> last_alpha;
+                b <font color='#5555FF'>=</font> alpha;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>val_der<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> thresh<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> alpha;
+
+            <font color='#009900'>// if we are stuck not making progress then quit with the current alpha
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>last_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> alpha <font color='#5555FF'>|</font><font color='#5555FF'>|</font> itr <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> max_iter<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> alpha;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val_der <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                a_val <font color='#5555FF'>=</font> val;
+                a_val_der <font color='#5555FF'>=</font> val_der;
+                b_val <font color='#5555FF'>=</font> last_val;
+                b_val_der <font color='#5555FF'>=</font> last_val_der;
+
+                a <font color='#5555FF'>=</font> alpha;
+                b <font color='#5555FF'>=</font> last_alpha;
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>mu <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>alpha <font color='#5555FF'>-</font> last_alpha<font face='Lucida Console'>)</font>
+            <b>{</b>
+                last_alpha <font color='#5555FF'>=</font> alpha;
+                alpha <font color='#5555FF'>=</font> mu;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> temp <font color='#5555FF'>=</font> alpha;
+
+                <font color='#0000FF'><u>double</u></font> first <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>alpha <font color='#5555FF'>-</font> last_alpha;
+                <font color='#0000FF'><u>double</u></font> last;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>mu <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    last <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>mu, alpha <font color='#5555FF'>+</font> tau1<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>alpha <font color='#5555FF'>-</font> last_alpha<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    last <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>mu, alpha <font color='#5555FF'>+</font> tau1<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>alpha <font color='#5555FF'>-</font> last_alpha<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+                <font color='#009900'>// pick a point between first and last by doing some kind of interpolation
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>last_alpha <font color='#5555FF'>&lt;</font> alpha<font face='Lucida Console'>)</font>
+                    alpha <font color='#5555FF'>=</font> last_alpha <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>alpha<font color='#5555FF'>-</font>last_alpha<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>poly_min_extrap</font><font face='Lucida Console'>(</font>last_val, last_val_der, val, val_der<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    alpha <font color='#5555FF'>=</font> alpha <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>last_alpha<font color='#5555FF'>-</font>alpha<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>poly_min_extrap</font><font face='Lucida Console'>(</font>val, val_der, last_val, last_val_der<font face='Lucida Console'>)</font>;
+
+                alpha <font color='#5555FF'>=</font> <font color='#BB00BB'>put_in_range</font><font face='Lucida Console'>(</font>first,last,alpha<font face='Lucida Console'>)</font>;
+
+
+                last_alpha <font color='#5555FF'>=</font> temp;
+            <b>}</b>
+
+            last_val <font color='#5555FF'>=</font> val;
+            last_val_der <font color='#5555FF'>=</font> val_der;
+
+        <b>}</b>
+
+
+        <font color='#009900'>// Now do the sectioning phase from 2.6.4
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>itr;
+            <font color='#0000FF'><u>double</u></font> first <font color='#5555FF'>=</font> a <font color='#5555FF'>+</font> tau2<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>b<font color='#5555FF'>-</font>a<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>double</u></font> last <font color='#5555FF'>=</font> b <font color='#5555FF'>-</font> tau3<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>b<font color='#5555FF'>-</font>a<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// use interpolation to pick alpha between first and last
+</font>            alpha <font color='#5555FF'>=</font> a <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>b<font color='#5555FF'>-</font>a<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>poly_min_extrap</font><font face='Lucida Console'>(</font>a_val, a_val_der, b_val, b_val_der<font face='Lucida Console'>)</font>;
+            alpha <font color='#5555FF'>=</font> <font color='#BB00BB'>put_in_range</font><font face='Lucida Console'>(</font>first,last,alpha<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> val <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> val_der <font color='#5555FF'>=</font> <font color='#BB00BB'>der</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// we are done with the line search since we found a value smaller
+</font>            <font color='#009900'>// than the minimum f value or we ran out of iterations.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> min_f <font color='#5555FF'>|</font><font color='#5555FF'>|</font> itr <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> max_iter<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> alpha;
+
+            <font color='#009900'>// stop if the interval gets so small that it isn't shrinking any more due to rounding error 
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> first <font color='#5555FF'>|</font><font color='#5555FF'>|</font> b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> last<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> b;
+            <b>}</b>
+
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val <font color='#5555FF'>&gt;</font> f0 <font color='#5555FF'>+</font> rho<font color='#5555FF'>*</font>alpha<font color='#5555FF'>*</font>d0 <font color='#5555FF'>|</font><font color='#5555FF'>|</font> val <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> a_val<font face='Lucida Console'>)</font>
+            <b>{</b>
+                b <font color='#5555FF'>=</font> alpha;
+                b_val <font color='#5555FF'>=</font> val;
+                b_val_der <font color='#5555FF'>=</font> val_der;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>val_der<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> thresh<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> alpha;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>b<font color='#5555FF'>-</font>a<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>val_der <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    b <font color='#5555FF'>=</font> a;
+                    b_val <font color='#5555FF'>=</font> a_val;
+                    b_val_der <font color='#5555FF'>=</font> a_val_der;
+                <b>}</b>
+
+                a <font color='#5555FF'>=</font> alpha;
+                a_val <font color='#5555FF'>=</font> val;
+                a_val_der <font color='#5555FF'>=</font> val_der;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='backtracking_line_search'></a>backtracking_line_search</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'><u>double</u></font> f0,
+        <font color='#0000FF'><u>double</u></font> d0,
+        <font color='#0000FF'><u>double</u></font> alpha,
+        <font color='#0000FF'><u>double</u></font> rho, 
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font> <font face='Lucida Console'>(</font>
+            <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font> rho <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> rho <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> max_iter <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\tdouble backtracking_line_search()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have given invalid arguments to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t rho:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rho 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_iter: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> max_iter 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make sure alpha is going in the right direction.  That is, it should be opposite
+</font>        <font color='#009900'>// the direction of the gradient.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>d0 <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> alpha <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+            <font face='Lucida Console'>(</font>d0 <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> alpha <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            alpha <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> have_prev_alpha <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'><u>double</u></font> prev_alpha <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>double</u></font> prev_val <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> iter <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>iter;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> val <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> f0 <font color='#5555FF'>+</font> alpha<font color='#5555FF'>*</font>rho<font color='#5555FF'>*</font>d0 <font color='#5555FF'>|</font><font color='#5555FF'>|</font> iter <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> max_iter<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> alpha;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// Interpolate a new alpha.  We also make sure the step by which we
+</font>                <font color='#009900'>// reduce alpha is not super small.
+</font>                <font color='#0000FF'><u>double</u></font> step;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>have_prev_alpha<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>d0 <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        step <font color='#5555FF'>=</font> alpha<font color='#5555FF'>*</font><font color='#BB00BB'>put_in_range</font><font face='Lucida Console'>(</font><font color='#979000'>0.1</font>,<font color='#979000'>0.9</font>, <font color='#BB00BB'>poly_min_extrap</font><font face='Lucida Console'>(</font>f0, d0, val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>else</font>
+                        step <font color='#5555FF'>=</font> alpha<font color='#5555FF'>*</font><font color='#BB00BB'>put_in_range</font><font face='Lucida Console'>(</font><font color='#979000'>0.1</font>,<font color='#979000'>0.9</font>, <font color='#BB00BB'>poly_min_extrap</font><font face='Lucida Console'>(</font>f0, <font color='#5555FF'>-</font>d0, val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    have_prev_alpha <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>d0 <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        step <font color='#5555FF'>=</font> <font color='#BB00BB'>put_in_range</font><font face='Lucida Console'>(</font><font color='#979000'>0.1</font><font color='#5555FF'>*</font>alpha,<font color='#979000'>0.9</font><font color='#5555FF'>*</font>alpha, <font color='#BB00BB'>poly_min_extrap</font><font face='Lucida Console'>(</font>f0, d0, alpha, val, prev_alpha, prev_val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>else</font>
+                        step <font color='#5555FF'>=</font> <font color='#BB00BB'>put_in_range</font><font face='Lucida Console'>(</font><font color='#979000'>0.1</font><font color='#5555FF'>*</font>alpha,<font color='#979000'>0.9</font><font color='#5555FF'>*</font>alpha, <font color='#5555FF'>-</font><font color='#BB00BB'>poly_min_extrap</font><font face='Lucida Console'>(</font>f0, <font color='#5555FF'>-</font>d0, <font color='#5555FF'>-</font>alpha, val, <font color='#5555FF'>-</font>prev_alpha, prev_val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                prev_alpha <font color='#5555FF'>=</font> alpha;
+                prev_val <font color='#5555FF'>=</font> val;
+
+                alpha <font color='#5555FF'>=</font> step;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='optimize_single_variable_failure'></a>optimize_single_variable_failure</b> : <font color='#0000FF'>public</font> error <b>{</b>
+    <font color='#0000FF'>public</font>: <b><a name='optimize_single_variable_failure'></a>optimize_single_variable_failure</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> s<font face='Lucida Console'>)</font>:error<font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> funct<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_min_single_variable'></a>find_min_single_variable</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f,
+        <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> starting_point,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> begin <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1e200</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> end <font color='#5555FF'>=</font> <font color='#979000'>1e200</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> eps <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>3</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> max_iter <font color='#5555FF'>=</font> <font color='#979000'>100</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> initial_search_radius <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> eps <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                      max_iter <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                      begin <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> starting_point <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> starting_point <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                      initial_search_radius <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                      "<font color='#CC0000'>eps: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> eps
+                      <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n max_iter: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> max_iter 
+                      <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n begin: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> begin 
+                      <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n end:   </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> end 
+                      <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n starting_point: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> starting_point 
+                      <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n initial_search_radius: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> initial_search_radius 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>double</u></font> search_radius <font color='#5555FF'>=</font> initial_search_radius;
+
+        <font color='#0000FF'><u>double</u></font> p1<font color='#5555FF'>=</font><font color='#979000'>0</font>, p2<font color='#5555FF'>=</font><font color='#979000'>0</font>, p3<font color='#5555FF'>=</font><font color='#979000'>0</font>, f1<font color='#5555FF'>=</font><font color='#979000'>0</font>, f2<font color='#5555FF'>=</font><font color='#979000'>0</font>, f3<font color='#5555FF'>=</font><font color='#979000'>0</font>;
+        <font color='#0000FF'><u>long</u></font> f_evals <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>begin <font color='#5555FF'>=</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>starting_point<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>using</font> std::abs;
+        <font color='#0000FF'>using</font> std::min;
+        <font color='#0000FF'>using</font> std::max;
+
+        <font color='#009900'>// find three bracketing points such that f1 &gt; f2 &lt; f3.   Do this by generating a sequence
+</font>        <font color='#009900'>// of points expanding away from 0.   Also note that, in the following code, it is always the
+</font>        <font color='#009900'>// case that p1 &lt; p2 &lt; p3.
+</font>
+
+
+        <font color='#009900'>// The first thing we do is get a starting set of 3 points that are inside the [begin,end] bounds
+</font>        p1 <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>starting_point<font color='#5555FF'>-</font>search_radius, begin<font face='Lucida Console'>)</font>;
+        p3 <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>starting_point<font color='#5555FF'>+</font>search_radius, end<font face='Lucida Console'>)</font>;
+        f1 <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>p1<font face='Lucida Console'>)</font>;
+        f3 <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>p3<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>starting_point <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p1 <font color='#5555FF'>|</font><font color='#5555FF'>|</font> starting_point <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p3<font face='Lucida Console'>)</font>
+        <b>{</b>
+            p2 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p1<font color='#5555FF'>+</font>p3<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+            f2 <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>p2<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            p2 <font color='#5555FF'>=</font> starting_point;
+            f2 <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>starting_point<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        f_evals <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+        <font color='#009900'>// Now we have 3 points on the function.  Start looking for a bracketing set such that
+</font>        <font color='#009900'>// f1 &gt; f2 &lt; f3 is the case.
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>f1 <font color='#5555FF'>&gt;</font> f2 <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> f2 <font color='#5555FF'>&lt;</font> f3<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// check for hitting max_iter or if the interval is now too small
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>f_evals <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> max_iter<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>optimize_single_variable_failure</font><font face='Lucida Console'>(</font>
+                    "<font color='#CC0000'>The max number of iterations of single variable optimization have been reached\n</font>"
+                    "<font color='#CC0000'>without converging.</font>"<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p3<font color='#5555FF'>-</font>p1 <font color='#5555FF'>&lt;</font> eps<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>f1 <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>f2,f3<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    starting_point <font color='#5555FF'>=</font> p1;
+                    <font color='#0000FF'>return</font> f1;
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>f2 <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>f1,f3<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    starting_point <font color='#5555FF'>=</font> p2;
+                    <font color='#0000FF'>return</font> f2;
+                <b>}</b>
+
+                starting_point <font color='#5555FF'>=</font> p3;
+                <font color='#0000FF'>return</font> f3;
+            <b>}</b>
+            
+            <font color='#009900'>// If the left most points are identical in function value then expand out the
+</font>            <font color='#009900'>// left a bit, unless it's already at bound or we would drop that left most
+</font>            <font color='#009900'>// point anyway because it's bad.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>f1<font color='#5555FF'>=</font><font color='#5555FF'>=</font>f2 <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> f1<font color='#5555FF'>&lt;</font>f3 <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p1<font color='#5555FF'>!</font><font color='#5555FF'>=</font>begin<font face='Lucida Console'>)</font>
+            <b>{</b>
+                p1 <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>p1 <font color='#5555FF'>-</font> search_radius, begin<font face='Lucida Console'>)</font>;
+                f1 <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>p1<font face='Lucida Console'>)</font>;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>f_evals;
+                search_radius <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+                <font color='#0000FF'>continue</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>f2<font color='#5555FF'>=</font><font color='#5555FF'>=</font>f3 <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> f3<font color='#5555FF'>&lt;</font>f1 <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p3<font color='#5555FF'>!</font><font color='#5555FF'>=</font>end<font face='Lucida Console'>)</font>
+            <b>{</b>
+                p3 <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>p3 <font color='#5555FF'>+</font> search_radius, end<font face='Lucida Console'>)</font>;
+                f3 <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>p3<font face='Lucida Console'>)</font>;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>f_evals;
+                search_radius <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+                <font color='#0000FF'>continue</font>;
+            <b>}</b>
+
+
+            <font color='#009900'>// if f1 is small then take a step to the left
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>f1 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> f3<font face='Lucida Console'>)</font>
+            <b>{</b> 
+                <font color='#009900'>// check if the minimum is butting up against the bounds and if so then pick
+</font>                <font color='#009900'>// a point between p1 and p2 in the hopes that shrinking the interval will
+</font>                <font color='#009900'>// be a good thing to do.  Or if p1 and p2 aren't differentiated then try and
+</font>                <font color='#009900'>// get them to obtain different values.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> begin <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>f1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> f2 <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>end<font color='#5555FF'>-</font>begin<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> search_radius <font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    p3 <font color='#5555FF'>=</font> p2;
+                    f3 <font color='#5555FF'>=</font> f2;
+
+                    p2 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p1<font color='#5555FF'>+</font>p2<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2.0</font>;
+                    f2 <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>p2<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// pick a new point to the left of our current bracket
+</font>                    p3 <font color='#5555FF'>=</font> p2;
+                    f3 <font color='#5555FF'>=</font> f2;
+
+                    p2 <font color='#5555FF'>=</font> p1;
+                    f2 <font color='#5555FF'>=</font> f1;
+
+                    p1 <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>p1 <font color='#5555FF'>-</font> search_radius, begin<font face='Lucida Console'>)</font>;
+                    f1 <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>p1<font face='Lucida Console'>)</font>;
+
+                    search_radius <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+                <b>}</b>
+
+            <b>}</b>
+            <font color='#009900'>// otherwise f3 is small and we should take a step to the right
+</font>            <font color='#0000FF'>else</font> 
+            <b>{</b>
+                <font color='#009900'>// check if the minimum is butting up against the bounds and if so then pick
+</font>                <font color='#009900'>// a point between p2 and p3 in the hopes that shrinking the interval will
+</font>                <font color='#009900'>// be a good thing to do.  Or if p2 and p3 aren't differentiated then try and
+</font>                <font color='#009900'>// get them to obtain different values.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p3 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> end <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>f2 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> f3 <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>end<font color='#5555FF'>-</font>begin<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> search_radius<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    p1 <font color='#5555FF'>=</font> p2;
+                    f1 <font color='#5555FF'>=</font> f2;
+
+                    p2 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p3<font color='#5555FF'>+</font>p2<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2.0</font>;
+                    f2 <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>p2<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// pick a new point to the right of our current bracket
+</font>                    p1 <font color='#5555FF'>=</font> p2;
+                    f1 <font color='#5555FF'>=</font> f2;
+
+                    p2 <font color='#5555FF'>=</font> p3;
+                    f2 <font color='#5555FF'>=</font> f3;
+
+                    p3 <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>p3 <font color='#5555FF'>+</font> search_radius, end<font face='Lucida Console'>)</font>;
+                    f3 <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>p3<font face='Lucida Console'>)</font>;
+
+                    search_radius <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>f_evals;
+        <b>}</b>
+
+
+        <font color='#009900'>// Loop until we have done the max allowable number of iterations or
+</font>        <font color='#009900'>// the bracketing window is smaller than eps.
+</font>        <font color='#009900'>// Within this loop we maintain the invariant that: f1 &gt; f2 &lt; f3 and p1 &lt; p2 &lt; p3
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> tau <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>;
+        <font color='#0000FF'>while</font><font face='Lucida Console'>(</font> f_evals <font color='#5555FF'>&lt;</font> max_iter <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p3<font color='#5555FF'>-</font>p1 <font color='#5555FF'>&gt;</font> eps<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>double</u></font> p_min <font color='#5555FF'>=</font> <font color='#BB00BB'>lagrange_poly_min_extrap</font><font face='Lucida Console'>(</font>p1,p2,p3, f1,f2,f3<font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// make sure p_min isn't too close to the three points we already have
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p_min <font color='#5555FF'>&lt;</font> p2<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> min_dist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p2<font color='#5555FF'>-</font>p1<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>tau;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>p1<font color='#5555FF'>-</font>p_min<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> min_dist<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    p_min <font color='#5555FF'>=</font> p1 <font color='#5555FF'>+</font> min_dist;
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>p2<font color='#5555FF'>-</font>p_min<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> min_dist<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    p_min <font color='#5555FF'>=</font> p2 <font color='#5555FF'>-</font> min_dist;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> min_dist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p3<font color='#5555FF'>-</font>p2<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>tau;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>p2<font color='#5555FF'>-</font>p_min<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> min_dist<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    p_min <font color='#5555FF'>=</font> p2 <font color='#5555FF'>+</font> min_dist;
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>p3<font color='#5555FF'>-</font>p_min<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> min_dist<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    p_min <font color='#5555FF'>=</font> p3 <font color='#5555FF'>-</font> min_dist;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#009900'>// make sure one side of the bracket isn't super huge compared to the other
+</font>            <font color='#009900'>// side.  If it is then contract it.
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> bracket_ratio <font color='#5555FF'>=</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>p1<font color='#5555FF'>-</font>p2<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>p2<font color='#5555FF'>-</font>p3<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font> bracket_ratio <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bracket_ratio <font color='#5555FF'>&gt;</font> <font color='#979000'>0.1</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// Force p_min to be on a reasonable side.  But only if lagrange_poly_min_extrap()
+</font>                <font color='#009900'>// didn't put it on a good side already.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bracket_ratio <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p_min <font color='#5555FF'>&gt;</font> p2<font face='Lucida Console'>)</font>
+                    p_min <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p1<font color='#5555FF'>+</font>p2<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p_min <font color='#5555FF'>&lt;</font> p2<font face='Lucida Console'>)</font>
+                    p_min <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p2<font color='#5555FF'>+</font>p3<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+            <b>}</b>
+
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> f_min <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>p_min<font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// Remove one of the endpoints of our bracket depending on where the new point falls.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p_min <font color='#5555FF'>&lt;</font> p2<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>f1 <font color='#5555FF'>&gt;</font> f_min <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> f_min <font color='#5555FF'>&lt;</font> f2<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    p3 <font color='#5555FF'>=</font> p2;
+                    f3 <font color='#5555FF'>=</font> f2;
+                    p2 <font color='#5555FF'>=</font> p_min;
+                    f2 <font color='#5555FF'>=</font> f_min;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    p1 <font color='#5555FF'>=</font> p_min;
+                    f1 <font color='#5555FF'>=</font> f_min;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>f2 <font color='#5555FF'>&gt;</font> f_min <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> f_min <font color='#5555FF'>&lt;</font> f3<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    p1 <font color='#5555FF'>=</font> p2;
+                    f1 <font color='#5555FF'>=</font> f2;
+                    p2 <font color='#5555FF'>=</font> p_min;
+                    f2 <font color='#5555FF'>=</font> f_min;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    p3 <font color='#5555FF'>=</font> p_min;
+                    f3 <font color='#5555FF'>=</font> f_min;
+                <b>}</b>
+            <b>}</b>
+
+
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>f_evals;
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>f_evals <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> max_iter<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>optimize_single_variable_failure</font><font face='Lucida Console'>(</font>
+                "<font color='#CC0000'>The max number of iterations of single variable optimization have been reached\n</font>"
+                "<font color='#CC0000'>without converging.</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        starting_point <font color='#5555FF'>=</font> p2;
+        <font color='#0000FF'>return</font> f2;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> funct<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='negate_function_object'></a>negate_function_object</b> 
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='negate_function_object'></a>negate_function_object</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f_<font face='Lucida Console'>)</font> : f<font face='Lucida Console'>(</font>f_<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> funct<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> negate_function_object<font color='#5555FF'>&lt;</font>funct<font color='#5555FF'>&gt;</font> <b><a name='negate_function'></a>negate_function</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> negate_function_object<font color='#5555FF'>&lt;</font>funct<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> funct<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_max_single_variable'></a>find_max_single_variable</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f,
+        <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> starting_point,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> begin <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1e200</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> end <font color='#5555FF'>=</font> <font color='#979000'>1e200</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> eps <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>3</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> max_iter <font color='#5555FF'>=</font> <font color='#979000'>100</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> initial_search_radius <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#BB00BB'>find_min_single_variable</font><font face='Lucida Console'>(</font><font color='#BB00BB'>negate_function</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>, starting_point, begin, end, eps, max_iter, initial_search_radius<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_OPTIMIZATIOn_LINE_SEARCH_H_
+</font>
+
+</pre></body></html>

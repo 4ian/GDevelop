@@ -1,0 +1,399 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sequence_labeler_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SEQUENCE_LAbELER_ABSTRACT_H_h_
+<font color='#0000FF'>#ifdef</font> DLIB_SEQUENCE_LAbELER_ABSTRACT_H_h_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../optimization/find_max_factor_graph_viterbi_abstract.h.html'>../optimization/find_max_factor_graph_viterbi_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='example_feature_extractor'></a>example_feature_extractor</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object defines the interface a feature extractor must implement
+                if it is to be used with the sequence_labeler defined at the bottom
+                of this file.  
+                
+                The model used by sequence_labeler objects is the following.  
+                Given an input sequence x, predict an output label sequence y
+                such that:
+                    y == argmax_Y dot(w, PSI(x,Y))
+                    Where w is a parameter vector.
+
+                Therefore, a feature extractor defines how the PSI(x,y) feature vector 
+                is calculated.  It also defines how many output labels there are as 
+                well as the order of the model.  
+
+                Finally, note that PSI(x,y) is a sum of feature vectors, each derived 
+                from the entire input sequence x but only part of the label sequence y.
+                Each of these constituent feature vectors is defined by the get_features() 
+                method of this class.
+
+            THREAD SAFETY
+                Instances of this object are required to be threadsafe, that is, it should
+                be safe for multiple threads to make concurrent calls to the member
+                functions of this object.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#009900'>// This should be the type used to represent an input sequence.  It can be
+</font>        <font color='#009900'>// anything so long as it has a .size() which returns the length of the sequence.
+</font>        <font color='#0000FF'>typedef</font> the_type_used_to_represent_a_sequence sequence_type;
+
+        <b><a name='example_feature_extractor'></a>example_feature_extractor</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_features'></a>num_features</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the dimensionality of the PSI() feature vector.  
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='order'></a>order</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - This object represents a Markov model on the output labels.
+                  This parameter defines the order of the model.  That is, this 
+                  value controls how many previous label values get to be taken 
+                  into consideration when performing feature extraction for a
+                  particular element of the input sequence.  Note that the runtime
+                  of the algorithm is exponential in the order.  So don't make order
+                  very large.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_labels'></a>num_labels</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of possible output labels.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='reject_labeling'></a>reject_labeling</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sequence_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> y,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> position
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - EXP::type == unsigned long
+                  (i.e. y contains unsigned longs)
+                - position &lt; x.size()
+                - y.size() == min(position, order()) + 1
+                - is_vector(y) == true
+                - max(y) &lt; num_labels() 
+            ensures
+                - for all valid i:
+                    - interprets y(i) as the label corresponding to x[position-i]
+                - if (the labeling in y for x[position] is always the wrong labeling) then
+                    - returns true
+                      (note that reject_labeling() is just an optional tool to allow you 
+                      to overrule the normal labeling algorithm.  You don't have to use
+                      it.  So if you don't include a reject_labeling() method in your
+                      feature extractor it is the same as including one that always
+                      returns false.)
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> feature_setter, <font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_features'></a>get_features</b> <font face='Lucida Console'>(</font>
+            feature_setter<font color='#5555FF'>&amp;</font> set_feature,
+            <font color='#0000FF'>const</font> sequence_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> y,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> position
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - EXP::type == unsigned long
+                  (i.e. y contains unsigned longs)
+                - reject_labeling(x,y,position) == false
+                - position &lt; x.size()
+                - y.size() == min(position, order()) + 1
+                - is_vector(y) == true
+                - max(y) &lt; num_labels() 
+                - set_feature is a function object which allows expressions of the form:
+                    - set_features((unsigned long)feature_index, (double)feature_value);
+                    - set_features((unsigned long)feature_index);
+            ensures
+                - for all valid i:
+                    - interprets y(i) as the label corresponding to x[position-i]
+                - This function computes the part of PSI() corresponding to the x[position]
+                  element of the input sequence.  Moreover, this part of PSI() is returned as 
+                  a sparse vector by invoking set_feature().  For example, to set the feature 
+                  with an index of 55 to the value of 1 this method would call:
+                    set_feature(55);
+                  Or equivalently:
+                    set_feature(55,1);
+                  Therefore, the first argument to set_feature is the index of the feature 
+                  to be set while the second argument is the value the feature should take.
+                  Additionally, note that calling set_feature() multiple times with the same 
+                  feature index does NOT overwrite the old value, it adds to the previous 
+                  value.  For example, if you call set_feature(55) 3 times then it will
+                  result in feature 55 having a value of 3.
+                - This function only calls set_feature() with feature_index values &lt; num_features()
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_nonnegative_weights'></a>num_nonnegative_weights</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of elements of the w parameter vector which should be
+                  non-negative.  That is, this feature extractor is intended to be used
+                  with w vectors where the first num_nonnegative_weights() elements of w
+                  are &gt;= 0.  That is, it should be the case that w(i) &gt;= 0 for all i &lt;
+                  num_nonnegative_weights().
+                - Note that num_nonnegative_weights() is just an optional method to allow
+                  you to tell a tool like the structural_sequence_labeling_trainer that the
+                  learned w should have a certain number of non-negative elements.
+                  Therefore, if you do not provide a num_nonnegative_weights() method in
+                  your feature extractor then it will default to a value of 0, indicating
+                  that all elements of the w parameter vector may be any value.
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> example_feature_extractor<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>
+        example_feature_extractor<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='contains_invalid_labeling'></a>contains_invalid_labeling</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> fe,
+        <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> feature_extractor::sequence_type<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> y
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - feature_extractor must be an object that implements an interface compatible 
+              with the example_feature_extractor discussed above.
+        ensures
+            - if (x.size() != y.size() ||
+                fe.reject_labeling() rejects any of the labels in y) then
+                - returns true
+            - else
+                - returns false
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='contains_invalid_labeling'></a>contains_invalid_labeling</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> fe,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> feature_extractor::sequence_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> y
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - feature_extractor must be an object that implements an interface compatible 
+              with the example_feature_extractor discussed above.
+        ensures
+            - if (x.size() != y.size() ||
+                contains_invalid_labeling(fe,x[i],y[i]) == true for some i ) then
+                - returns true
+            - else
+                - returns false
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='sequence_labeler'></a>sequence_labeler</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON feature_extractor
+                It must be an object that implements an interface compatible with 
+                the example_feature_extractor discussed above.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for doing sequence labeling.  In particular, it is
+                capable of representing sequence labeling models such as those produced by
+                Hidden Markov SVMs or Chain Structured Conditional Random fields.  See the
+                following papers for an introduction to these techniques:
+                    - Hidden Markov Support Vector Machines by 
+                      Y. Altun, I. Tsochantaridis, T. Hofmann
+                    - Shallow Parsing with Conditional Random Fields by 
+                      Fei Sha and Fernando Pereira
+
+
+                The model used by this object is the following.  Given
+                an input sequence x, predict an output label sequence y
+                such that:
+                    y == argmax_Y dot(get_weights(), PSI(x,Y))
+                    Where PSI() is defined by the feature_extractor template
+                    argument.  
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    It is safe to call the const members of this object from multiple
+                    threads so long as the feature_extractor is also threadsafe.  This is
+                    because the const members are purely read-only operations.  However,
+                    any operation that modifies a sequence_labeler is not threadsafe.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> feature_extractor::sequence_type sample_sequence_type;
+        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> labeled_sequence_type;
+
+        <b><a name='sequence_labeler'></a>sequence_labeler</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_feature_extractor() == feature_extractor() 
+                  (i.e. it will have its default value)
+                - #get_weights().size() == #get_feature_extractor().num_features()
+                - #get_weights() == 0
+        !*/</font>
+
+        <font color='#0000FF'>explicit</font> <b><a name='sequence_labeler'></a>sequence_labeler</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> weights
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - feature_extractor().num_features() == weights.size()
+            ensures
+                - #get_feature_extractor() == feature_extractor() 
+                  (i.e. it will have its default value)
+                - #get_weights() == weights
+        !*/</font>
+
+        <b><a name='sequence_labeler'></a>sequence_labeler</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> weights,
+            <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> fe
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - fe.num_features() == weights.size()
+            ensures
+                - #get_feature_extractor() == fe
+                - #get_weights() == weights
+        !*/</font>
+
+        <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> <b><a name='get_feature_extractor'></a>get_feature_extractor</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the feature extractor used by this object
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_weights'></a>get_weights</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the parameter vector associated with this sequence labeler. 
+                  The length of the vector is get_feature_extractor().num_features().  
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_labels'></a>num_labels</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns get_feature_extractor().num_labels()
+                  (i.e. returns the number of possible output labels for each 
+                  element of a sequence)
+        !*/</font>
+
+        labeled_sequence_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_sequence_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - num_labels() &gt; 0
+            ensures
+                - returns a vector Y of label values such that:
+                    - Y.size() == x.size()
+                    - for all valid i: 
+                        - Y[i] == the predicted label for x[i]
+                        - 0 &lt;= Y[i] &lt; num_labels()
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='label_sequence'></a>label_sequence</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_sequence_type<font color='#5555FF'>&amp;</font> x,
+            labeled_sequence_type<font color='#5555FF'>&amp;</font> y
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - num_labels() &gt; 0
+            ensures
+                - #y == (*this)(x)
+                  (i.e. This is just another interface to the operator() routine
+                  above.  This one avoids returning the results by value and therefore
+                  might be a little faster in some cases)
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> sequence_labeler<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        sequence_labeler<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SEQUENCE_LAbELER_ABSTRACT_H_h_
+</font>
+
+
+</pre></body></html>

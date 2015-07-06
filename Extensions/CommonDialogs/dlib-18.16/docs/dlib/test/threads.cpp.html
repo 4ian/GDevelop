@@ -1,0 +1,131 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - threads.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>misc_api.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>threads.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.threads</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>class</font> <b><a name='threads_tester'></a>threads_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='threads_tester'></a>threads_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_threads</font>",
+                    "<font color='#CC0000'>Runs tests on the threads component.</font>"<font face='Lucida Console'>)</font>,
+            sm<font face='Lucida Console'>(</font>cm<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        thread_specific_data<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> tsd;
+        rmutex cm;
+        rsignaler sm;
+        <font color='#0000FF'><u>int</u></font> count;
+        <font color='#0000FF'><u>bool</u></font> failure;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            failure <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+            count <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>create_new_thread<font color='#5555FF'>&lt;</font>threads_tester,<font color='#5555FF'>&amp;</font>threads_tester::thread1<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> failure <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>create_new_thread<font color='#5555FF'>&lt;</font>threads_tester,<font color='#5555FF'>&amp;</font>threads_tester::thread2<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> failure <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>create_new_thread<font color='#5555FF'>&lt;</font>threads_tester,<font color='#5555FF'>&amp;</font>threads_tester::thread3<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> failure <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>create_new_thread<font color='#5555FF'>&lt;</font>threads_tester,<font color='#5555FF'>&amp;</font>threads_tester::thread4<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> failure <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>create_new_thread<font color='#5555FF'>&lt;</font>threads_tester,<font color='#5555FF'>&amp;</font>threads_tester::thread5<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> failure <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>create_new_thread<font color='#5555FF'>&lt;</font>threads_tester,<font color='#5555FF'>&amp;</font>threads_tester::thread6<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> failure <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>create_new_thread<font color='#5555FF'>&lt;</font>threads_tester,<font color='#5555FF'>&amp;</font>threads_tester::thread7<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> failure <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>create_new_thread<font color='#5555FF'>&lt;</font>threads_tester,<font color='#5555FF'>&amp;</font>threads_tester::thread8<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> failure <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>create_new_thread<font color='#5555FF'>&lt;</font>threads_tester,<font color='#5555FF'>&amp;</font>threads_tester::thread9<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> failure <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>create_new_thread<font color='#5555FF'>&lt;</font>threads_tester,<font color='#5555FF'>&amp;</font>threads_tester::thread10<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> failure <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+            <font color='#BB00BB'>thread</font><font face='Lucida Console'>(</font><font color='#979000'>66</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// this should happen in the main program thread
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_dlib_thread</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                failure <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+            auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>cm<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>failure<font face='Lucida Console'>)</font>
+                sm.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>failure<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread_end_handler'></a>thread_end_handler</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>cm<font face='Lucida Console'>)</font>;
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>count;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                sm.<font color='#BB00BB'>signal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread1'></a>thread1</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>thread</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread2'></a>thread2</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>thread</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_dlib_thread</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                failure <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread3'></a>thread3</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>thread</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread4'></a>thread4</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>thread</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread5'></a>thread5</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>thread</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread6'></a>thread6</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>thread</font><font face='Lucida Console'>(</font><font color='#979000'>6</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread7'></a>thread7</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>thread</font><font face='Lucida Console'>(</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread8'></a>thread8</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>thread</font><font face='Lucida Console'>(</font><font color='#979000'>8</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread9'></a>thread9</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>thread</font><font face='Lucida Console'>(</font><font color='#979000'>9</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread10'></a>thread10</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>thread</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread'></a>thread</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> num
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>starting thread num </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_dlib_thread</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>register_thread_end_handler</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>threads_tester::thread_end_handler<font face='Lucida Console'>)</font>;
+            tsd.<font color='#BB00BB'>data</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> num;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>0x3FFFF</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>&amp;</font><font color='#979000'>0xFFF</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#009900'>// if this isn't equal to num then there is a problem with the thread specific data stuff
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tsd.<font color='#BB00BB'>data</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> num<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>cm<font face='Lucida Console'>)</font>;
+                    failure <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    sm.<font color='#BB00BB'>signal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>ending of thread num </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num;
+
+        <b>}</b>
+    <b>}</b> a;
+
+
+<b>}</b>
+
+
+
+
+</pre></body></html>

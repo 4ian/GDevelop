@@ -1,0 +1,126 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - threaded_object_extension.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_THREADED_OBJECT_EXTENSIOn_
+<font color='#0000FF'>#define</font> DLIB_THREADED_OBJECT_EXTENSIOn_ 
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threaded_object_extension_abstract.h.html'>threaded_object_extension_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel.h.html'>threads_kernel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='auto_mutex_extension.h.html'>auto_mutex_extension.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='threaded_object'></a>threaded_object</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - is_running_ == false
+                - is_alive_ == false 
+                - should_stop_ == false
+                - should_respawn_ == false
+
+#ifdef ENABLE_ASSERTS
+                - id_valid == false 
+                - id1 == get_main_thread_id()
+#endif
+
+            CONVENTION
+                - is_running() == is_running_
+                - is_alive() == is_alive_
+                - should_stop() == should_stop_
+                - should_respawn() == should_respawn_
+
+
+#ifdef ENABLE_ASSERTS
+                - if (when thread() is executing) then
+                    - id1 == the id of the running thread 
+                    - id_valid == true
+                - else
+                    - id1 == an undefined value
+                    - id_valid == false
+#endif
+
+                - m_ == the mutex used to protect all our variables
+                - s == the signaler for m_
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='threaded_object'></a>threaded_object</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='threaded_object'></a>threaded_object</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_running'></a>is_running</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_alive'></a>is_alive</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='wait'></a>wait</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='start'></a>start</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='restart'></a>restart</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_respawn'></a>set_respawn</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='should_respawn'></a>should_respawn</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='pause'></a>pause</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='stop'></a>stop</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>protected</font>:
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='should_stop'></a>should_stop</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread_helper'></a>thread_helper</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='thread'></a>thread</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        mutex m_;
+        signaler s;
+        thread_id_type id1;
+        <font color='#0000FF'><u>bool</u></font> is_running_;
+        <font color='#0000FF'><u>bool</u></font> is_alive_;
+        <font color='#0000FF'><u>bool</u></font> should_stop_;
+        <font color='#0000FF'><u>bool</u></font> should_respawn_;
+        <font color='#0000FF'><u>bool</u></font> id_valid;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='threaded_object'></a>threaded_object</b><font face='Lucida Console'>(</font>threaded_object<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        threaded_object<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>threaded_object<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threaded_object_extension.cpp.html'>threaded_object_extension.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_THREADED_OBJECT_EXTENSIOn_
+</font>
+
+
+</pre></body></html>

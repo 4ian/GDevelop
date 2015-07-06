@@ -5,7 +5,7 @@ Copyright (c) 2011-2012 Thomas Flecy
 This project is released under the MIT License.
 */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #include "SoundObjectEditor.h"
 

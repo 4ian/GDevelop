@@ -1,0 +1,93 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sockstreambuf_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use of the sockets and sockstreambuf
+    components from the dlib C++ Library.  Note that there is also an
+    iosockstream object in dlib that is often simpler to use, see
+    <a href="iosockstream_ex.cpp.html">iosockstream_ex.cpp</a> for an example of its use.
+
+    This program simply connects to www.google.com at port 80 and requests the
+    main Google web page.  It then prints what it gets back from Google to the
+    screen.
+
+
+    For those of you curious about HTTP check out the excellent introduction at
+    http://www.jmarshall.com/easy/http/
+*/</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>sockets.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>sockstreambuf.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// Connect to Google's web server which listens on port 80.  If this
+</font>        <font color='#009900'>// fails it will throw a dlib::socket_error exception.  Note that we
+</font>        <font color='#009900'>// are using a smart pointer here to contain the connection pointer
+</font>        <font color='#009900'>// returned from connect.  Doing this ensures that the connection
+</font>        <font color='#009900'>// is deleted even if someone throws an exception somewhere in your code.
+</font>        scoped_ptr<font color='#5555FF'>&lt;</font>connection<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>con</font><font face='Lucida Console'>(</font><font color='#BB00BB'>connect</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>www.google.com</font>",<font color='#979000'>80</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        <b>{</b>
+            <font color='#009900'>// Create a stream buffer for our connection
+</font>            sockstreambuf <font color='#BB00BB'>buf</font><font face='Lucida Console'>(</font>con<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// Now stick that stream buffer into an iostream object
+</font>            iostream <font color='#BB00BB'>stream</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>buf<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// This command causes the iostream to flush its output buffers
+</font>            <font color='#009900'>// whenever someone makes a read request. 
+</font>            buf.<font color='#BB00BB'>flush_output_on_read</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Now we make the HTTP GET request for the main Google page.
+</font>            stream <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>GET / HTTP/1.0\r\n\r\n</font>";
+
+            <font color='#009900'>// Here we print each character we get back one at a time. 
+</font>            <font color='#0000FF'><u>int</u></font> ch <font color='#5555FF'>=</font> stream.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+            <b>{</b>
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font>ch;
+                ch <font color='#5555FF'>=</font> stream.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>// At the end of this scope buf will be destructed and flush 
+</font>            <font color='#009900'>// anything it still contains to the connection.  Thus putting
+</font>            <font color='#009900'>// this } here makes it safe to destroy the connection later on.
+</font>            <font color='#009900'>// If we just destroyed the connection before buf was destructed
+</font>            <font color='#009900'>// then buf might try to flush its data to a closed connection
+</font>            <font color='#009900'>// which would be an error.
+</font>        <b>}</b>
+
+        <font color='#009900'>// Here we call close_gracefully().  It takes a connection and performs
+</font>        <font color='#009900'>// a proper TCP shutdown by sending a FIN packet to the other end of the 
+</font>        <font color='#009900'>// connection and waiting half a second for the other end to close the 
+</font>        <font color='#009900'>// connection as well.  If half a second goes by without the other end 
+</font>        <font color='#009900'>// responding then the connection is forcefully shutdown and deleted.  
+</font>        <font color='#009900'>// 
+</font>        <font color='#009900'>// You usually want to perform a graceful shutdown of your TCP connections 
+</font>        <font color='#009900'>// because there might be some data you tried to send that is still buffered 
+</font>        <font color='#009900'>// in the operating system's output buffers.  If you just killed the 
+</font>        <font color='#009900'>// connection it might not be sent to the other side (although maybe 
+</font>        <font color='#009900'>// you don't care, and in the case of this example it doesn't really matter.  
+</font>        <font color='#009900'>// But I'm only putting this here for the purpose of illustration :-).  
+</font>        <font color='#009900'>// In any case, this function is provided to allow you to perform a graceful 
+</font>        <font color='#009900'>// close if you so choose.  
+</font>        <font color='#009900'>// 
+</font>        <font color='#009900'>// Also note that the timeout can be changed by suppling an optional argument 
+</font>        <font color='#009900'>// to this function.
+</font>        <font color='#BB00BB'>close_gracefully</font><font face='Lucida Console'>(</font>con<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+
+
+</pre></body></html>

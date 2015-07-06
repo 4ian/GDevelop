@@ -5,6 +5,7 @@ Copyright (c) 2014-2015 Victor Levasseur (victorlevasseur52@gmail.com)
 This project is released under the MIT License.
 */
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "TileEditor.h"
 
 #include <algorithm>
@@ -304,3 +305,4 @@ void TileEditor::OnPreviewMotion(wxMouseEvent& event)
 
     m_tilePreviewPanel->Refresh();
 }
+#endif

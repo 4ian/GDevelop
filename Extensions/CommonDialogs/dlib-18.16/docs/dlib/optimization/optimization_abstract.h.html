@@ -1,0 +1,471 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - optimization_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_OPTIMIZATIOn_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_OPTIMIZATIOn_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='optimization_search_strategies_abstract.h.html'>optimization_search_strategies_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='optimization_stop_strategies_abstract.h.html'>optimization_stop_strategies_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='optimization_line_search_abstract.h.html'>optimization_line_search_abstract.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                    Functions that transform other functions  
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> central_differences;
+    <font color='#009900'>/*!
+        This is a function object that represents the derivative of some other
+        function. 
+
+        Note that if funct is a function of a double then the derivative of 
+        funct is just a double but if funct is a function of a dlib::matrix (i.e. a
+        function of many variables) then its derivative is a gradient vector (a column
+        vector in particular).
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> central_differences<font color='#5555FF'>&lt;</font>funct<font color='#5555FF'>&gt;</font> <b><a name='derivative'></a>derivative</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'><u>double</u></font> eps
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - f == a function that returns a scalar
+            - f must have one of the following forms:
+                - double f(double)
+                - double f(dlib::matrix)  (where the matrix is a column vector)
+                - double f(T, dlib::matrix)  (where the matrix is a column vector.  In 
+                  this case the derivative of f is taken with respect to the second argument.)
+            - eps &gt; 0
+        ensures
+            - returns a function that represents the derivative of the function f.  It
+              is approximated numerically by:
+                  (f(x+eps)-f(x-eps))/(2*eps)
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> central_differences<font color='#5555FF'>&lt;</font>funct<font color='#5555FF'>&gt;</font> <b><a name='derivative'></a>derivative</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns derivative(f, 1e-7)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> EXP1, 
+        <font color='#0000FF'>typename</font> EXP2
+        <font color='#5555FF'>&gt;</font>
+    clamped_function_object<font color='#5555FF'>&lt;</font>funct,EXP1,EXP2<font color='#5555FF'>&gt;</font> <b><a name='clamp_function'></a>clamp_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x_lower,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x_upper 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - f == a function that takes a matrix and returns a scalar value.  Moreover, f
+              must be capable of taking in matrices with the same dimensions as x_lower and
+              x_upper.  So f(x_lower) must be a valid expression that evaluates to a scalar
+              value.
+            - x_lower.nr() == x_upper.nr() &amp;&amp; x_lower.nc() == x_upper.nc()
+              (i.e. x_lower and x_upper must have the same dimensions)
+            - x_lower and x_upper must contain the same type of elements.
+        ensures
+            - returns a function object that represents the function g(x) where
+              g(x) == f(clamp(x,x_lower,x_upper))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                    Functions that perform unconstrained optimization 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> search_strategy_type,
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> funct_der, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_min'></a>find_min</b> <font face='Lucida Console'>(</font>
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> funct_der<font color='#5555FF'>&amp;</font> der, 
+        T<font color='#5555FF'>&amp;</font> x, 
+        <font color='#0000FF'><u>double</u></font> min_f
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - search_strategy == an object that defines a search strategy such as one 
+              of the objects from dlib/optimization/optimization_search_strategies_abstract.h
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
+            - f(x) must be a valid expression that evaluates to a double
+            - der(x) must be a valid expression that evaluates to the derivative of f() at x.
+            - is_col_vector(x) == true
+        ensures
+            - Performs an unconstrained minimization of the function f() using the given
+              search_strategy and starting from the initial point x.  
+            - The function is optimized until stop_strategy decides that an acceptable 
+              point has been found or f(#x) &lt; min_f.
+            - #x == the value of x that was found to minimize f()
+            - returns f(#x). 
+            - When this function makes calls to f() and der() it always does so by
+              first calling f() and then calling der().  That is, these two functions
+              are always called in pairs with f() being called first and then der()
+              being called second.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> search_strategy_type,
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> funct_der, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_max'></a>find_max</b> <font face='Lucida Console'>(</font>
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> funct_der<font color='#5555FF'>&amp;</font> der, 
+        T<font color='#5555FF'>&amp;</font> x, 
+        <font color='#0000FF'><u>double</u></font> max_f
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - search_strategy == an object that defines a search strategy such as one 
+              of the objects from dlib/optimization/optimization_search_strategies_abstract.h
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
+            - f(x) must be a valid expression that evaluates to a double
+            - der(x) must be a valid expression that evaluates to the derivative of f() at x.
+            - is_col_vector(x) == true
+        ensures
+            - Performs an unconstrained maximization of the function f() using the given
+              search_strategy and starting from the initial point x.  
+            - The function is optimized until stop_strategy decides that an acceptable 
+              point has been found or f(#x) &gt; max_f.
+            - #x == the value of x that was found to maximize f()
+            - returns f(#x). 
+            - When this function makes calls to f() and der() it always does so by
+              first calling f() and then calling der().  That is, these two functions
+              are always called in pairs with f() being called first and then der()
+              being called second.
+            - Note that this function solves the maximization problem by converting it 
+              into a minimization problem.  Therefore, the values of f and its derivative
+              reported to the stopping strategy will be negated.  That is, stop_strategy
+              will see -f() and -der().  All this really means is that the status messages
+              from a stopping strategy in verbose mode will display a negated objective
+              value.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> search_strategy_type,
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_min_using_approximate_derivatives'></a>find_min_using_approximate_derivatives</b> <font face='Lucida Console'>(</font>
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f,
+        T<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'><u>double</u></font> min_f,
+        <font color='#0000FF'><u>double</u></font> derivative_eps <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - search_strategy == an object that defines a search strategy such as one 
+              of the objects from dlib/optimization/optimization_search_strategies_abstract.h
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
+            - f(x) must be a valid expression that evaluates to a double
+            - is_col_vector(x) == true
+            - derivative_eps &gt; 0 
+        ensures
+            - Performs an unconstrained minimization of the function f() using the given
+              search_strategy and starting from the initial point x.  
+            - The function is optimized until stop_strategy decides that an acceptable 
+              point has been found or f(#x) &lt; min_f.
+            - #x == the value of x that was found to minimize f()
+            - returns f(#x). 
+            - Uses the dlib::derivative(f,derivative_eps) function to compute gradient
+              information.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> search_strategy_type,
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_max_using_approximate_derivatives'></a>find_max_using_approximate_derivatives</b> <font face='Lucida Console'>(</font>
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f,
+        T<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'><u>double</u></font> max_f,
+        <font color='#0000FF'><u>double</u></font> derivative_eps <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - search_strategy == an object that defines a search strategy such as one 
+              of the objects from dlib/optimization/optimization_search_strategies_abstract.h
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
+            - f(x) must be a valid expression that evaluates to a double
+            - is_col_vector(x) == true
+            - derivative_eps &gt; 0 
+        ensures
+            - Performs an unconstrained maximization of the function f() using the given
+              search_strategy and starting from the initial point x.  
+            - The function is optimized until stop_strategy decides that an acceptable 
+              point has been found or f(#x) &gt; max_f.
+            - #x == the value of x that was found to maximize f()
+            - returns f(#x). 
+            - Uses the dlib::derivative(f,derivative_eps) function to compute gradient
+              information.
+            - Note that this function solves the maximization problem by converting it 
+              into a minimization problem.  Therefore, the values of f and its derivative
+              reported to the stopping strategy will be negated.  That is, stop_strategy
+              will see -f() and -der().  All this really means is that the status messages
+              from a stopping strategy in verbose mode will display a negated objective
+              value.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                  Functions that perform box constrained optimization 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> search_strategy_type,
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> funct_der, 
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> EXP1,
+        <font color='#0000FF'>typename</font> EXP2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_min_box_constrained'></a>find_min_box_constrained</b> <font face='Lucida Console'>(</font>
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> funct_der<font color='#5555FF'>&amp;</font> der, 
+        T<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x_lower,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x_upper
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - search_strategy == an object that defines a search strategy such as one 
+              of the objects from dlib/optimization/optimization_search_strategies_abstract.h
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
+            - f(x) must be a valid expression that evaluates to a double
+            - der(x) must be a valid expression that evaluates to the derivative of f() at x.
+            - is_col_vector(x) == true
+            - is_col_vector(x_lower) == true
+            - is_col_vector(x_upper) == true
+            - x.size() == x_lower.size() == x_upper.size()
+              (i.e. x, x_lower, and x_upper need to all be column vectors of the same dimensionality)
+            - min(x_upper-x_lower) &gt; 0
+              (i.e. x_upper must contain upper bounds relative to x_lower)
+        ensures
+            - Performs a box constrained minimization of the function f() using the given
+              search_strategy and starting from the initial point x.  That is, we try to
+              find the x value that minimizes f(x) but is also within the box constraints 
+              specified by x_lower and x_upper.  That is, we ensure that #x satisfies: 
+                - min(#x - x_lower) &gt;= 0 &amp;&amp; min(x_upper - #x) &gt;= 0
+            - This function uses a backtracking line search along with a gradient projection
+              step to handle the box constraints.
+            - The function is optimized until stop_strategy decides that an acceptable
+              point has been found. 
+            - #x == the value of x that was found to minimize f() within the given box
+              constraints.
+            - returns f(#x). 
+            - The last call to f() will be made with f(#x).  
+            - When calling f() and der(), the input passed to them will always be inside
+              the box constraints defined by x_lower and x_upper.
+            - When calling der(x), it will always be the case that the last call to f() was
+              made with the same x value.  This means that you can reuse any intermediate
+              results from the previous call to f(x) inside der(x) rather than recomputing
+              them inside der(x).
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> search_strategy_type,
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> funct_der, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_min_box_constrained'></a>find_min_box_constrained</b> <font face='Lucida Console'>(</font>
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> funct_der<font color='#5555FF'>&amp;</font> der, 
+        T<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> x_lower,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> x_upper
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - search_strategy == an object that defines a search strategy such as one 
+              of the objects from dlib/optimization/optimization_search_strategies_abstract.h
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
+            - f(x) must be a valid expression that evaluates to a double
+            - der(x) must be a valid expression that evaluates to the derivative of f() at x.
+            - is_col_vector(x) == true
+            - x_lower &lt; x_upper
+        ensures
+            - This function is identical to find_min_box_constrained() as defined above
+              except that it takes x_lower and x_upper as doubles rather than column
+              vectors.  In this case, all variables have the same lower bound of x_lower
+              and similarly have the same upper bound of x_upper.  Therefore, this is just
+              a convenience function for calling find_max_box_constrained() when all
+              variables have the same bound constraints.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> search_strategy_type,
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> funct_der, 
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> EXP1,
+        <font color='#0000FF'>typename</font> EXP2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_max_box_constrained'></a>find_max_box_constrained</b> <font face='Lucida Console'>(</font>
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> funct_der<font color='#5555FF'>&amp;</font> der, 
+        T<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x_lower,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x_upper
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - search_strategy == an object that defines a search strategy such as one 
+              of the objects from dlib/optimization/optimization_search_strategies_abstract.h
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
+            - f(x) must be a valid expression that evaluates to a double
+            - der(x) must be a valid expression that evaluates to the derivative of f() at x.
+            - is_col_vector(x) == true
+            - is_col_vector(x_lower) == true
+            - is_col_vector(x_upper) == true
+            - x.size() == x_lower.size() == x_upper.size()
+              (i.e. x, x_lower, and x_upper need to all be column vectors of the same dimensionality)
+            - min(x_upper-x_lower) &gt; 0
+              (i.e. x_upper must contain upper bounds relative to x_lower)
+        ensures
+            - Performs a box constrained maximization of the function f() using the given
+              search_strategy and starting from the initial point x.  That is, we try to
+              find the x value that maximizes f(x) but is also within the box constraints 
+              specified by x_lower and x_upper.  That is, we ensure that #x satisfies: 
+                - min(#x - x_lower) &gt;= 0 &amp;&amp; min(x_upper - #x) &gt;= 0
+            - This function uses a backtracking line search along with a gradient projection
+              step to handle the box constraints.
+            - The function is optimized until stop_strategy decides that an acceptable
+              point has been found. 
+            - #x == the value of x that was found to maximize f() within the given box
+              constraints.
+            - returns f(#x). 
+            - The last call to f() will be made with f(#x).  
+            - When calling f() and der(), the input passed to them will always be inside
+              the box constraints defined by x_lower and x_upper.
+            - When calling der(x), it will always be the case that the last call to f() was
+              made with the same x value.  This means that you can reuse any intermediate
+              results from the previous call to f(x) inside der(x) rather than recomputing
+              them inside der(x).
+            - Note that this function solves the maximization problem by converting it 
+              into a minimization problem.  Therefore, the values of f and its derivative
+              reported to the stopping strategy will be negated.  That is, stop_strategy
+              will see -f() and -der().  All this really means is that the status messages
+              from a stopping strategy in verbose mode will display a negated objective
+              value.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> search_strategy_type,
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> funct_der, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_max_box_constrained'></a>find_max_box_constrained</b> <font face='Lucida Console'>(</font>
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> funct_der<font color='#5555FF'>&amp;</font> der, 
+        T<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> x_lower,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> x_upper
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - search_strategy == an object that defines a search strategy such as one 
+              of the objects from dlib/optimization/optimization_search_strategies_abstract.h
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
+            - f(x) must be a valid expression that evaluates to a double
+            - der(x) must be a valid expression that evaluates to the derivative of f() at x.
+            - is_col_vector(x) == true
+            - x_lower &lt; x_upper
+        ensures
+            - This function is identical to find_max_box_constrained() as defined above
+              except that it takes x_lower and x_upper as doubles rather than column
+              vectors.  In this case, all variables have the same lower bound of x_lower
+              and similarly have the same upper bound of x_upper.  Therefore, this is just
+              a convenience function for calling find_max_box_constrained() when all
+              variables have the same bound constraints.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_OPTIMIZATIOn_ABSTRACT_
+</font>
+
+
+
+</pre></body></html>

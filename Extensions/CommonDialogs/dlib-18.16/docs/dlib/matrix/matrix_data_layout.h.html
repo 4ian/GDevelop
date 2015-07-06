@@ -1,0 +1,909 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - matrix_data_layout.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MATRIx_DATA_LAYOUT_
+<font color='#0000FF'>#define</font> DLIB_MATRIx_DATA_LAYOUT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_fwd.h.html'>matrix_fwd.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_data_layout_abstract.h.html'>matrix_data_layout_abstract.h</a>"
+
+<font color='#009900'>// GCC 4.8 gives false alarms about some matrix operations going out of bounds.  Disable
+</font><font color='#009900'>// these false warnings.
+</font><font color='#0000FF'>#if</font> <font face='Lucida Console'>(</font> defined<font face='Lucida Console'>(</font>__GNUC__<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> __GNUC__ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> __GNUC_MINOR__ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+    <font color='#0000FF'>#pragma</font> GCC diagnostic ignored "<font color='#CC0000'>-Warray-bounds</font>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>/*!
+        A matrix layout object is any object that contains a templated class called "layout"
+        with an interface identical to one below:
+        (Note that all the template arguments are just the template arguments from the dlib::matrix 
+        object and the member functions are defined identically to the ones with the same 
+        signatures inside the matrix object.)
+
+        struct matrix_layout
+        {
+            template &lt;
+                typename T,
+                long num_rows,
+                long num_cols,
+                typename mem_manager
+                &gt;
+            class layout 
+            {
+            public:
+
+                T&amp; operator() (
+                    long r, 
+                    long c
+                );
+
+                const T&amp; operator() (
+                    long r, 
+                    long c
+                );
+
+                T&amp; operator() (
+                    long i 
+                );
+
+                const T&amp; operator() (
+                    long i
+                ) const;
+
+                void swap(
+                    layout&amp; item
+                );
+
+                long nr (
+                ) const;
+
+                long nc (
+                ) const;
+
+                void set_size (
+                    long nr_,
+                    long nc_
+                );
+            };
+        };
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='row_major_layout'></a>row_major_layout</b>
+    <b>{</b>
+        <font color='#009900'>// if a matrix is bigger than this many bytes then don't put it on the stack
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>size_t</u></font> max_stack_based_size <font color='#5555FF'>=</font> <font color='#979000'>256</font>;
+
+        <font color='#009900'>// this is a hack to avoid a compile time error in visual studio 8.  I would just 
+</font>        <font color='#009900'>// use sizeof(T) and be done with it but that won't compile.  The idea here 
+</font>        <font color='#009900'>// is to avoid using the stack allocation of the layout object if it 
+</font>        <font color='#009900'>// is going to contain another matrix and also avoid asking for the sizeof()
+</font>        <font color='#009900'>// the contained matrix.
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='get_sizeof_helper'></a>get_sizeof_helper</b>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> std::<font color='#0000FF'><u>size_t</u></font> val <font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font>;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR, <font color='#0000FF'><u>long</u></font> NC, <font color='#0000FF'>typename</font> mm, <font color='#0000FF'>typename</font> l<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='get_sizeof_helper'></a>get_sizeof_helper</b><font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font>T,NR,NC,mm,l<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> std::<font color='#0000FF'><u>size_t</u></font> val <font color='#5555FF'>=</font> <font color='#979000'>1000000</font>;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'><u>long</u></font> num_rows,
+            <font color='#0000FF'><u>long</u></font> num_cols,
+            <font color='#0000FF'>typename</font> mem_manager,
+            <font color='#0000FF'><u>int</u></font> val <font color='#5555FF'>=</font> static_switch <font color='#5555FF'>&lt;</font>
+                <font color='#009900'>// when the sizes are all non zero and small
+</font>                <font face='Lucida Console'>(</font>num_rows<font color='#5555FF'>*</font>num_cols<font color='#5555FF'>*</font>get_sizeof_helper<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::val <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> max_stack_based_size<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>num_rows <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_cols <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            <font color='#009900'>// when the sizes are all non zero and big 
+</font>            <font face='Lucida Console'>(</font>num_rows<font color='#5555FF'>*</font>num_cols<font color='#5555FF'>*</font>get_sizeof_helper<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::val <font color='#5555FF'>&gt;</font>  max_stack_based_size<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>num_rows <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_cols <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            num_rows <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_cols <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            num_rows <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_cols <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            num_rows <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_cols <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>
+            <font color='#5555FF'>&gt;</font>::value
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> layout ;
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents the actual allocation of space for a matrix.
+                Small matrices allocate all their data on the stack and bigger ones
+                use a memory_manager to get their memory.
+        !*/</font>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'><u>long</u></font> num_rows,
+            <font color='#0000FF'><u>long</u></font> num_cols,
+            <font color='#0000FF'>typename</font> mem_manager
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='layout'></a>layout</b><font color='#5555FF'>&lt;</font>T,num_rows,num_cols,mem_manager,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> : noncopyable <font color='#009900'>// when the sizes are all non zero and small
+</font>        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> num_rows;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> num_cols;
+
+            <b><a name='layout'></a>layout</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> r, 
+                <font color='#0000FF'><u>long</u></font> c
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>+</font>r<font color='#5555FF'>*</font>num_cols <font color='#5555FF'>+</font> c<font face='Lucida Console'>)</font>; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> r, 
+                <font color='#0000FF'><u>long</u></font> c
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>+</font>r<font color='#5555FF'>*</font>num_cols <font color='#5555FF'>+</font> c<font face='Lucida Console'>)</font>; <b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> i 
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> data[i]; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> i
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data[i]; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+                layout<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> num_rows; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> num_cols; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>,<font color='#BB00BB'>item</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_rows; <b>}</b>
+
+            <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_cols; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> ,
+                <font color='#0000FF'><u>long</u></font> 
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+            T data[num_rows<font color='#5555FF'>*</font>num_cols];
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'><u>long</u></font> num_rows,
+            <font color='#0000FF'><u>long</u></font> num_cols,
+            <font color='#0000FF'>typename</font> mem_manager
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='layout'></a>layout</b><font color='#5555FF'>&lt;</font>T,num_rows,num_cols,mem_manager,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> : noncopyable <font color='#009900'>// when the sizes are all non zero and big 
+</font>        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> num_rows;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> num_cols;
+
+            <b><a name='layout'></a>layout</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <b>{</b> data <font color='#5555FF'>=</font> pool.<font color='#BB00BB'>allocate_array</font><font face='Lucida Console'>(</font>num_rows<font color='#5555FF'>*</font>num_cols<font face='Lucida Console'>)</font>; <b>}</b>
+
+            ~<b><a name='layout'></a>layout</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <b>{</b> pool.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>; <b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> r, 
+                <font color='#0000FF'><u>long</u></font> c
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> data[r<font color='#5555FF'>*</font>num_cols <font color='#5555FF'>+</font> c]; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> r, 
+                <font color='#0000FF'><u>long</u></font> c
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data[r<font color='#5555FF'>*</font>num_cols <font color='#5555FF'>+</font> c]; <b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> i 
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> data[i]; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> i 
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data[i]; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+                layout<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.data,data<font face='Lucida Console'>)</font>;
+                pool.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.pool<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_rows; <b>}</b>
+
+            <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_cols; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> ,
+                <font color='#0000FF'><u>long</u></font> 
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+            T<font color='#5555FF'>*</font> data;
+            <font color='#0000FF'>typename</font> mem_manager::<font color='#0000FF'>template</font> rebind<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::other pool;
+            <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'><u>long</u></font> num_rows,
+            <font color='#0000FF'><u>long</u></font> num_cols,
+            <font color='#0000FF'>typename</font> mem_manager
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='layout'></a>layout</b><font color='#5555FF'>&lt;</font>T,num_rows,num_cols,mem_manager,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> : noncopyable <font color='#009900'>// when num_rows == 0 &amp;&amp; num_cols != 0,
+</font>        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> num_rows;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> num_cols;
+
+            <b><a name='layout'></a>layout</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>:data<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, nr_<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b> <b>}</b>
+
+            ~<b><a name='layout'></a>layout</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <b>{</b> 
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font> 
+                    pool.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>; 
+            <b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> r, 
+                <font color='#0000FF'><u>long</u></font> c
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> data[r<font color='#5555FF'>*</font>num_cols <font color='#5555FF'>+</font> c]; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> r, 
+                <font color='#0000FF'><u>long</u></font> c
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data[r<font color='#5555FF'>*</font>num_cols <font color='#5555FF'>+</font> c]; <b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> i 
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> data[i]; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> i 
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data[i]; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+                layout<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.data,data<font face='Lucida Console'>)</font>;
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.nr_,nr_<font face='Lucida Console'>)</font>;
+                pool.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.pool<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> nr_; <b>}</b>
+
+            <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_cols; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> nr,
+                <font color='#0000FF'><u>long</u></font> nc
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    pool.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                data <font color='#5555FF'>=</font> pool.<font color='#BB00BB'>allocate_array</font><font face='Lucida Console'>(</font>nr<font color='#5555FF'>*</font>nc<font face='Lucida Console'>)</font>;
+                nr_ <font color='#5555FF'>=</font> nr;
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+            T<font color='#5555FF'>*</font> data;
+            <font color='#0000FF'><u>long</u></font> nr_;
+            <font color='#0000FF'>typename</font> mem_manager::<font color='#0000FF'>template</font> rebind<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::other pool;
+            <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'><u>long</u></font> num_rows,
+            <font color='#0000FF'><u>long</u></font> num_cols,
+            <font color='#0000FF'>typename</font> mem_manager
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='layout'></a>layout</b><font color='#5555FF'>&lt;</font>T,num_rows,num_cols,mem_manager,<font color='#979000'>4</font><font color='#5555FF'>&gt;</font> : noncopyable <font color='#009900'>// when num_rows != 0 &amp;&amp; num_cols == 0
+</font>        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> num_rows;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> num_cols;
+
+            <b><a name='layout'></a>layout</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>:data<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, nc_<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b> <b>}</b>
+
+            ~<b><a name='layout'></a>layout</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <b>{</b> 
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    pool.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> r, 
+                <font color='#0000FF'><u>long</u></font> c
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> data[r<font color='#5555FF'>*</font>nc_ <font color='#5555FF'>+</font> c]; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> r, 
+                <font color='#0000FF'><u>long</u></font> c
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data[r<font color='#5555FF'>*</font>nc_ <font color='#5555FF'>+</font> c]; <b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> i 
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> data[i]; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> i 
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data[i]; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+                layout<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.data,data<font face='Lucida Console'>)</font>;
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.nc_,nc_<font face='Lucida Console'>)</font>;
+                pool.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.pool<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_rows; <b>}</b>
+
+            <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> nc_; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> nr,
+                <font color='#0000FF'><u>long</u></font> nc
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    pool.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                data <font color='#5555FF'>=</font> pool.<font color='#BB00BB'>allocate_array</font><font face='Lucida Console'>(</font>nr<font color='#5555FF'>*</font>nc<font face='Lucida Console'>)</font>;
+                nc_ <font color='#5555FF'>=</font> nc;
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+            T<font color='#5555FF'>*</font> data;
+            <font color='#0000FF'><u>long</u></font> nc_;
+            <font color='#0000FF'>typename</font> mem_manager::<font color='#0000FF'>template</font> rebind<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::other pool;
+            <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'><u>long</u></font> num_rows,
+            <font color='#0000FF'><u>long</u></font> num_cols,
+            <font color='#0000FF'>typename</font> mem_manager
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='layout'></a>layout</b><font color='#5555FF'>&lt;</font>T,num_rows,num_cols,mem_manager,<font color='#979000'>5</font><font color='#5555FF'>&gt;</font> : noncopyable <font color='#009900'>// when num_rows == 0 &amp;&amp; num_cols == 0
+</font>        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> num_rows;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> num_cols;
+
+            <b><a name='layout'></a>layout</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>:data<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, nr_<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, nc_<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b> <b>}</b>
+
+            ~<b><a name='layout'></a>layout</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <b>{</b> 
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    pool.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> r, 
+                <font color='#0000FF'><u>long</u></font> c
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> data[r<font color='#5555FF'>*</font>nc_ <font color='#5555FF'>+</font> c]; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> r, 
+                <font color='#0000FF'><u>long</u></font> c
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data[r<font color='#5555FF'>*</font>nc_ <font color='#5555FF'>+</font> c]; <b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> i 
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> data[i]; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> i 
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data[i]; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+                layout<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.data,data<font face='Lucida Console'>)</font>;
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.nc_,nc_<font face='Lucida Console'>)</font>;
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.nr_,nr_<font face='Lucida Console'>)</font>;
+                pool.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.pool<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> nr_; <b>}</b>
+
+            <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> nc_; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> nr,
+                <font color='#0000FF'><u>long</u></font> nc
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    pool.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                data <font color='#5555FF'>=</font> pool.<font color='#BB00BB'>allocate_array</font><font face='Lucida Console'>(</font>nr<font color='#5555FF'>*</font>nc<font face='Lucida Console'>)</font>;
+                nr_ <font color='#5555FF'>=</font> nr;
+                nc_ <font color='#5555FF'>=</font> nc;
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+            T<font color='#5555FF'>*</font> data;
+            <font color='#0000FF'><u>long</u></font> nr_;
+            <font color='#0000FF'><u>long</u></font> nc_;
+            <font color='#0000FF'>typename</font> mem_manager::<font color='#0000FF'>template</font> rebind<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::other pool;
+            <b>}</b>;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='column_major_layout'></a>column_major_layout</b>
+    <b>{</b>
+        <font color='#009900'>// if a matrix is bigger than this many bytes then don't put it on the stack
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>size_t</u></font> max_stack_based_size <font color='#5555FF'>=</font> <font color='#979000'>256</font>;
+
+
+        <font color='#009900'>// this is a hack to avoid a compile time error in visual studio 8.  I would just 
+</font>        <font color='#009900'>// use sizeof(T) and be done with it but that won't compile.  The idea here 
+</font>        <font color='#009900'>// is to avoid using the stack allocation of the layout object if it 
+</font>        <font color='#009900'>// is going to contain another matrix and also avoid asking for the sizeof()
+</font>        <font color='#009900'>// the contained matrix.
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='get_sizeof_helper'></a>get_sizeof_helper</b>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> std::<font color='#0000FF'><u>size_t</u></font> val <font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font>;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR, <font color='#0000FF'><u>long</u></font> NC, <font color='#0000FF'>typename</font> mm, <font color='#0000FF'>typename</font> l<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='get_sizeof_helper'></a>get_sizeof_helper</b><font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font>T,NR,NC,mm,l<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> std::<font color='#0000FF'><u>size_t</u></font> val <font color='#5555FF'>=</font> <font color='#979000'>1000000</font>;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'><u>long</u></font> num_rows,
+            <font color='#0000FF'><u>long</u></font> num_cols,
+            <font color='#0000FF'>typename</font> mem_manager,
+            <font color='#0000FF'><u>int</u></font> val <font color='#5555FF'>=</font> static_switch <font color='#5555FF'>&lt;</font>
+                <font color='#009900'>// when the sizes are all non zero and small
+</font>                <font face='Lucida Console'>(</font>num_rows<font color='#5555FF'>*</font>num_cols<font color='#5555FF'>*</font>get_sizeof_helper<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::val <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> max_stack_based_size<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>num_rows <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_cols <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            <font color='#009900'>// when the sizes are all non zero and big 
+</font>            <font face='Lucida Console'>(</font>num_rows<font color='#5555FF'>*</font>num_cols<font color='#5555FF'>*</font>get_sizeof_helper<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::val <font color='#5555FF'>&gt;</font> max_stack_based_size<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>num_rows <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_cols <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            num_rows <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_cols <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            num_rows <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_cols <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            num_rows <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_cols <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>
+            <font color='#5555FF'>&gt;</font>::value
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> layout ;
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents the actual allocation of space for a matrix.
+                Small matrices allocate all their data on the stack and bigger ones
+                use a memory_manager to get their memory.
+        !*/</font>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'><u>long</u></font> num_rows,
+            <font color='#0000FF'><u>long</u></font> num_cols,
+            <font color='#0000FF'>typename</font> mem_manager
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='layout'></a>layout</b><font color='#5555FF'>&lt;</font>T,num_rows,num_cols,mem_manager,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> : noncopyable <font color='#009900'>// when the sizes are all non zero and small
+</font>        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> num_rows;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> num_cols;
+
+            <b><a name='layout'></a>layout</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> r, 
+                <font color='#0000FF'><u>long</u></font> c
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>+</font>c<font color='#5555FF'>*</font>num_rows <font color='#5555FF'>+</font> r<font face='Lucida Console'>)</font>; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> r, 
+                <font color='#0000FF'><u>long</u></font> c
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>data<font color='#5555FF'>+</font>c<font color='#5555FF'>*</font>num_rows <font color='#5555FF'>+</font> r<font face='Lucida Console'>)</font>; <b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> i 
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> data[i]; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> i
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data[i]; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+                layout<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> num_rows; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> num_cols; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>,<font color='#BB00BB'>item</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_rows; <b>}</b>
+
+            <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_cols; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font>,
+                <font color='#0000FF'><u>long</u></font> 
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+            T data[num_cols<font color='#5555FF'>*</font>num_rows];
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'><u>long</u></font> num_rows,
+            <font color='#0000FF'><u>long</u></font> num_cols,
+            <font color='#0000FF'>typename</font> mem_manager
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='layout'></a>layout</b><font color='#5555FF'>&lt;</font>T,num_rows,num_cols,mem_manager,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> : noncopyable <font color='#009900'>// when the sizes are all non zero and big 
+</font>        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> num_rows;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> num_cols;
+
+            <b><a name='layout'></a>layout</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <b>{</b> data <font color='#5555FF'>=</font> pool.<font color='#BB00BB'>allocate_array</font><font face='Lucida Console'>(</font>num_rows<font color='#5555FF'>*</font>num_cols<font face='Lucida Console'>)</font>; <b>}</b>
+
+            ~<b><a name='layout'></a>layout</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <b>{</b> pool.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>; <b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> r, 
+                <font color='#0000FF'><u>long</u></font> c
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> data[c<font color='#5555FF'>*</font>num_rows <font color='#5555FF'>+</font> r]; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> r, 
+                <font color='#0000FF'><u>long</u></font> c
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data[c<font color='#5555FF'>*</font>num_rows <font color='#5555FF'>+</font> r]; <b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> i 
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> data[i]; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> i 
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data[i]; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+                layout<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.data,data<font face='Lucida Console'>)</font>;
+                pool.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.pool<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_rows; <b>}</b>
+
+            <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_cols; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> ,
+                <font color='#0000FF'><u>long</u></font> 
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+            T<font color='#5555FF'>*</font> data;
+            <font color='#0000FF'>typename</font> mem_manager::<font color='#0000FF'>template</font> rebind<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::other pool;
+            <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'><u>long</u></font> num_rows,
+            <font color='#0000FF'><u>long</u></font> num_cols,
+            <font color='#0000FF'>typename</font> mem_manager
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='layout'></a>layout</b><font color='#5555FF'>&lt;</font>T,num_rows,num_cols,mem_manager,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> : noncopyable <font color='#009900'>// when num_rows == 0 &amp;&amp; num_cols != 0,
+</font>        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> num_rows;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> num_cols;
+
+            <b><a name='layout'></a>layout</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>:data<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, nr_<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b> <b>}</b>
+
+            ~<b><a name='layout'></a>layout</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <b>{</b> 
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font> 
+                    pool.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>; 
+            <b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> r, 
+                <font color='#0000FF'><u>long</u></font> c
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> data[c<font color='#5555FF'>*</font>nr_ <font color='#5555FF'>+</font> r]; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> r, 
+                <font color='#0000FF'><u>long</u></font> c
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data[c<font color='#5555FF'>*</font>nr_ <font color='#5555FF'>+</font> r]; <b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> i 
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> data[i]; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> i 
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data[i]; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+                layout<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.data,data<font face='Lucida Console'>)</font>;
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.nr_,nr_<font face='Lucida Console'>)</font>;
+                pool.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.pool<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> nr_; <b>}</b>
+
+            <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_cols; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> nr,
+                <font color='#0000FF'><u>long</u></font> nc
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    pool.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                data <font color='#5555FF'>=</font> pool.<font color='#BB00BB'>allocate_array</font><font face='Lucida Console'>(</font>nr<font color='#5555FF'>*</font>nc<font face='Lucida Console'>)</font>;
+                nr_ <font color='#5555FF'>=</font> nr;
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+            T<font color='#5555FF'>*</font> data;
+            <font color='#0000FF'><u>long</u></font> nr_;
+            <font color='#0000FF'>typename</font> mem_manager::<font color='#0000FF'>template</font> rebind<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::other pool;
+            <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'><u>long</u></font> num_rows,
+            <font color='#0000FF'><u>long</u></font> num_cols,
+            <font color='#0000FF'>typename</font> mem_manager
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='layout'></a>layout</b><font color='#5555FF'>&lt;</font>T,num_rows,num_cols,mem_manager,<font color='#979000'>4</font><font color='#5555FF'>&gt;</font> : noncopyable <font color='#009900'>// when num_rows != 0 &amp;&amp; num_cols == 0
+</font>        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> num_rows;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> num_cols;
+
+            <b><a name='layout'></a>layout</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>:data<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, nc_<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b> <b>}</b>
+
+            ~<b><a name='layout'></a>layout</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <b>{</b> 
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    pool.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> r, 
+                <font color='#0000FF'><u>long</u></font> c
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> data[c<font color='#5555FF'>*</font>num_rows <font color='#5555FF'>+</font> r]; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> r, 
+                <font color='#0000FF'><u>long</u></font> c
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data[c<font color='#5555FF'>*</font>num_rows <font color='#5555FF'>+</font> r]; <b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> i 
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> data[i]; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> i 
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data[i]; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+                layout<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.data,data<font face='Lucida Console'>)</font>;
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.nc_,nc_<font face='Lucida Console'>)</font>;
+                pool.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.pool<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_rows; <b>}</b>
+
+            <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> nc_; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> nr,
+                <font color='#0000FF'><u>long</u></font> nc
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    pool.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                data <font color='#5555FF'>=</font> pool.<font color='#BB00BB'>allocate_array</font><font face='Lucida Console'>(</font>nr<font color='#5555FF'>*</font>nc<font face='Lucida Console'>)</font>;
+                nc_ <font color='#5555FF'>=</font> nc;
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+            T<font color='#5555FF'>*</font> data;
+            <font color='#0000FF'><u>long</u></font> nc_;
+            <font color='#0000FF'>typename</font> mem_manager::<font color='#0000FF'>template</font> rebind<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::other pool;
+            <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'><u>long</u></font> num_rows,
+            <font color='#0000FF'><u>long</u></font> num_cols,
+            <font color='#0000FF'>typename</font> mem_manager
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='layout'></a>layout</b><font color='#5555FF'>&lt;</font>T,num_rows,num_cols,mem_manager,<font color='#979000'>5</font><font color='#5555FF'>&gt;</font> : noncopyable <font color='#009900'>// when num_rows == 0 &amp;&amp; num_cols == 0
+</font>        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> num_rows;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> num_cols;
+
+            <b><a name='layout'></a>layout</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>:data<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, nr_<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, nc_<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b> <b>}</b>
+
+            ~<b><a name='layout'></a>layout</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <b>{</b> 
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    pool.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> r, 
+                <font color='#0000FF'><u>long</u></font> c
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> data[c<font color='#5555FF'>*</font>nr_ <font color='#5555FF'>+</font> r]; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> r, 
+                <font color='#0000FF'><u>long</u></font> c
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data[c<font color='#5555FF'>*</font>nr_ <font color='#5555FF'>+</font> r]; <b>}</b>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> i 
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> data[i]; <b>}</b>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> i 
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data[i]; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+                layout<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.data,data<font face='Lucida Console'>)</font>;
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.nc_,nc_<font face='Lucida Console'>)</font>;
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.nr_,nr_<font face='Lucida Console'>)</font>;
+                pool.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.pool<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> nr_; <b>}</b>
+
+            <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> nc_; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> nr,
+                <font color='#0000FF'><u>long</u></font> nc
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    pool.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                data <font color='#5555FF'>=</font> pool.<font color='#BB00BB'>allocate_array</font><font face='Lucida Console'>(</font>nr<font color='#5555FF'>*</font>nc<font face='Lucida Console'>)</font>;
+                nr_ <font color='#5555FF'>=</font> nr;
+                nc_ <font color='#5555FF'>=</font> nc;
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+            T<font color='#5555FF'>*</font> data;
+            <font color='#0000FF'><u>long</u></font> nr_;
+            <font color='#0000FF'><u>long</u></font> nc_;
+            <font color='#0000FF'>typename</font> mem_manager::<font color='#0000FF'>template</font> rebind<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::other pool;
+            <b>}</b>;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MATRIx_DATA_LAYOUT_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,597 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - gzread.c</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/* gzread.c -- zlib functions for reading gzip files
+ * Copyright (C) 2004, 2005, 2010, 2011, 2012, 2013 Mark Adler
+ * For conditions of distribution and use, see copyright notice in zlib.h
+ */</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='gzguts.h.html'>gzguts.h</a>"
+
+<font color='#009900'>/* Local functions */</font>
+local <font color='#0000FF'><u>int</u></font> gz_load <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>gz_statep, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>, <font color='#0000FF'><u>unsigned</u></font>, <font color='#0000FF'><u>unsigned</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>int</u></font> gz_avail <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>gz_statep<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>int</u></font> gz_look <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>gz_statep<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>int</u></font> gz_decomp <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>gz_statep<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>int</u></font> gz_fetch <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>gz_statep<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+local <font color='#0000FF'><u>int</u></font> gz_skip <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>gz_statep, z_off64_t<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* Use read() to load a buffer -- return -1 on error, otherwise 0.  Read from
+   state-&gt;fd, and update state-&gt;eof, state-&gt;err, and state-&gt;msg as appropriate.
+   This function needs to loop on read(), since read() is not guaranteed to
+   read the number of bytes requested, depending on the type of descriptor. */</font>
+local <font color='#0000FF'><u>int</u></font> <b><a name='gz_load'></a>gz_load</b><font face='Lucida Console'>(</font>state, buf, len, have<font face='Lucida Console'>)</font>
+    gz_statep state;
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>buf;
+    <font color='#0000FF'><u>unsigned</u></font> len;
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#5555FF'>*</font>have;
+<b>{</b>
+    <font color='#0000FF'><u>int</u></font> ret;
+
+    <font color='#5555FF'>*</font>have <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>do</font> <b>{</b>
+        ret <font color='#5555FF'>=</font> <font color='#BB00BB'>read</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fd, buf <font color='#5555FF'>+</font> <font color='#5555FF'>*</font>have, len <font color='#5555FF'>-</font> <font color='#5555FF'>*</font>have<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ret <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>break</font>;
+        <font color='#5555FF'>*</font>have <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ret;
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>have <font color='#5555FF'>&lt;</font> len<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ret <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>gz_error</font><font face='Lucida Console'>(</font>state, Z_ERRNO, <font color='#BB00BB'>zstrerror</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+    <b>}</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ret <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>eof <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+<b>}</b>
+
+<font color='#009900'>/* Load up input buffer and set eof flag if last data loaded -- return -1 on
+   error, 0 otherwise.  Note that the eof flag is set when the end of the input
+   file is reached, even though there may be unused data in the buffer.  Once
+   that data has been used, no more attempts will be made to read the file.
+   If strm-&gt;avail_in != 0, then the current data is moved to the beginning of
+   the input buffer, and then the remainder of the buffer is loaded with the
+   available data from the input file. */</font>
+local <font color='#0000FF'><u>int</u></font> <b><a name='gz_avail'></a>gz_avail</b><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font>
+    gz_statep state;
+<b>{</b>
+    <font color='#0000FF'><u>unsigned</u></font> got;
+    z_streamp strm <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strm<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err <font color='#5555FF'>!</font><font color='#5555FF'>=</font> Z_OK <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err <font color='#5555FF'>!</font><font color='#5555FF'>=</font> Z_BUF_ERROR<font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>eof <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in<font face='Lucida Console'>)</font> <b>{</b>       <font color='#009900'>/* copy what's there to the start */</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>p <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>in;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>q <font color='#5555FF'>=</font> strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_in;
+            <font color='#0000FF'><u>unsigned</u></font> n <font color='#5555FF'>=</font> strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in;
+            <font color='#0000FF'>do</font> <b>{</b>
+                <font color='#5555FF'>*</font>p<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>q<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+            <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>n<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>gz_load</font><font face='Lucida Console'>(</font>state, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>in <font color='#5555FF'>+</font> strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in,
+                    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>size <font color='#5555FF'>-</font> strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in, <font color='#5555FF'>&amp;</font>got<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in <font color='#5555FF'>+</font><font color='#5555FF'>=</font> got;
+        strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_in <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>in;
+    <b>}</b>
+    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+<b>}</b>
+
+<font color='#009900'>/* Look for gzip header, set up for inflate or copy.  state-&gt;x.have must be 0.
+   If this is the first time in, allocate required memory.  state-&gt;how will be
+   left unchanged if there is no more input data available, will be set to COPY
+   if there is no gzip header and direct copying will be performed, or it will
+   be set to GZIP for decompression.  If direct copying, then leftover input
+   data from the input buffer will be copied to the output buffer.  In that
+   case, all further file reads will be directly to either the output buffer or
+   a user buffer.  If decompressing, the inflate state will be initialized.
+   gz_look() will return 0 on success or -1 on failure. */</font>
+local <font color='#0000FF'><u>int</u></font> <b><a name='gz_look'></a>gz_look</b><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font>
+    gz_statep state;
+<b>{</b>
+    z_streamp strm <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strm<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/* allocate read buffers and inflate memory */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#009900'>/* allocate buffers */</font>
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>in <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#BB00BB'>malloc</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>want<font face='Lucida Console'>)</font>;
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#BB00BB'>malloc</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>want <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>in <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL <font color='#5555FF'>|</font><font color='#5555FF'>|</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>free</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>in <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>free</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>gz_error</font><font face='Lucida Console'>(</font>state, Z_MEM_ERROR, "<font color='#CC0000'>out of memory</font>"<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <b>}</b>
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>size <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>want;
+
+        <font color='#009900'>/* allocate inflate memory */</font>
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strm.zalloc <font color='#5555FF'>=</font> Z_NULL;
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strm.zfree <font color='#5555FF'>=</font> Z_NULL;
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strm.opaque <font color='#5555FF'>=</font> Z_NULL;
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strm.avail_in <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strm.next_in <font color='#5555FF'>=</font> Z_NULL;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>inflateInit2</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strm<font face='Lucida Console'>)</font>, <font color='#979000'>15</font> <font color='#5555FF'>+</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> Z_OK<font face='Lucida Console'>)</font> <b>{</b>    <font color='#009900'>/* gunzip */</font>
+            <font color='#BB00BB'>free</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>free</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>in<font face='Lucida Console'>)</font>;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#BB00BB'>gz_error</font><font face='Lucida Console'>(</font>state, Z_MEM_ERROR, "<font color='#CC0000'>out of memory</font>"<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#009900'>/* get at least the magic bytes in the input buffer */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>gz_avail</font><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+    <font color='#009900'>/* look for gzip magic bytes -- if there, do gzip decoding (note: there is
+       a logical dilemma here when considering the case of a partially written
+       gzip file, to wit, if a single 31 byte is written, then we cannot tell
+       whether this is a single-byte file, or just a partially written gzip
+       file -- for here we assume that if a gzip file is being written, then
+       the header will be written in a single operation, so that reading a
+       single byte is sufficient indication that it is not a gzip file) */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_in[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>31</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_in[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>139</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>inflateReset</font><font face='Lucida Console'>(</font>strm<font face='Lucida Console'>)</font>;
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>how <font color='#5555FF'>=</font> GZIP;
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>direct <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+    <font color='#009900'>/* no gzip header -- if we were decoding gzip before, then this is trailing
+       garbage.  Ignore the trailing garbage and finish. */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>direct <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+        strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>eof <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+    <font color='#009900'>/* doing raw i/o, copy any leftover input to output -- this assumes that
+       the output buffer is larger than the input buffer, which also assures
+       space for gzungetc() */</font>
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.next <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in<font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>memcpy</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.next, strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_in, strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in<font face='Lucida Console'>)</font>;
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have <font color='#5555FF'>=</font> strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in;
+        strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>how <font color='#5555FF'>=</font> COPY;
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>direct <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+<b>}</b>
+
+<font color='#009900'>/* Decompress from input to the provided next_out and avail_out in the state.
+   On return, state-&gt;x.have and state-&gt;x.next point to the just decompressed
+   data.  If the gzip stream completes, state-&gt;how is reset to LOOK to look for
+   the next gzip stream or raw data, once state-&gt;x.have is depleted.  Returns 0
+   on success, -1 on failure. */</font>
+local <font color='#0000FF'><u>int</u></font> <b><a name='gz_decomp'></a>gz_decomp</b><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font>
+    gz_statep state;
+<b>{</b>
+    <font color='#0000FF'><u>int</u></font> ret <font color='#5555FF'>=</font> Z_OK;
+    <font color='#0000FF'><u>unsigned</u></font> had;
+    z_streamp strm <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strm<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/* fill output buffer up to end of deflate stream */</font>
+    had <font color='#5555FF'>=</font> strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_out;
+    <font color='#0000FF'>do</font> <b>{</b>
+        <font color='#009900'>/* get more input for inflate() */</font>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>gz_avail</font><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+            <font color='#BB00BB'>gz_error</font><font face='Lucida Console'>(</font>state, Z_BUF_ERROR, "<font color='#CC0000'>unexpected end of file</font>"<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>break</font>;
+        <b>}</b>
+
+        <font color='#009900'>/* decompress and handle errors */</font>
+        ret <font color='#5555FF'>=</font> <font color='#BB00BB'>inflate</font><font face='Lucida Console'>(</font>strm, Z_NO_FLUSH<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ret <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_STREAM_ERROR <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ret <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_NEED_DICT<font face='Lucida Console'>)</font> <b>{</b>
+            <font color='#BB00BB'>gz_error</font><font face='Lucida Console'>(</font>state, Z_STREAM_ERROR,
+                     "<font color='#CC0000'>internal error: inflate stream corrupt</font>"<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <b>}</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ret <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_MEM_ERROR<font face='Lucida Console'>)</font> <b>{</b>
+            <font color='#BB00BB'>gz_error</font><font face='Lucida Console'>(</font>state, Z_MEM_ERROR, "<font color='#CC0000'>out of memory</font>"<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <b>}</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ret <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_DATA_ERROR<font face='Lucida Console'>)</font> <b>{</b>              <font color='#009900'>/* deflate stream invalid */</font>
+            <font color='#BB00BB'>gz_error</font><font face='Lucida Console'>(</font>state, Z_DATA_ERROR,
+                     strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL ? "<font color='#CC0000'>compressed data error</font>" : strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <b>}</b>
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_out <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ret <font color='#5555FF'>!</font><font color='#5555FF'>=</font> Z_STREAM_END<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/* update available output */</font>
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have <font color='#5555FF'>=</font> had <font color='#5555FF'>-</font> strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_out;
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.next <font color='#5555FF'>=</font> strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_out <font color='#5555FF'>-</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have;
+
+    <font color='#009900'>/* if the gzip stream completed successfully, look for another */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ret <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_STREAM_END<font face='Lucida Console'>)</font>
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>how <font color='#5555FF'>=</font> LOOK;
+
+    <font color='#009900'>/* good decompression */</font>
+    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+<b>}</b>
+
+<font color='#009900'>/* Fetch data and put it in the output buffer.  Assumes state-&gt;x.have is 0.
+   Data is either copied from the input file or decompressed from the input
+   file depending on state-&gt;how.  If state-&gt;how is LOOK, then a gzip header is
+   looked for to determine whether to copy or decompress.  Returns -1 on error,
+   otherwise 0.  gz_fetch() will leave state-&gt;how as COPY or GZIP unless the
+   end of the input file has been reached and all data has been processed.  */</font>
+local <font color='#0000FF'><u>int</u></font> <b><a name='gz_fetch'></a>gz_fetch</b><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font>
+    gz_statep state;
+<b>{</b>
+    z_streamp strm <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strm<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>do</font> <b>{</b>
+        <font color='#0000FF'>switch</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>how<font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#0000FF'>case</font> LOOK:      <font color='#009900'>/* -&gt; LOOK, COPY (only if never GZIP), or GZIP */</font>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>gz_look</font><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>how <font color='#5555FF'>=</font><font color='#5555FF'>=</font> LOOK<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>break</font>;
+        <font color='#0000FF'>case</font> COPY:      <font color='#009900'>/* -&gt; COPY */</font>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>gz_load</font><font face='Lucida Console'>(</font>state, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>size <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>1</font>, <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.next <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out;
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>case</font> GZIP:      <font color='#009900'>/* -&gt; GZIP or LOOK (if end of gzip stream) */</font>
+            strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_out <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>size <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>1</font>;
+            strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_out <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>gz_decomp</font><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <b>}</b>
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>eof <font color='#5555FF'>|</font><font color='#5555FF'>|</font> strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+<b>}</b>
+
+<font color='#009900'>/* Skip len uncompressed bytes of output.  Return -1 on error, 0 on success. */</font>
+local <font color='#0000FF'><u>int</u></font> <b><a name='gz_skip'></a>gz_skip</b><font face='Lucida Console'>(</font>state, len<font face='Lucida Console'>)</font>
+    gz_statep state;
+    z_off64_t len;
+<b>{</b>
+    <font color='#0000FF'><u>unsigned</u></font> n;
+
+    <font color='#009900'>/* skip over len bytes or reach end-of-file, whichever comes first */</font>
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>len<font face='Lucida Console'>)</font>
+        <font color='#009900'>/* skip over whatever is in output buffer */</font>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have<font face='Lucida Console'>)</font> <b>{</b>
+            n <font color='#5555FF'>=</font> <font color='#BB00BB'>GT_OFF</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>z_off64_t<font face='Lucida Console'>)</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have <font color='#5555FF'>&gt;</font> len ?
+                <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font>len : state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have <font color='#5555FF'>-</font><font color='#5555FF'>=</font> n;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.next <font color='#5555FF'>+</font><font color='#5555FF'>=</font> n;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.pos <font color='#5555FF'>+</font><font color='#5555FF'>=</font> n;
+            len <font color='#5555FF'>-</font><font color='#5555FF'>=</font> n;
+        <b>}</b>
+
+        <font color='#009900'>/* output buffer empty -- return if we're at the end of the input */</font>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>eof <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strm.avail_in <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>break</font>;
+
+        <font color='#009900'>/* need more data to skip -- load up output buffer */</font>
+        <font color='#0000FF'>else</font> <b>{</b>
+            <font color='#009900'>/* get more output, looking for header if required */</font>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>gz_fetch</font><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <b>}</b>
+    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+<b>}</b>
+
+<font color='#009900'>/* -- see zlib.h -- */</font>
+<font color='#0000FF'><u>int</u></font> ZEXPORT <b><a name='gzread'></a>gzread</b><font face='Lucida Console'>(</font>file, buf, len<font face='Lucida Console'>)</font>
+    gzFile file;
+    voidp buf;
+    <font color='#0000FF'><u>unsigned</u></font> len;
+<b>{</b>
+    <font color='#0000FF'><u>unsigned</u></font> got, n;
+    gz_statep state;
+    z_streamp strm;
+
+    <font color='#009900'>/* get internal structure */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>file <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+    state <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>gz_statep<font face='Lucida Console'>)</font>file;
+    strm <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strm<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/* check that we're reading and that there's no (serious) error */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>!</font><font color='#5555FF'>=</font> GZ_READ <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+            <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err <font color='#5555FF'>!</font><font color='#5555FF'>=</font> Z_OK <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err <font color='#5555FF'>!</font><font color='#5555FF'>=</font> Z_BUF_ERROR<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+    <font color='#009900'>/* since an int is returned, make sure len fits in one, otherwise return
+       with an error (this avoids the flaw in the interface) */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>len <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>gz_error</font><font face='Lucida Console'>(</font>state, Z_DATA_ERROR, "<font color='#CC0000'>requested length does not fit in int</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+    <b>}</b>
+
+    <font color='#009900'>/* if len is zero, avoid unnecessary operations */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+
+    <font color='#009900'>/* process a skip request */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>seek<font face='Lucida Console'>)</font> <b>{</b>
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>seek <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>gz_skip</font><font face='Lucida Console'>(</font>state, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>skip<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+    <b>}</b>
+
+    <font color='#009900'>/* get len bytes to buf, or less than len if at the end */</font>
+    got <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>do</font> <b>{</b>
+        <font color='#009900'>/* first just try copying data from the output buffer */</font>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have<font face='Lucida Console'>)</font> <b>{</b>
+            n <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have <font color='#5555FF'>&gt;</font> len ? len : state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have;
+            <font color='#BB00BB'>memcpy</font><font face='Lucida Console'>(</font>buf, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.next, n<font face='Lucida Console'>)</font>;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.next <font color='#5555FF'>+</font><font color='#5555FF'>=</font> n;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have <font color='#5555FF'>-</font><font color='#5555FF'>=</font> n;
+        <b>}</b>
+
+        <font color='#009900'>/* output buffer empty -- return if we're at the end of the input */</font>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>eof <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_in <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>past <font color='#5555FF'>=</font> <font color='#979000'>1</font>;        <font color='#009900'>/* tried to read past end */</font>
+            <font color='#0000FF'>break</font>;
+        <b>}</b>
+
+        <font color='#009900'>/* need output data -- for small len or new stream load up our output
+           buffer */</font>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>how <font color='#5555FF'>=</font><font color='#5555FF'>=</font> LOOK <font color='#5555FF'>|</font><font color='#5555FF'>|</font> len <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>size <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+            <font color='#009900'>/* get more output, looking for header if required */</font>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>gz_fetch</font><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            <font color='#0000FF'>continue</font>;       <font color='#009900'>/* no progress yet -- go back to copy above */</font>
+            <font color='#009900'>/* the copy above assures that we will leave with space in the
+               output buffer, allowing at least one gzungetc() to succeed */</font>
+        <b>}</b>
+
+        <font color='#009900'>/* large len -- read directly into user buffer */</font>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>how <font color='#5555FF'>=</font><font color='#5555FF'>=</font> COPY<font face='Lucida Console'>)</font> <b>{</b>      <font color='#009900'>/* read directly */</font>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>gz_load</font><font face='Lucida Console'>(</font>state, <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>buf, len, <font color='#5555FF'>&amp;</font>n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#009900'>/* large len -- decompress directly into user buffer */</font>
+        <font color='#0000FF'>else</font> <b>{</b>  <font color='#009900'>/* state-&gt;how == GZIP */</font>
+            strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>avail_out <font color='#5555FF'>=</font> len;
+            strm<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_out <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>buf;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>gz_decomp</font><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            n <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have;
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#009900'>/* update progress */</font>
+        len <font color='#5555FF'>-</font><font color='#5555FF'>=</font> n;
+        buf <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>buf <font color='#5555FF'>+</font> n;
+        got <font color='#5555FF'>+</font><font color='#5555FF'>=</font> n;
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.pos <font color='#5555FF'>+</font><font color='#5555FF'>=</font> n;
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>len<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/* return number of bytes read into user buffer (will fit in int) */</font>
+    <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>got;
+<b>}</b>
+
+<font color='#009900'>/* -- see zlib.h -- */</font>
+<font color='#0000FF'>#ifdef</font> Z_PREFIX_SET
+#  undef z_gzgetc
+<font color='#0000FF'>#else</font>
+#  undef gzgetc
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'><u>int</u></font> ZEXPORT <b><a name='gzgetc'></a>gzgetc</b><font face='Lucida Console'>(</font>file<font face='Lucida Console'>)</font>
+    gzFile file;
+<b>{</b>
+    <font color='#0000FF'><u>int</u></font> ret;
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> buf[<font color='#979000'>1</font>];
+    gz_statep state;
+
+    <font color='#009900'>/* get internal structure */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>file <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+    state <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>gz_statep<font face='Lucida Console'>)</font>file;
+
+    <font color='#009900'>/* check that we're reading and that there's no (serious) error */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>!</font><font color='#5555FF'>=</font> GZ_READ <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+        <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err <font color='#5555FF'>!</font><font color='#5555FF'>=</font> Z_OK <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err <font color='#5555FF'>!</font><font color='#5555FF'>=</font> Z_BUF_ERROR<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+    <font color='#009900'>/* try output buffer (no need to check for skip request) */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have<font face='Lucida Console'>)</font> <b>{</b>
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.pos<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.next<font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+    <b>}</b>
+
+    <font color='#009900'>/* nothing there -- try gzread() */</font>
+    ret <font color='#5555FF'>=</font> <font color='#BB00BB'>gzread</font><font face='Lucida Console'>(</font>file, buf, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>return</font> ret <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font> ? <font color='#5555FF'>-</font><font color='#979000'>1</font> : buf[<font color='#979000'>0</font>];
+<b>}</b>
+
+<font color='#0000FF'><u>int</u></font> ZEXPORT <b><a name='gzgetc_'></a>gzgetc_</b><font face='Lucida Console'>(</font>file<font face='Lucida Console'>)</font>
+gzFile file;
+<b>{</b>
+    <font color='#0000FF'>return</font> <font color='#BB00BB'>gzgetc</font><font face='Lucida Console'>(</font>file<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>/* -- see zlib.h -- */</font>
+<font color='#0000FF'><u>int</u></font> ZEXPORT <b><a name='gzungetc'></a>gzungetc</b><font face='Lucida Console'>(</font>c, file<font face='Lucida Console'>)</font>
+    <font color='#0000FF'><u>int</u></font> c;
+    gzFile file;
+<b>{</b>
+    gz_statep state;
+
+    <font color='#009900'>/* get internal structure */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>file <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+    state <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>gz_statep<font face='Lucida Console'>)</font>file;
+
+    <font color='#009900'>/* check that we're reading and that there's no (serious) error */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>!</font><font color='#5555FF'>=</font> GZ_READ <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+        <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err <font color='#5555FF'>!</font><font color='#5555FF'>=</font> Z_OK <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err <font color='#5555FF'>!</font><font color='#5555FF'>=</font> Z_BUF_ERROR<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+    <font color='#009900'>/* process a skip request */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>seek<font face='Lucida Console'>)</font> <b>{</b>
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>seek <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>gz_skip</font><font face='Lucida Console'>(</font>state, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>skip<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+    <b>}</b>
+
+    <font color='#009900'>/* can't push EOF */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+    <font color='#009900'>/* if output buffer empty, put byte at end (allows more pushing) */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.next <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>size <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.next[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> c;
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.pos<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>past <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>return</font> c;
+    <b>}</b>
+
+    <font color='#009900'>/* if no room, give up (must have already done a gzungetc()) */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>size <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>gz_error</font><font face='Lucida Console'>(</font>state, Z_DATA_ERROR, "<font color='#CC0000'>out of room to push characters</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+    <b>}</b>
+
+    <font color='#009900'>/* slide output data if needed and insert byte before existing data */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.next <font color='#5555FF'>=</font><font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out<font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>src <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out <font color='#5555FF'>+</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>dest <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>size <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>src <font color='#5555FF'>&gt;</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out<font face='Lucida Console'>)</font>
+            <font color='#5555FF'>*</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>dest <font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>src;
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.next <font color='#5555FF'>=</font> dest;
+    <b>}</b>
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.next<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.next[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> c;
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.pos<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+    state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>past <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>return</font> c;
+<b>}</b>
+
+<font color='#009900'>/* -- see zlib.h -- */</font>
+<font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font> ZEXPORT <b><a name='gzgets'></a>gzgets</b><font face='Lucida Console'>(</font>file, buf, len<font face='Lucida Console'>)</font>
+    gzFile file;
+    <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>buf;
+    <font color='#0000FF'><u>int</u></font> len;
+<b>{</b>
+    <font color='#0000FF'><u>unsigned</u></font> left, n;
+    <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>str;
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>eol;
+    gz_statep state;
+
+    <font color='#009900'>/* check parameters and get internal structure */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>file <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL <font color='#5555FF'>|</font><font color='#5555FF'>|</font> buf <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL <font color='#5555FF'>|</font><font color='#5555FF'>|</font> len <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> NULL;
+    state <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>gz_statep<font face='Lucida Console'>)</font>file;
+
+    <font color='#009900'>/* check that we're reading and that there's no (serious) error */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>!</font><font color='#5555FF'>=</font> GZ_READ <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+        <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err <font color='#5555FF'>!</font><font color='#5555FF'>=</font> Z_OK <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err <font color='#5555FF'>!</font><font color='#5555FF'>=</font> Z_BUF_ERROR<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> NULL;
+
+    <font color='#009900'>/* process a skip request */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>seek<font face='Lucida Console'>)</font> <b>{</b>
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>seek <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>gz_skip</font><font face='Lucida Console'>(</font>state, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>skip<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> NULL;
+    <b>}</b>
+
+    <font color='#009900'>/* copy output bytes up to new line or len - 1, whichever comes first --
+       append a terminating zero to the string (we don't check for a zero in
+       the contents, let the user worry about that) */</font>
+    str <font color='#5555FF'>=</font> buf;
+    left <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font>len <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>left<font face='Lucida Console'>)</font> <font color='#0000FF'>do</font> <b>{</b>
+        <font color='#009900'>/* assure that something is in the output buffer */</font>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>gz_fetch</font><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> NULL;                <font color='#009900'>/* error */</font>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>       <font color='#009900'>/* end of file */</font>
+            state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>past <font color='#5555FF'>=</font> <font color='#979000'>1</font>;            <font color='#009900'>/* read past end */</font>
+            <font color='#0000FF'>break</font>;                      <font color='#009900'>/* return what we have */</font>
+        <b>}</b>
+
+        <font color='#009900'>/* look for end-of-line in current output buffer */</font>
+        n <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have <font color='#5555FF'>&gt;</font> left ? left : state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have;
+        eol <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#BB00BB'>memchr</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.next, '<font color='#FF0000'>\n</font>', n<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>eol <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+            n <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>eol <font color='#5555FF'>-</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.next<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+
+        <font color='#009900'>/* copy through end-of-line, or remainder if not found */</font>
+        <font color='#BB00BB'>memcpy</font><font face='Lucida Console'>(</font>buf, state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.next, n<font face='Lucida Console'>)</font>;
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have <font color='#5555FF'>-</font><font color='#5555FF'>=</font> n;
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.next <font color='#5555FF'>+</font><font color='#5555FF'>=</font> n;
+        state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.pos <font color='#5555FF'>+</font><font color='#5555FF'>=</font> n;
+        left <font color='#5555FF'>-</font><font color='#5555FF'>=</font> n;
+        buf <font color='#5555FF'>+</font><font color='#5555FF'>=</font> n;
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>left <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> eol <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/* return terminated string, or if nothing, end of file */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buf <font color='#5555FF'>=</font><font color='#5555FF'>=</font> str<font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> NULL;
+    buf[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>return</font> str;
+<b>}</b>
+
+<font color='#009900'>/* -- see zlib.h -- */</font>
+<font color='#0000FF'><u>int</u></font> ZEXPORT <b><a name='gzdirect'></a>gzdirect</b><font face='Lucida Console'>(</font>file<font face='Lucida Console'>)</font>
+    gzFile file;
+<b>{</b>
+    gz_statep state;
+
+    <font color='#009900'>/* get internal structure */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>file <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    state <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>gz_statep<font face='Lucida Console'>)</font>file;
+
+    <font color='#009900'>/* if the state is not known, but we can find out, then do so (this is
+       mainly for right after a gzopen() or gzdopen()) */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font><font color='#5555FF'>=</font> GZ_READ <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>how <font color='#5555FF'>=</font><font color='#5555FF'>=</font> LOOK <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>x.have <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>gz_look</font><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/* return 1 if transparent, 0 if processing a gzip stream */</font>
+    <font color='#0000FF'>return</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>direct;
+<b>}</b>
+
+<font color='#009900'>/* -- see zlib.h -- */</font>
+<font color='#0000FF'><u>int</u></font> ZEXPORT <b><a name='gzclose_r'></a>gzclose_r</b><font face='Lucida Console'>(</font>file<font face='Lucida Console'>)</font>
+    gzFile file;
+<b>{</b>
+    <font color='#0000FF'><u>int</u></font> ret, err;
+    gz_statep state;
+
+    <font color='#009900'>/* get internal structure */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>file <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> Z_STREAM_ERROR;
+    state <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>gz_statep<font face='Lucida Console'>)</font>file;
+
+    <font color='#009900'>/* check that we're reading */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>!</font><font color='#5555FF'>=</font> GZ_READ<font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> Z_STREAM_ERROR;
+
+    <font color='#009900'>/* free memory and close file */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>size<font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>inflateEnd</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>strm<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>free</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>free</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    err <font color='#5555FF'>=</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_BUF_ERROR ? Z_BUF_ERROR : Z_OK;
+    <font color='#BB00BB'>gz_error</font><font face='Lucida Console'>(</font>state, Z_OK, NULL<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>free</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>path<font face='Lucida Console'>)</font>;
+    ret <font color='#5555FF'>=</font> <font color='#BB00BB'>close</font><font face='Lucida Console'>(</font>state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fd<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>free</font><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>return</font> ret ? Z_ERRNO : err;
+<b>}</b>
+
+</pre></body></html>

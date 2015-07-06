@@ -1,0 +1,182 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - float_details.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_FLOAT_DEtAILS_Hh_
+<font color='#0000FF'>#define</font> DLIB_FLOAT_DEtAILS_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>math.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='algs.h.html'>algs.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font> 
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>struct</font> <b><a name='float_details'></a>float_details</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for converting floating point numbers into an
+                explicit integer representation and then also converting back.  In
+                particular, a float_details object represents a floating point number with
+                a 64 bit mantissa and 16 bit exponent.  These are stored in the public
+                fields of the same names.
+
+                The main use of this object is to convert floating point values into a
+                known uniform representation so they can be serialized to an output stream.
+                This allows dlib serialization code to work on any system, regardless of
+                the floating point representation used by the hardware.  It also means
+                that, for example, a double can be serialized and then deserialized into a
+                float and it will perform the appropriate conversion.
+
+
+                In more detail, this object represents a floating point value equal to
+                mantissa*pow(2,exponent), except when exponent takes on any of the
+                following special values: 
+                    - is_inf
+                    - is_ninf
+                    - is_nan
+                These values are used to indicate that the floating point value should be
+                either infinity, negative infinity, or not-a-number respectively.
+        !*/</font>
+
+        <b><a name='float_details'></a>float_details</b><font face='Lucida Console'>(</font>
+            int64 man,
+            int16 exp
+        <font face='Lucida Console'>)</font> : mantissa<font face='Lucida Console'>(</font>man<font face='Lucida Console'>)</font>, exponent<font face='Lucida Console'>(</font>exp<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #mantissa == man
+                - #exponent == exp
+        !*/</font>
+
+        <b><a name='float_details'></a>float_details</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> :
+            mantissa<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, exponent<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - this object represents a floating point value of 0
+        !*/</font>
+
+        <b><a name='float_details'></a>float_details</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font>      val<font face='Lucida Console'>)</font> <b>{</b> <font color='#5555FF'>*</font><font color='#0000FF'>this</font> <font color='#5555FF'>=</font> val; <b>}</b>
+        <b><a name='float_details'></a>float_details</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>float</u></font><font color='#5555FF'>&amp;</font>       val<font face='Lucida Console'>)</font> <b>{</b> <font color='#5555FF'>*</font><font color='#0000FF'>this</font> <font color='#5555FF'>=</font> val; <b>}</b>
+        <b><a name='float_details'></a>float_details</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> val<font face='Lucida Console'>)</font> <b>{</b> <font color='#5555FF'>*</font><font color='#0000FF'>this</font> <font color='#5555FF'>=</font> val; <b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - converts the given value into a float_details representation.  This 
+                  means that converting #*this back into a floating point number should
+                  recover the input val.
+        !*/</font>
+
+        float_details<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font>      val<font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>convert_from_T</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>; <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>; <b>}</b>
+        float_details<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>float</u></font><font color='#5555FF'>&amp;</font>       val<font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>convert_from_T</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>; <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>; <b>}</b>
+        float_details<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> val<font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>convert_from_T</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>; <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>; <b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - converts the given value into a float_details representation.  This 
+                  means that converting #*this back into a floating point number should
+                  recover the input val.
+        !*/</font>
+
+        <b><a name='operator'></a>operator</b> <font color='#0000FF'><u>double</u></font>      <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> convert_to_T<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <b><a name='operator'></a>operator</b> <font color='#0000FF'><u>float</u></font>       <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> convert_to_T<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <b><a name='operator'></a>operator</b> <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> convert_to_T<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - converts the contents of this float_details object into a floating point number.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> int16 is_inf  <font color='#5555FF'>=</font> <font color='#979000'>32000</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> int16 is_ninf <font color='#5555FF'>=</font> <font color='#979000'>32001</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> int16 is_nan  <font color='#5555FF'>=</font> <font color='#979000'>32002</font>;
+
+        int64 mantissa;
+        int16 exponent;
+
+
+    <font color='#0000FF'>private</font>:
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                                  IMPLEMENTATION DETAILS 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+
+
+        <font color='#0000FF'><u>double</u></font>      <b><a name='_frexp'></a>_frexp</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font>      v, <font color='#0000FF'><u>int</u></font><font color='#5555FF'>*</font> e<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>frexp</font><font face='Lucida Console'>(</font>v,e<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>float</u></font>       <b><a name='_frexp'></a>_frexp</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>float</u></font>       v, <font color='#0000FF'><u>int</u></font><font color='#5555FF'>*</font> e<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>frexpf</font><font face='Lucida Console'>(</font>v,e<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font>      <b><a name='_ldexp'></a>_ldexp</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font>      v, <font color='#0000FF'><u>int</u></font> e<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>ldexp</font><font face='Lucida Console'>(</font>v,e<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>float</u></font>       <b><a name='_ldexp'></a>_ldexp</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>float</u></font>       v, <font color='#0000FF'><u>int</u></font> e<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>ldexpf</font><font face='Lucida Console'>(</font>v,e<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#0000FF'>#ifdef</font> __CYGWIN__
+        <font color='#009900'>// frexpl and ldexpl aren't available on cygwin so just use the double version.
+</font>        <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> <b><a name='_frexp'></a>_frexp</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> v, <font color='#0000FF'><u>int</u></font><font color='#5555FF'>*</font> e<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>_frexp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>v,e<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> <b><a name='_ldexp'></a>_ldexp</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> v, <font color='#0000FF'><u>int</u></font> e<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>_ldexp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>v,e<font face='Lucida Console'>)</font>; <b>}</b>
+<font color='#0000FF'>#else</font>
+        <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> <b><a name='_frexp'></a>_frexp</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> v, <font color='#0000FF'><u>int</u></font><font color='#5555FF'>*</font> e<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>frexpl</font><font face='Lucida Console'>(</font>v,e<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> <b><a name='_ldexp'></a>_ldexp</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> v, <font color='#0000FF'><u>int</u></font> e<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>ldexpl</font><font face='Lucida Console'>(</font>v,e<font face='Lucida Console'>)</font>; <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='convert_from_T'></a>convert_from_T</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> val
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            mantissa <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> digits <font color='#5555FF'>=</font> dlib::tmin<font color='#5555FF'>&lt;</font>std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::digits, <font color='#979000'>63</font><font color='#5555FF'>&gt;</font>::value;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                exponent <font color='#5555FF'>=</font> is_inf;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                exponent <font color='#5555FF'>=</font> is_ninf;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val <font color='#5555FF'>&lt;</font> std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>int</u></font> exp;
+                mantissa <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>int64<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>_frexp</font><font face='Lucida Console'>(</font>val, <font color='#5555FF'>&amp;</font>exp<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>uint64<font face='Lucida Console'>)</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>digits<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                exponent <font color='#5555FF'>=</font> exp <font color='#5555FF'>-</font> digits;
+
+                <font color='#009900'>// Compact the representation a bit by shifting off any low order bytes 
+</font>                <font color='#009900'>// which are zero in the mantissa.  This makes the numbers in mantissa and
+</font>                <font color='#009900'>// exponent generally smaller which can make serialization and other things
+</font>                <font color='#009900'>// more efficient in some cases.
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>mantissa<font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    mantissa <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+                    exponent <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                exponent <font color='#5555FF'>=</font> is_nan;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        T <b><a name='convert_to_T'></a>convert_to_T</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>exponent <font color='#5555FF'>&lt;</font> is_inf<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>_ldexp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font>mantissa, exponent<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>exponent <font color='#5555FF'>=</font><font color='#5555FF'>=</font> is_inf<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>exponent <font color='#5555FF'>=</font><font color='#5555FF'>=</font> is_ninf<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>quiet_NaN</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b>;
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_FLOAT_DEtAILS_Hh_
+</font>
+
+</pre></body></html>

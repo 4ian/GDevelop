@@ -1,0 +1,332 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - threads_kernel_shared.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_THREADS_KERNEL_SHARED_CPp_
+<font color='#0000FF'>#define</font> DLIB_THREADS_KERNEL_SHARED_CPp_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel_shared.h.html'>threads_kernel_shared.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../platform.h.html'>../platform.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#009900'>// The point of this block of code is to cause a link time error that will prevent a user
+</font><font color='#009900'>// from compiling part of their application with DLIB_ASSERT enabled and part with them
+</font><font color='#009900'>// disabled since doing that would be a violation of C++'s one definition rule. 
+</font><font color='#0000FF'>extern</font> "<font color='#CC0000'>C</font>"
+<b>{</b>
+<font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+    <font color='#0000FF'><u>int</u></font> USER_ERROR__missing_dlib_all_source_cpp_file__OR__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives;
+<font color='#0000FF'>#else</font>
+    <font color='#0000FF'><u>int</u></font> USER_ERROR__missing_dlib_all_source_cpp_file__OR__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives_;
+<font color='#0000FF'>#endif</font>
+<b>}</b>
+
+<font color='#0000FF'>#ifndef</font> DLIB_THREAD_POOL_TIMEOUT
+<font color='#009900'>// default to 30000 milliseconds
+</font><font color='#0000FF'>#define</font> DLIB_THREAD_POOL_TIMEOUT <font color='#979000'>30000</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// threader functions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> threads_kernel_shared 
+    <b>{</b>
+
+        <font color='#0000FF'><u>bool</u></font> thread_pool_has_been_destroyed <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        threader<font color='#5555FF'>&amp;</font> <b><a name='thread_pool'></a>thread_pool</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>static</font> threader<font color='#5555FF'>*</font> thread_pool <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> threader;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>thread_pool;
+        <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>struct</font> <b><a name='threader_destruct_helper'></a>threader_destruct_helper</b>
+        <b>{</b>
+            <font color='#009900'>// cause the thread pool to begin its destruction process when 
+</font>            <font color='#009900'>// global objects start to be destroyed
+</font>            ~<b><a name='threader_destruct_helper'></a>threader_destruct_helper</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>thread_pool</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>destruct_if_ready</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+        <font color='#0000FF'>static</font> threader_destruct_helper a;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'><u>bool</u></font> threader::
+        <b><a name='is_dlib_thread'></a>is_dlib_thread</b> <font face='Lucida Console'>(</font>
+            thread_id_type id
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>data_mutex<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> thread_ids.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        threader::
+        <b><a name='threader'></a>threader</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            total_count<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            function_pointer<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            pool_count<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            data_ready<font face='Lucida Console'>(</font>data_mutex<font face='Lucida Console'>)</font>,
+            data_empty<font face='Lucida Console'>(</font>data_mutex<font face='Lucida Console'>)</font>,
+            destruct<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+            destructed<font face='Lucida Console'>(</font>data_mutex<font face='Lucida Console'>)</font>,
+            do_not_ever_destruct<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+<font color='#0000FF'>#ifdef</font> WIN32
+            <font color='#009900'>// Trying to destroy the global thread pool when we are part of a DLL and the
+</font>            <font color='#009900'>// DLL is being unloaded can sometimes lead to weird behavior.  For example, in
+</font>            <font color='#009900'>// the python interpreter you will get the interpreter to hang.  Or if we are
+</font>            <font color='#009900'>// part of a MATLAB mex file and the file is being unloaded there can also be
+</font>            <font color='#009900'>// similar weird issues.  So when we are using dlib on windows we just disable
+</font>            <font color='#009900'>// the destruction of the global thread pool since it doesn't matter anyway.
+</font>            <font color='#009900'>// It's resources will just get freed by the OS.  This is even the recommended
+</font>            <font color='#009900'>// thing to do by Microsoft (http://blogs.msdn.com/b/oldnewthing/archive/2012/01/05/10253268.aspx).
+</font>            <font color='#009900'>// 
+</font>            <font color='#009900'>// As an aside, it's worth pointing out that the reason we try and free
+</font>            <font color='#009900'>// resources on program shutdown on other operating systems is so we can have
+</font>            <font color='#009900'>// clean reports from tools like valgrind which check for memory leaks.  But
+</font>            <font color='#009900'>// trying to do this on windows is a lost cause so we give up in this case and
+</font>            <font color='#009900'>// follow the Microsoft recommendation.
+</font>            do_not_ever_destruct <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+<font color='#0000FF'>#endif</font> <font color='#009900'>// WIN32
+</font>        <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        threader::
+        ~<b><a name='threader'></a>threader</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b> 
+            data_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            destruct <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            data_ready.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// wait for all the threads to end
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>total_count <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                destructed.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            thread_pool_has_been_destroyed <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            data_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'><u>void</u></font> threader::
+        <b><a name='destruct_if_ready'></a>destruct_if_ready</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>do_not_ever_destruct<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font>;
+
+            data_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// if there aren't any active threads, just maybe some sitting around
+</font>            <font color='#009900'>// in the pool then just destroy the threader
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>total_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> pool_count<font face='Lucida Console'>)</font>
+            <b>{</b>
+                destruct <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                data_ready.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                data_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>delete</font> <font color='#0000FF'>this</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// There are still some user threads running so there isn't
+</font>                <font color='#009900'>// much we can really do.  Just let the program end without
+</font>                <font color='#009900'>// cleaning up threading resources.  
+</font>                data_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'><u>void</u></font> threader::
+        <b><a name='call_end_handlers'></a>call_end_handlers</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            reg.m.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> thread_id_type id <font color='#5555FF'>=</font> <font color='#BB00BB'>get_thread_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            thread_id_type id_copy;
+            member_function_pointer<font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> mfp;
+
+            <font color='#009900'>// Remove all the member function pointers for this thread from the tree 
+</font>            <font color='#009900'>// and call them.
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>reg.reg[id] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                reg.reg.<font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font>id,id_copy,mfp<font face='Lucida Console'>)</font>;
+                reg.m.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>mfp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                reg.m.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            reg.m.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'><u>bool</u></font> threader::
+        <b><a name='create_new_thread'></a>create_new_thread</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font>,
+            <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> param
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#009900'>// get a lock on the data mutex
+</font>            auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>data_mutex<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// loop to ensure that the new function pointer is in the data
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// if the data is empty then add new data and quit loop
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>function_pointer <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    parameter <font color='#5555FF'>=</font> param;
+                    function_pointer <font color='#5555FF'>=</font> funct;
+                    <font color='#0000FF'>break</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// wait for data to become empty
+</font>                    data_empty.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+
+            <font color='#009900'>// get a thread for this new data
+</font>            <font color='#009900'>// if a new thread must be created
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pool_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// make thread and add it to the pool
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> threads_kernel_shared_helpers::<font color='#BB00BB'>spawn_thread</font><font face='Lucida Console'>(</font>thread_starter, <font color='#0000FF'>this</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    function_pointer <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    parameter <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    data_empty.<font color='#BB00BB'>signal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <b>}</b>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>total_count;
+            <b>}</b>
+            <font color='#009900'>// wake up a thread from the pool
+</font>            <font color='#0000FF'>else</font>
+            <b>{</b>
+                data_ready.<font color='#BB00BB'>signal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread_starter'></a>thread_starter</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> object
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// get a reference to the calling threader object
+</font>            threader<font color='#5555FF'>&amp;</font> self <font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>threader<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>object<font face='Lucida Console'>)</font>;
+
+
+            <b>{</b>
+            auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>self.data_mutex<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// add this thread id
+</font>            thread_id_type thread_id <font color='#5555FF'>=</font> <font color='#BB00BB'>get_thread_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            self.thread_ids.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>thread_id<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// indicate that this thread is now in the thread pool
+</font>            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>self.pool_count;
+
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>self.destruct <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// if data is ready then process it and launch the thread
+</font>                <font color='#009900'>// if its not ready then go back into the pool
+</font>                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>self.function_pointer <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>                
+                    <font color='#009900'>// indicate that this thread is now out of the thread pool
+</font>                    <font color='#5555FF'>-</font><font color='#5555FF'>-</font>self.pool_count;
+
+                    <font color='#009900'>// get the data for the function call
+</font>                    <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> self.function_pointer;
+                    <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> param <font color='#5555FF'>=</font> self.parameter;
+                    self.function_pointer <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                    <font color='#009900'>// signal that the data is now empty
+</font>                    self.data_empty.<font color='#BB00BB'>signal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                    self.data_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#009900'>// Call funct with its intended parameter.  If this function throws then
+</font>                    <font color='#009900'>// we intentionally let the exception escape the thread and result in whatever
+</font>                    <font color='#009900'>// happens when it gets caught by the OS (generally the program is terminated).
+</font>                    <font color='#BB00BB'>funct</font><font face='Lucida Console'>(</font>param<font face='Lucida Console'>)</font>;
+                    self.<font color='#BB00BB'>call_end_handlers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                    self.data_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// indicate that this thread is now back in the thread pool
+</font>                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>self.pool_count;
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>self.destruct <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+
+                <font color='#009900'>// if we timed out and there isn't any work to do then
+</font>                <font color='#009900'>// this thread will quit this loop and end.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>self.data_ready.<font color='#BB00BB'>wait_or_timeout</font><font face='Lucida Console'>(</font>DLIB_THREAD_POOL_TIMEOUT<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                    self.function_pointer <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+
+            <b>}</b>
+
+            <font color='#009900'>// remove this thread id from thread_ids
+</font>            thread_id <font color='#5555FF'>=</font> <font color='#BB00BB'>get_thread_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            self.thread_ids.<font color='#BB00BB'>destroy</font><font face='Lucida Console'>(</font>thread_id<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// indicate that this thread is now out of the thread pool
+</font>            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>self.pool_count;
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>self.total_count;
+
+            self.destructed.<font color='#BB00BB'>signal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <b>}</b> <font color='#009900'>// end of auto_mutex M(self.data_mutex) block
+</font>        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_dlib_thread'></a>is_dlib_thread</b> <font face='Lucida Console'>(</font>
+        thread_id_type id
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> threads_kernel_shared::<font color='#BB00BB'>thread_pool</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>is_dlib_thread</font><font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_dlib_thread'></a>is_dlib_thread</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>is_dlib_thread</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_thread_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_THREADS_KERNEL_SHARED_CPp_
+</font>
+
+</pre></body></html>

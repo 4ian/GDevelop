@@ -1,0 +1,687 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - kcentroid.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>matrix.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>map<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../stl_checked.h.html'>../stl_checked.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array.h.html'>../array.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../rand.h.html'>../rand.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='checkerboard.h.html'>checkerboard.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>statistics.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm_threaded.h<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.kcentroid</font>"<font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='unopt_sparse_linear_kernel'></a>unopt_sparse_linear_kernel</b>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::value_type::second_type scalar_type;
+        <font color='#0000FF'>typedef</font> T sample_type;
+        <font color='#0000FF'>typedef</font> default_memory_manager mem_manager_type;
+
+        scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> unopt_sparse_linear_kernel<font color='#5555FF'>&amp;</font> 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='unopt_linear_kernel'></a>unopt_linear_kernel</b>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type scalar_type;
+        <font color='#0000FF'>typedef</font> T sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::mem_manager_type mem_manager_type;
+
+        scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>b;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> unopt_linear_kernel<font color='#5555FF'>&amp;</font> 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'><u>bool</u></font> <b><a name='approx_equal'></a>approx_equal</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> a, <font color='#0000FF'><u>double</u></font> b<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>-</font>b<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1000</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>bool</u></font> <b><a name='approx_equal'></a>approx_equal</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> a, <font color='#0000FF'><u>double</u></font> b, <font color='#0000FF'><u>double</u></font> eps<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>-</font>b<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> eps<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> K<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='dist'></a>dist</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> K<font color='#5555FF'>&amp;</font> k,
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>4</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>5</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        ensures
+            - returns the distance between the a and b vectors in the
+              feature space defined by the given kernel k.
+    !*/</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> bias <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>k.offset<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>-</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>b,<font color='#979000'>0</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font><font color='#BB00BB'>b</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>bias,<font color='#979000'>2.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> K<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='dist'></a>dist</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> K<font color='#5555FF'>&amp;</font> k,
+        std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> a,
+        std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> b
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        ensures
+            - returns the distance between the a and b vectors in the
+              feature space defined by the given kernel k.
+    !*/</font>
+    <b>{</b>
+        <font color='#0000FF'><u>double</u></font> temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> bias <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>k.offset<font face='Lucida Console'>)</font>;
+        temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>a[<font color='#979000'>0</font>]<font color='#5555FF'>-</font>b[<font color='#979000'>0</font>],<font color='#979000'>2.0</font><font face='Lucida Console'>)</font>;
+        temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>a[<font color='#979000'>1</font>]<font color='#5555FF'>-</font>b[<font color='#979000'>1</font>],<font color='#979000'>2.0</font><font face='Lucida Console'>)</font>;
+        temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>a[<font color='#979000'>2</font>]<font color='#5555FF'>-</font>b[<font color='#979000'>2</font>],<font color='#979000'>2.0</font><font face='Lucida Console'>)</font>;
+        temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>a[<font color='#979000'>3</font>]<font color='#5555FF'>-</font>b[<font color='#979000'>3</font>],<font color='#979000'>2.0</font><font face='Lucida Console'>)</font>;
+        temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>bias<font color='#5555FF'>-</font>b[<font color='#979000'>4</font>],<font color='#979000'>2.0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_kcentroid_with_linear_kernel'></a>test_kcentroid_with_linear_kernel</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - kernel_type::sample_type == a matrix&lt;double,5,1&gt;
+            - kernel_type == a kernel that just computes a dot product
+              between its inputs.  I.e. a linear kernel
+        ensures
+            - tests the kcentroid object with the given kernel
+    !*/</font>
+    <b>{</b>
+        <font color='#009900'>// Here we declare that our samples will be 2 dimensional column vectors.  
+</font>        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+
+        kernel_type default_kernel;
+        kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>default_kernel,<font color='#979000'>0.001</font>,<font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+
+        sample_type temp, temp2;
+
+        temp <font color='#5555FF'>=</font> <font color='#979000'>2</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font> ;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>squared_norm(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> ;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make test store the point(2,0,0,0,0)
+</font>        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp, <font color='#979000'>0</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font> ;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>squared_norm(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> ;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>2</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font> ;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>2.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make test store the point(0,2,0,0,0)
+</font>        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp, <font color='#979000'>0</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font> ;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        temp <font color='#5555FF'>=</font> <font color='#979000'>2</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>2.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make test store the point(1,1,0,0,0)
+</font>        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp, <font color='#979000'>0.5</font>, <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+
+        temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#979000'>2.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make test store the point(1,1,0,3,0)
+</font>        temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>3</font>,<font color='#979000'>0</font>;
+        temp2 <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>3</font>,<font color='#979000'>0</font>;
+        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp, <font color='#979000'>1</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        temp <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#979000'>3</font>,<font color='#979000'>4</font>,<font color='#979000'>5</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>temp2<font color='#5555FF'>-</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>temp2<font color='#5555FF'>-</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make test store the point(0,1,0,3,-1)
+</font>        temp <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>;
+        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp, <font color='#979000'>1</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        temp2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>3</font>,<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+        temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        temp <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#979000'>3</font>,<font color='#979000'>4</font>,<font color='#979000'>5</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>temp2<font color='#5555FF'>-</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// make test store the -1*point(0,1,0,3,-1)
+</font>        temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp, <font color='#5555FF'>-</font><font color='#979000'>1</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        temp2 <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>temp2;
+
+        temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        temp <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#5555FF'>-</font><font color='#979000'>3</font>,<font color='#979000'>4</font>,<font color='#979000'>5</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>temp2<font color='#5555FF'>-</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+
+        <font color='#009900'>// make test store the point(0,0,0,0,0)
+</font>        temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp, <font color='#979000'>0</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        temp2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        temp <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#5555FF'>-</font><font color='#979000'>3</font>,<font color='#979000'>4</font>,<font color='#979000'>5</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>temp2<font color='#5555FF'>-</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+
+        <font color='#009900'>// make test store the point(1,0,0,0,0)
+</font>        temp <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp, <font color='#979000'>1</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        temp2 <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+
+        temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>inner_product</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        temp <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#5555FF'>-</font><font color='#979000'>3</font>,<font color='#979000'>4</font>,<font color='#979000'>5</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>temp2<font color='#5555FF'>-</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_kcentroid_with_offset_linear_kernel'></a>test_kcentroid_with_offset_linear_kernel</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - kernel_type::sample_type == a matrix&lt;double,4,1&gt;
+            - kernel_type == a kernel that just computes a dot product
+              between its inputs + some constant.  I.e. a linear kernel
+              wrapped by offset_kernel
+        ensures
+            - tests the kcentroid object with the given kernel
+    !*/</font>
+    <b>{</b>
+        <font color='#009900'>// Here we declare that our samples will be 2 dimensional column vectors.  
+</font>        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+
+        kernel_type k;
+        kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>k,<font color='#979000'>0.001</font>,<font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+
+        sample_type temp, temp2, temp3;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>5</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> val, val2;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> b <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>k.offset<font face='Lucida Console'>)</font>;
+
+        temp <font color='#5555FF'>=</font> <font color='#979000'>2</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+        temp2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        val <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        temp2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#009900'>// make test store the point(0,0,0,0,b)
+</font>        val <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,b;
+        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp2, <font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        temp <font color='#5555FF'>=</font> <font color='#979000'>2</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font> ;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>squared_norm(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> ;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font>, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>6</font><font face='Lucida Console'>)</font>, 
+                     test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  compare to: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                     <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// make test store the point(0,0,0,0,0)
+</font>        val <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp2, <font color='#979000'>1</font>,<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, 
+                     test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  compare to: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                     <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+
+        val2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,b;
+        val <font color='#5555FF'>+</font><font color='#5555FF'>=</font> val2;
+        temp2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+        <font color='#009900'>// make test store the point val
+</font>        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp2, <font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        temp <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>3</font>,<font color='#979000'>0</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font>, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>, 
+                     <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>, <font color='#979000'>0</font>, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        val2 <font color='#5555FF'>=</font>  <font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>2.6</font>,<font color='#979000'>8</font>,b;
+        val <font color='#5555FF'>+</font><font color='#5555FF'>=</font> val2;
+        temp2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>2.6</font>,<font color='#979000'>8</font>;
+        <font color='#009900'>// make test store the point val
+</font>        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp2, <font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        temp <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>1</font>,<font color='#979000'>3</font>,<font color='#979000'>0</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>inner_product</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#979000'>0</font>, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>6</font><font face='Lucida Console'>)</font>, 
+                     test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_kcentroid_with_sparse_linear_kernel'></a>test_kcentroid_with_sparse_linear_kernel</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - kernel_type::sample_type == a std::map&lt;unsigned long,double&gt; 
+            - kernel_type == a kernel that just computes a dot product
+              between its inputs.  I.e. a linear kernel
+        ensures
+            - tests the kcentroid object with the given kernel
+    !*/</font>
+    <b>{</b>
+        <font color='#009900'>// Here we declare that our samples will be 2 dimensional column vectors.  
+</font>        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+
+        kernel_type default_kernel;
+        kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>default_kernel,<font color='#979000'>0.001</font>,<font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>AAAA 1</font>" ;
+
+        sample_type temp, temp2;
+
+        temp[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font> ;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>squared_norm(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> ;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make test store the point(2,0,0,0,0)
+</font>        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp, <font color='#979000'>0</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font> ;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>squared_norm(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> ;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>AAAA 2</font>" ;
+        temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        temp[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font> ;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>2.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make test store the point(0,2,0,0,0)
+</font>        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp, <font color='#979000'>0</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font> ;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        temp[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>2.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make test store the point(1,1,0,0,0)
+</font>        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp, <font color='#979000'>0.5</font>, <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>AAAA 3</font>" ;
+        temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#979000'>2.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>AAAA 3.1</font>" ;
+        <font color='#009900'>// make test store the point(1,1,0,3,0)
+</font>        temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; temp[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        temp2.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        temp2[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        temp2[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        temp2[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp, <font color='#979000'>1</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>AAAA 3.2</font>" ;
+        temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>AAAA 3.3</font>" ;
+        temp[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        temp[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+        temp[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        temp[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+        temp[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>AAAA 3.4</font>" ;
+        <font color='#0000FF'><u>double</u></font> junk <font color='#5555FF'>=</font> dlib::<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font>temp2,temp<font face='Lucida Console'>)</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>AAAA 3.5</font>" ;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, junk<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>AAAA 4</font>" ;
+        <font color='#009900'>// make test store the point(0,1,0,3,-1)
+</font>        temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        temp[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        temp[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp, <font color='#979000'>1</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        temp2.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        temp2[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        temp2[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        temp2[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+        temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        temp[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        temp[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+        temp[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        temp[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+        temp[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, dlib::<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font>temp2,temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// make test store the -1*point(0,1,0,3,-1)
+</font>        temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp, <font color='#5555FF'>-</font><font color='#979000'>1</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        temp2[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>temp2[<font color='#979000'>0</font>];
+        temp2[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>temp2[<font color='#979000'>1</font>];
+        temp2[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>temp2[<font color='#979000'>2</font>];
+        temp2[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>temp2[<font color='#979000'>3</font>];
+        temp2[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>temp2[<font color='#979000'>4</font>];
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>AAAA 5</font>" ;
+        temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        temp[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        temp[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+        temp[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>3</font>;
+        temp[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+        temp[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, dlib::<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font>temp2,temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+
+        <font color='#009900'>// make test store the point(0,0,0,0,0)
+</font>        temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp, <font color='#979000'>0</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        temp2.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        temp[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        temp[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+        temp[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>3</font>;
+        temp[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+        temp[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, dlib::<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font>temp2,temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, dlib::<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font>temp2,temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>AAAA 6</font>" ;
+
+        <font color='#009900'>// make test store the point(1,0,0,0,0)
+</font>        temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        temp[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp, <font color='#979000'>1</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        temp2.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        temp2[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>inner_product</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        temp[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        temp[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+        temp[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>3</font>;
+        temp[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+        temp[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, dlib::<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font>temp2,temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, dlib::<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font>temp2,temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>AAAA 7</font>" ;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_kcentroid_with_offset_sparse_linear_kernel'></a>test_kcentroid_with_offset_sparse_linear_kernel</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - kernel_type::sample_type == a std::map&lt;unsigned long,double&gt; 
+            - kernel_type == a kernel that just computes a dot product
+              between its inputs + some constant.  I.e. a linear kernel
+              wrapped by offset_kernel
+        ensures
+            - tests the kcentroid object with the given kernel
+    !*/</font>
+    <b>{</b>
+        <font color='#009900'>// Here we declare that our samples will be 2 dimensional column vectors.  
+</font>        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+
+        kernel_type k;
+        kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>k,<font color='#979000'>0.001</font>,<font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+
+        sample_type temp, temp2, temp3;
+
+        std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> val, val2;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> b <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>k.offset<font face='Lucida Console'>)</font>;
+
+        temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        temp[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+        temp2.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        val.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        temp2.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make test store the point(0,0,0,0,b)
+</font>        val.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        val[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> b;
+        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp2, <font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        temp[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font> ;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>squared_norm(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> ;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font>, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>, 
+                     test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#979000'>0</font>, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>6</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make test store the point(0,0,0,0,0)
+</font>        val.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp2, <font color='#979000'>1</font>,<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        temp[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font> ;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>squared_norm(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> ;
+
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        val2.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        val2[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        val2[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        val2[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        val2[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        val2[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> b;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>5</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font> val[i] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> val2[i];
+        temp2.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        temp2[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#009900'>// make test store the point val
+</font>        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp2, <font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        temp[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        temp[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font>, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>, 
+                     <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        val2.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        val2[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        val2[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        val2[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>2.6</font>;
+        val2[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+        val2[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> b;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>5</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font> val[i] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> val2[i];
+
+        temp2.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        temp2[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        temp2[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        temp2[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>2.6</font>;
+        temp2[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+        <font color='#009900'>// make test store the point val
+</font>        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp2, <font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        temp[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        temp[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        temp[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        temp[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font>, <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font>k,temp2,val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>squared_norm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>inner_product</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>, <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>, <font color='#979000'>0</font>, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>6</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>approx_equal</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_distance_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='kcentroid_tester'></a>kcentroid_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='kcentroid_tester'></a>kcentroid_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_kcentroid</font>",
+                    "<font color='#CC0000'>Runs tests on the kcentroid components.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// The idea here is to exercize all the various overloads of the kcentroid object.  We also want
+</font>            <font color='#009900'>// to exercize the non-overloaded default version.  That is why we have these unopt_* linear
+</font>            <font color='#009900'>// kernels
+</font>            test_kcentroid_with_linear_kernel<font color='#5555FF'>&lt;</font>linear_kernel<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>5</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test_kcentroid_with_offset_linear_kernel<font color='#5555FF'>&lt;</font>offset_kernel<font color='#5555FF'>&lt;</font>linear_kernel<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>4</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test_kcentroid_with_linear_kernel<font color='#5555FF'>&lt;</font>unopt_linear_kernel<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>5</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test_kcentroid_with_offset_linear_kernel<font color='#5555FF'>&lt;</font>offset_kernel<font color='#5555FF'>&lt;</font>unopt_linear_kernel<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>4</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test_kcentroid_with_sparse_linear_kernel<font color='#5555FF'>&lt;</font>sparse_linear_kernel<font color='#5555FF'>&lt;</font>std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test_kcentroid_with_offset_sparse_linear_kernel<font color='#5555FF'>&lt;</font>offset_kernel<font color='#5555FF'>&lt;</font>sparse_linear_kernel<font color='#5555FF'>&lt;</font>std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test_kcentroid_with_sparse_linear_kernel<font color='#5555FF'>&lt;</font>unopt_sparse_linear_kernel<font color='#5555FF'>&lt;</font>std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test_kcentroid_with_offset_sparse_linear_kernel<font color='#5555FF'>&lt;</font>offset_kernel<font color='#5555FF'>&lt;</font>unopt_sparse_linear_kernel<font color='#5555FF'>&lt;</font>std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> a;
+
+<b>}</b>
+
+
+
+</pre></body></html>

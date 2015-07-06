@@ -1,0 +1,844 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - pngtrans.c</title></head><body bgcolor='white'><pre>
+
+<font color='#009900'>/* pngtrans.c - transforms the data in a row (used by both readers and writers)
+ *
+ * Last changed in libpng 1.6.2 [April 25, 2013]
+ * Copyright (c) 1998-2013 Glenn Randers-Pehrson
+ * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
+ * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
+ */</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='pngpriv.h.html'>pngpriv.h</a>"
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>PNG_READ_SUPPORTED<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>PNG_WRITE_SUPPORTED<font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>PNG_READ_BGR_SUPPORTED<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>PNG_WRITE_BGR_SUPPORTED<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Turn on BGR-to-RGB mapping */</font>
+<font color='#0000FF'><u>void</u></font> PNGAPI
+<b><a name='png_set_bgr'></a>png_set_bgr</b><font face='Lucida Console'>(</font>png_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#BB00BB'>png_debug</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, "<font color='#CC0000'>in png_set_bgr</font>"<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>transformations <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_BGR;
+<b>}</b>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>PNG_READ_SWAP_SUPPORTED<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>PNG_WRITE_SWAP_SUPPORTED<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Turn on 16 bit byte swapping */</font>
+<font color='#0000FF'><u>void</u></font> PNGAPI
+<b><a name='png_set_swap'></a>png_set_swap</b><font face='Lucida Console'>(</font>png_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#BB00BB'>png_debug</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, "<font color='#CC0000'>in png_set_swap</font>"<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bit_depth <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>transformations <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_SWAP_BYTES;
+<b>}</b>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>PNG_READ_PACK_SUPPORTED<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>PNG_WRITE_PACK_SUPPORTED<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Turn on pixel packing */</font>
+<font color='#0000FF'><u>void</u></font> PNGAPI
+<b><a name='png_set_packing'></a>png_set_packing</b><font face='Lucida Console'>(</font>png_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#BB00BB'>png_debug</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, "<font color='#CC0000'>in png_set_packing</font>"<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bit_depth <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>transformations <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_PACK;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>usr_bit_depth <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+   <b>}</b>
+<b>}</b>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>PNG_READ_PACKSWAP_SUPPORTED<font face='Lucida Console'>)</font><font color='#5555FF'>|</font><font color='#5555FF'>|</font>defined<font face='Lucida Console'>(</font>PNG_WRITE_PACKSWAP_SUPPORTED<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Turn on packed pixel swapping */</font>
+<font color='#0000FF'><u>void</u></font> PNGAPI
+<b><a name='png_set_packswap'></a>png_set_packswap</b><font face='Lucida Console'>(</font>png_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#BB00BB'>png_debug</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, "<font color='#CC0000'>in png_set_packswap</font>"<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bit_depth <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>transformations <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_PACKSWAP;
+<b>}</b>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>PNG_READ_SHIFT_SUPPORTED<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>PNG_WRITE_SHIFT_SUPPORTED<font face='Lucida Console'>)</font>
+<font color='#0000FF'><u>void</u></font> PNGAPI
+<b><a name='png_set_shift'></a>png_set_shift</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_const_color_8p true_bits<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#BB00BB'>png_debug</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, "<font color='#CC0000'>in png_set_shift</font>"<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>transformations <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_SHIFT;
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>shift <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>true_bits;
+<b>}</b>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>PNG_READ_INTERLACING_SUPPORTED<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> \
+    <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>PNG_WRITE_INTERLACING_SUPPORTED<font face='Lucida Console'>)</font>
+<font color='#0000FF'><u>int</u></font> PNGAPI
+<b><a name='png_set_interlace_handling'></a>png_set_interlace_handling</b><font face='Lucida Console'>(</font>png_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#BB00BB'>png_debug</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, "<font color='#CC0000'>in png_set_interlace handling</font>"<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>interlaced<font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>transformations <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_INTERLACE;
+      <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+   <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>PNG_READ_FILLER_SUPPORTED<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>PNG_WRITE_FILLER_SUPPORTED<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Add a filler byte on read, or remove a filler or alpha byte on write.
+ * The filler type has changed in v0.95 to allow future 2-byte fillers
+ * for 48-bit input data, as well as to avoid problems with some compilers
+ * that don't like bytes as parameters.
+ */</font>
+<font color='#0000FF'><u>void</u></font> PNGAPI
+<b><a name='png_set_filler'></a>png_set_filler</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_uint_32 filler, <font color='#0000FF'><u>int</u></font> filler_loc<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#BB00BB'>png_debug</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, "<font color='#CC0000'>in png_set_filler</font>"<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+   <font color='#009900'>/* In libpng 1.6 it is possible to determine whether this is a read or write
+    * operation and therefore to do more checking here for a valid call.
+    */</font>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>&amp;</font> PNG_IS_READ_STRUCT<font face='Lucida Console'>)</font>
+   <b>{</b>
+#     ifdef PNG_READ_FILLER_SUPPORTED
+         <font color='#009900'>/* On read png_set_filler is always valid, regardless of the base PNG
+          * format, because other transformations can give a format where the
+          * filler code can execute (basically an 8 or 16-bit component RGB or G
+          * format.)
+          *
+          * NOTE: usr_channels is not used by the read code!  (This has led to
+          * confusion in the past.)  The filler is only used in the read code.
+          */</font>
+         png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>filler <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>png_uint_16<font face='Lucida Console'>)</font>filler;
+#     <font color='#0000FF'>else</font>
+         <font color='#BB00BB'>png_app_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>png_set_filler not supported on read</font>"<font face='Lucida Console'>)</font>;
+         <font color='#BB00BB'>PNG_UNUSED</font><font face='Lucida Console'>(</font>filler<font face='Lucida Console'>)</font> <font color='#009900'>/* not used in the write case */</font>
+         <font color='#0000FF'>return</font>;
+#     endif
+   <b>}</b>
+
+   <font color='#0000FF'>else</font> <font color='#009900'>/* write */</font>
+   <b>{</b>
+#     ifdef PNG_WRITE_FILLER_SUPPORTED
+         <font color='#009900'>/* On write the usr_channels parameter must be set correctly at the
+          * start to record the number of channels in the app-supplied data.
+          */</font>
+         <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_type<font face='Lucida Console'>)</font>
+         <b>{</b>
+            <font color='#0000FF'>case</font> PNG_COLOR_TYPE_RGB:
+               png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>usr_channels <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+               <font color='#0000FF'>break</font>;
+
+            <font color='#0000FF'>case</font> PNG_COLOR_TYPE_GRAY:
+               <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bit_depth <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+               <b>{</b>
+                  png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>usr_channels <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+                  <font color='#0000FF'>break</font>;
+               <b>}</b>
+
+               <font color='#0000FF'>else</font>
+               <b>{</b>
+                  <font color='#009900'>/* There simply isn't any code in libpng to strip out bits
+                   * from bytes when the components are less than a byte in
+                   * size!
+                   */</font>
+                  <font color='#BB00BB'>png_app_error</font><font face='Lucida Console'>(</font>png_ptr,
+                     "<font color='#CC0000'>png_set_filler is invalid for low bit depth gray output</font>"<font face='Lucida Console'>)</font>;
+                  <font color='#0000FF'>return</font>;
+               <b>}</b>
+
+            <font color='#0000FF'>default</font>:
+               <font color='#BB00BB'>png_app_error</font><font face='Lucida Console'>(</font>png_ptr,
+                  "<font color='#CC0000'>png_set_filler: inappropriate color type</font>"<font face='Lucida Console'>)</font>;
+               <font color='#0000FF'>return</font>;
+         <b>}</b>
+#     <font color='#0000FF'>else</font>
+         <font color='#BB00BB'>png_app_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>png_set_filler not supported on write</font>"<font face='Lucida Console'>)</font>;
+         <font color='#0000FF'>return</font>;
+#     endif
+   <b>}</b>
+
+   <font color='#009900'>/* Here on success - libpng supports the operation, set the transformation
+    * and the flag to say where the filler channel is.
+    */</font>
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>transformations <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_FILLER;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>filler_loc <font color='#5555FF'>=</font><font color='#5555FF'>=</font> PNG_FILLER_AFTER<font face='Lucida Console'>)</font>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>flags <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_FLAG_FILLER_AFTER;
+
+   <font color='#0000FF'>else</font>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>flags <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> ~PNG_FLAG_FILLER_AFTER;
+<b>}</b>
+
+<font color='#009900'>/* Added to libpng-1.2.7 */</font>
+<font color='#0000FF'><u>void</u></font> PNGAPI
+<b><a name='png_set_add_alpha'></a>png_set_add_alpha</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_uint_32 filler, <font color='#0000FF'><u>int</u></font> filler_loc<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#BB00BB'>png_debug</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, "<font color='#CC0000'>in png_set_add_alpha</font>"<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+   <font color='#BB00BB'>png_set_filler</font><font face='Lucida Console'>(</font>png_ptr, filler, filler_loc<font face='Lucida Console'>)</font>;
+   <font color='#009900'>/* The above may fail to do anything. */</font>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>transformations <font color='#5555FF'>&amp;</font> PNG_FILLER<font face='Lucida Console'>)</font>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>transformations <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_ADD_ALPHA;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>PNG_READ_SWAP_ALPHA_SUPPORTED<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> \
+    <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>PNG_WRITE_SWAP_ALPHA_SUPPORTED<font face='Lucida Console'>)</font>
+<font color='#0000FF'><u>void</u></font> PNGAPI
+<b><a name='png_set_swap_alpha'></a>png_set_swap_alpha</b><font face='Lucida Console'>(</font>png_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#BB00BB'>png_debug</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, "<font color='#CC0000'>in png_set_swap_alpha</font>"<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>transformations <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_SWAP_ALPHA;
+<b>}</b>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>PNG_READ_INVERT_ALPHA_SUPPORTED<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> \
+    <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>PNG_WRITE_INVERT_ALPHA_SUPPORTED<font face='Lucida Console'>)</font>
+<font color='#0000FF'><u>void</u></font> PNGAPI
+<b><a name='png_set_invert_alpha'></a>png_set_invert_alpha</b><font face='Lucida Console'>(</font>png_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#BB00BB'>png_debug</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, "<font color='#CC0000'>in png_set_invert_alpha</font>"<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>transformations <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_INVERT_ALPHA;
+<b>}</b>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>PNG_READ_INVERT_SUPPORTED<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>PNG_WRITE_INVERT_SUPPORTED<font face='Lucida Console'>)</font>
+<font color='#0000FF'><u>void</u></font> PNGAPI
+<b><a name='png_set_invert_mono'></a>png_set_invert_mono</b><font face='Lucida Console'>(</font>png_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#BB00BB'>png_debug</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, "<font color='#CC0000'>in png_set_invert_mono</font>"<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>transformations <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_INVERT_MONO;
+<b>}</b>
+
+<font color='#009900'>/* Invert monochrome grayscale data */</font>
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_do_invert'></a>png_do_invert</b><font face='Lucida Console'>(</font>png_row_infop row_info, png_bytep row<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#BB00BB'>png_debug</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, "<font color='#CC0000'>in png_do_invert</font>"<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* This test removed from libpng version 1.0.13 and 1.2.0:
+   *   if (row_info-&gt;bit_depth == 1 &amp;&amp;
+   */</font>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> PNG_COLOR_TYPE_GRAY<font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_bytep rp <font color='#5555FF'>=</font> row;
+      png_size_t i;
+      png_size_t istop <font color='#5555FF'>=</font> row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowbytes;
+
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> istop; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#5555FF'>*</font>rp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>png_byte<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>~<font face='Lucida Console'>(</font><font color='#5555FF'>*</font>rp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+         rp<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+      <b>}</b>
+   <b>}</b>
+
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> PNG_COLOR_TYPE_GRAY_ALPHA <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+      row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bit_depth <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_bytep rp <font color='#5555FF'>=</font> row;
+      png_size_t i;
+      png_size_t istop <font color='#5555FF'>=</font> row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowbytes;
+
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> istop; i <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#5555FF'>*</font>rp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>png_byte<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>~<font face='Lucida Console'>(</font><font color='#5555FF'>*</font>rp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+         rp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+      <b>}</b>
+   <b>}</b>
+
+<font color='#0000FF'>#ifdef</font> PNG_16BIT_SUPPORTED
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> PNG_COLOR_TYPE_GRAY_ALPHA <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+      row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bit_depth <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_bytep rp <font color='#5555FF'>=</font> row;
+      png_size_t i;
+      png_size_t istop <font color='#5555FF'>=</font> row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowbytes;
+
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> istop; i <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#5555FF'>*</font>rp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>png_byte<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>~<font face='Lucida Console'>(</font><font color='#5555FF'>*</font>rp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+         <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rp <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>png_byte<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>~<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rp <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+         rp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+      <b>}</b>
+   <b>}</b>
+<font color='#0000FF'>#endif</font>
+<b>}</b>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> PNG_16BIT_SUPPORTED
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>PNG_READ_SWAP_SUPPORTED<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>PNG_WRITE_SWAP_SUPPORTED<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Swaps byte order on 16 bit depth images */</font>
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_do_swap'></a>png_do_swap</b><font face='Lucida Console'>(</font>png_row_infop row_info, png_bytep row<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#BB00BB'>png_debug</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, "<font color='#CC0000'>in png_do_swap</font>"<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bit_depth <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_bytep rp <font color='#5555FF'>=</font> row;
+      png_uint_32 i;
+      png_uint_32 istop<font color='#5555FF'>=</font> row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>width <font color='#5555FF'>*</font> row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>channels;
+
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> istop; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, rp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+      <b>{</b>
+         png_byte t <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>rp;
+         <font color='#5555FF'>*</font>rp <font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rp <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+         <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rp <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> t;
+      <b>}</b>
+   <b>}</b>
+<b>}</b>
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>PNG_READ_PACKSWAP_SUPPORTED<font face='Lucida Console'>)</font><font color='#5555FF'>|</font><font color='#5555FF'>|</font>defined<font face='Lucida Console'>(</font>PNG_WRITE_PACKSWAP_SUPPORTED<font face='Lucida Console'>)</font>
+<font color='#0000FF'>static</font> PNG_CONST png_byte onebppswaptable[<font color='#979000'>256</font>] <font color='#5555FF'>=</font> <b>{</b>
+   <font color='#979000'>0x00</font>, <font color='#979000'>0x80</font>, <font color='#979000'>0x40</font>, <font color='#979000'>0xC0</font>, <font color='#979000'>0x20</font>, <font color='#979000'>0xA0</font>, <font color='#979000'>0x60</font>, <font color='#979000'>0xE0</font>,
+   <font color='#979000'>0x10</font>, <font color='#979000'>0x90</font>, <font color='#979000'>0x50</font>, <font color='#979000'>0xD0</font>, <font color='#979000'>0x30</font>, <font color='#979000'>0xB0</font>, <font color='#979000'>0x70</font>, <font color='#979000'>0xF0</font>,
+   <font color='#979000'>0x08</font>, <font color='#979000'>0x88</font>, <font color='#979000'>0x48</font>, <font color='#979000'>0xC8</font>, <font color='#979000'>0x28</font>, <font color='#979000'>0xA8</font>, <font color='#979000'>0x68</font>, <font color='#979000'>0xE8</font>,
+   <font color='#979000'>0x18</font>, <font color='#979000'>0x98</font>, <font color='#979000'>0x58</font>, <font color='#979000'>0xD8</font>, <font color='#979000'>0x38</font>, <font color='#979000'>0xB8</font>, <font color='#979000'>0x78</font>, <font color='#979000'>0xF8</font>,
+   <font color='#979000'>0x04</font>, <font color='#979000'>0x84</font>, <font color='#979000'>0x44</font>, <font color='#979000'>0xC4</font>, <font color='#979000'>0x24</font>, <font color='#979000'>0xA4</font>, <font color='#979000'>0x64</font>, <font color='#979000'>0xE4</font>,
+   <font color='#979000'>0x14</font>, <font color='#979000'>0x94</font>, <font color='#979000'>0x54</font>, <font color='#979000'>0xD4</font>, <font color='#979000'>0x34</font>, <font color='#979000'>0xB4</font>, <font color='#979000'>0x74</font>, <font color='#979000'>0xF4</font>,
+   <font color='#979000'>0x0C</font>, <font color='#979000'>0x8C</font>, <font color='#979000'>0x4C</font>, <font color='#979000'>0xCC</font>, <font color='#979000'>0x2C</font>, <font color='#979000'>0xAC</font>, <font color='#979000'>0x6C</font>, <font color='#979000'>0xEC</font>,
+   <font color='#979000'>0x1C</font>, <font color='#979000'>0x9C</font>, <font color='#979000'>0x5C</font>, <font color='#979000'>0xDC</font>, <font color='#979000'>0x3C</font>, <font color='#979000'>0xBC</font>, <font color='#979000'>0x7C</font>, <font color='#979000'>0xFC</font>,
+   <font color='#979000'>0x02</font>, <font color='#979000'>0x82</font>, <font color='#979000'>0x42</font>, <font color='#979000'>0xC2</font>, <font color='#979000'>0x22</font>, <font color='#979000'>0xA2</font>, <font color='#979000'>0x62</font>, <font color='#979000'>0xE2</font>,
+   <font color='#979000'>0x12</font>, <font color='#979000'>0x92</font>, <font color='#979000'>0x52</font>, <font color='#979000'>0xD2</font>, <font color='#979000'>0x32</font>, <font color='#979000'>0xB2</font>, <font color='#979000'>0x72</font>, <font color='#979000'>0xF2</font>,
+   <font color='#979000'>0x0A</font>, <font color='#979000'>0x8A</font>, <font color='#979000'>0x4A</font>, <font color='#979000'>0xCA</font>, <font color='#979000'>0x2A</font>, <font color='#979000'>0xAA</font>, <font color='#979000'>0x6A</font>, <font color='#979000'>0xEA</font>,
+   <font color='#979000'>0x1A</font>, <font color='#979000'>0x9A</font>, <font color='#979000'>0x5A</font>, <font color='#979000'>0xDA</font>, <font color='#979000'>0x3A</font>, <font color='#979000'>0xBA</font>, <font color='#979000'>0x7A</font>, <font color='#979000'>0xFA</font>,
+   <font color='#979000'>0x06</font>, <font color='#979000'>0x86</font>, <font color='#979000'>0x46</font>, <font color='#979000'>0xC6</font>, <font color='#979000'>0x26</font>, <font color='#979000'>0xA6</font>, <font color='#979000'>0x66</font>, <font color='#979000'>0xE6</font>,
+   <font color='#979000'>0x16</font>, <font color='#979000'>0x96</font>, <font color='#979000'>0x56</font>, <font color='#979000'>0xD6</font>, <font color='#979000'>0x36</font>, <font color='#979000'>0xB6</font>, <font color='#979000'>0x76</font>, <font color='#979000'>0xF6</font>,
+   <font color='#979000'>0x0E</font>, <font color='#979000'>0x8E</font>, <font color='#979000'>0x4E</font>, <font color='#979000'>0xCE</font>, <font color='#979000'>0x2E</font>, <font color='#979000'>0xAE</font>, <font color='#979000'>0x6E</font>, <font color='#979000'>0xEE</font>,
+   <font color='#979000'>0x1E</font>, <font color='#979000'>0x9E</font>, <font color='#979000'>0x5E</font>, <font color='#979000'>0xDE</font>, <font color='#979000'>0x3E</font>, <font color='#979000'>0xBE</font>, <font color='#979000'>0x7E</font>, <font color='#979000'>0xFE</font>,
+   <font color='#979000'>0x01</font>, <font color='#979000'>0x81</font>, <font color='#979000'>0x41</font>, <font color='#979000'>0xC1</font>, <font color='#979000'>0x21</font>, <font color='#979000'>0xA1</font>, <font color='#979000'>0x61</font>, <font color='#979000'>0xE1</font>,
+   <font color='#979000'>0x11</font>, <font color='#979000'>0x91</font>, <font color='#979000'>0x51</font>, <font color='#979000'>0xD1</font>, <font color='#979000'>0x31</font>, <font color='#979000'>0xB1</font>, <font color='#979000'>0x71</font>, <font color='#979000'>0xF1</font>,
+   <font color='#979000'>0x09</font>, <font color='#979000'>0x89</font>, <font color='#979000'>0x49</font>, <font color='#979000'>0xC9</font>, <font color='#979000'>0x29</font>, <font color='#979000'>0xA9</font>, <font color='#979000'>0x69</font>, <font color='#979000'>0xE9</font>,
+   <font color='#979000'>0x19</font>, <font color='#979000'>0x99</font>, <font color='#979000'>0x59</font>, <font color='#979000'>0xD9</font>, <font color='#979000'>0x39</font>, <font color='#979000'>0xB9</font>, <font color='#979000'>0x79</font>, <font color='#979000'>0xF9</font>,
+   <font color='#979000'>0x05</font>, <font color='#979000'>0x85</font>, <font color='#979000'>0x45</font>, <font color='#979000'>0xC5</font>, <font color='#979000'>0x25</font>, <font color='#979000'>0xA5</font>, <font color='#979000'>0x65</font>, <font color='#979000'>0xE5</font>,
+   <font color='#979000'>0x15</font>, <font color='#979000'>0x95</font>, <font color='#979000'>0x55</font>, <font color='#979000'>0xD5</font>, <font color='#979000'>0x35</font>, <font color='#979000'>0xB5</font>, <font color='#979000'>0x75</font>, <font color='#979000'>0xF5</font>,
+   <font color='#979000'>0x0D</font>, <font color='#979000'>0x8D</font>, <font color='#979000'>0x4D</font>, <font color='#979000'>0xCD</font>, <font color='#979000'>0x2D</font>, <font color='#979000'>0xAD</font>, <font color='#979000'>0x6D</font>, <font color='#979000'>0xED</font>,
+   <font color='#979000'>0x1D</font>, <font color='#979000'>0x9D</font>, <font color='#979000'>0x5D</font>, <font color='#979000'>0xDD</font>, <font color='#979000'>0x3D</font>, <font color='#979000'>0xBD</font>, <font color='#979000'>0x7D</font>, <font color='#979000'>0xFD</font>,
+   <font color='#979000'>0x03</font>, <font color='#979000'>0x83</font>, <font color='#979000'>0x43</font>, <font color='#979000'>0xC3</font>, <font color='#979000'>0x23</font>, <font color='#979000'>0xA3</font>, <font color='#979000'>0x63</font>, <font color='#979000'>0xE3</font>,
+   <font color='#979000'>0x13</font>, <font color='#979000'>0x93</font>, <font color='#979000'>0x53</font>, <font color='#979000'>0xD3</font>, <font color='#979000'>0x33</font>, <font color='#979000'>0xB3</font>, <font color='#979000'>0x73</font>, <font color='#979000'>0xF3</font>,
+   <font color='#979000'>0x0B</font>, <font color='#979000'>0x8B</font>, <font color='#979000'>0x4B</font>, <font color='#979000'>0xCB</font>, <font color='#979000'>0x2B</font>, <font color='#979000'>0xAB</font>, <font color='#979000'>0x6B</font>, <font color='#979000'>0xEB</font>,
+   <font color='#979000'>0x1B</font>, <font color='#979000'>0x9B</font>, <font color='#979000'>0x5B</font>, <font color='#979000'>0xDB</font>, <font color='#979000'>0x3B</font>, <font color='#979000'>0xBB</font>, <font color='#979000'>0x7B</font>, <font color='#979000'>0xFB</font>,
+   <font color='#979000'>0x07</font>, <font color='#979000'>0x87</font>, <font color='#979000'>0x47</font>, <font color='#979000'>0xC7</font>, <font color='#979000'>0x27</font>, <font color='#979000'>0xA7</font>, <font color='#979000'>0x67</font>, <font color='#979000'>0xE7</font>,
+   <font color='#979000'>0x17</font>, <font color='#979000'>0x97</font>, <font color='#979000'>0x57</font>, <font color='#979000'>0xD7</font>, <font color='#979000'>0x37</font>, <font color='#979000'>0xB7</font>, <font color='#979000'>0x77</font>, <font color='#979000'>0xF7</font>,
+   <font color='#979000'>0x0F</font>, <font color='#979000'>0x8F</font>, <font color='#979000'>0x4F</font>, <font color='#979000'>0xCF</font>, <font color='#979000'>0x2F</font>, <font color='#979000'>0xAF</font>, <font color='#979000'>0x6F</font>, <font color='#979000'>0xEF</font>,
+   <font color='#979000'>0x1F</font>, <font color='#979000'>0x9F</font>, <font color='#979000'>0x5F</font>, <font color='#979000'>0xDF</font>, <font color='#979000'>0x3F</font>, <font color='#979000'>0xBF</font>, <font color='#979000'>0x7F</font>, <font color='#979000'>0xFF</font>
+<b>}</b>;
+
+<font color='#0000FF'>static</font> PNG_CONST png_byte twobppswaptable[<font color='#979000'>256</font>] <font color='#5555FF'>=</font> <b>{</b>
+   <font color='#979000'>0x00</font>, <font color='#979000'>0x40</font>, <font color='#979000'>0x80</font>, <font color='#979000'>0xC0</font>, <font color='#979000'>0x10</font>, <font color='#979000'>0x50</font>, <font color='#979000'>0x90</font>, <font color='#979000'>0xD0</font>,
+   <font color='#979000'>0x20</font>, <font color='#979000'>0x60</font>, <font color='#979000'>0xA0</font>, <font color='#979000'>0xE0</font>, <font color='#979000'>0x30</font>, <font color='#979000'>0x70</font>, <font color='#979000'>0xB0</font>, <font color='#979000'>0xF0</font>,
+   <font color='#979000'>0x04</font>, <font color='#979000'>0x44</font>, <font color='#979000'>0x84</font>, <font color='#979000'>0xC4</font>, <font color='#979000'>0x14</font>, <font color='#979000'>0x54</font>, <font color='#979000'>0x94</font>, <font color='#979000'>0xD4</font>,
+   <font color='#979000'>0x24</font>, <font color='#979000'>0x64</font>, <font color='#979000'>0xA4</font>, <font color='#979000'>0xE4</font>, <font color='#979000'>0x34</font>, <font color='#979000'>0x74</font>, <font color='#979000'>0xB4</font>, <font color='#979000'>0xF4</font>,
+   <font color='#979000'>0x08</font>, <font color='#979000'>0x48</font>, <font color='#979000'>0x88</font>, <font color='#979000'>0xC8</font>, <font color='#979000'>0x18</font>, <font color='#979000'>0x58</font>, <font color='#979000'>0x98</font>, <font color='#979000'>0xD8</font>,
+   <font color='#979000'>0x28</font>, <font color='#979000'>0x68</font>, <font color='#979000'>0xA8</font>, <font color='#979000'>0xE8</font>, <font color='#979000'>0x38</font>, <font color='#979000'>0x78</font>, <font color='#979000'>0xB8</font>, <font color='#979000'>0xF8</font>,
+   <font color='#979000'>0x0C</font>, <font color='#979000'>0x4C</font>, <font color='#979000'>0x8C</font>, <font color='#979000'>0xCC</font>, <font color='#979000'>0x1C</font>, <font color='#979000'>0x5C</font>, <font color='#979000'>0x9C</font>, <font color='#979000'>0xDC</font>,
+   <font color='#979000'>0x2C</font>, <font color='#979000'>0x6C</font>, <font color='#979000'>0xAC</font>, <font color='#979000'>0xEC</font>, <font color='#979000'>0x3C</font>, <font color='#979000'>0x7C</font>, <font color='#979000'>0xBC</font>, <font color='#979000'>0xFC</font>,
+   <font color='#979000'>0x01</font>, <font color='#979000'>0x41</font>, <font color='#979000'>0x81</font>, <font color='#979000'>0xC1</font>, <font color='#979000'>0x11</font>, <font color='#979000'>0x51</font>, <font color='#979000'>0x91</font>, <font color='#979000'>0xD1</font>,
+   <font color='#979000'>0x21</font>, <font color='#979000'>0x61</font>, <font color='#979000'>0xA1</font>, <font color='#979000'>0xE1</font>, <font color='#979000'>0x31</font>, <font color='#979000'>0x71</font>, <font color='#979000'>0xB1</font>, <font color='#979000'>0xF1</font>,
+   <font color='#979000'>0x05</font>, <font color='#979000'>0x45</font>, <font color='#979000'>0x85</font>, <font color='#979000'>0xC5</font>, <font color='#979000'>0x15</font>, <font color='#979000'>0x55</font>, <font color='#979000'>0x95</font>, <font color='#979000'>0xD5</font>,
+   <font color='#979000'>0x25</font>, <font color='#979000'>0x65</font>, <font color='#979000'>0xA5</font>, <font color='#979000'>0xE5</font>, <font color='#979000'>0x35</font>, <font color='#979000'>0x75</font>, <font color='#979000'>0xB5</font>, <font color='#979000'>0xF5</font>,
+   <font color='#979000'>0x09</font>, <font color='#979000'>0x49</font>, <font color='#979000'>0x89</font>, <font color='#979000'>0xC9</font>, <font color='#979000'>0x19</font>, <font color='#979000'>0x59</font>, <font color='#979000'>0x99</font>, <font color='#979000'>0xD9</font>,
+   <font color='#979000'>0x29</font>, <font color='#979000'>0x69</font>, <font color='#979000'>0xA9</font>, <font color='#979000'>0xE9</font>, <font color='#979000'>0x39</font>, <font color='#979000'>0x79</font>, <font color='#979000'>0xB9</font>, <font color='#979000'>0xF9</font>,
+   <font color='#979000'>0x0D</font>, <font color='#979000'>0x4D</font>, <font color='#979000'>0x8D</font>, <font color='#979000'>0xCD</font>, <font color='#979000'>0x1D</font>, <font color='#979000'>0x5D</font>, <font color='#979000'>0x9D</font>, <font color='#979000'>0xDD</font>,
+   <font color='#979000'>0x2D</font>, <font color='#979000'>0x6D</font>, <font color='#979000'>0xAD</font>, <font color='#979000'>0xED</font>, <font color='#979000'>0x3D</font>, <font color='#979000'>0x7D</font>, <font color='#979000'>0xBD</font>, <font color='#979000'>0xFD</font>,
+   <font color='#979000'>0x02</font>, <font color='#979000'>0x42</font>, <font color='#979000'>0x82</font>, <font color='#979000'>0xC2</font>, <font color='#979000'>0x12</font>, <font color='#979000'>0x52</font>, <font color='#979000'>0x92</font>, <font color='#979000'>0xD2</font>,
+   <font color='#979000'>0x22</font>, <font color='#979000'>0x62</font>, <font color='#979000'>0xA2</font>, <font color='#979000'>0xE2</font>, <font color='#979000'>0x32</font>, <font color='#979000'>0x72</font>, <font color='#979000'>0xB2</font>, <font color='#979000'>0xF2</font>,
+   <font color='#979000'>0x06</font>, <font color='#979000'>0x46</font>, <font color='#979000'>0x86</font>, <font color='#979000'>0xC6</font>, <font color='#979000'>0x16</font>, <font color='#979000'>0x56</font>, <font color='#979000'>0x96</font>, <font color='#979000'>0xD6</font>,
+   <font color='#979000'>0x26</font>, <font color='#979000'>0x66</font>, <font color='#979000'>0xA6</font>, <font color='#979000'>0xE6</font>, <font color='#979000'>0x36</font>, <font color='#979000'>0x76</font>, <font color='#979000'>0xB6</font>, <font color='#979000'>0xF6</font>,
+   <font color='#979000'>0x0A</font>, <font color='#979000'>0x4A</font>, <font color='#979000'>0x8A</font>, <font color='#979000'>0xCA</font>, <font color='#979000'>0x1A</font>, <font color='#979000'>0x5A</font>, <font color='#979000'>0x9A</font>, <font color='#979000'>0xDA</font>,
+   <font color='#979000'>0x2A</font>, <font color='#979000'>0x6A</font>, <font color='#979000'>0xAA</font>, <font color='#979000'>0xEA</font>, <font color='#979000'>0x3A</font>, <font color='#979000'>0x7A</font>, <font color='#979000'>0xBA</font>, <font color='#979000'>0xFA</font>,
+   <font color='#979000'>0x0E</font>, <font color='#979000'>0x4E</font>, <font color='#979000'>0x8E</font>, <font color='#979000'>0xCE</font>, <font color='#979000'>0x1E</font>, <font color='#979000'>0x5E</font>, <font color='#979000'>0x9E</font>, <font color='#979000'>0xDE</font>,
+   <font color='#979000'>0x2E</font>, <font color='#979000'>0x6E</font>, <font color='#979000'>0xAE</font>, <font color='#979000'>0xEE</font>, <font color='#979000'>0x3E</font>, <font color='#979000'>0x7E</font>, <font color='#979000'>0xBE</font>, <font color='#979000'>0xFE</font>,
+   <font color='#979000'>0x03</font>, <font color='#979000'>0x43</font>, <font color='#979000'>0x83</font>, <font color='#979000'>0xC3</font>, <font color='#979000'>0x13</font>, <font color='#979000'>0x53</font>, <font color='#979000'>0x93</font>, <font color='#979000'>0xD3</font>,
+   <font color='#979000'>0x23</font>, <font color='#979000'>0x63</font>, <font color='#979000'>0xA3</font>, <font color='#979000'>0xE3</font>, <font color='#979000'>0x33</font>, <font color='#979000'>0x73</font>, <font color='#979000'>0xB3</font>, <font color='#979000'>0xF3</font>,
+   <font color='#979000'>0x07</font>, <font color='#979000'>0x47</font>, <font color='#979000'>0x87</font>, <font color='#979000'>0xC7</font>, <font color='#979000'>0x17</font>, <font color='#979000'>0x57</font>, <font color='#979000'>0x97</font>, <font color='#979000'>0xD7</font>,
+   <font color='#979000'>0x27</font>, <font color='#979000'>0x67</font>, <font color='#979000'>0xA7</font>, <font color='#979000'>0xE7</font>, <font color='#979000'>0x37</font>, <font color='#979000'>0x77</font>, <font color='#979000'>0xB7</font>, <font color='#979000'>0xF7</font>,
+   <font color='#979000'>0x0B</font>, <font color='#979000'>0x4B</font>, <font color='#979000'>0x8B</font>, <font color='#979000'>0xCB</font>, <font color='#979000'>0x1B</font>, <font color='#979000'>0x5B</font>, <font color='#979000'>0x9B</font>, <font color='#979000'>0xDB</font>,
+   <font color='#979000'>0x2B</font>, <font color='#979000'>0x6B</font>, <font color='#979000'>0xAB</font>, <font color='#979000'>0xEB</font>, <font color='#979000'>0x3B</font>, <font color='#979000'>0x7B</font>, <font color='#979000'>0xBB</font>, <font color='#979000'>0xFB</font>,
+   <font color='#979000'>0x0F</font>, <font color='#979000'>0x4F</font>, <font color='#979000'>0x8F</font>, <font color='#979000'>0xCF</font>, <font color='#979000'>0x1F</font>, <font color='#979000'>0x5F</font>, <font color='#979000'>0x9F</font>, <font color='#979000'>0xDF</font>,
+   <font color='#979000'>0x2F</font>, <font color='#979000'>0x6F</font>, <font color='#979000'>0xAF</font>, <font color='#979000'>0xEF</font>, <font color='#979000'>0x3F</font>, <font color='#979000'>0x7F</font>, <font color='#979000'>0xBF</font>, <font color='#979000'>0xFF</font>
+<b>}</b>;
+
+<font color='#0000FF'>static</font> PNG_CONST png_byte fourbppswaptable[<font color='#979000'>256</font>] <font color='#5555FF'>=</font> <b>{</b>
+   <font color='#979000'>0x00</font>, <font color='#979000'>0x10</font>, <font color='#979000'>0x20</font>, <font color='#979000'>0x30</font>, <font color='#979000'>0x40</font>, <font color='#979000'>0x50</font>, <font color='#979000'>0x60</font>, <font color='#979000'>0x70</font>,
+   <font color='#979000'>0x80</font>, <font color='#979000'>0x90</font>, <font color='#979000'>0xA0</font>, <font color='#979000'>0xB0</font>, <font color='#979000'>0xC0</font>, <font color='#979000'>0xD0</font>, <font color='#979000'>0xE0</font>, <font color='#979000'>0xF0</font>,
+   <font color='#979000'>0x01</font>, <font color='#979000'>0x11</font>, <font color='#979000'>0x21</font>, <font color='#979000'>0x31</font>, <font color='#979000'>0x41</font>, <font color='#979000'>0x51</font>, <font color='#979000'>0x61</font>, <font color='#979000'>0x71</font>,
+   <font color='#979000'>0x81</font>, <font color='#979000'>0x91</font>, <font color='#979000'>0xA1</font>, <font color='#979000'>0xB1</font>, <font color='#979000'>0xC1</font>, <font color='#979000'>0xD1</font>, <font color='#979000'>0xE1</font>, <font color='#979000'>0xF1</font>,
+   <font color='#979000'>0x02</font>, <font color='#979000'>0x12</font>, <font color='#979000'>0x22</font>, <font color='#979000'>0x32</font>, <font color='#979000'>0x42</font>, <font color='#979000'>0x52</font>, <font color='#979000'>0x62</font>, <font color='#979000'>0x72</font>,
+   <font color='#979000'>0x82</font>, <font color='#979000'>0x92</font>, <font color='#979000'>0xA2</font>, <font color='#979000'>0xB2</font>, <font color='#979000'>0xC2</font>, <font color='#979000'>0xD2</font>, <font color='#979000'>0xE2</font>, <font color='#979000'>0xF2</font>,
+   <font color='#979000'>0x03</font>, <font color='#979000'>0x13</font>, <font color='#979000'>0x23</font>, <font color='#979000'>0x33</font>, <font color='#979000'>0x43</font>, <font color='#979000'>0x53</font>, <font color='#979000'>0x63</font>, <font color='#979000'>0x73</font>,
+   <font color='#979000'>0x83</font>, <font color='#979000'>0x93</font>, <font color='#979000'>0xA3</font>, <font color='#979000'>0xB3</font>, <font color='#979000'>0xC3</font>, <font color='#979000'>0xD3</font>, <font color='#979000'>0xE3</font>, <font color='#979000'>0xF3</font>,
+   <font color='#979000'>0x04</font>, <font color='#979000'>0x14</font>, <font color='#979000'>0x24</font>, <font color='#979000'>0x34</font>, <font color='#979000'>0x44</font>, <font color='#979000'>0x54</font>, <font color='#979000'>0x64</font>, <font color='#979000'>0x74</font>,
+   <font color='#979000'>0x84</font>, <font color='#979000'>0x94</font>, <font color='#979000'>0xA4</font>, <font color='#979000'>0xB4</font>, <font color='#979000'>0xC4</font>, <font color='#979000'>0xD4</font>, <font color='#979000'>0xE4</font>, <font color='#979000'>0xF4</font>,
+   <font color='#979000'>0x05</font>, <font color='#979000'>0x15</font>, <font color='#979000'>0x25</font>, <font color='#979000'>0x35</font>, <font color='#979000'>0x45</font>, <font color='#979000'>0x55</font>, <font color='#979000'>0x65</font>, <font color='#979000'>0x75</font>,
+   <font color='#979000'>0x85</font>, <font color='#979000'>0x95</font>, <font color='#979000'>0xA5</font>, <font color='#979000'>0xB5</font>, <font color='#979000'>0xC5</font>, <font color='#979000'>0xD5</font>, <font color='#979000'>0xE5</font>, <font color='#979000'>0xF5</font>,
+   <font color='#979000'>0x06</font>, <font color='#979000'>0x16</font>, <font color='#979000'>0x26</font>, <font color='#979000'>0x36</font>, <font color='#979000'>0x46</font>, <font color='#979000'>0x56</font>, <font color='#979000'>0x66</font>, <font color='#979000'>0x76</font>,
+   <font color='#979000'>0x86</font>, <font color='#979000'>0x96</font>, <font color='#979000'>0xA6</font>, <font color='#979000'>0xB6</font>, <font color='#979000'>0xC6</font>, <font color='#979000'>0xD6</font>, <font color='#979000'>0xE6</font>, <font color='#979000'>0xF6</font>,
+   <font color='#979000'>0x07</font>, <font color='#979000'>0x17</font>, <font color='#979000'>0x27</font>, <font color='#979000'>0x37</font>, <font color='#979000'>0x47</font>, <font color='#979000'>0x57</font>, <font color='#979000'>0x67</font>, <font color='#979000'>0x77</font>,
+   <font color='#979000'>0x87</font>, <font color='#979000'>0x97</font>, <font color='#979000'>0xA7</font>, <font color='#979000'>0xB7</font>, <font color='#979000'>0xC7</font>, <font color='#979000'>0xD7</font>, <font color='#979000'>0xE7</font>, <font color='#979000'>0xF7</font>,
+   <font color='#979000'>0x08</font>, <font color='#979000'>0x18</font>, <font color='#979000'>0x28</font>, <font color='#979000'>0x38</font>, <font color='#979000'>0x48</font>, <font color='#979000'>0x58</font>, <font color='#979000'>0x68</font>, <font color='#979000'>0x78</font>,
+   <font color='#979000'>0x88</font>, <font color='#979000'>0x98</font>, <font color='#979000'>0xA8</font>, <font color='#979000'>0xB8</font>, <font color='#979000'>0xC8</font>, <font color='#979000'>0xD8</font>, <font color='#979000'>0xE8</font>, <font color='#979000'>0xF8</font>,
+   <font color='#979000'>0x09</font>, <font color='#979000'>0x19</font>, <font color='#979000'>0x29</font>, <font color='#979000'>0x39</font>, <font color='#979000'>0x49</font>, <font color='#979000'>0x59</font>, <font color='#979000'>0x69</font>, <font color='#979000'>0x79</font>,
+   <font color='#979000'>0x89</font>, <font color='#979000'>0x99</font>, <font color='#979000'>0xA9</font>, <font color='#979000'>0xB9</font>, <font color='#979000'>0xC9</font>, <font color='#979000'>0xD9</font>, <font color='#979000'>0xE9</font>, <font color='#979000'>0xF9</font>,
+   <font color='#979000'>0x0A</font>, <font color='#979000'>0x1A</font>, <font color='#979000'>0x2A</font>, <font color='#979000'>0x3A</font>, <font color='#979000'>0x4A</font>, <font color='#979000'>0x5A</font>, <font color='#979000'>0x6A</font>, <font color='#979000'>0x7A</font>,
+   <font color='#979000'>0x8A</font>, <font color='#979000'>0x9A</font>, <font color='#979000'>0xAA</font>, <font color='#979000'>0xBA</font>, <font color='#979000'>0xCA</font>, <font color='#979000'>0xDA</font>, <font color='#979000'>0xEA</font>, <font color='#979000'>0xFA</font>,
+   <font color='#979000'>0x0B</font>, <font color='#979000'>0x1B</font>, <font color='#979000'>0x2B</font>, <font color='#979000'>0x3B</font>, <font color='#979000'>0x4B</font>, <font color='#979000'>0x5B</font>, <font color='#979000'>0x6B</font>, <font color='#979000'>0x7B</font>,
+   <font color='#979000'>0x8B</font>, <font color='#979000'>0x9B</font>, <font color='#979000'>0xAB</font>, <font color='#979000'>0xBB</font>, <font color='#979000'>0xCB</font>, <font color='#979000'>0xDB</font>, <font color='#979000'>0xEB</font>, <font color='#979000'>0xFB</font>,
+   <font color='#979000'>0x0C</font>, <font color='#979000'>0x1C</font>, <font color='#979000'>0x2C</font>, <font color='#979000'>0x3C</font>, <font color='#979000'>0x4C</font>, <font color='#979000'>0x5C</font>, <font color='#979000'>0x6C</font>, <font color='#979000'>0x7C</font>,
+   <font color='#979000'>0x8C</font>, <font color='#979000'>0x9C</font>, <font color='#979000'>0xAC</font>, <font color='#979000'>0xBC</font>, <font color='#979000'>0xCC</font>, <font color='#979000'>0xDC</font>, <font color='#979000'>0xEC</font>, <font color='#979000'>0xFC</font>,
+   <font color='#979000'>0x0D</font>, <font color='#979000'>0x1D</font>, <font color='#979000'>0x2D</font>, <font color='#979000'>0x3D</font>, <font color='#979000'>0x4D</font>, <font color='#979000'>0x5D</font>, <font color='#979000'>0x6D</font>, <font color='#979000'>0x7D</font>,
+   <font color='#979000'>0x8D</font>, <font color='#979000'>0x9D</font>, <font color='#979000'>0xAD</font>, <font color='#979000'>0xBD</font>, <font color='#979000'>0xCD</font>, <font color='#979000'>0xDD</font>, <font color='#979000'>0xED</font>, <font color='#979000'>0xFD</font>,
+   <font color='#979000'>0x0E</font>, <font color='#979000'>0x1E</font>, <font color='#979000'>0x2E</font>, <font color='#979000'>0x3E</font>, <font color='#979000'>0x4E</font>, <font color='#979000'>0x5E</font>, <font color='#979000'>0x6E</font>, <font color='#979000'>0x7E</font>,
+   <font color='#979000'>0x8E</font>, <font color='#979000'>0x9E</font>, <font color='#979000'>0xAE</font>, <font color='#979000'>0xBE</font>, <font color='#979000'>0xCE</font>, <font color='#979000'>0xDE</font>, <font color='#979000'>0xEE</font>, <font color='#979000'>0xFE</font>,
+   <font color='#979000'>0x0F</font>, <font color='#979000'>0x1F</font>, <font color='#979000'>0x2F</font>, <font color='#979000'>0x3F</font>, <font color='#979000'>0x4F</font>, <font color='#979000'>0x5F</font>, <font color='#979000'>0x6F</font>, <font color='#979000'>0x7F</font>,
+   <font color='#979000'>0x8F</font>, <font color='#979000'>0x9F</font>, <font color='#979000'>0xAF</font>, <font color='#979000'>0xBF</font>, <font color='#979000'>0xCF</font>, <font color='#979000'>0xDF</font>, <font color='#979000'>0xEF</font>, <font color='#979000'>0xFF</font>
+<b>}</b>;
+
+<font color='#009900'>/* Swaps pixel packing order within bytes */</font>
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_do_packswap'></a>png_do_packswap</b><font face='Lucida Console'>(</font>png_row_infop row_info, png_bytep row<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#BB00BB'>png_debug</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, "<font color='#CC0000'>in png_do_packswap</font>"<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bit_depth <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_bytep rp;
+      png_const_bytep end, table;
+
+      end <font color='#5555FF'>=</font> row <font color='#5555FF'>+</font> row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowbytes;
+
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bit_depth <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+         table <font color='#5555FF'>=</font> onebppswaptable;
+
+      <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bit_depth <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+         table <font color='#5555FF'>=</font> twobppswaptable;
+
+      <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bit_depth <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>
+         table <font color='#5555FF'>=</font> fourbppswaptable;
+
+      <font color='#0000FF'>else</font>
+         <font color='#0000FF'>return</font>;
+
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>rp <font color='#5555FF'>=</font> row; rp <font color='#5555FF'>&lt;</font> end; rp<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+         <font color='#5555FF'>*</font>rp <font color='#5555FF'>=</font> table[<font color='#5555FF'>*</font>rp];
+   <b>}</b>
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNG_READ_PACKSWAP_SUPPORTED or PNG_WRITE_PACKSWAP_SUPPORTED */</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>PNG_WRITE_FILLER_SUPPORTED<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> \
+    <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>PNG_READ_STRIP_ALPHA_SUPPORTED<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Remove a channel - this used to be 'png_do_strip_filler' but it used a
+ * somewhat weird combination of flags to determine what to do.  All the calls
+ * to png_do_strip_filler are changed in 1.5.2 to call this instead with the
+ * correct arguments.
+ *
+ * The routine isn't general - the channel must be the channel at the start or
+ * end (not in the middle) of each pixel.
+ */</font>
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_do_strip_channel'></a>png_do_strip_channel</b><font face='Lucida Console'>(</font>png_row_infop row_info, png_bytep row, <font color='#0000FF'><u>int</u></font> at_start<font face='Lucida Console'>)</font>
+<b>{</b>
+   png_bytep sp <font color='#5555FF'>=</font> row; <font color='#009900'>/* source pointer */</font>
+   png_bytep dp <font color='#5555FF'>=</font> row; <font color='#009900'>/* destination pointer */</font>
+   png_bytep ep <font color='#5555FF'>=</font> row <font color='#5555FF'>+</font> row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowbytes; <font color='#009900'>/* One beyond end of row */</font>
+
+   <font color='#009900'>/* At the start sp will point to the first byte to copy and dp to where
+    * it is copied to.  ep always points just beyond the end of the row, so
+    * the loop simply copies (channels-1) channels until sp reaches ep.
+    *
+    * at_start:        0 -- convert AG, XG, ARGB, XRGB, AAGG, XXGG, etc.
+    *            nonzero -- convert GA, GX, RGBA, RGBX, GGAA, RRGGBBXX, etc.
+    */</font>
+
+   <font color='#009900'>/* GA, GX, XG cases */</font>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>channels <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bit_depth <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>at_start<font face='Lucida Console'>)</font> <font color='#009900'>/* Skip initial filler */</font>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>sp;
+         <font color='#0000FF'>else</font>          <font color='#009900'>/* Skip initial channel and, for sp, the filler */</font>
+            sp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>, <font color='#5555FF'>+</font><font color='#5555FF'>+</font>dp;
+
+         <font color='#009900'>/* For a 1 pixel wide image there is nothing to do */</font>
+         <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>sp <font color='#5555FF'>&lt;</font> ep<font face='Lucida Console'>)</font>
+            <font color='#5555FF'>*</font>dp<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>sp, sp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+         row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pixel_depth <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+      <b>}</b>
+
+      <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bit_depth <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>at_start<font face='Lucida Console'>)</font> <font color='#009900'>/* Skip initial filler */</font>
+            sp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+         <font color='#0000FF'>else</font>          <font color='#009900'>/* Skip initial channel and, for sp, the filler */</font>
+            sp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>, dp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+         <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>sp <font color='#5555FF'>&lt;</font> ep<font face='Lucida Console'>)</font>
+            <font color='#5555FF'>*</font>dp<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>sp<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, <font color='#5555FF'>*</font>dp<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>sp, sp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+
+         row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pixel_depth <font color='#5555FF'>=</font> <font color='#979000'>16</font>;
+      <b>}</b>
+
+      <font color='#0000FF'>else</font>
+         <font color='#0000FF'>return</font>; <font color='#009900'>/* bad bit depth */</font>
+
+      row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>channels <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+      <font color='#009900'>/* Finally fix the color type if it records an alpha channel */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> PNG_COLOR_TYPE_GRAY_ALPHA<font face='Lucida Console'>)</font>
+         row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_type <font color='#5555FF'>=</font> PNG_COLOR_TYPE_GRAY;
+   <b>}</b>
+
+   <font color='#009900'>/* RGBA, RGBX, XRGB cases */</font>
+   <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>channels <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bit_depth <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>at_start<font face='Lucida Console'>)</font> <font color='#009900'>/* Skip initial filler */</font>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>sp;
+         <font color='#0000FF'>else</font>          <font color='#009900'>/* Skip initial channels and, for sp, the filler */</font>
+            sp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>, dp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+
+         <font color='#009900'>/* Note that the loop adds 3 to dp and 4 to sp each time. */</font>
+         <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>sp <font color='#5555FF'>&lt;</font> ep<font face='Lucida Console'>)</font>
+            <font color='#5555FF'>*</font>dp<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>sp<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, <font color='#5555FF'>*</font>dp<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>sp<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, <font color='#5555FF'>*</font>dp<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>sp, sp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+         row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pixel_depth <font color='#5555FF'>=</font> <font color='#979000'>24</font>;
+      <b>}</b>
+
+      <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bit_depth <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>at_start<font face='Lucida Console'>)</font> <font color='#009900'>/* Skip initial filler */</font>
+            sp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+         <font color='#0000FF'>else</font>          <font color='#009900'>/* Skip initial channels and, for sp, the filler */</font>
+            sp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>, dp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>6</font>;
+
+         <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>sp <font color='#5555FF'>&lt;</font> ep<font face='Lucida Console'>)</font>
+         <b>{</b>
+            <font color='#009900'>/* Copy 6 bytes, skip 2 */</font>
+            <font color='#5555FF'>*</font>dp<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>sp<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, <font color='#5555FF'>*</font>dp<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>sp<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+            <font color='#5555FF'>*</font>dp<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>sp<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, <font color='#5555FF'>*</font>dp<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>sp<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+            <font color='#5555FF'>*</font>dp<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>sp<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, <font color='#5555FF'>*</font>dp<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>sp, sp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+         <b>}</b>
+
+         row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pixel_depth <font color='#5555FF'>=</font> <font color='#979000'>48</font>;
+      <b>}</b>
+
+      <font color='#0000FF'>else</font>
+         <font color='#0000FF'>return</font>; <font color='#009900'>/* bad bit depth */</font>
+
+      row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>channels <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+
+      <font color='#009900'>/* Finally fix the color type if it records an alpha channel */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> PNG_COLOR_TYPE_RGB_ALPHA<font face='Lucida Console'>)</font>
+         row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_type <font color='#5555FF'>=</font> PNG_COLOR_TYPE_RGB;
+   <b>}</b>
+
+   <font color='#0000FF'>else</font>
+      <font color='#0000FF'>return</font>; <font color='#009900'>/* The filler channel has gone already */</font>
+
+   <font color='#009900'>/* Fix the rowbytes value. */</font>
+   row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowbytes <font color='#5555FF'>=</font> dp<font color='#5555FF'>-</font>row;
+<b>}</b>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>PNG_READ_BGR_SUPPORTED<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>PNG_WRITE_BGR_SUPPORTED<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Swaps red and blue bytes within a pixel */</font>
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_do_bgr'></a>png_do_bgr</b><font face='Lucida Console'>(</font>png_row_infop row_info, png_bytep row<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#BB00BB'>png_debug</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, "<font color='#CC0000'>in png_do_bgr</font>"<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_type <font color='#5555FF'>&amp;</font> PNG_COLOR_MASK_COLOR<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_uint_32 row_width <font color='#5555FF'>=</font> row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>width;
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bit_depth <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> PNG_COLOR_TYPE_RGB<font face='Lucida Console'>)</font>
+         <b>{</b>
+            png_bytep rp;
+            png_uint_32 i;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>, rp <font color='#5555FF'>=</font> row; i <font color='#5555FF'>&lt;</font> row_width; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, rp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+               png_byte save <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>rp;
+               <font color='#5555FF'>*</font>rp <font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rp <font color='#5555FF'>+</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+               <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rp <font color='#5555FF'>+</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> save;
+            <b>}</b>
+         <b>}</b>
+
+         <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> PNG_COLOR_TYPE_RGB_ALPHA<font face='Lucida Console'>)</font>
+         <b>{</b>
+            png_bytep rp;
+            png_uint_32 i;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>, rp <font color='#5555FF'>=</font> row; i <font color='#5555FF'>&lt;</font> row_width; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, rp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+               png_byte save <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>rp;
+               <font color='#5555FF'>*</font>rp <font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rp <font color='#5555FF'>+</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+               <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rp <font color='#5555FF'>+</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> save;
+            <b>}</b>
+         <b>}</b>
+      <b>}</b>
+
+<font color='#0000FF'>#ifdef</font> PNG_16BIT_SUPPORTED
+      <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bit_depth <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> PNG_COLOR_TYPE_RGB<font face='Lucida Console'>)</font>
+         <b>{</b>
+            png_bytep rp;
+            png_uint_32 i;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>, rp <font color='#5555FF'>=</font> row; i <font color='#5555FF'>&lt;</font> row_width; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, rp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+               png_byte save <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>rp;
+               <font color='#5555FF'>*</font>rp <font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rp <font color='#5555FF'>+</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+               <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rp <font color='#5555FF'>+</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> save;
+               save <font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rp <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+               <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rp <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rp <font color='#5555FF'>+</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+               <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rp <font color='#5555FF'>+</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> save;
+            <b>}</b>
+         <b>}</b>
+
+         <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> PNG_COLOR_TYPE_RGB_ALPHA<font face='Lucida Console'>)</font>
+         <b>{</b>
+            png_bytep rp;
+            png_uint_32 i;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>, rp <font color='#5555FF'>=</font> row; i <font color='#5555FF'>&lt;</font> row_width; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, rp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+               png_byte save <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>rp;
+               <font color='#5555FF'>*</font>rp <font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rp <font color='#5555FF'>+</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+               <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rp <font color='#5555FF'>+</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> save;
+               save <font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rp <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+               <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rp <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rp <font color='#5555FF'>+</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+               <font color='#5555FF'>*</font><font face='Lucida Console'>(</font>rp <font color='#5555FF'>+</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> save;
+            <b>}</b>
+         <b>}</b>
+      <b>}</b>
+<font color='#0000FF'>#endif</font>
+   <b>}</b>
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNG_READ_BGR_SUPPORTED or PNG_WRITE_BGR_SUPPORTED */</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> \
+    <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Added at libpng-1.5.10 */</font>
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_do_check_palette_indexes'></a>png_do_check_palette_indexes</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_row_infop row_info<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_palette <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bit_depth<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_palette <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#009900'>/* num_palette can be 0 in MNG files */</font>
+   <b>{</b>
+      <font color='#009900'>/* Calculations moved outside switch in an attempt to stop different
+       * compiler warnings.  'padding' is in *bits* within the last byte, it is
+       * an 'int' because pixel_depth becomes an 'int' in the expression below,
+       * and this calculation is used because it avoids warnings that other
+       * forms produced on either GCC or MSVC.
+       */</font>
+      <font color='#0000FF'><u>int</u></font> padding <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pixel_depth <font color='#5555FF'>*</font> row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>width<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>7</font>;
+      png_bytep rp <font color='#5555FF'>=</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf <font color='#5555FF'>+</font> row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowbytes;
+
+      <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>row_info<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bit_depth<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#0000FF'>case</font> <font color='#979000'>1</font>:
+         <b>{</b>
+            <font color='#009900'>/* in this case, all bytes must be 0 so we don't need
+             * to unpack the pixels except for the rightmost one.
+             */</font>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; rp <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf; rp<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+              <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>rp <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> padding <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                 png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_palette_max <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+              padding <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>break</font>;
+         <b>}</b>
+
+         <font color='#0000FF'>case</font> <font color='#979000'>2</font>:
+         <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; rp <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf; rp<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+              <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>rp <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> padding<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0x03</font><font face='Lucida Console'>)</font>;
+
+              <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_palette_max<font face='Lucida Console'>)</font>
+                 png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_palette_max <font color='#5555FF'>=</font> i;
+
+              i <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>rp <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> padding<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0x03</font><font face='Lucida Console'>)</font>;
+
+              <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_palette_max<font face='Lucida Console'>)</font>
+                 png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_palette_max <font color='#5555FF'>=</font> i;
+
+              i <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>rp <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> padding<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0x03</font><font face='Lucida Console'>)</font>;
+
+              <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_palette_max<font face='Lucida Console'>)</font>
+                 png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_palette_max <font color='#5555FF'>=</font> i;
+
+              i <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>rp <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> padding<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0x03</font><font face='Lucida Console'>)</font>;
+
+              <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_palette_max<font face='Lucida Console'>)</font>
+                 png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_palette_max <font color='#5555FF'>=</font> i;
+
+              padding <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>break</font>;
+         <b>}</b>
+
+         <font color='#0000FF'>case</font> <font color='#979000'>4</font>:
+         <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; rp <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf; rp<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+              <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>rp <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> padding<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0x0f</font><font face='Lucida Console'>)</font>;
+
+              <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_palette_max<font face='Lucida Console'>)</font>
+                 png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_palette_max <font color='#5555FF'>=</font> i;
+
+              i <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>rp <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> padding<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0x0f</font><font face='Lucida Console'>)</font>;
+
+              <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_palette_max<font face='Lucida Console'>)</font>
+                 png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_palette_max <font color='#5555FF'>=</font> i;
+
+              padding <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>break</font>;
+         <b>}</b>
+
+         <font color='#0000FF'>case</font> <font color='#979000'>8</font>:
+         <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; rp <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_buf; rp<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+               <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>rp <font color='#5555FF'>&gt;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_palette_max<font face='Lucida Console'>)</font>
+                  png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_palette_max <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font>rp;
+            <b>}</b>
+
+            <font color='#0000FF'>break</font>;
+         <b>}</b>
+
+         <font color='#0000FF'>default</font>:
+            <font color='#0000FF'>break</font>;
+      <b>}</b>
+   <b>}</b>
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED */</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>PNG_READ_USER_TRANSFORM_SUPPORTED<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> \
+    <b><a name='defined'></a>defined</b><font face='Lucida Console'>(</font>PNG_WRITE_USER_TRANSFORM_SUPPORTED<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#ifdef</font> PNG_USER_TRANSFORM_PTR_SUPPORTED
+<font color='#0000FF'><u>void</u></font> PNGAPI
+<b><a name='png_set_user_transform_info'></a>png_set_user_transform_info</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_voidp
+   user_transform_ptr, <font color='#0000FF'><u>int</u></font> user_transform_depth, <font color='#0000FF'><u>int</u></font> user_transform_channels<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#BB00BB'>png_debug</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, "<font color='#CC0000'>in png_set_user_transform_info</font>"<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+<font color='#0000FF'>#ifdef</font> PNG_READ_USER_TRANSFORM_SUPPORTED
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>&amp;</font> PNG_IS_READ_STRUCT<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+      <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>flags <font color='#5555FF'>&amp;</font> PNG_FLAG_ROW_INIT<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#BB00BB'>png_app_error</font><font face='Lucida Console'>(</font>png_ptr,
+            "<font color='#CC0000'>info change after png_start_read_image or png_read_update_info</font>"<font face='Lucida Console'>)</font>;
+      <font color='#0000FF'>return</font>;
+   <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>user_transform_ptr <font color='#5555FF'>=</font> user_transform_ptr;
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>user_transform_depth <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>png_byte<font face='Lucida Console'>)</font>user_transform_depth;
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>user_transform_channels <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>png_byte<font face='Lucida Console'>)</font>user_transform_channels;
+<b>}</b>
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* This function returns a pointer to the user_transform_ptr associated with
+ * the user transform functions.  The application should free any memory
+ * associated with this pointer before png_write_destroy and png_read_destroy
+ * are called.
+ */</font>
+<font color='#0000FF'>#ifdef</font> PNG_USER_TRANSFORM_PTR_SUPPORTED
+png_voidp PNGAPI
+<b><a name='png_get_user_transform_ptr'></a>png_get_user_transform_ptr</b><font face='Lucida Console'>(</font>png_const_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>NULL<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>return</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>user_transform_ptr;
+<b>}</b>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> PNG_USER_TRANSFORM_INFO_SUPPORTED
+png_uint_32 PNGAPI
+<b><a name='png_get_current_row_number'></a>png_get_current_row_number</b><font face='Lucida Console'>(</font>png_const_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#009900'>/* See the comments in png.h - this is the sub-image row when reading and
+    * interlaced image.
+    */</font>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>row_number;
+
+   <font color='#0000FF'>return</font> PNG_UINT_32_MAX; <font color='#009900'>/* help the app not to fail silently */</font>
+<b>}</b>
+
+png_byte PNGAPI
+<b><a name='png_get_current_pass_number'></a>png_get_current_pass_number</b><font face='Lucida Console'>(</font>png_const_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass;
+   <font color='#0000FF'>return</font> <font color='#979000'>8</font>; <font color='#009900'>/* invalid */</font>
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNG_USER_TRANSFORM_INFO_SUPPORTED */</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNG_READ_USER_TRANSFORM_SUPPORTED ||
+          PNG_WRITE_USER_TRANSFORM_SUPPORTED */</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */</font>
+
+</pre></body></html>

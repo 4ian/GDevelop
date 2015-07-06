@@ -1,0 +1,2293 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - base_widgets_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net), Keita Mochizuki
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_BASE_WIDGETs_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_BASE_WIDGETs_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='fonts_abstract.h.html'>fonts_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='drawable_abstract.h.html'>drawable_abstract.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../gui_core.h.html'>../gui_core.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#009900'>/*!
+        GENERAL REMARKS
+            This file contains objects that are useful for creating complex drawable 
+            widgets.
+
+        THREAD SAFETY
+            All objects and functions defined in this file are thread safe.  You may
+            call them from any thread without serializing access to them.
+
+        EVENT HANDLERS
+            If you derive from any of the drawable objects and redefine any of the on_*() 
+            event handlers then you should ensure that your version calls the same event 
+            handler in the base object so that the base class part of your object will also 
+            be able to process the event. 
+
+            Also note that all event handlers, including the user registered callback
+            functions, are executed in the event handling thread.   Additionally,
+            the drawable::m mutex will always be locked while these event handlers
+            are running.  Also, don't rely on get_thread_id() always returning the 
+            same ID from inside event handlers.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// class draggable
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='draggable'></a>draggable</b> : <font color='#0000FF'>public</font> drawable
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                draggable_area() == an initial value for its type 
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a drawable object that is draggable by the mouse.  
+                You use it by inheriting from it and defining the draw() method and any
+                of the on_*() event handlers you need.  
+
+                This object is draggable by the user when is_enabled() == true and 
+                not draggable otherwise.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='draggable'></a>draggable</b><font face='Lucida Console'>(</font>  
+            drawable_window<font color='#5555FF'>&amp;</font> w,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> events <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - #*this is properly initialized 
+                - #*this has been added to window w
+                - #parent_window() == w
+                - This object will not receive any events or draw() requests until 
+                  enable_events() is called
+                - the events flags are passed on to the drawable object's 
+                  constructor.
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='draggable'></a>draggable</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources associated with *this have been released
+        !*/</font>
+
+        rectangle <b><a name='draggable_area'></a>draggable_area</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the area that this draggable can be dragged around in. 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_draggable_area'></a>set_draggable_area</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area 
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #draggable_area() == area
+        !*/</font>
+
+    <font color='#0000FF'>protected</font>:
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_being_dragged'></a>is_being_dragged</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - mutex drawable::m is locked
+            ensures
+                - if (this widget is currently being dragged by the user) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#009900'>// does nothing by default
+</font>        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='on_drag'></a>on_drag</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font><b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            requires
+                - enable_events() has been called
+                - is_enabled() == true
+                - is_hidden() == false
+                - mutex drawable::m is locked
+                - is called when the user drags this object
+                - get_rect() == the rectangle that defines the new position
+                  of this object.
+                - is_being_dragged() == true
+            ensures
+                - does not change the state of mutex drawable::m. 
+        !*/</font>
+
+        <font color='#009900'>// does nothing by default
+</font>        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='on_drag_stop'></a>on_drag_stop</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font><b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            requires
+                - enable_events() has been called
+                - mutex drawable::m is locked
+                - is called when the user stops dragging this object
+                - is_being_dragged() == false 
+            ensures
+                - does not change the state of mutex drawable::m. 
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='draggable'></a>draggable</b><font face='Lucida Console'>(</font>draggable<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        draggable<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>draggable<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// class mouse_over_event 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='mouse_over_event'></a>mouse_over_event</b> : <font color='#0000FF'>public</font> drawable
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                is_mouse_over() == false
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a drawable object with the addition of two events
+                that will alert you when the mouse enters or leaves your drawable object.
+
+                You use it by inheriting from it and defining the draw() method and any
+                of the on_*() event handlers you need.  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='mouse_over_event'></a>mouse_over_event</b><font face='Lucida Console'>(</font>  
+            drawable_window<font color='#5555FF'>&amp;</font> w,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> events <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - #*this is properly initialized 
+                - #*this has been added to window w
+                - #parent_window() == w
+                - #*this will not receive any events or draw() requests until 
+                  enable_events() is called
+                - the events flags are passed on to the drawable object's 
+                  constructor.
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='mouse_over_event'></a>mouse_over_event</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources associated with *this have been released
+        !*/</font>
+
+    <font color='#0000FF'>protected</font>:
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_mouse_over'></a>is_mouse_over</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - mutex drawable::m is locked
+            ensures
+                - if (the mouse is currently over this widget) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#009900'>// does nothing by default
+</font>        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='on_mouse_over'></a>on_mouse_over</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font><b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            requires
+                - enable_events() has been called
+                - mutex drawable::m is locked
+                - is_enabled() == true
+                - is_hidden() == false
+                - is called whenever this object transitions from the state where
+                  is_mouse_over() == false to is_mouse_over() == true
+            ensures
+                - does not change the state of mutex drawable::m. 
+        !*/</font>
+
+        <font color='#009900'>// does nothing by default
+</font>        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='on_mouse_not_over'></a>on_mouse_not_over</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font><b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            requires
+                - enable_events() has been called
+                - mutex drawable::m is locked
+                - is called whenever this object transitions from the state where
+                  is_mouse_over() == true to is_mouse_over() == false 
+            ensures
+                - does not change the state of mutex drawable::m. 
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='mouse_over_event'></a>mouse_over_event</b><font face='Lucida Console'>(</font>mouse_over_event<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        mouse_over_event<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>mouse_over_event<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// class button_action 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='button_action'></a>button_action</b> : <font color='#0000FF'>public</font> mouse_over_event 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                is_depressed() == false
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents the clicking action of a push button.  It provides
+                simple callbacks that can be used to make various kinds of button 
+                widgets.
+
+                You use it by inheriting from it and defining the draw() method and any
+                of the on_*() event handlers you need.  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='button_action'></a>button_action</b><font face='Lucida Console'>(</font>  
+            drawable_window<font color='#5555FF'>&amp;</font> w,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> events <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - #*this is properly initialized 
+                - #*this has been added to window w
+                - #parent_window() == w
+                - #*this will not receive any events or draw() requests until 
+                  enable_events() is called
+                - the events flags are passed on to the drawable object's 
+                  constructor.
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='button_action'></a>button_action</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources associated with *this have been released
+        !*/</font>
+
+    <font color='#0000FF'>protected</font>:
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_depressed'></a>is_depressed</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - mutex drawable::m is locked
+            ensures
+                - if (this button is currently in a depressed state) then
+                    - the user has left clicked on this drawable and is still
+                      holding the left mouse button down over it.
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#009900'>// does nothing by default
+</font>        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='on_button_down'></a>on_button_down</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font><b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            requires
+                - enable_events() has been called
+                - mutex drawable::m is locked
+                - is_enabled() == true
+                - is_hidden() == false
+                - the area in parent_window() defined by get_rect() has been invalidated. 
+                  (This means you don't have to call invalidate_rectangle())
+                - is called whenever this object transitions from the state where
+                  is_depressed() == false to is_depressed() == true
+            ensures
+                - does not change the state of mutex drawable::m. 
+        !*/</font>
+
+        <font color='#009900'>// does nothing by default
+</font>        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='on_button_up'></a>on_button_up</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>bool</u></font> mouse_over
+        <font face='Lucida Console'>)</font><b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            requires
+                - enable_events() has been called
+                - mutex drawable::m is locked
+                - the area in parent_window() defined by get_rect() has been invalidated. 
+                  (This means you don't have to call invalidate_rectangle())
+                - is called whenever this object transitions from the state where
+                  is_depressed() == true to is_depressed() == false 
+                - if (the mouse was over this button when this event occurred) then
+                    - mouse_over == true
+                - else
+                    - mouse_over == false
+            ensures
+                - does not change the state of mutex drawable::m. 
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='button_action'></a>button_action</b><font face='Lucida Console'>(</font>button_action<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        button_action<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>button_action<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// class button
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='button'></a>button</b> : <font color='#0000FF'>public</font> button_action 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                name() == ""
+                tooltip_text() == "" (i.e. there is no tooltip by default)
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a simple button.  
+
+                When this object is disabled it means it will not respond to user clicks.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='button'></a>button</b><font face='Lucida Console'>(</font>  
+            drawable_window<font color='#5555FF'>&amp;</font> w
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - #*this is properly initialized 
+                - #*this has been added to window w
+                - #parent_window() == w
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='button'></a>button</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources associated with *this have been released
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> height_
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*! 
+            ensures
+                - if (width and height are big enough to contain the name of this button) then
+                    - #width() == width_
+                    - #height() == height_
+                    - #top() == top()
+                    - #left() == left()
+                    - i.e. The location of the upper left corner of this button stays the
+                      same but its width and height are modified
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_name'></a>set_name</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::wstring<font color='#5555FF'>&amp;</font> name<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_name'></a>set_name</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> dlib::ustring<font color='#5555FF'>&amp;</font> name<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_name'></a>set_name</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> name
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #name() == name
+                - this button has been resized such that it is big enough to contain
+                  the new name.
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::wstring <b><a name='wname'></a>wname</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#0000FF'>const</font> dlib::string <b><a name='uname'></a>uname</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#0000FF'>const</font> std::string  <b><a name='name'></a>name</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the name of this button
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_tooltip_text'></a>set_tooltip_text</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::wstring<font color='#5555FF'>&amp;</font> text<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_tooltip_text'></a>set_tooltip_text</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> dlib::ustring<font color='#5555FF'>&amp;</font> text<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_tooltip_text'></a>set_tooltip_text</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> text
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #tooltip_text() == text
+                - enables the tooltip for this button
+        !*/</font>
+
+        <font color='#0000FF'>const</font> dlib::ustring <b><a name='tooltip_utext'></a>tooltip_utext</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#0000FF'>const</font> std::wstring  <b><a name='tooltip_wtext'></a>tooltip_wtext</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#0000FF'>const</font> std::string   <b><a name='tooltip_text'></a>tooltip_text</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the text that is displayed in the tooltip for this button
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_depressed'></a>is_depressed</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (this button is currently in a depressed state) then
+                    - the user has left clicked on this widget and is still
+                      holding the left mouse button down over it.
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> style_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_style'></a>set_style</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> style_type<font color='#5555FF'>&amp;</font> style
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - style_type == a type that inherits from button_style
+            ensures
+                - this button object will draw itself using the given
+                  button style
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_click_handler'></a>set_click_handler</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>event_handler<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - event_handler is a valid pointer to a member function in T 
+            ensures
+                - the event_handler function is called on object when the button is 
+                  clicked by the user.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_click_handler'></a>set_click_handler</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> any_function<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> event_handler
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - the event_handler function is called when the button is clicked by 
+                  the user.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_click_handler'></a>set_click_handler</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>event_handler<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>button<font color='#5555FF'>&amp;</font> self<font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - event_handler is a valid pointer to a member function in T 
+            ensures
+                - &amp;self == this
+                - the event_handler function is called on object when the button is 
+                  clicked by the user.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_sourced_click_handler'></a>set_sourced_click_handler</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> any_function<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>(</font>button<font color='#5555FF'>&amp;</font> self<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> event_handler
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - &amp;self == this
+                - the event_handler function is called when the button is clicked by 
+                  the user.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_button_down_handler'></a>set_button_down_handler</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>event_handler<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - event_handler is a valid pointer to a member function in T 
+            ensures
+                - the event_handler function is called on object when the user causes 
+                  the button to go into its depressed state.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_button_down_handler'></a>set_button_down_handler</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> any_function<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> event_handler
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - the event_handler function is called when the user causes the button 
+                  to go into its depressed state.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_button_up_handler'></a>set_button_up_handler</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>event_handler<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>bool</u></font> mouse_over<font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - event_handler is a valid pointer to a member function in T 
+            ensures
+                - the event_handler function is called on object when the user causes 
+                  the button to go into its non-depressed state.
+                - if (the mouse is over this button when this event occurs) then
+                    - mouse_over == true
+                - else
+                    - mouse_over == false
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_button_up_handler'></a>set_button_up_handler</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> any_function<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>(</font><font color='#0000FF'><u>bool</u></font> mouse_over<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> event_handler
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - the event_handler function is called when the user causes the 
+                  button to go into its non-depressed state.
+                - if (the mouse is over this button when this event occurs) then
+                    - mouse_over == true
+                - else
+                    - mouse_over == false
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_button_down_handler'></a>set_button_down_handler</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>event_handler<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>button<font color='#5555FF'>&amp;</font> self<font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - event_handler is a valid pointer to a member function in T 
+            ensures
+                - &amp;self == this
+                - the event_handler function is called on object when the user causes 
+                  the button to go into its depressed state.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_sourced_button_down_handler'></a>set_sourced_button_down_handler</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> any_function<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>(</font>button<font color='#5555FF'>&amp;</font> self<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> event_handler
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - &amp;self == this
+                - the event_handler function is called when the user causes the button 
+                  to go into its depressed state.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_button_up_handler'></a>set_button_up_handler</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>event_handler<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>bool</u></font> mouse_over, button<font color='#5555FF'>&amp;</font> self<font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - event_handler is a valid pointer to a member function in T 
+            ensures
+                - &amp;self == this
+                - the event_handler function is called on object when the user causes 
+                  the button to go into its non-depressed state.
+                - if (the mouse is over this button when this event occurs) then
+                    - mouse_over == true
+                - else
+                    - mouse_over == false
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_sourced_button_up_handler'></a>set_sourced_button_up_handler</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> any_function<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>(</font><font color='#0000FF'><u>bool</u></font> mouse_over, button<font color='#5555FF'>&amp;</font> self<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> event_handler
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - &amp;self == this
+                - the event_handler function is called when the user causes the 
+                  button to go into its non-depressed state.
+                - if (the mouse is over this button when this event occurs) then
+                    - mouse_over == true
+                - else
+                    - mouse_over == false
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='button'></a>button</b><font face='Lucida Console'>(</font>button<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        button<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>button<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// class scroll_bar 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='scroll_bar'></a>scroll_bar</b> : <font color='#0000FF'>public</font> drawable 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                orientation() == a value given to the constructor.
+                max_slider_pos() == 0
+                slider_pos() == 0
+                jump_size() == 10
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a scroll bar.  The slider_pos() of the scroll bar
+                ranges from 0 to max_slider_pos().  The 0 position of the scroll_bar is
+                in the top or left side of the scroll_bar depending on its orientation.
+
+                When this object is disabled it means it will not respond to user clicks.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>enum</font> <b><a name='bar_orientation'></a>bar_orientation</b> 
+        <b>{</b>
+            HORIZONTAL,
+            VERTICAL
+        <b>}</b>;
+
+        <b><a name='scroll_bar'></a>scroll_bar</b><font face='Lucida Console'>(</font>  
+            drawable_window<font color='#5555FF'>&amp;</font> w,
+            bar_orientation orientation 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - #*this is properly initialized 
+                - #*this has been added to window w
+                - #orientation() == orientation 
+                - #parent_window() == w
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='scroll_bar'></a>scroll_bar</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources associated with *this have been released
+        !*/</font>
+
+        bar_orientation <b><a name='orientation'></a>orientation</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the orientation of this scroll_bar 
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> style_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_style'></a>set_style</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> style_type<font color='#5555FF'>&amp;</font> style
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - style_type == a type that inherits from scroll_bar_style 
+            ensures
+                - this scroll_bar object will draw itself using the given
+                  scroll bar style
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_length'></a>set_length</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> length,
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*! 
+            ensures
+                - if (orientation() == HORIZONTAL) then
+                    - #width() == max(length,1)
+                - else
+                    - #height() == max(length,1)
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='max_slider_pos'></a>max_slider_pos</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the maximum value that slider_pos() can take. 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_slider_pos'></a>set_max_slider_pos</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> mpos
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (mpos &lt; 0) then
+                    - #max_slider_pos() == 0
+                - else
+                    - #max_slider_pos() == mpos
+                - if (slider_pos() &gt; #max_slider_pos()) then
+                    - #slider_pos() == #max_slider_pos() 
+                - else
+                    - #slider_pos() == slider_pos()
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_slider_pos'></a>set_slider_pos</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (pos &lt; 0) then
+                    - #slider_pos() == 0
+                - else if (pos &gt; max_slider_pos()) then
+                    - #slider_pos() == max_slider_pos()
+                - else
+                    - #slider_pos() == pos
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='slider_pos'></a>slider_pos</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the current position of the slider box within the scroll bar.
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='jump_size'></a>jump_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of positions that the slider bar will jump when the
+                  user clicks on the empty gaps above or below the slider bar.
+                  (note that the slider will jump less than the jump size if it hits the 
+                  end of the scroll bar)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_jump_size'></a>set_jump_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> js 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (js &lt; 1) then
+                    - #jump_size() == 1
+                - else
+                    - #jump_size() == js 
+        !*/</font>
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_scroll_handler'></a>set_scroll_handler</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>event_handler<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - event_handler is a valid pointer to a member function in T
+            ensures
+                - The event_handler function is called whenever the user causes the slider box
+                  to move.  
+                - This event is NOT triggered by calling set_slider_pos()
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_scroll_handler'></a>set_scroll_handler</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> any_function<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> event_handler
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - The event_handler function is called whenever the user causes the slider box
+                  to move.  
+                - This event is NOT triggered by calling set_slider_pos()
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='scroll_bar'></a>scroll_bar</b><font face='Lucida Console'>(</font>scroll_bar<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        scroll_bar<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>scroll_bar<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// class widget_group 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='widget_group'></a>widget_group</b> : <font color='#0000FF'>public</font> drawable 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                size() == 0
+                get_rect().is_empty() == true
+                left() == 0
+                top() == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a grouping of drawable widgets.  It doesn't draw 
+                anything itself, rather it lets you manipulate the position, enabled
+                status, and visibility of a set of widgets as a group.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <b><a name='widget_group'></a>widget_group</b><font face='Lucida Console'>(</font>  
+            drawable_window<font color='#5555FF'>&amp;</font> w
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - #*this is properly initialized 
+                - #*this has been added to window w
+                - #parent_window() == w
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='widget_group'></a>widget_group</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources associated with *this have been released.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='empty'></a>empty</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #size() == 0
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='fit_to_contents'></a>fit_to_contents</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - does not change the position of this object. 
+                  (i.e. the upper left corner of get_rect() remains at the same position)
+                - if (size() == 0) then
+                    - #get_rect().is_empty() == true
+                - else
+                    - recursively calls fit_to_contents() on any widget_groups inside
+                      this object.
+                    - #get_rect() will be the smallest rectangle that contains all the 
+                      widgets in this group and the upper left corner of get_rect(). 
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of widgets currently in *this.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+            drawable<font color='#5555FF'>&amp;</font> widget,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> x,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> y
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #is_member(widget) == true
+                - if (is_member(widget) == false) then
+                    - #size() == size() + 1
+                - else
+                    - #size() == size()
+                - The following conditions apply to this function as well as to all of the 
+                  following functions so long as is_member(widget) == true: 
+                  enable(), disable(), hide(), show(), set_z_order(), and set_pos().
+                    - #widget.left() == left()+x
+                    - #widget.width() == widget.width()
+                    - #widget.top() == top()+y
+                    - #widget.height() == widget.height()
+                    - #widget.is_hidden() == is_hidden()
+                    - #widget.is_enabled() == is_enabled()
+                    - #widget.z_order() == z_order()
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_member'></a>is_member</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> drawable<font color='#5555FF'>&amp;</font> widget
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if widget is currently in this object, returns false otherwise.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='remove'></a>remove</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> drawable<font color='#5555FF'>&amp;</font> widget
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #is_member(widget) == false 
+                - if (is_member(widget) == true) then
+                    - #size() == size() - 1
+                - else
+                    - #size() == size()
+        !*/</font>
+
+    <font color='#0000FF'>protected</font>:
+
+        <font color='#009900'>// this object doesn't draw anything but also isn't abstract
+</font>        <font color='#0000FF'><u>void</u></font> <b><a name='draw'></a>draw</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b><b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='widget_group'></a>widget_group</b><font face='Lucida Console'>(</font>widget_group<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        widget_group<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>widget_group<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// class image_widget 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='image_widget'></a>image_widget</b> : <font color='#0000FF'>public</font> draggable
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                draggable_area() == an initial value for its type.
+                This object isn't displaying anything. 
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a draggable image.  You give it an image to display
+                by calling set_image().
+
+                Also note that initially the draggable area is empty so it won't be 
+                draggable unless you call set_draggable_area() to some non-empty region.
+
+                The image is drawn such that:
+                    - the pixel img[0][0] is the upper left corner of the image.
+                    - the pixel img[img.nr()-1][0] is the lower left corner of the image.
+                    - the pixel img[0][img.nc()-1] is the upper right corner of the image.
+                    - the pixel img[img.nr()-1][img.nc()-1] is the lower right corner of the image.
+                
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='image_widget'></a>image_widget</b><font face='Lucida Console'>(</font>  
+            drawable_window<font color='#5555FF'>&amp;</font> w
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - #*this is properly initialized 
+                - #*this has been added to window w
+                - #parent_window() == w
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='image_widget'></a>image_widget</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources associated with *this have been released
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type 
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_image'></a>set_image</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - image_type == an implementation of array2d/array2d_kernel_abstract.h
+                - pixel_traits&lt;typename image_type::type&gt; must be defined 
+            ensures
+                - #width() == img.nc()
+                - #height() == img.nr()
+                - #*this widget is now displaying the given image img.
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='image_widget'></a>image_widget</b><font face='Lucida Console'>(</font>image_widget<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        image_widget<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>image_widget<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// class tooltip 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='tooltip'></a>tooltip</b> : <font color='#0000FF'>public</font> mouse_over_event 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - text() == ""
+                - the tooltip is inactive until the text is changed to
+                  a non-empty string.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a region on a window where if the user
+                hovers the mouse over this region a tooltip with a message
+                appears.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='tooltip'></a>tooltip</b><font face='Lucida Console'>(</font>  
+            drawable_window<font color='#5555FF'>&amp;</font> w
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - #*this is properly initialized 
+                - #*this has been added to window w
+                - #parent_window() == w
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='tooltip'></a>tooltip</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources associated with *this have been released
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width_, 
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> height_ 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #width() == width_
+                - #height() == height_
+                - #top() == top()
+                - #left() == left()
+                - i.e. The location of the upper left corner of this widget stays the
+                  same but its width and height are modified
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_text'></a>set_text</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::wstring<font color='#5555FF'>&amp;</font> str<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_text'></a>set_text</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> dlib::ustring<font color='#5555FF'>&amp;</font> str<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_text'></a>set_text</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> str
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #text() == str
+                - activates the tooltip.  i.e. after this function the tooltip
+                  will display on the screen when the user hovers the mouse over it
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::wstring  <b><a name='wtext'></a>wtext</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#0000FF'>const</font> dlib::ustring <b><a name='utext'></a>utext</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#0000FF'>const</font> std::string   <b><a name='text'></a>text</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the text that is displayed inside this
+                  tooltip
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='tooltip'></a>tooltip</b><font face='Lucida Console'>(</font>tooltip<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        tooltip<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>tooltip<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// popup menu stuff  
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='menu_item'></a>menu_item</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an abstract class that defines the interface a
+                menu item in a popup_menu must implement.
+
+                Note that a menu_item is drawn as 3 separate pieces:
+                    ---------------------------------
+                    | left | middle |         right |
+                    ---------------------------------
+
+                Also note that derived classes must be copyable via
+                their copy constructors.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='menu_item'></a>menu_item</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='on_click'></a>on_click</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+                - if (has_click_event()) then
+                    - this function is called when the user clicks on this menu_item
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='has_click_event'></a>has_click_event</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>false</font>; <b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - if (this menu_item wants to receive on_click events) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> unichar <b><a name='get_hot_key'></a>get_hot_key</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>0</font>; <b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - if (this menu item has a keyboard hot key) then
+                    - returns the unicode value of the key
+                - else
+                    - returns 0
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> rectangle <b><a name='get_left_size'></a>get_left_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b> <font color='#009900'>// return empty rect by default
+</font>        <font color='#009900'>/*!
+            ensures
+                - returns the dimensions of the left part of the menu_item
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> rectangle <b><a name='get_middle_size'></a>get_middle_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the dimensions of the middle part of the menu_item
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> rectangle <b><a name='get_right_size'></a>get_right_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b> <font color='#009900'>// return empty rect by default
+</font>        <font color='#009900'>/*!
+            ensures
+                - returns the dimensions of the right part of the menu_item
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_background'></a>draw_background</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_selected
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+            requires
+                - c == the canvas to draw on
+                - rect == the rectangle in which we are to draw the background
+                - enabled == true if the menu_item is to be drawn enabled
+                - is_selected == true if the menu_item is to be drawn selected
+            ensures
+                - draws the background of the menu_item on the canvas c at the location 
+                  given by rect.  
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_left'></a>draw_left</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_selected
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+            requires
+                - c == the canvas to draw on
+                - rect == the rectangle in which we are to draw the background
+                - enabled == true if the menu_item is to be drawn enabled
+                - is_selected == true if the menu_item is to be drawn selected
+            ensures
+                - draws the left part of the menu_item on the canvas c at the location 
+                  given by rect.  
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_middle'></a>draw_middle</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_selected
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+            requires
+                - c == the canvas to draw on
+                - rect == the rectangle in which we are to draw the background
+                - enabled == true if the menu_item is to be drawn enabled
+                - is_selected == true if the menu_item is to be drawn selected
+            ensures
+                - draws the middle part of the menu_item on the canvas c at the location 
+                  given by rect.  
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_right'></a>draw_right</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_selected
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            requires
+                - the mutex drawable::m is locked
+            requires
+                - c == the canvas to draw on
+                - rect == the rectangle in which we are to draw the background
+                - enabled == true if the menu_item is to be drawn enabled
+                - is_selected == true if the menu_item is to be drawn selected
+            ensures
+                - draws the right part of the menu_item on the canvas c at the location 
+                  given by rect.  
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='menu_item_text'></a>menu_item_text</b> : <font color='#0000FF'>public</font> menu_item
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a simple text menu item
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <b><a name='menu_item_text'></a>menu_item_text</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> str,
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>on_click_handler<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            unichar hotkey <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - The text of this menu item will be str
+                - the on_click_handler function is called on object when this menu_item 
+                  clicked by the user.
+                - #get_hot_key() == hotkey
+        !*/</font>
+        
+        <b><a name='menu_item_text'></a>menu_item_text</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> str,
+            <font color='#0000FF'>const</font> any_function<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> on_click_handler,
+            unichar hotkey <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - The text of this menu item will be str
+                - the on_click_handler function is called when this menu_item 
+                  clicked by the user.
+                - #get_hot_key() == hotkey
+        !*/</font>
+        
+        <font color='#009900'>// overloads for wide character strings
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <b><a name='menu_item_text'></a>menu_item_text</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::wstring<font color='#5555FF'>&amp;</font> str,
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>on_click_handler<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            unichar hotkey <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>; 
+
+        <b><a name='menu_item_text'></a>menu_item_text</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::wstring<font color='#5555FF'>&amp;</font> str,
+            <font color='#0000FF'>const</font> any_function<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> on_click_handler,
+            unichar hotkey <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>; 
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <b><a name='menu_item_text'></a>menu_item_text</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> dlib::ustring<font color='#5555FF'>&amp;</font> str,
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>on_click_handler<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            unichar hotkey <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>; 
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <b><a name='menu_item_text'></a>menu_item_text</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> dlib::ustring<font color='#5555FF'>&amp;</font> str,
+            <font color='#0000FF'>const</font> any_function<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> on_click_handler,
+            unichar hotkey <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>; 
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='menu_item_submenu'></a>menu_item_submenu</b> : <font color='#0000FF'>public</font> menu_item
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a simple text item intended to be used with
+                submenus inside a popup_menu.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='menu_item_submenu'></a>menu_item_submenu</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> str,
+            unichar hotkey <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - The text of this menu item will be str
+                - #get_hot_key() == hotkey
+        !*/</font>
+
+        <font color='#009900'>//overloads for wide character strings
+</font>        <b><a name='menu_item_submenu'></a>menu_item_submenu</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::wstring<font color='#5555FF'>&amp;</font> str,
+            unichar hotkey <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>; 
+
+        <b><a name='menu_item_submenu'></a>menu_item_submenu</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> dlib::ustring<font color='#5555FF'>&amp;</font> str,
+            unichar hotkey <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>; 
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='menu_item_separator'></a>menu_item_separator</b> : <font color='#0000FF'>public</font> menu_item
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a horizontal separator in a popup menu 
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='popup_menu'></a>popup_menu</b> : <font color='#0000FF'>public</font> base_window
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - size() == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a popup menu window capable of containing
+                menu_item objects.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='popup_menu'></a>popup_menu</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - #*this is properly initialized 
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+                - dlib::gui_error
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this has its initial value
+            throws
+                - std::bad_alloc 
+                  if this exception is thrown then *this is unusable
+                  until clear() is called and succeeds
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> menu_item_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='add_menu_item'></a>add_menu_item</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> menu_item_type<font color='#5555FF'>&amp;</font> new_item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - menu_item_type == a type that inherits from menu_item 
+            ensures
+                - adds new_item onto the bottom of this popup_menu. 
+                - returns size() 
+                  (This is also the index by which this item can be
+                  referenced by the enable_menu_item() and disable_menu_item()
+                  functions.)
+        !*/</font>
+        
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> menu_item_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='add_submenu'></a>add_submenu</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> menu_item_type<font color='#5555FF'>&amp;</font> new_item,
+            popup_menu<font color='#5555FF'>&amp;</font> submenu
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - menu_item_type == a type that inherits from menu_item 
+            ensures
+                - adds new_item onto the bottom of this popup_menu. 
+                - when the user puts the mouse above this menu_item the given
+                  submenu popup_menu will be displayed.
+                - returns size() 
+                  (This is also the index by which this item can be
+                  referenced by the enable_menu_item() and disable_menu_item()
+                  functions.)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='enable_menu_item'></a>enable_menu_item</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - idx &lt; size()
+            ensures
+                - the menu_item in this with the index idx has been enabled 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='disable_menu_item'></a>disable_menu_item</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - idx &lt; size()
+            ensures
+                - the menu_item in this with the index idx has been disabled
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of menu_item objects in this popup_menu
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_on_hide_handler'></a>set_on_hide_handler</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>event_handler<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - the event_handler function is called on object when this popup_menu
+                  hides itself due to an action by the user. 
+                - Note that you can register multiple handlers for this event. 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='select_first_item'></a>select_first_item</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - causes this popup menu to highlight the first 
+                  menu item that it contains which has a click event 
+                  and is enabled.
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='forwarded_on_keydown'></a>forwarded_on_keydown</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> key,
+            <font color='#0000FF'><u>bool</u></font> is_printable,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> state
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - key, is_printable, and state are the variables from the
+                  base_window::on_keydown() event
+            ensures
+                - forwards this keyboard event to this popup window so that it
+                  may deal with keyboard events from other windows.
+                - if (this popup_menu uses the keyboard event) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='popup_menu'></a>popup_menu</b><font face='Lucida Console'>(</font>popup_menu<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        popup_menu<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>popup_menu<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// class popup_menu_region 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='popup_menu_region'></a>popup_menu_region</b> : <font color='#0000FF'>public</font> drawable 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - popup_menu_visible() == false
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a region on a window where if the user
+                right clicks the mouse over this region a popup_menu pops up.
+                
+                Note that this widget doesn't actually draw anything, it just 
+                provides a region the user can click on to get a popup menu.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='popup_menu_region'></a>popup_menu_region</b><font face='Lucida Console'>(</font>  
+            drawable_window<font color='#5555FF'>&amp;</font> w
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - #*this is properly initialized 
+                - #*this has been added to window w
+                - #parent_window() == w
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='popup_menu_region'></a>popup_menu_region</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources associated with *this have been released
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width_, 
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> height_ 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #width() == width_
+                - #height() == height_
+                - #top() == top()
+                - #left() == left()
+                - i.e. The location of the upper left corner of this widget stays the
+                  same but its width and height are modified
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_rect'></a>set_rect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> new_rect
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_rect() == new_rect
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='popup_menu_visible'></a>popup_menu_visible</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (the popup menu is currently visible on the screen) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        popup_menu<font color='#5555FF'>&amp;</font> <b><a name='menu'></a>menu</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a reference to the popup_menu for this object. It is
+                  the menu that is displayed when the user right clicks on 
+                  this widget
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='popup_menu_region'></a>popup_menu_region</b><font face='Lucida Console'>(</font>popup_menu_region<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        popup_menu_region<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>popup_menu_region<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// class zoomable_region 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='zoomable_region'></a>zoomable_region</b> : <font color='#0000FF'>public</font> drawable 
+    <b>{</b>
+        <font color='#009900'>/*
+            INITIAL VALUE
+                - min_zoom_scale() == 0.15
+                - max_zoom_scale() == 1.0
+                - zoom_increment() == 0.90
+                - zoom_scale() == 1.0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a 2D Cartesian graph that you can zoom into and
+                out of.  It is a graphical widget that draws a rectangle with 
+                a horizontal and vertical scroll bar that allow the user to scroll
+                around on a Cartesian graph that is much larger than the actual 
+                area occupied by this object on the screen.  It also allows 
+                the user to zoom in and out.
+
+                To use this object you inherit from it and make use of its public and
+                protected member functions.  It provides functions for converting between
+                pixel locations and the points in our 2D Cartesian graph so that when the 
+                user is scrolling/zooming the widget you can still determine where
+                things are to be placed on the screen and what screen pixels correspond
+                to in the Cartesian graph.
+
+                Note that the Cartesian graph in this object is bounded by the point
+                (0,0), corresponding to the upper left corner when we are zoomed all 
+                the way out, and max_graph_point() which corresponds to the lower right 
+                corner when zoomed all the way out. The value of max_graph_point() is 
+                determined automatically from the size of this object's on screen 
+                rectangle and the value of min_zoom_scale() which determines how far 
+                out you can zoom.
+        */</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='zoomable_region'></a>zoomable_region</b> <font face='Lucida Console'>(</font>
+            drawable_window<font color='#5555FF'>&amp;</font> w,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> events <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - #*this is properly initialized 
+                - #*this has been added to window w
+                - #parent_window() == w
+                - This object will not receive any events or draw() requests until 
+                  enable_events() is called
+                - the events flags are passed on to the drawable object's 
+                  constructor.
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='zoomable_region'></a>zoomable_region</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources associated with *this have been released
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> style_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_style'></a>set_style</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> style_type<font color='#5555FF'>&amp;</font> style_
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - style_type == a type that inherits from scrollable_region_style 
+            ensures
+                - this zoomable_region object will draw itself using the given
+                  style
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_zoom_increment'></a>set_zoom_increment</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> zi
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt; zi &lt; 1
+            ensures
+                - #zoom_increment() == zi
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='zoom_increment'></a>zoom_increment</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - When the user zooms in using the mouse wheel:
+                    - #zoom_scale() == zoom_scale() / zoom_increment()
+                - When the user zooms out using the mouse wheel:
+                    - #zoom_scale() == zoom_scale() * zoom_increment()
+                - So this function returns the number that determines how much the zoom
+                  changes when the mouse wheel is moved.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_zoom_scale'></a>set_max_zoom_scale</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> ms 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - ms &gt; 0
+            ensures
+                - #max_zoom_scale() == ms
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_min_zoom_scale'></a>set_min_zoom_scale</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> ms 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - ms &gt; 0
+            ensures
+                - #min_zoom_scale() == ms
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='min_zoom_scale'></a>min_zoom_scale</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the minimum allowed value of zoom_scale()
+                  (i.e. this is the number that determines how far out the user is allowed to zoom)
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='max_zoom_scale'></a>max_zoom_scale</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the maximum allowed value of zoom_scale() 
+                  (i.e. this is the number that determines how far in the user is allowed to zoom)
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> height
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*! 
+            ensures
+                - #width() == width_
+                - #height() == height_
+                - #top() == top()
+                - #left() == left()
+                - i.e. The location of the upper left corner of this button stays the
+                  same but its width and height are modified
+        !*/</font>
+
+    <font color='#0000FF'>protected</font>:
+
+        rectangle <b><a name='display_rect'></a>display_rect</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - mutex drawable::m is locked
+            ensures
+                - returns the rectangle on the screen that contains the Cartesian
+                  graph in this widget.  I.e. this is the area of this widget minus
+                  the area taken up by the scroll bars and border decorations.
+        !*/</font>
+
+        point <b><a name='graph_to_gui_space'></a>graph_to_gui_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> graph_point
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - mutex drawable::m is locked
+            ensures
+                - returns the location of the pixel on the screen that corresponds
+                  to the given point in Cartesian graph space
+        !*/</font>
+
+        vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='gui_to_graph_space'></a>gui_to_graph_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> pixel_point
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - mutex drawable::m is locked
+            ensures
+                - returns the point in Cartesian graph space that corresponds to the given
+                  pixel location
+        !*/</font>
+
+        vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='max_graph_point'></a>max_graph_point</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - mutex drawable::m is locked
+            ensures
+                - returns the pixel farthest from the graph point (0,0) that is still
+                  in the graph.  I.e. returns the point in graph space that corresponds
+                  to the lower right corner of the display_rect() when we are zoomed
+                  all the way out.
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='zoom_scale'></a>zoom_scale</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - mutex drawable::m is locked
+            ensures
+                - returns a double Z that represents the current zoom.  
+                    - Smaller values of Z represent the user zooming out. 
+                    - Bigger values of Z represent the user zooming in.  
+                    - The default unzoomed case is when Z == 1
+                    - objects should be drawn such that they are zoom_scale() 
+                      times their normal size
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_zoom_scale'></a>set_zoom_scale</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> new_scale
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - mutex drawable::m is locked
+            ensures
+                - invalidates the display_rect() so that it will be redrawn
+                - if (min_zoom_scale() &lt;= new_scale &amp;&amp; new_scale &lt;= max_zoom_scale()) then
+                    - #zoom_scale() == new_scale
+                - else if (new_scale &lt; min_zoom_scale()) then
+                    - #zoom_scale() == min_zoom_scale() 
+                - else if (new_scale &gt; max_zoom_scale()) then
+                    - #zoom_scale() == max_zoom_scale() 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='center_display_at_graph_point'></a>center_display_at_graph_point</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> graph_point
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - mutex drawable::m is locked
+            ensures
+                - causes the given graph point to be centered in the display
+                  if possible
+                - invalidates the display_rect() so that it will be redrawn
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='on_view_changed'></a>on_view_changed</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            requires
+                - events_are_enabled() == true
+                - mutex drawable::m is locked
+            ensures
+                - on_view_changed() is called whenever the user causes the view of the
+                  zoomable_region to change.  That is, this function is called when the
+                  user scrolls or zooms around in the region.
+        !*/</font>
+
+    <font color='#009900'>// ---------------------------- event handlers ----------------------------
+</font>    <font color='#009900'>// The following event handlers are used in this object.  So if you
+</font>    <font color='#009900'>// use any of them in your derived object you should pass the events 
+</font>    <font color='#009900'>// back to it so that they still operate unless you wish to hijack the
+</font>    <font color='#009900'>// event for your own reasons (e.g. to override the mouse drag this object
+</font>    <font color='#009900'>// performs)
+</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='on_wheel_down'></a>on_wheel_down</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> state<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>void</u></font> <b><a name='on_wheel_up'></a>on_wheel_up</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> state<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>void</u></font> <b><a name='on_mouse_move'></a>on_mouse_move</b> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> state, <font color='#0000FF'><u>long</u></font> x, <font color='#0000FF'><u>long</u></font> y<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>void</u></font> <b><a name='on_mouse_up'></a>on_mouse_up</b> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> btn, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> state, <font color='#0000FF'><u>long</u></font> x, <font color='#0000FF'><u>long</u></font> y<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>void</u></font> <b><a name='on_mouse_down'></a>on_mouse_down</b> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> btn, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> state, <font color='#0000FF'><u>long</u></font> x, <font color='#0000FF'><u>long</u></font> y, <font color='#0000FF'><u>bool</u></font> is_double_click<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>void</u></font> <b><a name='draw'></a>draw</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='zoomable_region'></a>zoomable_region</b><font face='Lucida Console'>(</font>zoomable_region<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        zoomable_region<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>zoomable_region<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='scrollable_region'></a>scrollable_region</b> : <font color='#0000FF'>public</font> drawable 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - horizontal_scroll_pos() == 0
+                - horizontal_scroll_increment() == 1
+                - horizontal_mouse_wheel_scroll_increment() == 1
+                - vertical_scroll_pos() == 0
+                - vertical_scroll_increment() == 1
+                - vertical_mouse_wheel_scroll_increment() == 1
+                - total_rect().empty() == true
+                - mouse_drag_enabled() == false
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a 2D region of arbitrary size that is displayed
+                within a possibly smaller scrollable gui widget.  That is, it is a 
+                graphical widget that draws a rectangle with a horizontal and vertical 
+                scroll bar that allows the user to scroll around on a region that is much 
+                larger than the actual area occupied by this object on the screen. 
+                
+                To use this object you inherit from it and make use of its public and
+                protected member functions.  It provides a function, total_rect(), that
+                tells you where the 2D region is on the screen.  You draw your stuff 
+                inside total_rect() as you would normally except that you only modify 
+                pixels that are also inside display_rect().  When the user moves the
+                scroll bars the position of total_rect() is updated accordingly, causing
+                the widget's content to scroll across the screen. 
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <b><a name='scrollable_region'></a>scrollable_region</b> <font face='Lucida Console'>(</font>
+            drawable_window<font color='#5555FF'>&amp;</font> w,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> events <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - #*this is properly initialized 
+                - #*this has been added to window w
+                - #parent_window() == w
+                - This object will not receive any events or draw() requests until 
+                  enable_events() is called
+                - the events flags are passed on to the drawable object's 
+                  constructor.
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='scrollable_region'></a>scrollable_region</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources associated with *this have been released
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> style_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_style'></a>set_style</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> style_type<font color='#5555FF'>&amp;</font> style_
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - style_type == a type that inherits from scrollable_region_style 
+            ensures
+                - this scrollable_region object will draw itself using the given
+                  style
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> height
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*! 
+            ensures
+                - #width() == width_
+                - #height() == height_
+                - #top() == top()
+                - #left() == left()
+                - i.e. The location of the upper left corner of this widget stays the
+                  same but its width and height are modified.
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='horizontal_scroll_pos'></a>horizontal_scroll_pos</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the current position of the horizontal scroll bar.
+                  0 means it is at the far left while bigger values represent
+                  scroll positions closer to the right.
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='vertical_scroll_pos'></a>vertical_scroll_pos</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the current position of the vertical scroll bar.
+                  0 means it is at the top and bigger values represent scroll positions
+                  closer to the bottom.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_horizontal_scroll_pos'></a>set_horizontal_scroll_pos</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> pos
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (pos is a valid horizontal scroll position) then
+                    - #horizontal_scroll_pos() == pos
+                - else
+                    - #horizontal_scroll_pos() == the valid scroll position closest to pos
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_vertical_scroll_pos'></a>set_vertical_scroll_pos</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> pos
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (pos is a valid vertical scroll position) then
+                    - #vertical_scroll_pos() == pos
+                - else
+                    - #vertical_scroll_pos() == the valid scroll position closest to pos
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='horizontal_mouse_wheel_scroll_increment'></a>horizontal_mouse_wheel_scroll_increment</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of positions the horizontal scroll bar
+                  moves when the user scrolls the mouse wheel.  
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='vertical_mouse_wheel_scroll_increment'></a>vertical_mouse_wheel_scroll_increment</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of positions the vertical scroll bar
+                  moves when the user scrolls the mouse wheel.  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_horizontal_mouse_wheel_scroll_increment'></a>set_horizontal_mouse_wheel_scroll_increment</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> inc
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #horizontal_mouse_wheel_scroll_increment() == inc
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_vertical_mouse_wheel_scroll_increment'></a>set_vertical_mouse_wheel_scroll_increment</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> inc
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #vertical_mouse_wheel_scroll_increment() == inc
+        !*/</font>
+
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='horizontal_scroll_increment'></a>horizontal_scroll_increment</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of pixels that total_rect() is moved by when
+                  the horizontal scroll bar moves by one position
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='vertical_scroll_increment'></a>vertical_scroll_increment</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of pixels that total_rect() is moved by when
+                  the vertical scroll bar moves by one position
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_horizontal_scroll_increment'></a>set_horizontal_scroll_increment</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> inc
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #horizontal_scroll_increment() == inc
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_vertical_scroll_increment'></a>set_vertical_scroll_increment</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> inc
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #vertical_scroll_increment() == inc
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='mouse_drag_enabled'></a>mouse_drag_enabled</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (the user can drag this contents of this widget around by
+                  holding down the left mouse button and dragging) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='enable_mouse_drag'></a>enable_mouse_drag</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #mouse_drag_enabled() == true
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='disable_mouse_drag'></a>disable_mouse_drag</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #mouse_drag_enabled() == false
+        !*/</font>
+
+    <font color='#0000FF'>protected</font>:
+
+        rectangle <b><a name='display_rect'></a>display_rect</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - mutex drawable::m is locked
+            ensures
+                - returns the rectangle on the screen that contains the scrollable 
+                  area in this widget.  I.e. this is the area of this widget minus
+                  the area taken up by the scroll bars and border decorations.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_total_rect_size'></a>set_total_rect_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> height
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - mutex drawable::m is locked
+                - (width &gt; 0 &amp;&amp; height &gt; 0) || (width == 0 &amp;&amp; height == 0)
+            ensures
+                - #total_rect().width()  == width
+                - #total_rect().height() == height 
+                - The scroll bars as well as the position of #total_rect() 
+                  is updated so that the total rect is still in the correct
+                  position with respect to the scroll bars.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> <b><a name='total_rect'></a>total_rect</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - mutex drawable::m is locked
+            ensures
+                - returns a rectangle that represents the entire scrollable
+                  region inside this widget, even the parts that are outside
+                  display_rect().  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='scroll_to_rect'></a>scroll_to_rect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - mutex drawable::m is locked
+            ensures
+                - Adjusts the scroll bars of this object so that the part of 
+                  the total_rect() rectangle that overlaps with r is displayed in 
+                  the display_rect() rectangle on the screen.
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='on_view_changed'></a>on_view_changed</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            requires
+                - events_are_enabled() == true
+                - mutex drawable::m is locked
+            ensures
+                - on_view_changed() is called whenever the user causes the view of the
+                  scrollable_region to change.  That is, this function is called when the
+                  user scrolls around in the region.
+        !*/</font>
+
+    <font color='#009900'>// ---------------------------- event handlers ----------------------------
+</font>    <font color='#009900'>// The following event handlers are used in this object.  So if you
+</font>    <font color='#009900'>// use any of them in your derived object you should pass the events 
+</font>    <font color='#009900'>// back to it so that they still operate unless you wish to hijack the
+</font>    <font color='#009900'>// event for your own reasons (e.g. to override the mouse wheel action 
+</font>    <font color='#009900'>// this object performs)
+</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='on_wheel_down'></a>on_wheel_down</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> state<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>void</u></font> <b><a name='on_wheel_up'></a>on_wheel_up</b>   <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> state<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>void</u></font> <b><a name='on_mouse_move'></a>on_mouse_move</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> state, <font color='#0000FF'><u>long</u></font> x, <font color='#0000FF'><u>long</u></font> y<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>void</u></font> <b><a name='on_mouse_down'></a>on_mouse_down</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> btn, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> state, <font color='#0000FF'><u>long</u></font> x, <font color='#0000FF'><u>long</u></font> y, <font color='#0000FF'><u>bool</u></font> is_double_click<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>void</u></font> <b><a name='on_mouse_up'></a>on_mouse_up</b>   <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> btn, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> state, <font color='#0000FF'><u>long</u></font> x, <font color='#0000FF'><u>long</u></font> y<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>void</u></font> <b><a name='draw'></a>draw</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='scrollable_region'></a>scrollable_region</b><font face='Lucida Console'>(</font>scrollable_region<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        scrollable_region<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>scrollable_region<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BASE_WIDGETs_ABSTRACT_
+</font>
+
+
+</pre></body></html>

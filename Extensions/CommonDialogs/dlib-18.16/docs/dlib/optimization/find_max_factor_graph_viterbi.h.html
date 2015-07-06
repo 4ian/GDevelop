@@ -1,0 +1,235 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - find_max_factor_graph_viterbi.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_FIND_MAX_FACTOR_GRAPH_VITERBi_Hh_
+<font color='#0000FF'>#define</font> DLIB_FIND_MAX_FACTOR_GRAPH_VITERBi_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='find_max_factor_graph_viterbi_abstract.h.html'>find_max_factor_graph_viterbi_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array2d.h.html'>../array2d.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>struct</font> <b><a name='viterbi_data'></a>viterbi_data</b>
+        <b>{</b>
+            <b><a name='viterbi_data'></a>viterbi_data</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> :val<font face='Lucida Console'>(</font><font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::infinity<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, back_index<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'><u>double</u></font> val;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> back_index;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> NC<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='advance_state'></a>advance_state</b><font face='Lucida Console'>(</font>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#979000'>1</font>,NC<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> node_states,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_states
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            ensures
+                - advances node_states to the next state by adding 1
+                  to node_states(node_states.size()-1) and carrying any 
+                  rollover (modulo num_states).  Stores the result into #node_states.
+                - if (#node_states is all zeros) then
+                    - returns false
+                - else
+                    - returns true
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> node_states.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>; i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>node_states</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>node_states</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> num_states<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+                <font color='#BB00BB'>node_states</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_problem
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_max_factor_graph_viterbi'></a>find_max_factor_graph_viterbi</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> map_problem<font color='#5555FF'>&amp;</font> prob,
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> map_assignment
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib::impl;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> order <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>order</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_states <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>num_states</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>prob.<font color='#BB00BB'>num_states</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void find_max_factor_graph_viterbi()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t The nodes in a factor graph have to be able to take on more than 0 states.</font>"
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>num_states,<font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>order<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\t void find_max_factor_graph_viterbi()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t The order is way too large for this algorithm to handle.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t order:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> order
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_states: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_states 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t std::pow(num_states,order):                </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>num_states,<font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>order<font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t std::numeric_limits&lt;unsigned long&gt;::max(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>prob.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            map_assignment.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>order <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            map_assignment.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>prob.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> map_assignment.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#979000'>1</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> node_state;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> best_state <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'><u>double</u></font> best_val <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> s <font color='#5555FF'>=</font> <font color='#979000'>0</font>; s <font color='#5555FF'>&lt;</font> num_states; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>s<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>node_state</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> s;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> temp <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>factor_value</font><font face='Lucida Console'>(</font>i,node_state<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&gt;</font> best_val<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        best_val <font color='#5555FF'>=</font> temp;
+                        best_state <font color='#5555FF'>=</font> s;
+                    <b>}</b>
+                <b>}</b>
+                map_assignment[i] <font color='#5555FF'>=</font> best_state;
+            <b>}</b>
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> trellis_size <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>num_states,<font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>order<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> init_ring_size <font color='#5555FF'>=</font> <font color='#979000'>1</font>; 
+
+        array2d<font color='#5555FF'>&lt;</font>impl::viterbi_data<font color='#5555FF'>&gt;</font> trellis;
+        trellis.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>prob.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, trellis_size<font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> node <font color='#5555FF'>=</font> <font color='#979000'>0</font>; node <font color='#5555FF'>&lt;</font> prob.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>node<font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>node <font color='#5555FF'>&lt;</font> order<font face='Lucida Console'>)</font>
+            <b>{</b>
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#979000'>1</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> node_states;
+                node_states.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>std::min<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>node, order<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                node_states <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>node <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>do</font> 
+                    <b>{</b>
+                        trellis[node][idx].val <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>factor_value</font><font face='Lucida Console'>(</font>node,node_states<font face='Lucida Console'>)</font>;
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>idx;
+                    <b>}</b> <font color='#0000FF'>while</font><font face='Lucida Console'>(</font><font color='#BB00BB'>advance_state</font><font face='Lucida Console'>(</font>node_states,num_states<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    init_ring_size <font color='#5555FF'>*</font><font color='#5555FF'>=</font> num_states;
+                    <font color='#0000FF'>do</font> 
+                    <b>{</b>
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> back_index <font color='#5555FF'>=</font> idx<font color='#5555FF'>%</font>init_ring_size;
+                        trellis[node][idx].val <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>factor_value</font><font face='Lucida Console'>(</font>node,node_states<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> trellis[node<font color='#5555FF'>-</font><font color='#979000'>1</font>][back_index].val;
+                        trellis[node][idx].back_index <font color='#5555FF'>=</font> back_index;
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>idx;
+                    <b>}</b> <font color='#0000FF'>while</font><font face='Lucida Console'>(</font><font color='#BB00BB'>advance_state</font><font face='Lucida Console'>(</font>node_states,num_states<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>order <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>/*
+                    WHAT'S THE DEAL WITH THIS PREPROCESSOR MACRO?
+                        Well, if we can declare the dimensions of node_states as a compile
+                        time constant then this function runs significantly faster.  So this macro
+                        is here to let us do that.  It just lets us avoid replicating this code
+                        block in the following if statements for different order sizes.
+                */</font>
+<font color='#0000FF'>#define</font> DLIB_FMFGV_WORK                                                                                                     \
+                node_states <font color='#5555FF'>=</font> <font color='#979000'>0</font>;                                                                                            \
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;                                                                                    \
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> trellis_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>                                                            \
+                <b>{</b>                                                                                                           \
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> back_index <font color='#5555FF'>=</font> <font color='#979000'>0</font>;                                                                           \
+                    <font color='#0000FF'><u>double</u></font> best_score <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;                                           \
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> s <font color='#5555FF'>=</font> <font color='#979000'>0</font>; s <font color='#5555FF'>&lt;</font> num_states; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>s<font face='Lucida Console'>)</font>                                                          \
+                    <b>{</b>                                                                                                       \
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> temp <font color='#5555FF'>=</font> prob.<font color='#BB00BB'>factor_value</font><font face='Lucida Console'>(</font>node,node_states<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> trellis[node<font color='#5555FF'>-</font><font color='#979000'>1</font>][count<font color='#5555FF'>%</font>trellis_size].val;  \
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&gt;</font> best_score<font face='Lucida Console'>)</font>                                                                              \
+                        <b>{</b>                                                                                                   \
+                            best_score <font color='#5555FF'>=</font> temp;                                                                              \
+                            back_index <font color='#5555FF'>=</font> count<font color='#5555FF'>%</font>trellis_size;                                                                \
+                        <b>}</b>                                                                                                   \
+                        <font color='#BB00BB'>advance_state</font><font face='Lucida Console'>(</font>node_states,num_states<font face='Lucida Console'>)</font>;                                                              \
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;                                                                                            \
+                    <b>}</b>                                                                                                       \
+                    trellis[node][i].val <font color='#5555FF'>=</font> best_score;                                                                      \
+                    trellis[node][i].back_index <font color='#5555FF'>=</font> back_index;                                                               \
+                <b>}</b>
+
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#979000'>1</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> node_states;
+                DLIB_FMFGV_WORK
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>order <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#979000'>1</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> node_states;
+                DLIB_FMFGV_WORK
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>order <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#979000'>1</font>,<font color='#979000'>4</font><font color='#5555FF'>&gt;</font> node_states;
+                DLIB_FMFGV_WORK
+            <b>}</b>
+            <font color='#0000FF'>else</font> 
+            <b>{</b>
+                <font color='#009900'>// The general case, here we don't define the size of node_states at compile time.
+</font>                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#979000'>1</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>node_states</font><font face='Lucida Console'>(</font>order<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                DLIB_FMFGV_WORK
+            <b>}</b>
+        <b>}</b>
+
+
+        map_assignment.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>prob.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Figure out which state of the last node has the biggest value. 
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> back_index <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>double</u></font> best_val <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> trellis.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>trellis[trellis.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>][i].val <font color='#5555FF'>&gt;</font> best_val<font face='Lucida Console'>)</font>
+            <b>{</b>
+                best_val <font color='#5555FF'>=</font> trellis[trellis.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>][i].val;
+                back_index <font color='#5555FF'>=</font> i;
+            <b>}</b>
+        <b>}</b>
+        <font color='#009900'>// Follow the back links to find the decoding.
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> node <font color='#5555FF'>=</font> map_assignment.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>; node <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>node<font face='Lucida Console'>)</font>
+        <b>{</b>
+            map_assignment[node] <font color='#5555FF'>=</font> back_index<font color='#5555FF'>/</font>init_ring_size;
+            back_index <font color='#5555FF'>=</font> trellis[node][back_index].back_index;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>node <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>order<font face='Lucida Console'>)</font>
+                init_ring_size <font color='#5555FF'>/</font><font color='#5555FF'>=</font> num_states;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_FIND_MAX_FACTOR_GRAPH_VITERBi_Hh_
+</font>
+
+
+</pre></body></html>

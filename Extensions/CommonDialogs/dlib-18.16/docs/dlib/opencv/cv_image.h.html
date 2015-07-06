@@ -1,0 +1,202 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - cv_image.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_CvIMAGE_H_
+<font color='#0000FF'>#define</font> DLIB_CvIMAGE_H_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>opencv2<font color='#5555FF'>/</font>core<font color='#5555FF'>/</font>core.hpp<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>opencv2<font color='#5555FF'>/</font>core<font color='#5555FF'>/</font>types_c.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='cv_image_abstract.h.html'>cv_image_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_mat.h.html'>../matrix/matrix_mat.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/generic_image.h.html'>../image_processing/generic_image.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> pixel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='cv_image'></a>cv_image</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> pixel_type type;
+        <font color='#0000FF'>typedef</font> default_memory_manager mem_manager_type;
+
+        <b><a name='cv_image'></a>cv_image</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> cv::Mat img<font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>img.<font color='#BB00BB'>depth</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> cv::DataType<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pixel_traits<font color='#5555FF'>&lt;</font>pixel_type<font color='#5555FF'>&gt;</font>::basic_pixel_type<font color='#5555FF'>&gt;</font>::depth <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                         img.<font color='#BB00BB'>channels</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> pixel_traits<font color='#5555FF'>&lt;</font>pixel_type<font color='#5555FF'>&gt;</font>::num, 
+                         "<font color='#CC0000'>The pixel type you gave doesn't match pixel used by the open cv Mat object.</font>"
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t img.depth():    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> img.<font color='#BB00BB'>depth</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t img.cv::DataType&lt;typename pixel_traits&lt;pixel_type&gt;::basic_pixel_type&gt;::depth: </font>" 
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cv::DataType<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pixel_traits<font color='#5555FF'>&lt;</font>pixel_type<font color='#5555FF'>&gt;</font>::basic_pixel_type<font color='#5555FF'>&gt;</font>::depth 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t img.channels(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> img.<font color='#BB00BB'>channels</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t img.pixel_traits&lt;pixel_type&gt;::num: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> pixel_traits<font color='#5555FF'>&lt;</font>pixel_type<font color='#5555FF'>&gt;</font>::num 
+                         <font face='Lucida Console'>)</font>;
+            IplImage temp <font color='#5555FF'>=</font> img;
+            <font color='#BB00BB'>init</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>temp<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <b><a name='cv_image'></a>cv_image</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> IplImage img<font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>init</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>img<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <b><a name='cv_image'></a>cv_image</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> IplImage<font color='#5555FF'>*</font> img<font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>init</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <b><a name='cv_image'></a>cv_image</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : _data<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, _widthStep<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, _nr<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, _nc<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>_nr<font color='#5555FF'>*</font>_nc<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>inline</font> pixel_type<font color='#5555FF'>*</font> <b><a name='operator'></a>operator</b>[]<font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> row <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> row <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> row <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\tpixel_type* cv_image::operator[](row)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you have asked for an out of bounds row </font>" 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t row:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> row
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font>pixel_type<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font> _data <font color='#5555FF'>+</font> _widthStep<font color='#5555FF'>*</font>row<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>*</font> <b><a name='operator'></a>operator</b>[]<font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> row <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> row <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> row <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\tconst pixel_type* cv_image::operator[](row)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you have asked for an out of bounds row </font>" 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t row:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> row
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font> _data <font color='#5555FF'>+</font> _widthStep<font color='#5555FF'>*</font>row<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> _nr; <b>}</b>
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> _nc; <b>}</b>
+        <font color='#0000FF'><u>long</u></font> <b><a name='width_step'></a>width_step</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> _widthStep; <b>}</b>
+
+        cv_image<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> cv_image<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font>
+        <b>{</b>
+            _data <font color='#5555FF'>=</font> item._data;
+            _widthStep <font color='#5555FF'>=</font> item._widthStep;
+            _nr <font color='#5555FF'>=</font> item._nr;
+            _nc <font color='#5555FF'>=</font> item._nc;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        cv_image<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> IplImage<font color='#5555FF'>*</font> img<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>init</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        cv_image<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> IplImage img<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>init</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>img<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        cv_image<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> cv::Mat img<font face='Lucida Console'>)</font>
+        <b>{</b>
+            IplImage temp <font color='#5555FF'>=</font> img;
+            <font color='#BB00BB'>init</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>temp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='init'></a>init</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> IplImage<font color='#5555FF'>*</font> img<font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> img<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dataOrder <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>, "<font color='#CC0000'>Only interleaved color channels are supported with cv_image</font>"<font face='Lucida Console'>)</font>; 
+            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>img<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>depth<font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>8</font><font color='#5555FF'>*</font>img<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>nChannels <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>pixel_type<font face='Lucida Console'>)</font>, 
+                         "<font color='#CC0000'>The pixel type you gave doesn't match the size of pixel used by the open cv image struct</font>"<font face='Lucida Console'>)</font>;
+
+            _data <font color='#5555FF'>=</font> img<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>imageData;
+            _widthStep <font color='#5555FF'>=</font> img<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>widthStep;
+            _nr <font color='#5555FF'>=</font> img<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>height;
+            _nc <font color='#5555FF'>=</font> img<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>width;
+
+        <b>}</b>
+
+        <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> _data;
+        <font color='#0000FF'><u>long</u></font> _widthStep;
+        <font color='#0000FF'><u>long</u></font> _nr;
+        <font color='#0000FF'><u>long</u></font> _nc;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_op<font color='#5555FF'>&lt;</font>op_array2d_to_mat<font color='#5555FF'>&lt;</font>cv_image<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='mat'></a>mat</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> cv_image<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> op_array2d_to_mat<font color='#5555FF'>&lt;</font>cv_image<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> op;
+        <font color='#0000FF'>return</font> matrix_op<font color='#5555FF'>&lt;</font>op<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>op</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// Define the global functions that make cv_image a proper "generic image" according to
+</font><font color='#009900'>// ../image_processing/generic_image.h
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='image_traits'></a>image_traits</b><font color='#5555FF'>&lt;</font>cv_image<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> T pixel_type;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='num_rows'></a>num_rows</b><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> cv_image<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> img<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='num_columns'></a>num_columns</b><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> cv_image<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> img<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> <b><a name='image_data'></a>image_data</b><font face='Lucida Console'>(</font>
+        cv_image<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>img.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>&amp;</font>img[<font color='#979000'>0</font>][<font color='#979000'>0</font>];
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> <b><a name='image_data'></a>image_data</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> cv_image<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>img.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>&amp;</font>img[<font color='#979000'>0</font>][<font color='#979000'>0</font>];
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='width_step'></a>width_step</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> cv_image<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#0000FF'>return</font> img.<font color='#BB00BB'>width_step</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CvIMAGE_H_
+</font>
+
+</pre></body></html>

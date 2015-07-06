@@ -1,0 +1,213 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - setup_hashed_features_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SETUP_HAShED_FEATURES_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_SETUP_HAShED_FEATURES_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='scan_image_pyramid_abstract.h.html'>scan_image_pyramid_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='scan_image_boxes_abstract.h.html'>scan_image_boxes_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../lsh/projection_hash_abstract.h.html'>../lsh/projection_hash_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_keypoint/hashed_feature_image_abstract.h.html'>../image_keypoint/hashed_feature_image_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_keypoint/binned_vector_feature_image_abstract.h.html'>../image_keypoint/binned_vector_feature_image_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='image_hash_construction_failure'></a>image_hash_construction_failure</b> : <font color='#0000FF'>public</font> error
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is the exception object used by the routines in this file.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_scanner
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='use_uniform_feature_weights'></a>use_uniform_feature_weights</b> <font face='Lucida Console'>(</font>
+        image_scanner<font color='#5555FF'>&amp;</font> scanner
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_scanner should be either scan_image_pyramid or scan_image_boxes and
+              should use the hashed_feature_image as its local feature extractor.
+        ensures
+            - #scanner.get_feature_extractor().uses_uniform_feature_weights() == true
+              (i.e. Make the scanner's feature extractor use the uniform feature weighting
+              scheme)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_scanner
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='use_relative_feature_weights'></a>use_relative_feature_weights</b> <font face='Lucida Console'>(</font>
+        image_scanner<font color='#5555FF'>&amp;</font> scanner
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_scanner should be either scan_image_pyramid or scan_image_boxes and
+              should use the hashed_feature_image as its local feature extractor.
+        ensures
+            - #scanner.get_feature_extractor().uses_uniform_feature_weights() == false 
+              (i.e. Make the scanner's feature extractor use the relative feature weighting
+              scheme)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_array,
+        <font color='#0000FF'>typename</font> pyramid,
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> fe, <font color='#0000FF'>typename</font> hash<font color='#5555FF'>&gt;</font> <font color='#0000FF'>class</font> <b><a name='feature_image'></a>feature_image</b>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='setup_hashed_features'></a>setup_hashed_features</b> <font face='Lucida Console'>(</font>
+        scan_image_pyramid<font color='#5555FF'>&lt;</font>pyramid, feature_image<font color='#5555FF'>&lt;</font>feature_extractor, projection_hash<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> scanner,
+        <font color='#0000FF'>const</font> image_array<font color='#5555FF'>&amp;</font> images,
+        <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> fe,
+        <font color='#0000FF'><u>int</u></font> bits,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_samples <font color='#5555FF'>=</font> <font color='#979000'>200000</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt; bits &lt;= 32
+            - num_samples &gt; 1
+            - images.size() &gt; 0
+            - it must be valid to pass images[0] into scanner.load().
+              (also, image_array must be an implementation of dlib/array/array_kernel_abstract.h)
+            - feature_image == must be either hashed_feature_image, binned_vector_feature_image,
+              or a type with a compatible interface.
+        ensures
+            - Creates a projection_hash suitable for hashing the feature vectors produced by
+              fe and then configures scanner to use this hash function.
+            - The hash function will map vectors into integers in the range [0, pow(2,bits))
+            - The hash function will be setup so that it hashes a random sample of num_samples
+              vectors from fe such that each bin ends up with roughly the same number of 
+              elements in it.
+        throws
+            - image_hash_construction_failure
+              This exception is thrown if there is a problem creating the projection_hash.
+              This should only happen the images are so small they contain less than 2
+              feature vectors.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_array,
+        <font color='#0000FF'>typename</font> pyramid,
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> fe, <font color='#0000FF'>typename</font> hash<font color='#5555FF'>&gt;</font> <font color='#0000FF'>class</font> <b><a name='feature_image'></a>feature_image</b>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='setup_hashed_features'></a>setup_hashed_features</b> <font face='Lucida Console'>(</font>
+        scan_image_pyramid<font color='#5555FF'>&lt;</font>pyramid, feature_image<font color='#5555FF'>&lt;</font>feature_extractor, projection_hash<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> scanner,
+        <font color='#0000FF'>const</font> image_array<font color='#5555FF'>&amp;</font> images,
+        <font color='#0000FF'><u>int</u></font> bits,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_samples <font color='#5555FF'>=</font> <font color='#979000'>200000</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt; bits &lt;= 32
+            - num_samples &gt; 1
+            - images.size() &gt; 0
+            - it must be valid to pass images[0] into scanner.load().
+              (also, image_array must be an implementation of dlib/array/array_kernel_abstract.h)
+            - feature_image == must be either hashed_feature_image, binned_vector_feature_image,
+              or a type with a compatible interface.
+        ensures
+            - performs: setup_hashed_features(scanner, images, feature_extractor(), bits, num_samples)
+        throws
+            - image_hash_construction_failure
+              This exception is thrown if there is a problem creating the projection_hash.
+              This should only happen the images are so small they contain less than 2
+              feature vectors.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_array,
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> fe, <font color='#0000FF'>typename</font> hash<font color='#5555FF'>&gt;</font> <font color='#0000FF'>class</font> <b><a name='feature_image'></a>feature_image</b>
+        <font color='#0000FF'>typename</font> box_generator
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='setup_hashed_features'></a>setup_hashed_features</b> <font face='Lucida Console'>(</font>
+        scan_image_boxes<font color='#5555FF'>&lt;</font>feature_image<font color='#5555FF'>&lt;</font>feature_extractor, projection_hash<font color='#5555FF'>&gt;</font>,box_generator<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> scanner,
+        <font color='#0000FF'>const</font> image_array<font color='#5555FF'>&amp;</font> images,
+        <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> fe,
+        <font color='#0000FF'><u>int</u></font> bits,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_samples <font color='#5555FF'>=</font> <font color='#979000'>200000</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt; bits &lt;= 32
+            - num_samples &gt; 1
+            - images.size() &gt; 0
+            - it must be valid to pass images[0] into scanner.load().
+              (also, image_array must be an implementation of dlib/array/array_kernel_abstract.h)
+            - feature_image == must be either hashed_feature_image, binned_vector_feature_image,
+              or a type with a compatible interface.
+        ensures
+            - Creates a projection_hash suitable for hashing the feature vectors produced by
+              fe and then configures scanner to use this hash function.
+            - The hash function will map vectors into integers in the range [0, pow(2,bits))
+            - The hash function will be setup so that it hashes a random sample of num_samples
+              vectors from fe such that each bin ends up with roughly the same number of 
+              elements in it.
+        throws
+            - image_hash_construction_failure
+              This exception is thrown if there is a problem creating the projection_hash.
+              This should only happen the images are so small they contain less than 2
+              feature vectors.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_array,
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> fe, <font color='#0000FF'>typename</font> hash<font color='#5555FF'>&gt;</font> <font color='#0000FF'>class</font> <b><a name='feature_image'></a>feature_image</b>
+        <font color='#0000FF'>typename</font> box_generator
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='setup_hashed_features'></a>setup_hashed_features</b> <font face='Lucida Console'>(</font>
+        scan_image_boxes<font color='#5555FF'>&lt;</font>feature_image<font color='#5555FF'>&lt;</font>feature_extractor, projection_hash<font color='#5555FF'>&gt;</font>,box_generator<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> scanner,
+        <font color='#0000FF'>const</font> image_array<font color='#5555FF'>&amp;</font> images,
+        <font color='#0000FF'><u>int</u></font> bits,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_samples <font color='#5555FF'>=</font> <font color='#979000'>200000</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt; bits &lt;= 32
+            - num_samples &gt; 1
+            - images.size() &gt; 0
+            - it must be valid to pass images[0] into scanner.load().
+              (also, image_array must be an implementation of dlib/array/array_kernel_abstract.h)
+            - feature_image == must be either hashed_feature_image, binned_vector_feature_image,
+              or a type with a compatible interface.
+        ensures
+            - performs: setup_hashed_features(scanner, images, feature_extractor(), bits, num_samples)
+        throws
+            - image_hash_construction_failure
+              This exception is thrown if there is a problem creating the projection_hash.
+              This should only happen the images are so small they contain less than 2
+              feature vectors.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SETUP_HAShED_FEATURES_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

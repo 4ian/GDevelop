@@ -38,159 +38,130 @@ public:
 
         #if defined(GD_IDE_ONLY)
 
-        {
-            class CodeGen : public gd::EventMetadata::CodeGenerator
-            {
-                virtual std::string Generate(gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator,
-                                             gd::EventsCodeGenerationContext & context)
+
+        AddEvent("TimedEvent",
+                      _("Timed event"),
+                      _("Event which launch its conditions and actions only after a amount of time is reached."),
+                      "",
+                      "CppPlatform/Extensions/timedevent16.png",
+                      std::shared_ptr<gd::BaseEvent>(new TimedEvent))
+            .SetCodeGenerator([](gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) {
+                TimedEvent & event = dynamic_cast<TimedEvent&>(event_);
+
+                codeGenerator.AddIncludeFile("TimedEvent/TimedEventTools.h");
+
+                //Notify parent timed event that they have a child
+                for (unsigned int i = 0;i<TimedEvent::codeGenerationCurrentParents.size();++i)
+                    TimedEvent::codeGenerationCurrentParents[i]->codeGenerationChildren.push_back(&event);
+
+                //And register this event as potential parent
+                TimedEvent::codeGenerationCurrentParents.push_back(&event);
+                event.codeGenerationChildren.clear();
+
+                //Prepare code for computing timeout
+                gd::String timeOutCode;
+                gd::CallbacksForGeneratingExpressionCode callbacks(timeOutCode, codeGenerator, context);
+                gd::ExpressionParser parser(event.GetTimeoutExpression());
+                if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || timeOutCode.empty()) timeOutCode = "0";
+
+                //Prepare name
+                gd::String codeName = !event.GetName().empty() ? "GDNamedTimedEvent_"+codeGenerator.ConvertToString(event.GetName()) : "GDTimedEvent_"+ToString(&event);
+
+                gd::String outputCode;
+
+                outputCode += "if ( static_cast<double>(GDpriv::TimedEvents::UpdateAndGetTimeOf(*runtimeContext->scene, \""+codeName+"\"))/1000000.0 > "+timeOutCode+")";
+                outputCode += "{";
+
+                outputCode += codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
+
+                gd::String ifPredicat;
+                for (unsigned int i = 0;i<event.GetConditions().size();++i)
                 {
-                    TimedEvent & event = dynamic_cast<TimedEvent&>(event_);
-                    const gd::Layout & scene = codeGenerator.GetLayout();
-
-                    codeGenerator.AddIncludeFile("TimedEvent/TimedEventTools.h");
-
-                    //Notify parent timed event that they have a child
-                    for (unsigned int i = 0;i<TimedEvent::codeGenerationCurrentParents.size();++i)
-                        TimedEvent::codeGenerationCurrentParents[i]->codeGenerationChildren.push_back(&event);
-
-                    //And register this event as potential parent
-                    TimedEvent::codeGenerationCurrentParents.push_back(&event);
-                    event.codeGenerationChildren.clear();
-
-                    //Prepare code for computing timeout
-                    std::string timeOutCode;
-                    gd::CallbacksForGeneratingExpressionCode callbacks(timeOutCode, codeGenerator, context);
-                    gd::ExpressionParser parser(event.GetTimeoutExpression());
-                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), scene, callbacks) || timeOutCode.empty()) timeOutCode = "0";
-
-                    //Prepare name
-                    std::string codeName = !event.GetName().empty() ? "GDNamedTimedEvent_"+codeGenerator.ConvertToString(event.GetName()) : "GDTimedEvent_"+ToString(&event);
-
-                    std::string outputCode;
-
-                    outputCode += "if ( static_cast<double>(GDpriv::TimedEvents::UpdateAndGetTimeOf(*runtimeContext->scene, \""+codeName+"\"))/1000000.0 > "+timeOutCode+")";
-                    outputCode += "{";
-
-                    outputCode += codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
-
-                    std::string ifPredicat;
-                    for (unsigned int i = 0;i<event.GetConditions().size();++i)
-                    {
-                        if (i!=0) ifPredicat += " && ";
-                        ifPredicat += "condition"+ToString(i)+"IsTrue";
-                    }
-
-                    if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ")\n";
-                    outputCode += "{\n";
-                    outputCode += codeGenerator.GenerateActionsListCode(event.GetActions(), context);
-                    if ( event.HasSubEvents() ) //Sub events
-                    {
-                        outputCode += "\n{\n";
-                        outputCode += codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
-                        outputCode += "}\n";
-                    }
-
-                    outputCode += "}\n";
-
-                    outputCode += "}";
-
-                    //This event cannot be a parent of other TimedEvent anymore
-                    if (!TimedEvent::codeGenerationCurrentParents.empty())
-                        TimedEvent::codeGenerationCurrentParents.pop_back();
-                    else
-                        std::cout << "Error! CodeGenerationCurrentParents cannot be empty!";
-
-                    return outputCode;
+                    if (i!=0) ifPredicat += " && ";
+                    ifPredicat += "condition"+ToString(i)+"IsTrue";
                 }
-            };
-            gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
-            AddEvent("TimedEvent",
-                          GD_T("Timed event"),
-                          GD_T("Event which launch its conditions and actions only after a amount of time is reached."),
-                          "",
-                          "CppPlatform/Extensions/timedevent16.png",
-                          std::shared_ptr<gd::BaseEvent>(new TimedEvent))
-                .SetCodeGenerator(std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
-        }
-
-        {
-            class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
-            {
-                virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+                if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ")\n";
+                outputCode += "{\n";
+                outputCode += codeGenerator.GenerateActionsListCode(event.GetActions(), context);
+                if ( event.HasSubEvents() ) //Sub events
                 {
-                    codeGenerator.AddIncludeFile("TimedEvent/TimedEventTools.h");
+                    outputCode += "\n{\n";
+                    outputCode += codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
+                    outputCode += "}\n";
+                }
 
-                    std::string codeName = "GDNamedTimedEvent_"+codeGenerator.ConvertToString(instruction.GetParameter(1).GetPlainString());
-                    return "GDpriv::TimedEvents::Reset(*runtimeContext->scene, \""+codeName+"\");\n";
+                outputCode += "}\n";
 
-                    return "";
-                };
-            };
-            gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+                outputCode += "}";
 
-            AddAction("ResetTimedEvent",
-                           _("Reset a timed event"),
-                           _("Reset a timed event"),
-                           GD_T("Reset the timed event(s) called _PARAM1_"),
-                           _("Timed events"),
-                           "CppPlatform/Extensions/timedevent24.png",
-                           "CppPlatform/Extensions/timedevent16.png")
-                .AddCodeOnlyParameter("currentScene", "")
-                .AddParameter("", GD_T("Name"))
-                .codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
-        }
+                //This event cannot be a parent of other TimedEvent anymore
+                if (!TimedEvent::codeGenerationCurrentParents.empty())
+                    TimedEvent::codeGenerationCurrentParents.pop_back();
+                else
+                    std::cout << "Error! CodeGenerationCurrentParents cannot be empty!";
 
-        {
-            class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
-            {
-                virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+                return outputCode;
+            });
+
+        AddAction("ResetTimedEvent",
+                       _("Reset a timed event"),
+                       _("Reset a timed event"),
+                       _("Reset the timed event(s) called _PARAM1_"),
+                       _("Timed events"),
+                       "CppPlatform/Extensions/timedevent24.png",
+                       "CppPlatform/Extensions/timedevent16.png")
+            .AddCodeOnlyParameter("currentScene", "")
+            .AddParameter("", _("Name"))
+            .codeExtraInformation.SetCustomCodeGenerator([](gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) {
+                codeGenerator.AddIncludeFile("TimedEvent/TimedEventTools.h");
+
+                gd::String codeName = "GDNamedTimedEvent_"+codeGenerator.ConvertToString(instruction.GetParameter(1).GetPlainString());
+                return "GDpriv::TimedEvents::Reset(*runtimeContext->scene, \""+codeName+"\");\n";
+
+                return gd::String("");
+            });
+
+        AddAction("ResetTimedEventAndSubs",
+                       _("Reset a timed event and sub events"),
+                       _("Reset a timed events, as well as all of its sub events."),
+                       _("Reset timed events called _PARAM1_ and their sub events"),
+                       _("Timed events"),
+                       "CppPlatform/Extensions/timedevent24.png",
+                       "CppPlatform/Extensions/timedevent16.png")
+            .AddParameter("", _("Name"))
+            .codeExtraInformation.SetCustomCodeGenerator([](gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) {
+                codeGenerator.AddIncludeFile("TimedEvent/TimedEventTools.h");
+
+                for (unsigned int i = 0;i<TimedEvent::codeGenerationCurrentParents.size();++i)
                 {
-                    codeGenerator.AddIncludeFile("TimedEvent/TimedEventTools.h");
-
-                    for (unsigned int i = 0;i<TimedEvent::codeGenerationCurrentParents.size();++i)
+                    if ( TimedEvent::codeGenerationCurrentParents[i] == NULL )
                     {
-                        if ( TimedEvent::codeGenerationCurrentParents[i] == NULL )
-                        {
-                            std::cout << "WARNING : NULL timed event in codeGenerationCurrentParents";
-                            continue;
-                        }
-
-                        if (TimedEvent::codeGenerationCurrentParents[i]->GetName() == instruction.GetParameter(0).GetPlainString())
-                        {
-                            TimedEvent & timedEvent = *TimedEvent::codeGenerationCurrentParents[i];
-
-                            std::string code;
-                            {
-                                std::string codeName = !timedEvent.GetName().empty() ? "GDNamedTimedEvent_"+codeGenerator.ConvertToString(timedEvent.GetName()) : "GDTimedEvent_"+ToString(&timedEvent);
-                                code += "GDpriv::TimedEvents::Reset(*runtimeContext->scene, \""+codeName+"\");\n";
-                            }
-                            for (unsigned int j = 0;j<timedEvent.codeGenerationChildren.size();++j)
-                            {
-                                std::string codeName = !timedEvent.codeGenerationChildren[j]->GetName().empty() ? "GDNamedTimedEvent_"+codeGenerator.ConvertToString(timedEvent.codeGenerationChildren[j]->GetName()) : "GDTimedEvent_"+ToString(timedEvent.codeGenerationChildren[j]);
-                                code += "GDpriv::TimedEvents::Reset(*runtimeContext->scene, \""+codeName+"\");\n";
-                            }
-                            return code;
-                        }
+                        std::cout << "WARNING : NULL timed event in codeGenerationCurrentParents";
+                        continue;
                     }
 
-                    return "";
-                };
-            };
-            gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+                    if (TimedEvent::codeGenerationCurrentParents[i]->GetName() == instruction.GetParameter(0).GetPlainString())
+                    {
+                        TimedEvent & timedEvent = *TimedEvent::codeGenerationCurrentParents[i];
 
-            AddAction("ResetTimedEventAndSubs",
-                           _("Reset a timed event and sub events"),
-                           _("Reset a timed events, as well as all of its sub events."),
-                           GD_T("Reset timed events called _PARAM1_ and their sub events"),
-                           _("Timed events"),
-                           "CppPlatform/Extensions/timedevent24.png",
-                           "CppPlatform/Extensions/timedevent16.png")
+                        gd::String code;
+                        {
+                            gd::String codeName = !timedEvent.GetName().empty() ? "GDNamedTimedEvent_"+codeGenerator.ConvertToString(timedEvent.GetName()) : "GDTimedEvent_"+ToString(&timedEvent);
+                            code += "GDpriv::TimedEvents::Reset(*runtimeContext->scene, \""+codeName+"\");\n";
+                        }
+                        for (unsigned int j = 0;j<timedEvent.codeGenerationChildren.size();++j)
+                        {
+                            gd::String codeName = !timedEvent.codeGenerationChildren[j]->GetName().empty() ? "GDNamedTimedEvent_"+codeGenerator.ConvertToString(timedEvent.codeGenerationChildren[j]->GetName()) : "GDTimedEvent_"+ToString(timedEvent.codeGenerationChildren[j]);
+                            code += "GDpriv::TimedEvents::Reset(*runtimeContext->scene, \""+codeName+"\");\n";
+                        }
+                        return code;
+                    }
+                }
 
-                .AddParameter("", GD_T("Name"))
-                .codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator))
-                .SetIncludeFile("TimedEvent/TimedEventTools.h");
-        }
+                return gd::String("");
+            })
+            .SetIncludeFile("TimedEvent/TimedEventTools.h");
         #endif
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
@@ -199,11 +170,11 @@ public:
     #if defined(GD_IDE_ONLY)
     bool HasDebuggingProperties() const { return true; };
 
-    void GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, std::string & name, std::string & value) const
+    void GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, gd::String & name, gd::String & value) const
     {
         unsigned int i = 0;
-        std::map < std::string, ManualTimer >::const_iterator end = TimedEventsManager::managers[&scene].timedEvents.end();
-        for (std::map < std::string, ManualTimer >::iterator iter = TimedEventsManager::managers[&scene].timedEvents.begin();iter != end;++iter)
+        std::map < gd::String, ManualTimer >::const_iterator end = TimedEventsManager::managers[&scene].timedEvents.end();
+        for (std::map < gd::String, ManualTimer >::iterator iter = TimedEventsManager::managers[&scene].timedEvents.begin();iter != end;++iter)
         {
             if ( propertyNb == i )
             {
@@ -223,11 +194,11 @@ public:
         }
     }
 
-    bool ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, std::string newValue)
+    bool ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, gd::String newValue)
     {
         unsigned int i = 0;
-        std::map < std::string, ManualTimer >::const_iterator end = TimedEventsManager::managers[&scene].timedEvents.end();
-        for (std::map < std::string, ManualTimer >::iterator iter = TimedEventsManager::managers[&scene].timedEvents.begin();iter != end;++iter)
+        std::map < gd::String, ManualTimer >::const_iterator end = TimedEventsManager::managers[&scene].timedEvents.end();
+        for (std::map < gd::String, ManualTimer >::iterator iter = TimedEventsManager::managers[&scene].timedEvents.begin();iter != end;++iter)
         {
             if ( propertyNb == i )
             {

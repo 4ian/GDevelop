@@ -1,0 +1,61 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - fortran_id.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_BOOST_NUMERIC_BINDINGS_TRAITS_FORTRAN_H
+<font color='#0000FF'>#define</font> DLIB_BOOST_NUMERIC_BINDINGS_TRAITS_FORTRAN_H
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//       FORTRAN BINDING STUFF FROM BOOST 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>//  Permission to copy, use, modify, sell and
+</font><font color='#009900'>//  distribute this software is granted provided this copyright notice appears
+</font><font color='#009900'>//  in all copies. This software is provided "as is" without express or implied
+</font><font color='#009900'>//  warranty, and with no claim as to its suitability for any purpose.
+</font><font color='#009900'>//  Copyright (C) 2002, 2003 Si-Lab b.v.b.a., Toon Knapen and Kresimir Fresl 
+</font>
+
+<font color='#009900'>// First we need to know what the conventions for linking
+</font><font color='#009900'>// C with Fortran is on this platform/toolset
+</font><font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>__GNUC__<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>__ICC<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>__sgi<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>__COMO__<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>__KCC<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> DLIB_BIND_FORTRAN_LOWERCASE_UNDERSCORE
+<font color='#0000FF'>#elif</font> defined<font face='Lucida Console'>(</font>__IBMCPP__<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>_MSC_VER<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> DLIB_BIND_FORTRAN_LOWERCASE
+<font color='#0000FF'>#else</font>
+<font color='#0000FF'>#error</font> <font color='#0000FF'>do</font> not know how to link with fortran <font color='#0000FF'>for</font> the given platform
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>// Next we define macros to convert our symbols to 
+</font><font color='#009900'>// the current convention
+</font><font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>DLIB_BIND_FORTRAN_LOWERCASE_UNDERSCORE<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> DLIB_FORTRAN_ID<font face='Lucida Console'>(</font> id <font face='Lucida Console'>)</font> id##_
+<font color='#0000FF'>#elif</font> defined<font face='Lucida Console'>(</font>DLIB_BIND_FORTRAN_LOWERCASE<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> DLIB_FORTRAN_ID<font face='Lucida Console'>(</font> id <font face='Lucida Console'>)</font> id
+<font color='#0000FF'>#else</font>
+<font color='#0000FF'>#error</font> <font color='#0000FF'>do</font> not know how to bind to fortran calling convention
+<font color='#0000FF'>#endif</font>
+
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>namespace</font> lapack
+    <b>{</b>
+            <font color='#009900'>// stuff from f2c used to define what exactly is an integer in fortran
+</font><font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>__alpha__<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>__sparc64__<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>__x86_64__<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>__ia64__<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>int</u></font> integer;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> uinteger;
+<font color='#0000FF'>#else</font>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>int</u></font> integer;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>int</u></font> uinteger;
+<font color='#0000FF'>#endif</font>
+
+    <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BOOST_NUMERIC_BINDINGS_TRAITS_FORTRAN_H
+</font>
+
+</pre></body></html>

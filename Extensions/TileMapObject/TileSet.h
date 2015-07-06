@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #ifndef TILESET_H
 #define TILESET_H
 
-#ifdef GD_IDE_ONLY
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif
 
@@ -130,7 +130,7 @@ public:
      * \name Textures
      */
     ///\{
-#ifdef GD_IDE_ONLY
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     /**
      * Returns the tileset bitmap
      */
@@ -234,7 +234,7 @@ private:
 
     std::vector<TileHitbox> m_hitboxes;
 
-    #ifdef GD_IDE_ONLY
+    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     wxBitmap m_tilesetBitmap; ///< The tileset texture
     static wxBitmap m_invalidBitmap;
     #endif

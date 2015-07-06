@@ -1,0 +1,289 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - hashes_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_LSH_HAShES_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_LSH_HAShES_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='hash_similar_angles_64'></a>hash_similar_angles_64</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for computing locality sensitive hashes that give
+                vectors with small angles between each other similar hash values.  In
+                particular, this object creates 64 random planes which pass though the
+                origin and uses them to create a 64bit hash.  To compute the hash for a new
+                vector, this object checks which side of each plane the vector falls on and
+                records this information into a 64bit integer.  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='hash_similar_angles_64'></a>hash_similar_angles_64</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #get_seed() == 0
+        !*/</font>
+
+        <b><a name='hash_similar_angles_64'></a>hash_similar_angles_64</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> uint64 seed
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_seed() == seed
+        !*/</font>
+
+        uint64 <b><a name='get_seed'></a>get_seed</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the random seed used to generate the random planes used for
+                  hashing.
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> uint64 result_type;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> vector_type<font color='#5555FF'>&gt;</font>
+        result_type <b><a name='perator'></a>perator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> v
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - v is an unsorted sparse vector or a dlib matrix representing either a
+                  column or row vector.
+            ensures
+                - returns a 64 bit hash of the input vector v.  The bits in the hash record
+                  which side of each random plane v falls on.  
+
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> <b><a name='distance'></a>distance</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> result_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> result_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the Hamming distance between the two hashes given to this
+                  function.  That is, we return the number of bits in a and b which differ.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='hash_similar_angles_128'></a>hash_similar_angles_128</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for computing locality sensitive hashes that give
+                vectors with small angles between each other similar hash values.  In
+                particular, this object creates 128 random planes which pass though the
+                origin and uses them to create a 128bit hash.  To compute the hash for a new
+                vector, this object checks which side of each plane the vector falls on and
+                records this information into a 128bit integer.  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='hash_similar_angles_128'></a>hash_similar_angles_128</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #get_seed() == 0
+        !*/</font>
+
+        <b><a name='hash_similar_angles_128'></a>hash_similar_angles_128</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> uint64 seed
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_seed() == seed
+        !*/</font>
+
+        uint64 <b><a name='get_seed'></a>get_seed</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the random seed used to generate the random planes used for
+                  hashing.
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> std::pair<font color='#5555FF'>&lt;</font>uint64,uint64<font color='#5555FF'>&gt;</font> result_type;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> vector_type<font color='#5555FF'>&gt;</font>
+        result_type <b><a name='perator'></a>perator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> v
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - v is an unsorted sparse vector or a dlib matrix representing either a
+                  column or row vector.
+            ensures
+                - returns a 128 bit hash of the input vector v.  The bits in the hash record
+                  which side of each random plane v falls on.  
+
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> <b><a name='distance'></a>distance</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> result_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> result_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the Hamming distance between the two hashes given to this
+                  function.  That is, we return the number of bits in a and b which differ.
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='hash_similar_angles_256'></a>hash_similar_angles_256</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for computing locality sensitive hashes that give
+                vectors with small angles between each other similar hash values.  In
+                particular, this object creates 256 random planes which pass though the
+                origin and uses them to create a 256bit hash.  To compute the hash for a new
+                vector, this object checks which side of each plane the vector falls on and
+                records this information into a 256bit integer.  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='hash_similar_angles_256'></a>hash_similar_angles_256</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #get_seed() == 0
+        !*/</font>
+
+        <b><a name='hash_similar_angles_256'></a>hash_similar_angles_256</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> uint64 seed
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_seed() == seed
+        !*/</font>
+
+        uint64 <b><a name='get_seed'></a>get_seed</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the random seed used to generate the random planes used for
+                  hashing.
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> std::pair<font color='#5555FF'>&lt;</font>uint64,uint64<font color='#5555FF'>&gt;</font> hash128_type;
+        <font color='#0000FF'>typedef</font> std::pair<font color='#5555FF'>&lt;</font>hash128_type,hash128_type<font color='#5555FF'>&gt;</font> result_type;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> vector_type<font color='#5555FF'>&gt;</font>
+        result_type <b><a name='perator'></a>perator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> v
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - v is an unsorted sparse vector or a dlib matrix representing either a
+                  column or row vector.
+            ensures
+                - returns a 256 bit hash of the input vector v.  The bits in the hash record
+                  which side of each random plane v falls on.  
+
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> <b><a name='distance'></a>distance</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> result_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> result_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the Hamming distance between the two hashes given to this
+                  function.  That is, we return the number of bits in a and b which differ.
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='hash_similar_angles_512'></a>hash_similar_angles_512</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for computing locality sensitive hashes that give
+                vectors with small angles between each other similar hash values.  In
+                particular, this object creates 512 random planes which pass though the
+                origin and uses them to create a 512bit hash.  To compute the hash for a new
+                vector, this object checks which side of each plane the vector falls on and
+                records this information into a 512bit integer.  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='hash_similar_angles_512'></a>hash_similar_angles_512</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #get_seed() == 0
+        !*/</font>
+
+        <b><a name='hash_similar_angles_512'></a>hash_similar_angles_512</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> uint64 seed
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_seed() == seed
+        !*/</font>
+
+        uint64 <b><a name='get_seed'></a>get_seed</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the random seed used to generate the random planes used for
+                  hashing.
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> hash_similar_angles_256::result_type hash256_type;
+        <font color='#0000FF'>typedef</font> std::pair<font color='#5555FF'>&lt;</font>hash256_type,hash256_type<font color='#5555FF'>&gt;</font> result_type;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> vector_type<font color='#5555FF'>&gt;</font>
+        result_type <b><a name='perator'></a>perator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> v
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - v is an unsorted sparse vector or a dlib matrix representing either a
+                  column or row vector.
+            ensures
+                - returns a 512 bit hash of the input vector v.  The bits in the hash record
+                  which side of each random plane v falls on.  
+
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> <b><a name='distance'></a>distance</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> result_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> result_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the Hamming distance between the two hashes given to this
+                  function.  That is, we return the number of bits in a and b which differ.
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LSH_HAShES_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

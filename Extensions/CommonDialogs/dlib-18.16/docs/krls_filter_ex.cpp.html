@@ -1,0 +1,112 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - krls_filter_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+    This is an example illustrating the use of the krls object 
+    from the dlib C++ Library.
+
+    The krls object allows you to perform online regression.  This
+    example will use the krls object to perform filtering of a signal
+    corrupted by uniformly distributed noise.
+*/</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>rand.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// Here is the function we will be trying to learn with the krls
+</font><font color='#009900'>// object.
+</font><font color='#0000FF'><u>double</u></font> <b><a name='sinc'></a>sinc</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> x<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+
+    <font color='#009900'>// also add in x just to make this function a little more complex
+</font>    <font color='#0000FF'>return</font> <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>x <font color='#5555FF'>+</font> x;
+<b>}</b>
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// Here we declare that our samples will be 1 dimensional column vectors.  The reason for
+</font>    <font color='#009900'>// using a matrix here is that in general you can use N dimensional vectors as inputs to the
+</font>    <font color='#009900'>// krls object.  But here we only have 1 dimension to make the example simple.
+</font>    <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample_type;
+
+
+    <font color='#009900'>// Now we are making a typedef for the kind of kernel we want to use.  I picked the
+</font>    <font color='#009900'>// radial basis kernel because it only has one parameter and generally gives good
+</font>    <font color='#009900'>// results without much fiddling.
+</font>    <font color='#0000FF'>typedef</font> radial_basis_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> kernel_type;
+
+
+    <font color='#009900'>// Here we declare an instance of the krls object.  The first argument to the constructor
+</font>    <font color='#009900'>// is the kernel we wish to use.  The second is a parameter that determines the numerical 
+</font>    <font color='#009900'>// accuracy with which the object will perform part of the regression algorithm.  Generally
+</font>    <font color='#009900'>// smaller values give better results but cause the algorithm to run slower (because it tries
+</font>    <font color='#009900'>// to use more "dictionary vectors" to represent the function it is learning.  
+</font>    <font color='#009900'>// You just have to play with it to decide what balance of speed and accuracy is right 
+</font>    <font color='#009900'>// for your problem.  Here we have set it to 0.001.
+</font>    <font color='#009900'>//
+</font>    <font color='#009900'>// The last argument is the maximum number of dictionary vectors the algorithm is allowed
+</font>    <font color='#009900'>// to use.  The default value for this field is 1,000,000 which is large enough that you 
+</font>    <font color='#009900'>// won't ever hit it in practice.  However, here we have set it to the much smaller value
+</font>    <font color='#009900'>// of 7.  This means that once the krls object accumulates 7 dictionary vectors it will 
+</font>    <font color='#009900'>// start discarding old ones in favor of new ones as it goes through the training process.  
+</font>    <font color='#009900'>// In other words, the algorithm "forgets" about old training data and focuses on recent
+</font>    <font color='#009900'>// training samples. So the bigger the maximum dictionary size the longer its memory will 
+</font>    <font color='#009900'>// be.  But in this example program we are doing filtering so we only care about the most 
+</font>    <font color='#009900'>// recent data.  So using a small value is appropriate here since it will result in much
+</font>    <font color='#009900'>// faster filtering and won't introduce much error.
+</font>    krls<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_type</font><font face='Lucida Console'>(</font><font color='#979000'>0.05</font><font face='Lucida Console'>)</font>,<font color='#979000'>0.001</font>,<font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+
+    dlib::rand rnd;
+
+    <font color='#009900'>// Now let's loop over a big range of values from the sinc() function.  Each time
+</font>    <font color='#009900'>// adding some random noise to the data we send to the krls object for training.
+</font>    sample_type m;
+    <font color='#0000FF'><u>double</u></font> mse_noise <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'><u>double</u></font> mse <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'><u>double</u></font> count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> x <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>20</font>; x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>20</font>; x <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>0.01</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x;
+        <font color='#009900'>// get a random number between -0.5 and 0.5
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> noise <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>0.5</font>;
+
+        <font color='#009900'>// train on this new sample
+</font>        test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>m, <font color='#BB00BB'>sinc</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font color='#5555FF'>+</font>noise<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// once we have seen a bit of data start measuring the mean squared prediction error.
+</font>        <font color='#009900'>// Also measure the mean squared error due to the noise.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>&gt;</font> <font color='#5555FF'>-</font><font color='#979000'>19</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+            mse <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sinc</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            mse_noise <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>noise,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    mse <font color='#5555FF'>/</font><font color='#5555FF'>=</font> count;
+    mse_noise <font color='#5555FF'>/</font><font color='#5555FF'>=</font> count;
+
+    <font color='#009900'>// Output the ratio of the error from the noise and the mean squared prediction error.  
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>prediction error:                   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> mse <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>noise:                              </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> mse_noise <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>ratio of noise to prediction error: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> mse_noise<font color='#5555FF'>/</font>mse <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>// When the program runs it should print the following:
+</font>    <font color='#009900'>//    prediction error:                   0.00735201
+</font>    <font color='#009900'>//    noise:                              0.0821628
+</font>    <font color='#009900'>//    ratio of noise to prediction error: 11.1756
+</font>
+    <font color='#009900'>// And we see that the noise has been significantly reduced by filtering the points 
+</font>    <font color='#009900'>// through the krls object.
+</font>
+<b>}</b>
+
+
+
+</pre></body></html>

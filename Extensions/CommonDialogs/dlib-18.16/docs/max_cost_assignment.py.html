@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+<head>
+  <title></title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <style type="text/css">
+td.linenos { background-color: #f0f0f0; padding-right: 10px; }
+span.lineno { background-color: #f0f0f0; padding: 0 5px 0 5px; }
+pre { line-height: 125%; }
+body .hll { background-color: #ffffcc }
+body  { background: #ffffff; }
+body .c { color: #008000 } /* Comment */
+body .err { border: 1px solid #FF0000 } /* Error */
+body .k { color: #0000ff } /* Keyword */
+body .cm { color: #008000 } /* Comment.Multiline */
+body .cp { color: #0000ff } /* Comment.Preproc */
+body .c1 { color: #008000 } /* Comment.Single */
+body .cs { color: #008000 } /* Comment.Special */
+body .ge { font-style: italic } /* Generic.Emph */
+body .gh { font-weight: bold } /* Generic.Heading */
+body .gp { font-weight: bold } /* Generic.Prompt */
+body .gs { font-weight: bold } /* Generic.Strong */
+body .gu { font-weight: bold } /* Generic.Subheading */
+body .kc { color: #0000ff } /* Keyword.Constant */
+body .kd { color: #0000ff } /* Keyword.Declaration */
+body .kn { color: #0000ff } /* Keyword.Namespace */
+body .kp { color: #0000ff } /* Keyword.Pseudo */
+body .kr { color: #0000ff } /* Keyword.Reserved */
+body .kt { color: #2b91af } /* Keyword.Type */
+body .s { color: #a31515 } /* Literal.String */
+body .nc { color: #2b91af } /* Name.Class */
+body .ow { color: #0000ff } /* Operator.Word */
+body .sb { color: #a31515 } /* Literal.String.Backtick */
+body .sc { color: #a31515 } /* Literal.String.Char */
+body .sd { color: #a31515 } /* Literal.String.Doc */
+body .s2 { color: #a31515 } /* Literal.String.Double */
+body .se { color: #a31515 } /* Literal.String.Escape */
+body .sh { color: #a31515 } /* Literal.String.Heredoc */
+body .si { color: #a31515 } /* Literal.String.Interpol */
+body .sx { color: #a31515 } /* Literal.String.Other */
+body .sr { color: #a31515 } /* Literal.String.Regex */
+body .s1 { color: #a31515 } /* Literal.String.Single */
+body .ss { color: #a31515 } /* Literal.String.Symbol */
+
+  </style>
+</head>
+<body>
+<h2></h2>
+
+<div class="highlight"><pre><span class="c">#!/usr/bin/python</span>
+<span class="c"># The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt</span>
+<span class="c"># </span>
+<span class="c"># This simple example shows how to call dlib&#39;s optimal linear assignment</span>
+<span class="c"># problem solver.  It is an implementation of the famous Hungarian algorithm</span>
+<span class="c"># and is quite fast, operating in O(N^3) time.</span>
+<span class="c">#</span>
+<span class="c"># COMPILING THE DLIB PYTHON INTERFACE</span>
+<span class="c">#   Dlib comes with a compiled python interface for python 2.7 on MS Windows. If</span>
+<span class="c">#   you are using another python version or operating system then you need to</span>
+<span class="c">#   compile the dlib python interface before you can use this file.  To do this,</span>
+<span class="c">#   run compile_dlib_python_module.bat.  This should work on any operating</span>
+<span class="c">#   system so long as you have CMake and boost-python installed.</span>
+<span class="c">#   On Ubuntu, this can be done easily by running the command:</span>
+<span class="c">#       sudo apt-get install libboost-python-dev cmake</span>
+<span class="kn">import</span> <span class="nn">dlib</span>
+
+<span class="c"># Let&#39;s imagine you need to assign N people to N jobs.  Additionally, each</span>
+<span class="c"># person will make your company a certain amount of money at each job, but each</span>
+<span class="c"># person has different skills so they are better at some jobs and worse at</span>
+<span class="c"># others.  You would like to find the best way to assign people to these jobs.</span>
+<span class="c"># In particular, you would like to maximize the amount of money the group makes</span>
+<span class="c"># as a whole.  This is an example of an assignment problem and is what is solved</span>
+<span class="c"># by the dlib.max_cost_assignment() routine.</span>
+
+<span class="c"># So in this example, let&#39;s imagine we have 3 people and 3 jobs. We represent</span>
+<span class="c"># the amount of money each person will produce at each job with a cost matrix.</span>
+<span class="c"># Each row corresponds to a person and each column corresponds to a job. So for</span>
+<span class="c"># example, below we are saying that person 0 will make $1 at job 0, $2 at job 1,</span>
+<span class="c"># and $6 at job 2.</span>
+<span class="n">cost</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">matrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+                    <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+                    <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+
+<span class="c"># To find out the best assignment of people to jobs we just need to call this</span>
+<span class="c"># function.</span>
+<span class="n">assignment</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">max_cost_assignment</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span>
+
+<span class="c"># This prints optimal assignments:  [2, 0, 1]</span>
+<span class="c"># which indicates that we should assign the person from the first row of the</span>
+<span class="c"># cost matrix to job 2, the middle row person to job 0, and the bottom row</span>
+<span class="c"># person to job 1.</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Optimal assignments: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">assignment</span><span class="p">))</span>
+
+<span class="c"># This prints optimal cost:  16.0</span>
+<span class="c"># which is correct since our optimal assignment is 6+5+5.</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Optimal cost: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dlib</span><span class="o">.</span><span class="n">assignment_cost</span><span class="p">(</span><span class="n">cost</span><span class="p">,</span> <span class="n">assignment</span><span class="p">)))</span>
+</pre></div>
+</body>
+</html>

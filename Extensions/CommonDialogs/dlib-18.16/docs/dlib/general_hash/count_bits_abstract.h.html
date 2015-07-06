@@ -1,0 +1,51 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - count_bits_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_COUNT_BiTS_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_COUNT_BiTS_ABSTRACT_Hh_
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    T <b><a name='count_bits'></a>count_bits</b> <font face='Lucida Console'>(</font>
+        T v
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T is an unsigned integral type
+        ensures
+            - returns the number of bits in v which are set to 1.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    T <b><a name='hamming_distance'></a>hamming_distance</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T is an unsigned integral type
+        ensures
+            - returns the number of bits which differ between a and b.  (I.e. returns
+              count_bits(a^b).)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_COUNT_BiTS_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

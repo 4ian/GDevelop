@@ -1,0 +1,1104 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - scan_image_pyramid.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SCAN_IMaGE_PYRAMID_Hh_
+<font color='#0000FF'>#define</font> DLIB_SCAN_IMaGE_PYRAMID_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='scan_image_pyramid_abstract.h.html'>scan_image_pyramid_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing.h.html'>../image_processing.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array2d.h.html'>../array2d.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='full_object_detection.h.html'>full_object_detection.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/generic_image.h.html'>../image_processing/generic_image.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='scan_image_pyramid'></a>scan_image_pyramid</b> : noncopyable
+    <b>{</b>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> feature_vector_type;
+
+        <font color='#0000FF'>typedef</font> Pyramid_type pyramid_type;
+        <font color='#0000FF'>typedef</font> Feature_extractor_type feature_extractor_type;
+
+        <b><a name='scan_image_pyramid'></a>scan_image_pyramid</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;  
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='load'></a>load</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='is_loaded_with_image'></a>is_loaded_with_image</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='copy_configuration'></a>copy_configuration</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> feature_extractor_type<font color='#5555FF'>&amp;</font> fe
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='copy_configuration'></a>copy_configuration</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scan_image_pyramid<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> Feature_extractor_type<font color='#5555FF'>&amp;</font> <b><a name='get_feature_extractor'></a>get_feature_extractor</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> feats_config; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add_detection_template'></a>add_detection_template</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> object_box,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> stationary_feature_extraction_regions,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> movable_feature_extraction_regions
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add_detection_template'></a>add_detection_template</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> object_box,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> stationary_feature_extraction_regions
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_detection_templates'></a>get_num_detection_templates</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_movable_components_per_detection_template'></a>get_num_movable_components_per_detection_template</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_stationary_components_per_detection_template'></a>get_num_stationary_components_per_detection_template</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_components_per_detection_template'></a>get_num_components_per_detection_template</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_dimensions'></a>get_num_dimensions</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_pyramid_levels'></a>get_max_pyramid_levels</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_pyramid_levels'></a>set_max_pyramid_levels</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_levels
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_detections_per_template'></a>get_max_detections_per_template</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_min_pyramid_layer_size'></a>set_min_pyramid_layer_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> height 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_min_pyramid_layer_width'></a>get_min_pyramid_layer_width</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_min_pyramid_layer_height'></a>get_min_pyramid_layer_height</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_detections_per_template'></a>set_max_detections_per_template</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_dets
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='detect'></a>detect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> feature_vector_type<font color='#5555FF'>&amp;</font> w,
+            std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dets,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> thresh
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_feature_vector'></a>get_feature_vector</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> full_object_detection<font color='#5555FF'>&amp;</font> obj,
+            feature_vector_type<font color='#5555FF'>&amp;</font> psi
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        full_object_detection <b><a name='get_full_object_detection'></a>get_full_object_detection</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> feature_vector_type<font color='#5555FF'>&amp;</font> w
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> rectangle <b><a name='get_best_matching_rect'></a>get_best_matching_rect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scan_image_pyramid<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+            std::ostream<font color='#5555FF'>&amp;</font> out
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+            scan_image_pyramid<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+            std::istream<font color='#5555FF'>&amp;</font> in 
+        <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> <b><a name='compare_pair_rect'></a>compare_pair_rect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> a.first <font color='#5555FF'>&lt;</font> b.first;
+        <b>}</b>
+
+        <font color='#0000FF'>struct</font> <b><a name='detection_template'></a>detection_template</b>
+        <b>{</b>
+            rectangle object_box; <font color='#009900'>// always centered at (0,0)
+</font>            std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> rects; <font color='#009900'>// template with respect to (0,0)
+</font>            std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> movable_rects; 
+        <b>}</b>;
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> detection_template<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> version <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>version, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.object_box, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.rects, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.movable_rects, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>detection_template<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> version <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>version, in<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>version <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unexpected version found while deserializing a dlib::scan_image_pyramid::detection_template object.</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.object_box, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.rects, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.movable_rects, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_mapped_rect_and_metadata'></a>get_mapped_rect_and_metadata</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> number_pyramid_levels,
+            rectangle rect,
+            rectangle<font color='#5555FF'>&amp;</font> mapped_rect,
+            detection_template<font color='#5555FF'>&amp;</font> best_template,
+            rectangle<font color='#5555FF'>&amp;</font> object_box,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> best_level,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> detection_template_idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_match_score'></a>get_match_score</b> <font face='Lucida Console'>(</font>
+            rectangle r1,
+            rectangle r2
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make the rectangles overlap as much as possible before computing the match score.
+</font>            r1 <font color='#5555FF'>=</font> <font color='#BB00BB'>move_rect</font><font face='Lucida Console'>(</font>r1, r2.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>r1.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>r2<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>r1 <font color='#5555FF'>+</font> r2<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='test_coordinate_transforms'></a>test_coordinate_transforms</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font>; x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>; x <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> y <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font>; y <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>; y <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> rectangle rect <font color='#5555FF'>=</font> <font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font>x,y,<font color='#979000'>5</font>,<font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+                    rectangle a;
+
+                    a <font color='#5555FF'>=</font> feats_config.<font color='#BB00BB'>image_to_feat_space</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>  <font color='#5555FF'>&gt;</font> <font color='#979000'>10000000</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> a.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>10000000</font> <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>false</font>, "<font color='#CC0000'>The image_to_feat_space() routine is outputting rectangles of an implausibly </font>"
+                                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nlarge size.  This means there is probably a bug in your feature extractor.</font>"<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    a <font color='#5555FF'>=</font> feats_config.<font color='#BB00BB'>feat_to_image_space</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>  <font color='#5555FF'>&gt;</font> <font color='#979000'>10000000</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> a.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>10000000</font> <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>false</font>, "<font color='#CC0000'>The feat_to_image_space() routine is outputting rectangles of an implausibly </font>"
+                                     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nlarge size.  This means there is probably a bug in your feature extractor.</font>"<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+            
+        <b>}</b>
+
+        feature_extractor_type feats_config; <font color='#009900'>// just here to hold configuration.  use it to populate the feats elements.
+</font>        array<font color='#5555FF'>&lt;</font>feature_extractor_type<font color='#5555FF'>&gt;</font> feats;
+        std::vector<font color='#5555FF'>&lt;</font>detection_template<font color='#5555FF'>&gt;</font> det_templates;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_dets_per_template;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_pyramid_levels;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> min_pyramid_layer_width;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> min_pyramid_layer_height;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> scan_image_pyramid<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>int</u></font> version <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>version, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.feats_config, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.feats, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.det_templates, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.max_dets_per_template, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.max_pyramid_levels, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.min_pyramid_layer_width, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.min_pyramid_layer_height, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, out<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        scan_image_pyramid<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>int</u></font> version <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>version, in<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>version <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unsupported version found when deserializing a scan_image_pyramid object.</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.feats_config, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.feats, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.det_templates, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.max_dets_per_template, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.max_pyramid_levels, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.min_pyramid_layer_width, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.min_pyramid_layer_height, in<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// When developing some feature extractor, it's easy to accidentally change its
+</font>        <font color='#009900'>// number of dimensions and then try to deserialize data from an older version of
+</font>        <font color='#009900'>// your extractor into the current code.  This check is here to catch that kind of
+</font>        <font color='#009900'>// user error.
+</font>        <font color='#0000FF'><u>long</u></font> dims;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>dims, in<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item.<font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> dims<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Number of dimensions in serialized scan_image_pyramid doesn't match the expected number.</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                         scan_image_pyramid member functions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='scan_image_pyramid'></a>scan_image_pyramid</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> : 
+        max_dets_per_template<font face='Lucida Console'>(</font><font color='#979000'>10000</font><font face='Lucida Console'>)</font>,
+        max_pyramid_levels<font face='Lucida Console'>(</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>,
+        min_pyramid_layer_width<font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>,
+        min_pyramid_layer_height<font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='load'></a>load</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> levels <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        rectangle rect <font color='#5555FF'>=</font> <font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// figure out how many pyramid levels we should be using based on the image size
+</font>        pyramid_type pyr;
+        <font color='#0000FF'>do</font>
+        <b>{</b>
+            rect <font color='#5555FF'>=</font> pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>levels;
+        <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> min_pyramid_layer_width <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> rect.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> min_pyramid_layer_height <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                 levels <font color='#5555FF'>&lt;</font> max_pyramid_levels<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>feats.<font color='#BB00BB'>max_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> levels<font face='Lucida Console'>)</font>
+            feats.<font color='#BB00BB'>set_max_size</font><font face='Lucida Console'>(</font>levels<font face='Lucida Console'>)</font>;
+        feats.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>levels<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> feats.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            feats[i].<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>feats_config<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// build our feature pyramid
+</font>        feats[<font color='#979000'>0</font>].<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>feats.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            image_type temp1, temp2;
+            <font color='#BB00BB'>pyr</font><font face='Lucida Console'>(</font>img, temp1<font face='Lucida Console'>)</font>;
+            feats[<font color='#979000'>1</font>].<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>temp1<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>temp1,temp2<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>2</font>; i <font color='#5555FF'>&lt;</font> feats.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>pyr</font><font face='Lucida Console'>(</font>temp2, temp1<font face='Lucida Console'>)</font>;
+                feats[i].<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>temp1<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>temp1,temp2<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_max_detections_per_template'></a>get_max_detections_per_template</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> max_dets_per_template;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='set_max_detections_per_template'></a>set_max_detections_per_template</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_dets
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>max_dets <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> ,
+            "<font color='#CC0000'>\t void scan_image_pyramid::set_max_detections_per_template()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t The max number of possible detections can't be zero. </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_dets: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> max_dets
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        max_dets_per_template <font color='#5555FF'>=</font> max_dets;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='is_loaded_with_image'></a>is_loaded_with_image</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> feats.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='copy_configuration'></a>copy_configuration</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> feature_extractor_type<font color='#5555FF'>&amp;</font> fe
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>test_coordinate_transforms</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        feats_config.<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>fe<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='copy_configuration'></a>copy_configuration</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> scan_image_pyramid<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        feats_config.<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>item.feats_config<font face='Lucida Console'>)</font>;
+        det_templates <font color='#5555FF'>=</font> item.det_templates;
+        max_dets_per_template <font color='#5555FF'>=</font> item.max_dets_per_template;
+        max_pyramid_levels <font color='#5555FF'>=</font> item.max_pyramid_levels;
+        min_pyramid_layer_width <font color='#5555FF'>=</font> item.min_pyramid_layer_width;
+        min_pyramid_layer_height <font color='#5555FF'>=</font> item.min_pyramid_layer_height;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='add_detection_template'></a>add_detection_template</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> object_box,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> stationary_feature_extraction_regions,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> movable_feature_extraction_regions
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+<font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> 
+                        <font face='Lucida Console'>(</font><font color='#BB00BB'>get_num_stationary_components_per_detection_template</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> stationary_feature_extraction_regions.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        <font color='#BB00BB'>get_num_movable_components_per_detection_template</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> movable_feature_extraction_regions.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        <font color='#BB00BB'>center</font><font face='Lucida Console'>(</font>object_box<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\t void scan_image_pyramid::add_detection_template()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t The number of rects in this new detection template doesn't match </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t the number in previous detection templates.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t get_num_stationary_components_per_detection_template(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_num_stationary_components_per_detection_template</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t stationary_feature_extraction_regions.size():           </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> stationary_feature_extraction_regions.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t get_num_movable_components_per_detection_template():    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_num_movable_components_per_detection_template</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t movable_feature_extraction_regions.size():              </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> movable_feature_extraction_regions.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> movable_feature_extraction_regions.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>center</font><font face='Lucida Console'>(</font>movable_feature_extraction_regions[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                        "<font color='#CC0000'>Invalid inputs were given to this function.</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t center(movable_feature_extraction_regions[</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>]): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>center</font><font face='Lucida Console'>(</font>movable_feature_extraction_regions[i]<font face='Lucida Console'>)</font> 
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+        <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+        detection_template temp;
+        temp.object_box <font color='#5555FF'>=</font> object_box;
+        temp.rects <font color='#5555FF'>=</font> stationary_feature_extraction_regions;
+        temp.movable_rects <font color='#5555FF'>=</font> movable_feature_extraction_regions;
+        det_templates.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='add_detection_template'></a>add_detection_template</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> object_box,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> stationary_feature_extraction_regions
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// an empty set of movable feature regions
+</font>        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> movable_feature_extraction_regions;
+        <font color='#BB00BB'>add_detection_template</font><font face='Lucida Console'>(</font>object_box, stationary_feature_extraction_regions,
+                               movable_feature_extraction_regions<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_num_detection_templates'></a>get_num_detection_templates</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> det_templates.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_num_stationary_components_per_detection_template'></a>get_num_stationary_components_per_detection_template</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> ,
+            "<font color='#CC0000'>\t unsigned long scan_image_pyramid::get_num_stationary_components_per_detection_template()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You need to give some detection templates before calling this function. </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t get_num_detection_templates(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> det_templates[<font color='#979000'>0</font>].rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_num_movable_components_per_detection_template'></a>get_num_movable_components_per_detection_template</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> ,
+            "<font color='#CC0000'>\t unsigned long scan_image_pyramid::get_num_movable_components_per_detection_template()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You need to give some detection templates before calling this function. </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t get_num_detection_templates(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> det_templates[<font color='#979000'>0</font>].movable_rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_num_components_per_detection_template'></a>get_num_components_per_detection_template</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> ,
+            "<font color='#CC0000'>\t unsigned long scan_image_pyramid::get_num_components_per_detection_template()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You need to give some detection templates before calling this function. </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t get_num_detection_templates(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>get_num_movable_components_per_detection_template</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>
+               <font color='#BB00BB'>get_num_stationary_components_per_detection_template</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>long</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_num_dimensions'></a>get_num_dimensions</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> ,
+            "<font color='#CC0000'>\t long scan_image_pyramid::get_num_dimensions()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You need to give some detection templates before calling this function. </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t get_num_detection_templates(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> feats_config.<font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>get_num_components_per_detection_template</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_max_pyramid_levels'></a>get_max_pyramid_levels</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> max_pyramid_levels;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='set_max_pyramid_levels'></a>set_max_pyramid_levels</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_levels
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>max_levels <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> ,
+            "<font color='#CC0000'>\t void scan_image_pyramid::set_max_pyramid_levels()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You can't have zero levels. </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_levels: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> max_levels 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        max_pyramid_levels <font color='#5555FF'>=</font> max_levels;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='detect'></a>detect</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> feature_vector_type<font color='#5555FF'>&amp;</font> w,
+        std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dets,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> thresh
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    <font color='#BB00BB'>is_loaded_with_image</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    w.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+            "<font color='#CC0000'>\t void scan_image_pyramid::detect()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t get_num_detection_templates(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_loaded_with_image(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_loaded_with_image</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t w.size():               </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> w.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t get_num_dimensions():   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        dets.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        array<font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> saliency_images;
+        saliency_images.<font color='#BB00BB'>set_max_size</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_num_components_per_detection_template</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        saliency_images.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_num_components_per_detection_template</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font>,rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>stationary_region_rects</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_num_stationary_components_per_detection_template</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+        std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font>,rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>movable_region_rects</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_num_movable_components_per_detection_template</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+        pyramid_type pyr;
+        std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, point<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> point_dets;
+
+        <font color='#009900'>// for all pyramid levels
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> l <font color='#5555FF'>=</font> <font color='#979000'>0</font>; l <font color='#5555FF'>&lt;</font> feats.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>l<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> saliency_images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                saliency_images[i].<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>feats[l].<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, feats[l].<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> offset <font color='#5555FF'>=</font> <font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> feats_config.<font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>i;
+
+                <font color='#009900'>// build saliency images for pyramid level l 
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> feats[l].<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> feats[l].<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> feature_extractor_type::descriptor_type<font color='#5555FF'>&amp;</font> descriptor <font color='#5555FF'>=</font> feats[l]<font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>;
+
+                        <font color='#0000FF'><u>double</u></font> sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> descriptor.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font>descriptor[k].first <font color='#5555FF'>+</font> offset<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>descriptor[k].second;
+                        <b>}</b>
+                        saliency_images[i][r][c] <font color='#5555FF'>=</font> sum;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#009900'>// now search the saliency images
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> det_templates.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> point offset <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>feats[l].<font color='#BB00BB'>image_to_feat_space</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> stationary_region_rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    stationary_region_rects[j] <font color='#5555FF'>=</font> std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>j, <font color='#BB00BB'>translate_rect</font><font face='Lucida Console'>(</font>feats[l].<font color='#BB00BB'>image_to_feat_space</font><font face='Lucida Console'>(</font>det_templates[i].rects[j]<font face='Lucida Console'>)</font>,offset<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+                <b>}</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> movable_region_rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// Scale the size of the movable rectangle but make sure its center
+</font>                    <font color='#009900'>// stays at point(0,0).
+</font>                    <font color='#0000FF'>const</font> rectangle temp <font color='#5555FF'>=</font> feats[l].<font color='#BB00BB'>image_to_feat_space</font><font face='Lucida Console'>(</font>det_templates[i].movable_rects[j]<font face='Lucida Console'>)</font>;
+                    movable_region_rects[j] <font color='#5555FF'>=</font> std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>j<font color='#5555FF'>+</font>stationary_region_rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                                             <font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,temp.<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, temp.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+                <b>}</b>
+
+                <font color='#009900'>// Scale the object box into the feature extraction image, but keeping it
+</font>                <font color='#009900'>// centered at point(0,0).
+</font>                rectangle scaled_object_box <font color='#5555FF'>=</font> feats[l].<font color='#BB00BB'>image_to_feat_space</font><font face='Lucida Console'>(</font>det_templates[i].object_box<font face='Lucida Console'>)</font>;
+                scaled_object_box <font color='#5555FF'>=</font> <font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,scaled_object_box.<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, scaled_object_box.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// Each detection template gets its own special threshold in addition to
+</font>                <font color='#009900'>// the global detection threshold.  This allows us to model the fact that
+</font>                <font color='#009900'>// some detection templates might be more prone to false alarming or since
+</font>                <font color='#009900'>// their size is different naturally require a larger or smaller threshold
+</font>                <font color='#009900'>// (since they integrate over a larger or smaller region of the image).
+</font>                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> template_specific_thresh <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>scan_image_movable_parts</font><font face='Lucida Console'>(</font>point_dets, saliency_images, scaled_object_box,
+                                         stationary_region_rects, movable_region_rects,
+                                         thresh<font color='#5555FF'>+</font>template_specific_thresh, max_dets_per_template<font face='Lucida Console'>)</font>; 
+
+                <font color='#009900'>// convert all the point detections into rectangles at the original image scale and coordinate system
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> point_dets.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> score <font color='#5555FF'>=</font> point_dets[j].first<font color='#5555FF'>-</font>template_specific_thresh;
+                    point p <font color='#5555FF'>=</font> point_dets[j].second;
+                    p <font color='#5555FF'>=</font> feats[l].<font color='#BB00BB'>feat_to_image_space</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+                    rectangle rect <font color='#5555FF'>=</font> <font color='#BB00BB'>translate_rect</font><font face='Lucida Console'>(</font>det_templates[i].object_box, p<font face='Lucida Console'>)</font>;
+                    rect <font color='#5555FF'>=</font> pyr.<font color='#BB00BB'>rect_up</font><font face='Lucida Console'>(</font>rect, l<font face='Lucida Console'>)</font>;
+
+                    dets.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>score, rect<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>dets.<font color='#BB00BB'>rbegin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, dets.<font color='#BB00BB'>rend</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, compare_pair_rect<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> rectangle scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_best_matching_rect'></a>get_best_matching_rect</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> ,
+            "<font color='#CC0000'>\t const rectangle scan_image_pyramid::get_best_matching_rect()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t get_num_detection_templates(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        rectangle mapped_rect, object_box;
+        detection_template best_template;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> best_level, junk;
+        <font color='#BB00BB'>get_mapped_rect_and_metadata</font><font face='Lucida Console'>(</font>max_pyramid_levels, rect, mapped_rect, best_template, object_box, best_level, junk<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> mapped_rect;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_mapped_rect_and_metadata'></a>get_mapped_rect_and_metadata</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> number_pyramid_levels,
+        rectangle rect,
+        rectangle<font color='#5555FF'>&amp;</font> mapped_rect,
+        detection_template<font color='#5555FF'>&amp;</font> best_template,
+        rectangle<font color='#5555FF'>&amp;</font> object_box,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> best_level,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> detection_template_idx
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        pyramid_type pyr;
+        <font color='#009900'>// Figure out the pyramid level which best matches rect against one of our 
+</font>        <font color='#009900'>// detection template object boxes.
+</font>        best_level <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>double</u></font> best_match_score <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+
+        <font color='#009900'>// Find the best matching detection template for rect
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> l <font color='#5555FF'>=</font> <font color='#979000'>0</font>; l <font color='#5555FF'>&lt;</font> number_pyramid_levels; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>l<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> rectangle temp <font color='#5555FF'>=</font> pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>rect,l<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> 
+                <font color='#0000FF'>break</font>;
+
+            <font color='#009900'>// At this pyramid level, what matches best?
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> t <font color='#5555FF'>=</font> <font color='#979000'>0</font>; t <font color='#5555FF'>&lt;</font> det_templates.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>t<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> match_score <font color='#5555FF'>=</font> <font color='#BB00BB'>get_match_score</font><font face='Lucida Console'>(</font>det_templates[t].object_box, temp<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>match_score <font color='#5555FF'>&gt;</font> best_match_score<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    best_match_score <font color='#5555FF'>=</font> match_score;
+                    best_level <font color='#5555FF'>=</font> l;
+                    best_template <font color='#5555FF'>=</font> det_templates[t];
+                    detection_template_idx <font color='#5555FF'>=</font> t;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+
+        <font color='#009900'>// Now we translate best_template into the right spot (it should be centered at the location 
+</font>        <font color='#009900'>// determined by rect) and convert it into the feature image coordinate system.
+</font>        rect <font color='#5555FF'>=</font> pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>rect,best_level<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> point offset <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>feats_config.<font color='#BB00BB'>image_to_feat_space</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> point origin <font color='#5555FF'>=</font> feats_config.<font color='#BB00BB'>image_to_feat_space</font><font face='Lucida Console'>(</font><font color='#BB00BB'>center</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> offset;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> best_template.rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+        <b>{</b>
+            rectangle temp <font color='#5555FF'>=</font> best_template.rects[k];
+            temp <font color='#5555FF'>=</font> feats_config.<font color='#BB00BB'>image_to_feat_space</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            temp <font color='#5555FF'>=</font> <font color='#BB00BB'>translate_rect</font><font face='Lucida Console'>(</font>temp, origin<font face='Lucida Console'>)</font>;
+            best_template.rects[k] <font color='#5555FF'>=</font> temp;
+        <b>}</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> best_template.movable_rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+        <b>{</b>
+            rectangle temp <font color='#5555FF'>=</font> best_template.movable_rects[k];
+            temp <font color='#5555FF'>=</font> feats_config.<font color='#BB00BB'>image_to_feat_space</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            temp <font color='#5555FF'>=</font> <font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, temp.<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, temp.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            best_template.movable_rects[k] <font color='#5555FF'>=</font> temp;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> rectangle scaled_object_box <font color='#5555FF'>=</font> feats_config.<font color='#BB00BB'>image_to_feat_space</font><font face='Lucida Console'>(</font>best_template.object_box<font face='Lucida Console'>)</font>;
+        object_box <font color='#5555FF'>=</font> <font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font>origin<font color='#5555FF'>-</font>offset, scaled_object_box.<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, scaled_object_box.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// The input rectangle was mapped to one of the detection templates.  Reverse the process
+</font>        <font color='#009900'>// to figure out what the mapped rectangle is in the original input space.
+</font>        mapped_rect <font color='#5555FF'>=</font> <font color='#BB00BB'>translate_rect</font><font face='Lucida Console'>(</font>best_template.object_box, feats_config.<font color='#BB00BB'>feat_to_image_space</font><font face='Lucida Console'>(</font>origin<font color='#5555FF'>-</font>offset<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        mapped_rect <font color='#5555FF'>=</font> pyr.<font color='#BB00BB'>rect_up</font><font face='Lucida Console'>(</font>mapped_rect, best_level<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    full_object_detection scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_full_object_detection'></a>get_full_object_detection</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> feature_vector_type<font color='#5555FF'>&amp;</font> w
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// fill in movable part positions.  
+</font>
+        rectangle mapped_rect;
+        detection_template best_template;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> best_level, junk;
+        rectangle object_box;
+        <font color='#BB00BB'>get_mapped_rect_and_metadata</font><font face='Lucida Console'>(</font>feats.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, rect, mapped_rect, best_template, object_box, best_level, junk<font face='Lucida Console'>)</font>;
+
+        Pyramid_type pyr;
+
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> saliency_image, sum_img;
+
+        <font color='#0000FF'><u>double</u></font> total_temp_score <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>// convert into feature space.
+</font>        object_box <font color='#5555FF'>=</font> object_box.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>feats[best_level]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font>point<font color='#5555FF'>&gt;</font> movable_parts;
+        movable_parts.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_num_movable_components_per_detection_template</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_num_movable_components_per_detection_template</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make the saliency_image for the ith movable part.
+</font>
+            <font color='#0000FF'>const</font> rectangle part_rect <font color='#5555FF'>=</font> best_template.movable_rects[i];
+            <font color='#0000FF'>const</font> rectangle area <font color='#5555FF'>=</font> <font color='#BB00BB'>grow_rect</font><font face='Lucida Console'>(</font>object_box, 
+                                             part_rect.<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>, 
+                                             part_rect.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>feats[best_level]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            saliency_image.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>area.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, area.<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> offset <font color='#5555FF'>=</font> <font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> feats_config.<font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#BB00BB'>get_num_stationary_components_per_detection_template</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// build saliency image for pyramid level best_level 
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; r <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; c <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> feature_extractor_type::descriptor_type<font color='#5555FF'>&amp;</font> descriptor <font color='#5555FF'>=</font> feats[best_level]<font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'><u>double</u></font> sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> descriptor.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font>descriptor[k].first <font color='#5555FF'>+</font> offset<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>descriptor[k].second;
+                    <b>}</b>
+                    saliency_image[r<font color='#5555FF'>-</font>area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][c<font color='#5555FF'>-</font>area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font> sum;
+                <b>}</b>
+            <b>}</b>
+
+            sum_img.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>saliency_image.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, saliency_image.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>sum_filter_assign</font><font face='Lucida Console'>(</font>saliency_image, sum_img, part_rect<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// Figure out where the maximizer is in sum_img.  Note that we
+</font>            <font color='#009900'>// only look in the part of sum_img that corresponds to a location inside
+</font>            <font color='#009900'>// object_box.
+</font>            rectangle valid_area <font color='#5555FF'>=</font> <font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>sum_img<font face='Lucida Console'>)</font>;
+            valid_area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>   <font color='#5555FF'>+</font><font color='#5555FF'>=</font> object_box.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>   <font color='#5555FF'>-</font> area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            valid_area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>    <font color='#5555FF'>+</font><font color='#5555FF'>=</font> object_box.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>    <font color='#5555FF'>-</font> area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            valid_area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>  <font color='#5555FF'>+</font><font color='#5555FF'>=</font> object_box.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>  <font color='#5555FF'>-</font> area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            valid_area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> object_box.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>double</u></font> max_val <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            point max_loc;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; r <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; c <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sum_img[r][c] <font color='#5555FF'>&gt;</font> max_val<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#009900'>//if (object_box.contains(point(c,r) + area.tl_corner()))
+</font>                        <b>{</b>
+                            max_loc <font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c,r<font face='Lucida Console'>)</font>;
+                            max_val <font color='#5555FF'>=</font> sum_img[r][c];
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>max_val <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                max_loc <font color='#5555FF'>=</font> OBJECT_PART_NOT_PRESENT;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                total_temp_score <font color='#5555FF'>+</font><font color='#5555FF'>=</font> max_val;
+                <font color='#009900'>// convert max_loc back into feature image space from our cropped image.
+</font>                max_loc <font color='#5555FF'>+</font><font color='#5555FF'>=</font> area.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// now convert from feature space to image space.
+</font>                max_loc <font color='#5555FF'>=</font> feats[best_level].<font color='#BB00BB'>feat_to_image_space</font><font face='Lucida Console'>(</font>max_loc<font face='Lucida Console'>)</font>;
+                max_loc <font color='#5555FF'>=</font> pyr.<font color='#BB00BB'>point_up</font><font face='Lucida Console'>(</font>max_loc, best_level<font face='Lucida Console'>)</font>;
+                max_loc <font color='#5555FF'>=</font> <font color='#BB00BB'>nearest_point</font><font face='Lucida Console'>(</font>rect, max_loc<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            movable_parts.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>max_loc<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>full_object_detection</font><font face='Lucida Console'>(</font>rect, movable_parts<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_feature_vector'></a>get_feature_vector</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> full_object_detection<font color='#5555FF'>&amp;</font> obj,
+        feature_vector_type<font color='#5555FF'>&amp;</font> psi
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    <font color='#BB00BB'>is_loaded_with_image</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    psi.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    obj.<font color='#BB00BB'>num_parts</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>get_num_movable_components_per_detection_template</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\t void scan_image_pyramid::get_feature_vector()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t get_num_detection_templates(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_loaded_with_image(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_loaded_with_image</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t psi.size():             </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> psi.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t get_num_dimensions():   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t get_num_movable_components_per_detection_template(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_num_movable_components_per_detection_template</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t obj.num_parts():                            </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> obj.<font color='#BB00BB'>num_parts</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>all_parts_in_rect</font><font face='Lucida Console'>(</font>obj<font face='Lucida Console'>)</font>, 
+            "<font color='#CC0000'>\t void scan_image_pyramid::get_feature_vector()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t obj.get_rect(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> obj.<font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+        <font face='Lucida Console'>)</font>;
+
+
+
+        rectangle mapped_rect;
+        detection_template best_template;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> best_level, detection_template_idx;
+        rectangle object_box;
+        <font color='#BB00BB'>get_mapped_rect_and_metadata</font><font face='Lucida Console'>(</font>feats.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, obj.<font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, mapped_rect, best_template, object_box, best_level, detection_template_idx<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>psi</font><font face='Lucida Console'>(</font>detection_template_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        Pyramid_type pyr;
+
+        <font color='#009900'>// put the movable rects at the places indicated by obj.
+</font>        std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> rects <font color='#5555FF'>=</font> best_template.rects;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> obj.<font color='#BB00BB'>num_parts</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>part</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> OBJECT_PART_NOT_PRESENT<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// map from the original image to scaled feature space.
+</font>                point loc <font color='#5555FF'>=</font> feats[best_level].<font color='#BB00BB'>image_to_feat_space</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>point_down</font><font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>part</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>, best_level<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#009900'>// Make sure the movable part always stays within the object_box.
+</font>                <font color='#009900'>// Otherwise it would be at a place that the detect() function can never
+</font>                <font color='#009900'>// look.  
+</font>                loc <font color='#5555FF'>=</font> <font color='#BB00BB'>nearest_point</font><font face='Lucida Console'>(</font>object_box, loc<font face='Lucida Console'>)</font>;
+                rects.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>translate_rect</font><font face='Lucida Console'>(</font>best_template.movable_rects[i], loc<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// add an empty rectangle since this part wasn't observed.
+</font>                rects.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// pull features out of all the boxes in rects.
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> rectangle rect <font color='#5555FF'>=</font> rects[j].<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>feats[best_level]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> template_region_id <font color='#5555FF'>=</font> j;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> offset <font color='#5555FF'>=</font> <font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> feats_config.<font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>template_region_id;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; r <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; c <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> feature_extractor_type::descriptor_type<font color='#5555FF'>&amp;</font> descriptor <font color='#5555FF'>=</font> feats[best_level]<font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> descriptor.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>psi</font><font face='Lucida Console'>(</font>descriptor[k].first <font color='#5555FF'>+</font> offset<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> descriptor[k].second;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='set_min_pyramid_layer_size'></a>set_min_pyramid_layer_size</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> height 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>width <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> height <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> ,
+            "<font color='#CC0000'>\t void scan_image_pyramid::set_min_pyramid_layer_size()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t These sizes can't be zero. </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t width:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> width 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t height: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> height 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        min_pyramid_layer_width <font color='#5555FF'>=</font> width;
+        min_pyramid_layer_height <font color='#5555FF'>=</font> height;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_min_pyramid_layer_width'></a>get_min_pyramid_layer_width</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> min_pyramid_layer_width;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_min_pyramid_layer_height'></a>get_min_pyramid_layer_height</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> min_pyramid_layer_height;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SCAN_IMaGE_PYRAMID_Hh_
+</font>
+
+
+</pre></body></html>

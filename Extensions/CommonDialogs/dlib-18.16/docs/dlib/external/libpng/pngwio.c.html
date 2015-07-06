@@ -1,0 +1,167 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - pngwio.c</title></head><body bgcolor='white'><pre>
+
+<font color='#009900'>/* pngwio.c - functions for data output
+ *
+ * Last changed in libpng 1.6.0 [February 14, 2013]
+ * Copyright (c) 1998-2013 Glenn Randers-Pehrson
+ * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
+ * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
+ *
+ * This file provides a location for all output.  Users who need
+ * special handling are expected to write functions that have the same
+ * arguments as these and perform similar functions, but that possibly
+ * use different output methods.  Note that you shouldn't change these
+ * functions, but rather write replacement functions and then change
+ * them at run time with png_set_write_fn(...).
+ */</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='pngpriv.h.html'>pngpriv.h</a>"
+
+<font color='#0000FF'>#ifdef</font> PNG_WRITE_SUPPORTED
+
+<font color='#009900'>/* Write the data to whatever output you are using.  The default routine
+ * writes to a file pointer.  Note that this routine sometimes gets called
+ * with very small lengths, so you should implement some kind of simple
+ * buffering if you are using unbuffered writes.  This should never be asked
+ * to write more than 64K on a 16 bit machine.
+ */</font>
+
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_write_data'></a>png_write_data</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_const_bytep data, png_size_t length<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#009900'>/* NOTE: write_data_fn must not change the buffer! */</font>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_data_fn <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL <font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_data_fn<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>png_ptr, <font color='#BB00BB'>png_constcast</font><font face='Lucida Console'>(</font>png_bytep,data<font face='Lucida Console'>)</font>,
+         length<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>else</font>
+      <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>Call to NULL write function</font>"<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> PNG_STDIO_SUPPORTED
+<font color='#009900'>/* This is the function that does the actual writing of data.  If you are
+ * not writing to a standard C stream, you should create a replacement
+ * write_data function and use it at run time with png_set_write_fn(), rather
+ * than changing the library.
+ */</font>
+<font color='#0000FF'><u>void</u></font> PNGCBAPI
+<b><a name='png_default_write_data'></a>png_default_write_data</b><font face='Lucida Console'>(</font>png_structp png_ptr, png_bytep data, png_size_t length<font face='Lucida Console'>)</font>
+<b>{</b>
+   png_size_t check;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+   check <font color='#5555FF'>=</font> <font color='#BB00BB'>fwrite</font><font face='Lucida Console'>(</font>data, <font color='#979000'>1</font>, length, <font face='Lucida Console'>(</font>png_FILE_p<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>io_ptr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>check <font color='#5555FF'>!</font><font color='#5555FF'>=</font> length<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>Write Error</font>"<font face='Lucida Console'>)</font>;
+<b>}</b>
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* This function is called to output any data pending writing (normally
+ * to disk).  After png_flush is called, there should be no data pending
+ * writing in any buffers.
+ */</font>
+<font color='#0000FF'>#ifdef</font> PNG_WRITE_FLUSH_SUPPORTED
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_flush'></a>png_flush</b><font face='Lucida Console'>(</font>png_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_flush_fn <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_flush_fn<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+#  ifdef PNG_STDIO_SUPPORTED
+<font color='#0000FF'><u>void</u></font> PNGCBAPI
+<b><a name='png_default_flush'></a>png_default_flush</b><font face='Lucida Console'>(</font>png_structp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   png_FILE_p io_ptr;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+   io_ptr <font color='#5555FF'>=</font> <font color='#BB00BB'>png_voidcast</font><font face='Lucida Console'>(</font>png_FILE_p, <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>io_ptr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+   <font color='#BB00BB'>fflush</font><font face='Lucida Console'>(</font>io_ptr<font face='Lucida Console'>)</font>;
+<b>}</b>
+#  endif
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* This function allows the application to supply new output functions for
+ * libpng if standard C streams aren't being used.
+ *
+ * This function takes as its arguments:
+ * png_ptr       - pointer to a png output data structure
+ * io_ptr        - pointer to user supplied structure containing info about
+ *                 the output functions.  May be NULL.
+ * write_data_fn - pointer to a new output function that takes as its
+ *                 arguments a pointer to a png_struct, a pointer to
+ *                 data to be written, and a 32-bit unsigned int that is
+ *                 the number of bytes to be written.  The new write
+ *                 function should call png_error(png_ptr, "Error msg")
+ *                 to exit and output any fatal error messages.  May be
+ *                 NULL, in which case libpng's default function will
+ *                 be used.
+ * flush_data_fn - pointer to a new flush function that takes as its
+ *                 arguments a pointer to a png_struct.  After a call to
+ *                 the flush function, there should be no data in any buffers
+ *                 or pending transmission.  If the output method doesn't do
+ *                 any buffering of output, a function prototype must still be
+ *                 supplied although it doesn't have to do anything.  If
+ *                 PNG_WRITE_FLUSH_SUPPORTED is not defined at libpng compile
+ *                 time, output_flush_fn will be ignored, although it must be
+ *                 supplied for compatibility.  May be NULL, in which case
+ *                 libpng's default function will be used, if
+ *                 PNG_WRITE_FLUSH_SUPPORTED is defined.  This is not
+ *                 a good idea if io_ptr does not point to a standard
+ *                 *FILE structure.
+ */</font>
+<font color='#0000FF'><u>void</u></font> PNGAPI
+<b><a name='png_set_write_fn'></a>png_set_write_fn</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_voidp io_ptr,
+    png_rw_ptr write_data_fn, png_flush_ptr output_flush_fn<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>io_ptr <font color='#5555FF'>=</font> io_ptr;
+
+<font color='#0000FF'>#ifdef</font> PNG_STDIO_SUPPORTED
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>write_data_fn <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_data_fn <font color='#5555FF'>=</font> write_data_fn;
+
+   <font color='#0000FF'>else</font>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_data_fn <font color='#5555FF'>=</font> png_default_write_data;
+<font color='#0000FF'>#else</font>
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_data_fn <font color='#5555FF'>=</font> write_data_fn;
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> PNG_WRITE_FLUSH_SUPPORTED
+#  ifdef PNG_STDIO_SUPPORTED
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>output_flush_fn <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_flush_fn <font color='#5555FF'>=</font> output_flush_fn;
+
+   <font color='#0000FF'>else</font>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_flush_fn <font color='#5555FF'>=</font> png_default_flush;
+
+#  <font color='#0000FF'>else</font>
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_flush_fn <font color='#5555FF'>=</font> output_flush_fn;
+#  endif
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNG_WRITE_FLUSH_SUPPORTED */</font>
+
+   <font color='#009900'>/* It is an error to read while writing a png file */</font>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>read_data_fn <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>read_data_fn <font color='#5555FF'>=</font> NULL;
+
+      <font color='#BB00BB'>png_warning</font><font face='Lucida Console'>(</font>png_ptr,
+          "<font color='#CC0000'>Can't set both read_data_fn and write_data_fn in the</font>"
+          "<font color='#CC0000'> same structure</font>"<font face='Lucida Console'>)</font>;
+   <b>}</b>
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNG_WRITE_SUPPORTED */</font>
+
+</pre></body></html>

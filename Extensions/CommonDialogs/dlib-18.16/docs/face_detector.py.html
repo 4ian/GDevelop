@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+<head>
+  <title></title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <style type="text/css">
+td.linenos { background-color: #f0f0f0; padding-right: 10px; }
+span.lineno { background-color: #f0f0f0; padding: 0 5px 0 5px; }
+pre { line-height: 125%; }
+body .hll { background-color: #ffffcc }
+body  { background: #ffffff; }
+body .c { color: #008000 } /* Comment */
+body .err { border: 1px solid #FF0000 } /* Error */
+body .k { color: #0000ff } /* Keyword */
+body .cm { color: #008000 } /* Comment.Multiline */
+body .cp { color: #0000ff } /* Comment.Preproc */
+body .c1 { color: #008000 } /* Comment.Single */
+body .cs { color: #008000 } /* Comment.Special */
+body .ge { font-style: italic } /* Generic.Emph */
+body .gh { font-weight: bold } /* Generic.Heading */
+body .gp { font-weight: bold } /* Generic.Prompt */
+body .gs { font-weight: bold } /* Generic.Strong */
+body .gu { font-weight: bold } /* Generic.Subheading */
+body .kc { color: #0000ff } /* Keyword.Constant */
+body .kd { color: #0000ff } /* Keyword.Declaration */
+body .kn { color: #0000ff } /* Keyword.Namespace */
+body .kp { color: #0000ff } /* Keyword.Pseudo */
+body .kr { color: #0000ff } /* Keyword.Reserved */
+body .kt { color: #2b91af } /* Keyword.Type */
+body .s { color: #a31515 } /* Literal.String */
+body .nc { color: #2b91af } /* Name.Class */
+body .ow { color: #0000ff } /* Operator.Word */
+body .sb { color: #a31515 } /* Literal.String.Backtick */
+body .sc { color: #a31515 } /* Literal.String.Char */
+body .sd { color: #a31515 } /* Literal.String.Doc */
+body .s2 { color: #a31515 } /* Literal.String.Double */
+body .se { color: #a31515 } /* Literal.String.Escape */
+body .sh { color: #a31515 } /* Literal.String.Heredoc */
+body .si { color: #a31515 } /* Literal.String.Interpol */
+body .sx { color: #a31515 } /* Literal.String.Other */
+body .sr { color: #a31515 } /* Literal.String.Regex */
+body .s1 { color: #a31515 } /* Literal.String.Single */
+body .ss { color: #a31515 } /* Literal.String.Symbol */
+
+  </style>
+</head>
+<body>
+<h2></h2>
+
+<div class="highlight"><pre><span class="c">#!/usr/bin/python</span>
+<span class="c"># The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt</span>
+<span class="c">#</span>
+<span class="c">#   This example program shows how to find frontal human faces in an image.  In</span>
+<span class="c">#   particular, it shows how you can take a list of images from the command</span>
+<span class="c">#   line and display each on the screen with red boxes overlaid on each human</span>
+<span class="c">#   face.</span>
+<span class="c">#</span>
+<span class="c">#   The examples/faces folder contains some jpg images of people.  You can run</span>
+<span class="c">#   this program on them and see the detections by executing the</span>
+<span class="c">#   following command:</span>
+<span class="c">#       ./<a href="face_detector.py.html">face_detector.py</a> ../examples/faces/*.jpg</span>
+<span class="c">#</span>
+<span class="c">#   This face detector is made using the now classic Histogram of Oriented</span>
+<span class="c">#   Gradients (HOG) feature combined with a linear classifier, an image</span>
+<span class="c">#   pyramid, and sliding window detection scheme.  This type of object detector</span>
+<span class="c">#   is fairly general and capable of detecting many types of semi-rigid objects</span>
+<span class="c">#   in addition to human faces.  Therefore, if you are interested in making</span>
+<span class="c">#   your own object detectors then read the <a href="train_object_detector.py.html">train_object_detector.py</a> example</span>
+<span class="c">#   program.  </span>
+<span class="c">#</span>
+<span class="c">#</span>
+<span class="c"># COMPILING THE DLIB PYTHON INTERFACE</span>
+<span class="c">#   Dlib comes with a compiled python interface for python 2.7 on MS Windows. If</span>
+<span class="c">#   you are using another python version or operating system then you need to</span>
+<span class="c">#   compile the dlib python interface before you can use this file.  To do this,</span>
+<span class="c">#   run compile_dlib_python_module.bat.  This should work on any operating</span>
+<span class="c">#   system so long as you have CMake and boost-python installed.</span>
+<span class="c">#   On Ubuntu, this can be done easily by running the command:</span>
+<span class="c">#       sudo apt-get install libboost-python-dev cmake</span>
+<span class="c">#</span>
+<span class="c">#   Also note that this example requires scikit-image which can be installed</span>
+<span class="c">#   via the command:</span>
+<span class="c">#       pip install -U scikit-image</span>
+<span class="c">#   Or downloaded from http://scikit-image.org/download.html. </span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">dlib</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span>
+
+
+<span class="n">detector</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">get_frontal_face_detector</span><span class="p">()</span>
+<span class="n">win</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">image_window</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Processing file: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="c"># The 1 in the second argument indicates that we should upsample the image</span>
+    <span class="c"># 1 time.  This will make everything bigger and allow us to detect more</span>
+    <span class="c"># faces.</span>
+    <span class="n">dets</span> <span class="o">=</span> <span class="n">detector</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Number of faces detected: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dets</span><span class="p">)))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dets</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Detection {}: Left: {} Top: {} Right: {} Bottom: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">i</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">left</span><span class="p">(),</span> <span class="n">d</span><span class="o">.</span><span class="n">top</span><span class="p">(),</span> <span class="n">d</span><span class="o">.</span><span class="n">right</span><span class="p">(),</span> <span class="n">d</span><span class="o">.</span><span class="n">bottom</span><span class="p">()))</span>
+
+    <span class="n">win</span><span class="o">.</span><span class="n">clear_overlay</span><span class="p">()</span>
+    <span class="n">win</span><span class="o">.</span><span class="n">set_image</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+    <span class="n">win</span><span class="o">.</span><span class="n">add_overlay</span><span class="p">(</span><span class="n">dets</span><span class="p">)</span>
+    <span class="n">dlib</span><span class="o">.</span><span class="n">hit_enter_to_continue</span><span class="p">()</span>
+
+
+<span class="c"># Finally, if you really want to you can ask the detector to tell you the score</span>
+<span class="c"># for each detection.  The score is bigger for more confident detections.</span>
+<span class="c"># Also, the idx tells you which of the face sub-detectors matched.  This can be</span>
+<span class="c"># used to broadly identify faces in different orientations.</span>
+<span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">dets</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dets</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Detection {}, score: {}, face_type:{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">d</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">idx</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+</pre></div>
+</body>
+</html>

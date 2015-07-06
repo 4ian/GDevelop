@@ -8,9 +8,7 @@ This project is released under the MIT License.
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Version.h"
-
 #include <iostream>
-#include <wx/intl.h>
 
 /**
  * \brief This class declares information about the JS extension.

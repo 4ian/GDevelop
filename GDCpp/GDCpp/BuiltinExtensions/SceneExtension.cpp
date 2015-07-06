@@ -30,45 +30,36 @@ SceneExtension::SceneExtension()
     GetAllActions()["SceneBackground"].SetFunctionName("ChangeSceneBackground").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
     GetAllActions()["DisableInputWhenFocusIsLost"].SetFunctionName("DisableInputWhenFocusIsLost").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
 
-    {
-        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
-        {
-            virtual gd::String GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+    GetAllConditions()["Egal"].codeExtraInformation
+        .SetCustomCodeGenerator([](gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) {
+            gd::String value1Code;
             {
-                gd::String value1Code;
-                {
-                    gd::CallbacksForGeneratingExpressionCode callbacks(value1Code, codeGenerator, context);
-                    gd::ExpressionParser parser(instruction.GetParameters()[0].GetPlainString());
-                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || value1Code.empty()) value1Code = "0";
-                }
+                gd::CallbacksForGeneratingExpressionCode callbacks(value1Code, codeGenerator, context);
+                gd::ExpressionParser parser(instruction.GetParameters()[0].GetPlainString());
+                if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || value1Code.empty()) value1Code = "0";
+            }
 
-                gd::String value2Code;
-                {
-                    gd::CallbacksForGeneratingExpressionCode callbacks(value2Code, codeGenerator, context);
-                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
-                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || value2Code.empty()) value2Code = "0";
-                }
+            gd::String value2Code;
+            {
+                gd::CallbacksForGeneratingExpressionCode callbacks(value2Code, codeGenerator, context);
+                gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || value2Code.empty()) value2Code = "0";
+            }
 
-                if ( instruction.GetParameters()[1].GetPlainString() == "=" || instruction.GetParameters()[1].GetPlainString().empty() )
-                    return "conditionTrue = ("+value1Code+" == "+value2Code+");\n";
-                else if ( instruction.GetParameters()[1].GetPlainString() == ">")
-                    return "conditionTrue = ("+value1Code+" > "+value2Code+");\n";
-                else if ( instruction.GetParameters()[1].GetPlainString() == "<")
-                    return "conditionTrue = ("+value1Code+" < "+value2Code+");\n";
-                else if ( instruction.GetParameters()[1].GetPlainString() == "<=")
-                    return "conditionTrue = ("+value1Code+" <= "+value2Code+");\n";
-                else if ( instruction.GetParameters()[1].GetPlainString() == ">=")
-                    return "conditionTrue = ("+value1Code+" >= "+value2Code+");\n";
-                else if ( instruction.GetParameters()[1].GetPlainString() == "!=")
-                    return "conditionTrue = ("+value1Code+" != "+value2Code+");\n";
+            if ( instruction.GetParameters()[1].GetPlainString() == "=" || instruction.GetParameters()[1].GetPlainString().empty() )
+                return "conditionTrue = ("+value1Code+" == "+value2Code+");\n";
+            else if ( instruction.GetParameters()[1].GetPlainString() == ">")
+                return "conditionTrue = ("+value1Code+" > "+value2Code+");\n";
+            else if ( instruction.GetParameters()[1].GetPlainString() == "<")
+                return "conditionTrue = ("+value1Code+" < "+value2Code+");\n";
+            else if ( instruction.GetParameters()[1].GetPlainString() == "<=")
+                return "conditionTrue = ("+value1Code+" <= "+value2Code+");\n";
+            else if ( instruction.GetParameters()[1].GetPlainString() == ">=")
+                return "conditionTrue = ("+value1Code+" >= "+value2Code+");\n";
+            else if ( instruction.GetParameters()[1].GetPlainString() == "!=")
+                return "conditionTrue = ("+value1Code+" != "+value2Code+");\n";
 
-                return "";
-            };
-        };
-        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-
-        GetAllConditions()["Egal"].codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
-    }
+            return gd::String("");
+        });
     #endif
 }
-

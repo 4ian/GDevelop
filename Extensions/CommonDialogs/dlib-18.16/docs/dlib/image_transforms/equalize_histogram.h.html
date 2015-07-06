@@ -1,0 +1,146 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - equalize_histogram.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_EQUALIZE_HISTOGRAm_
+<font color='#0000FF'>#define</font> DLIB_EQUALIZE_HISTOGRAm_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='equalize_histogram_abstract.h.html'>equalize_histogram_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../enable_if.h.html'>../enable_if.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'><u>long</u></font> R,
+        <font color='#0000FF'><u>long</u></font> C,
+        <font color='#0000FF'>typename</font> MM
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='get_histogram'></a>get_histogram</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img_,
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,R,C,MM<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hist
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>in_image_type<font color='#5555FF'>&gt;</font>::pixel_type pixel_type;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>pixel_type<font color='#5555FF'>&gt;</font>::is_unsigned <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> pixel_traits<font color='#5555FF'>&lt;</font>pixel_type<font color='#5555FF'>&gt;</font>::basic_pixel_type in_image_basic_pixel_type;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>in_image_basic_pixel_type<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make sure hist is the right size
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>R <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            hist.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,pixel_traits<font color='#5555FF'>&lt;</font>pixel_type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            hist.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>pixel_traits<font color='#5555FF'>&lt;</font>pixel_type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#BB00BB'>set_all_elements</font><font face='Lucida Console'>(</font>hist,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        const_image_view<font color='#5555FF'>&lt;</font>in_image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in_img</font><font face='Lucida Console'>(</font>in_img_<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// compute the histogram 
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> p <font color='#5555FF'>=</font> <font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>in_img[r][c]<font face='Lucida Console'>)</font>;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font><font color='#BB00BB'>hist</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='equalize_histogram'></a>equalize_histogram</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img_,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img_
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        const_image_view<font color='#5555FF'>&lt;</font>in_image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in_img</font><font face='Lucida Console'>(</font>in_img_<font face='Lucida Console'>)</font>;
+        image_view<font color='#5555FF'>&lt;</font>out_image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>out_img</font><font face='Lucida Console'>(</font>out_img_<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>in_image_type<font color='#5555FF'>&gt;</font>::pixel_type in_pixel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>out_image_type<font color='#5555FF'>&gt;</font>::pixel_type out_pixel_type;
+
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>out_pixel_type<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type<font color='#5555FF'>&gt;</font>::is_unsigned <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>out_pixel_type<font color='#5555FF'>&gt;</font>::is_unsigned <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type<font color='#5555FF'>&gt;</font>::basic_pixel_type in_image_basic_pixel_type;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>in_image_basic_pixel_type<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// if there isn't any input image then don't do anything
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in_img.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            out_img.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+        out_img.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>in_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,in_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> p;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#979000'>1</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> histogram;
+        <font color='#BB00BB'>get_histogram</font><font face='Lucida Console'>(</font>in_img_, histogram<font face='Lucida Console'>)</font>;
+        in_img <font color='#5555FF'>=</font> in_img_;
+
+        <font color='#0000FF'><u>double</u></font> scale <font color='#5555FF'>=</font> pixel_traits<font color='#5555FF'>&lt;</font>out_pixel_type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in_img.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>histogram</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            scale <font color='#5555FF'>/</font><font color='#5555FF'>=</font> in_img.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#BB00BB'>histogram</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            scale <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#009900'>// make the black pixels remain black in the output image
+</font>        <font color='#BB00BB'>histogram</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#009900'>// compute the transform function
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> histogram.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>histogram</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>histogram</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// scale so that it is in the range [0,pixel_traits&lt;out_pixel_type&gt;::max()]
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> histogram.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>histogram</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>histogram</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>scale<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now do the transform
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> row <font color='#5555FF'>=</font> <font color='#979000'>0</font>; row <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>row<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> col <font color='#5555FF'>=</font> <font color='#979000'>0</font>; col <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>col<font face='Lucida Console'>)</font>
+            <b>{</b>
+                p <font color='#5555FF'>=</font> <font color='#BB00BB'>histogram</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>in_img[row][col]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>out_img[row][col], in_img[row][col]<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>assign_pixel_intensity</font><font face='Lucida Console'>(</font>out_img[row][col],p<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='equalize_histogram'></a>equalize_histogram</b> <font face='Lucida Console'>(</font>
+        image_type<font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>equalize_histogram</font><font face='Lucida Console'>(</font>img,img<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_EQUALIZE_HISTOGRAm_
+</font>
+
+
+
+</pre></body></html>

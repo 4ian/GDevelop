@@ -14,12 +14,14 @@ namespace gd
 {
 
 ImageManager::ImageManager() :
-game(NULL)
+    game(NULL)
 {
+    #if !defined(EMSCRIPTEN)
     badTexture = std::shared_ptr<SFMLTextureWrapper>(new SFMLTextureWrapper);
     badTexture->texture.loadFromMemory(gd::InvalidImageData, sizeof(gd::InvalidImageData));
     badTexture->texture.setSmooth(false);
     badTexture->image = badTexture->texture.copyToImage();
+    #endif
 }
 
 std::shared_ptr<SFMLTextureWrapper> ImageManager::GetSFMLTexture(const gd::String & name) const

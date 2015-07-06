@@ -1,0 +1,118 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - vector.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../tester.h.html'>../tester.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>geometry.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>matrix.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#ifndef</font> DLIB_USE_BLAS
+<font color='#0000FF'>#error</font> "<font color='#CC0000'>BLAS bindings must be used for this test to make any sense</font>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>namespace</font> blas_bindings
+    <b>{</b>
+
+<font color='#0000FF'>#ifdef</font> DLIB_TEST_BLAS_BINDINGS
+        <font color='#0000FF'>extern</font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> <b><a name='counter_gemm'></a>counter_gemm</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>extern</font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> <b><a name='counter_gemv'></a>counter_gemv</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        <font color='#0000FF'>extern</font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> <b><a name='counter_ger'></a>counter_ger</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>extern</font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> <b><a name='counter_dot'></a>counter_dot</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+
+    <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+    <font color='#009900'>// Declare the logger we will use in this test.  The name of the logger 
+</font>    <font color='#009900'>// should start with "test."
+</font>    dlib::logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.vector</font>"<font face='Lucida Console'>)</font>;
+
+
+    <font color='#0000FF'>class</font> <b><a name='vector_tester'></a>vector_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='vector_tester'></a>vector_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>
+                "<font color='#CC0000'>test_vector</font>", <font color='#009900'>// the command line argument name for this test
+</font>                "<font color='#CC0000'>Run tests on dlib::vector.</font>", <font color='#009900'>// the command line argument description
+</font>                <font color='#979000'>0</font>                     <font color='#009900'>// the number of command line arguments for this test
+</font>            <font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='test_vector'></a>test_vector</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib::blas_bindings;
+
+            dlib::vector<font color='#5555FF'>&lt;</font>type,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> a2, b2, c2;
+            dlib::vector<font color='#5555FF'>&lt;</font>type,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> a3, b3, c3;
+
+            matrix<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>mat2</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>mat3</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            mat2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            mat3 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            type var <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#009900'>// We want to make sure that the BLAS bindings are being called for the 2D and 3D vectors.  That would
+</font>            <font color='#009900'>// be very slow.
+</font>            <font color='#BB00BB'>counter_gemm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#BB00BB'>counter_gemv</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#BB00BB'>counter_ger</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#BB00BB'>counter_dot</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            var <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>a2<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>a2<font face='Lucida Console'>)</font>;
+            var <font color='#5555FF'>=</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>a2,a2<font face='Lucida Console'>)</font>;
+
+            a2 <font color='#5555FF'>=</font> mat2<font color='#5555FF'>*</font>b2;
+            var <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>b2<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>mat2<font color='#5555FF'>*</font>b2;
+
+            var <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>a3<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>a3<font face='Lucida Console'>)</font>;
+            var <font color='#5555FF'>=</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>a3,a3<font face='Lucida Console'>)</font>;
+
+            a3 <font color='#5555FF'>=</font> mat3<font color='#5555FF'>*</font>b3;
+            var <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>b3<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>mat3<font color='#5555FF'>*</font>b3;
+
+            mat3 <font color='#5555FF'>=</font> c3<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>a3<font face='Lucida Console'>)</font>;
+            mat2 <font color='#5555FF'>=</font> c2<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>a2<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counter_gemm</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>counter_gemv</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>counter_ger</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>counter_dot</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test double</font>";
+            test_vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test float</font>";
+            test_vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test int</font>";
+            test_vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test short</font>";
+            test_vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>;
+
+    vector_tester a;
+
+<b>}</b>
+
+
+
+</pre></body></html>

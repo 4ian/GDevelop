@@ -1,0 +1,176 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - entropy_decoder_model_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2004  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_ENTROPY_DECODER_MODEL_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_ENTROPY_DECODER_MODEL_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='entropy_decoder_model_kernel_abstract.h.html'>entropy_decoder_model_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'>typename</font> entropy_decoder,
+        <font color='#0000FF'>typename</font> cc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='entropy_decoder_model_kernel_1'></a>entropy_decoder_model_kernel_1</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON cc
+                cc is an implementation of conditioning_class/conditioning_class_kernel_abstract.h
+                cc::get_alphabet_size() == alphabet_size+1
+
+            INITIAL VALUE
+                Initially this object's finite context model is empty
+
+            CONVENTION
+                &amp;get_entropy_decoder() == coder
+                &amp;order_0.get_global_state() == &amp;gs
+
+                This is an order-0 model. The last symbol in the order-0 context is 
+                an escape into the order minus 1 context.           
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> entropy_decoder entropy_decoder_type;
+
+        <b><a name='entropy_decoder_model_kernel_1'></a>entropy_decoder_model_kernel_1</b> <font face='Lucida Console'>(</font>
+            entropy_decoder<font color='#5555FF'>&amp;</font> coder
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='entropy_decoder_model_kernel_1'></a>entropy_decoder_model_kernel_1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='decode'></a>decode</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> symbol
+        <font face='Lucida Console'>)</font>;
+
+        entropy_decoder<font color='#5555FF'>&amp;</font> <b><a name='get_entropy_decoder'></a>get_entropy_decoder</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> coder; <b>}</b>
+
+        <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_alphabet_size'></a>get_alphabet_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> alphabet_size; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        entropy_decoder<font color='#5555FF'>&amp;</font> coder;
+        <font color='#0000FF'>typename</font> cc::global_state_type gs;
+        cc order_0;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='entropy_decoder_model_kernel_1'></a>entropy_decoder_model_kernel_1</b><font face='Lucida Console'>(</font>entropy_decoder_model_kernel_1<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,cc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        entropy_decoder_model_kernel_1<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,cc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>entropy_decoder_model_kernel_1<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,cc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;   
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'>typename</font> entropy_decoder,
+        <font color='#0000FF'>typename</font> cc
+        <font color='#5555FF'>&gt;</font>
+    entropy_decoder_model_kernel_1<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,cc<font color='#5555FF'>&gt;</font>::
+    <b><a name='entropy_decoder_model_kernel_1'></a>entropy_decoder_model_kernel_1</b> <font face='Lucida Console'>(</font>
+        entropy_decoder<font color='#5555FF'>&amp;</font> coder_
+    <font face='Lucida Console'>)</font> : 
+        coder<font face='Lucida Console'>(</font>coder_<font face='Lucida Console'>)</font>,
+        order_0<font face='Lucida Console'>(</font>gs<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> <font color='#979000'>1</font> <font color='#5555FF'>&lt;</font> alphabet_size <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> alphabet_size <font color='#5555FF'>&lt;</font> <font color='#979000'>65535</font> <font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'>typename</font> entropy_decoder,
+        <font color='#0000FF'>typename</font> cc
+        <font color='#5555FF'>&gt;</font>
+    entropy_decoder_model_kernel_1<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,cc<font color='#5555FF'>&gt;</font>::
+    ~<b><a name='entropy_decoder_model_kernel_1'></a>entropy_decoder_model_kernel_1</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+    <b>}</b>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'>typename</font> entropy_decoder,
+        <font color='#0000FF'>typename</font> cc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> entropy_decoder_model_kernel_1<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,cc<font color='#5555FF'>&gt;</font>::
+    <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        order_0.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'>typename</font> entropy_decoder,
+        <font color='#0000FF'>typename</font> cc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> entropy_decoder_model_kernel_1<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,cc<font color='#5555FF'>&gt;</font>::
+    <b><a name='decode'></a>decode</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> symbol
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> current_symbol, low_count, high_count, target;
+
+        <font color='#009900'>// look in the order-0 context
+</font>        target <font color='#5555FF'>=</font> coder.<font color='#BB00BB'>get_target</font><font face='Lucida Console'>(</font>order_0.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        order_0.<font color='#BB00BB'>get_symbol</font><font face='Lucida Console'>(</font>target,current_symbol,low_count,high_count<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// have coder decode the next symbol
+</font>        coder.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>low_count,high_count<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// if current_symbol is not an escape from the order-0 context
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>current_symbol <font color='#5555FF'>!</font><font color='#5555FF'>=</font> alphabet_size<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// update the count for this symbol
+</font>            order_0.<font color='#BB00BB'>increment_count</font><font face='Lucida Console'>(</font>current_symbol,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+            symbol <font color='#5555FF'>=</font> current_symbol;
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+        <font color='#009900'>// update the count for the escape symbol
+</font>        order_0.<font color='#BB00BB'>increment_count</font><font face='Lucida Console'>(</font>alphabet_size<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// go into the order minus one context
+</font>        target <font color='#5555FF'>=</font> coder.<font color='#BB00BB'>get_target</font><font face='Lucida Console'>(</font>alphabet_size<font face='Lucida Console'>)</font>;
+        coder.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>target,target<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// update the count for this symbol in the order-0 context
+</font>        order_0.<font color='#BB00BB'>increment_count</font><font face='Lucida Console'>(</font>target,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+        symbol <font color='#5555FF'>=</font> target;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>  
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ENTROPY_DECODER_MODEL_KERNEl_1_
+</font>
+
+</pre></body></html>

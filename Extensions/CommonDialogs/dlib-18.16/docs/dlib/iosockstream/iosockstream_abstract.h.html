@@ -1,0 +1,174 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - iosockstream_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_IOSOCKSTrEAM_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_IOSOCKSTrEAM_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sockstreambuf/sockstreambuf_abstract.h.html'>../sockstreambuf/sockstreambuf_abstract.h</a>"
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+    <font color='#0000FF'>class</font> <b><a name='iosockstream'></a>iosockstream</b> : <font color='#0000FF'>public</font> std::iostream
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an iostream object that reads/writes from a TCP network connection.
+
+                Note that any attempt to read from this stream will automatically flush the
+                stream's output buffers.  
+
+            THREAD SAFETY
+                It is not safe for multiple threads to make concurrent accesses to the same
+                instance of this object (except for calls to shutdown() which are always
+                threadsafe).  Therefore, you should mutex lock an instance of this object
+                if you need to touch it from multiple threads. 
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='iosockstream'></a>iosockstream</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #good() == false
+        !*/</font>
+
+        <b><a name='iosockstream'></a>iosockstream</b><font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> network_address<font color='#5555FF'>&amp;</font> addr
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - Attempts to connect to the given network address. 
+                - Calling this constructor is equivalent to calling the default constructor
+                  and then invoking open(addr).
+                - #good() == true 
+            throws
+                - dlib::socket_error
+                    This exception is thrown if there is some problem that prevents us from
+                    creating the connection.  
+        !*/</font>
+
+        <b><a name='iosockstream'></a>iosockstream</b><font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> network_address<font color='#5555FF'>&amp;</font> addr,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - Attempts to connect to the given network address. 
+                - Calling this constructor is equivalent to calling the default constructor
+                  and then invoking open(addr, timeout).
+                - #good() == true 
+            throws
+                - dlib::socket_error
+                    This exception is thrown if there is some problem that prevents us from
+                    creating the connection or if timeout milliseconds elapses before the
+                    connect is successful.
+        !*/</font>
+
+        ~<b><a name='iosockstream'></a>iosockstream</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - Invokes close() before destructing the stream.  Therefore, any open
+                  connection will be gracefully closed using the default timeout time.
+                  This also means any data in the stream will be flushed to the connection.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='open'></a>open</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> network_address<font color='#5555FF'>&amp;</font> addr
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object will attempt to create a TCP connection with the remote host
+                  indicated by addr.  
+                - Any previous connection in this iosockstream is closed by calling close()
+                  before we make any new connection.
+                - #good() == true
+                  (i.e. the error flags are reset by calling open())
+            throws
+                - dlib::socket_error
+                    This exception is thrown if there is some problem that prevents us from
+                    creating the connection.  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='open'></a>open</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> network_address<font color='#5555FF'>&amp;</font> addr,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object will attempt to create a TCP connection with the remote host
+                  indicated by addr.  
+                - Any previous connection in this iosockstream is closed by calling close()
+                  before we make any new connection.
+                - #good() == true
+                  (i.e. the error flags are reset by calling open())
+            throws
+                - dlib::socket_error
+                    This exception is thrown if there is some problem that prevents us from
+                    creating the connection or if timeout milliseconds elapses before the
+                    connect is successful.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='close'></a>close</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout <font color='#5555FF'>=</font> <font color='#979000'>10000</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #good() == false 
+                - if (there is an active TCP connection) then
+                    - Flushes any data buffered in the output part of the stream
+                      to the connection.  
+                    - Performs a proper graceful close (i.e. like dlib::close_gracefully()).
+                    - Will only wait timeout milliseconds for the buffer flush and graceful
+                      close to finish before the connection is terminated forcefully.
+                      Therefore, close() will only block for at most timeout milliseconds.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='terminate_connection_after_timeout'></a>terminate_connection_after_timeout</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (there is an active TCP connection) then
+                    - Any operations on this TCP connection will return error or
+                      end-of-file once timeout milliseconds have elapsed from this call to
+                      terminate_connection_after_timeout().  This is true unless another
+                      call to terminate_connection_after_timeout() is made which gives a
+                      new time.  In this case, the previous call is forgotten and the
+                      timeout is reset.
+                    - This timeout only applies to the current TCP connection.  That is, if
+                      the iosockstream is closed and a new connection is established, any
+                      previous timeouts setup by terminate_connection_after_timeout() do
+                      not apply. 
+                - else
+                    - This function has no effect on this object.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='shutdown'></a>shutdown</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - Immediately closes the TCP connection and causes all I/O operations on
+                  this object to return an error.  
+                - It is safe to call this function from any thread, therefore, you can use
+                  it to signal when you want a connection to terminate from another thread.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+<b>}</b>
+
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_IOSOCKSTrEAM_ABSTRACT_Hh_
+</font>
+
+
+
+</pre></body></html>

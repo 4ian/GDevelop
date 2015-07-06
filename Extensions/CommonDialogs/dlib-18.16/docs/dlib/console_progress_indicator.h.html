@@ -1,0 +1,205 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - console_progress_indicator.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_CONSOLE_PROGRESS_INDiCATOR_Hh_
+<font color='#0000FF'>#define</font> DLIB_CONSOLE_PROGRESS_INDiCATOR_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='console_progress_indicator'></a>console_progress_indicator</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for reporting how long a task will take
+                to complete.  
+
+                For example, consider the following bit of code:
+
+                    console_progress_indicator pbar(100)
+                    for (int i = 1; i &lt;= 100; ++i)
+                    {
+                        pbar.print_status(i);
+                        long_running_operation();
+                    }
+
+                The above code will print a message to the console each iteration
+                which shows how much time is remaining until the loop terminates.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>explicit</font> <b><a name='console_progress_indicator'></a>console_progress_indicator</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> target_value 
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #target() == target_value
+        !*/</font>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> target_value
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #target() == target_value
+                - performs the equivalent of:
+                    *this = console_progress_indicator(target_value)
+                    (i.e. resets this object with a new target value)
+
+        !*/</font>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>double</u></font> <b><a name='target'></a>target</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object attempts to measure how much time is
+                  left until we reach a certain targeted value.  This
+                  function returns that targeted value.
+        !*/</font>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='print_status'></a>print_status</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> cur
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - print_status() assumes it is called with values which are linearly 
+                  approaching target().  It will attempt to predict how much time is 
+                  remaining until cur becomes equal to target().
+                - prints a status message to the screen which indicates how much
+                  more time is left until cur is equal to target()
+                - This function throttles the printing so that at most 1 message is printed
+                  each second.  Note that it won't print anything to the screen until about
+                  one second has elapsed.  This means that the first call to print_status()
+                  never prints to the screen.
+                - This function returns true if it prints to the screen and false
+                  otherwise. 
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>double</u></font> target_val;
+
+        time_t start_time;
+        <font color='#0000FF'><u>double</u></font> first_val;
+        <font color='#0000FF'><u>double</u></font> seen_first_val;
+        time_t last_time;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                               IMPLEMENTATION DETAILS
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    console_progress_indicator::
+    <b><a name='console_progress_indicator'></a>console_progress_indicator</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> target_value 
+    <font face='Lucida Console'>)</font> :
+        target_val<font face='Lucida Console'>(</font>target_value<font face='Lucida Console'>)</font>,
+        start_time<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        first_val<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        seen_first_val<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+        last_time<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> console_progress_indicator::
+    <b><a name='print_status'></a>print_status</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> cur
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> time_t cur_time <font color='#5555FF'>=</font> std::<font color='#BB00BB'>time</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// if this is the first time print_status has been called
+</font>        <font color='#009900'>// then collect some information and exit.  We will print status
+</font>        <font color='#009900'>// on the next call.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>seen_first_val<font face='Lucida Console'>)</font>
+        <b>{</b>
+            start_time <font color='#5555FF'>=</font> cur_time;
+            last_time <font color='#5555FF'>=</font> cur_time;
+            first_val <font color='#5555FF'>=</font> cur;
+            seen_first_val <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cur_time <font color='#5555FF'>!</font><font color='#5555FF'>=</font> last_time<font face='Lucida Console'>)</font>
+        <b>{</b>
+            last_time <font color='#5555FF'>=</font> cur_time;
+            <font color='#0000FF'><u>double</u></font> delta_t <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>cur_time <font color='#5555FF'>-</font> start_time<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>double</u></font> delta_val <font color='#5555FF'>=</font> std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>cur <font color='#5555FF'>-</font> first_val<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// don't do anything if cur is equal to first_val
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>delta_val <font color='#5555FF'>&lt;</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+
+            <font color='#0000FF'><u>double</u></font> seconds <font color='#5555FF'>=</font> delta_t<font color='#5555FF'>/</font>delta_val <font color='#5555FF'>*</font> std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>target_val <font color='#5555FF'>-</font> cur<font face='Lucida Console'>)</font>;
+
+            std::ios::fmtflags oldflags <font color='#5555FF'>=</font> std::cout.<font color='#BB00BB'>flags</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;  
+            std::cout.<font color='#BB00BB'>flags</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+            std::cout.<font color='#BB00BB'>setf</font><font face='Lucida Console'>(</font>std::ios::fixed,std::ios::floatfield<font face='Lucida Console'>)</font>;
+            std::streamsize ss;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>seconds <font color='#5555FF'>&lt;</font> <font color='#979000'>60</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                ss <font color='#5555FF'>=</font> std::cout.<font color='#BB00BB'>precision</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>; 
+                std::cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Time remaining: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> seconds <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> seconds.                        \r</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::flush;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>seconds <font color='#5555FF'>&lt;</font> <font color='#979000'>60</font><font color='#5555FF'>*</font><font color='#979000'>60</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                ss <font color='#5555FF'>=</font> std::cout.<font color='#BB00BB'>precision</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>; 
+                std::cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Time remaining: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> seconds<font color='#5555FF'>/</font><font color='#979000'>60</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> minutes.                        \r</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::flush;
+            <b>}</b>
+            <font color='#0000FF'>else</font> 
+            <b>{</b>
+                ss <font color='#5555FF'>=</font> std::cout.<font color='#BB00BB'>precision</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>; 
+                std::cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Time remaining: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> seconds<font color='#5555FF'>/</font><font color='#979000'>60</font><font color='#5555FF'>/</font><font color='#979000'>60</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> hours.                        \r</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::flush;
+            <b>}</b>
+
+            <font color='#009900'>// restore previous output flags and precision settings
+</font>            std::cout.<font color='#BB00BB'>flags</font><font face='Lucida Console'>(</font>oldflags<font face='Lucida Console'>)</font>; 
+            std::cout.<font color='#BB00BB'>precision</font><font face='Lucida Console'>(</font>ss<font face='Lucida Console'>)</font>; 
+
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>double</u></font> console_progress_indicator::
+    <b><a name='target'></a>target</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> target_val;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> console_progress_indicator::
+    <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> target_value
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#5555FF'>*</font><font color='#0000FF'>this</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>console_progress_indicator</font><font face='Lucida Console'>(</font>target_value<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CONSOLE_PROGRESS_INDiCATOR_Hh_
+</font>
+
+</pre></body></html>

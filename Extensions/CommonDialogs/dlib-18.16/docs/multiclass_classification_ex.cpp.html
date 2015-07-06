@@ -1,0 +1,251 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - multiclass_classification_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+    This is an example illustrating the use of the multiclass classification tools  
+    from the dlib C++ Library.  Specifically, this example will make points from 
+    three classes and show you how to train a multiclass classifier to recognize 
+    these three classes.
+
+    The classes are as follows:
+        - class 1: points very close to the origin
+        - class 2: points on the circle of radius 10 around the origin
+        - class 3: points that are on a circle of radius 4 but not around the origin at all
+*/</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm_threaded.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>rand.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// Our data will be 2-dimensional data. So declare an appropriate type to contain these points.
+</font><font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample_type;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='generate_data'></a>generate_data</b> <font face='Lucida Console'>(</font>
+    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+<font face='Lucida Console'>)</font>;
+<font color='#009900'>/*!
+    ensures
+        - make some 3 class data as described above.  
+        - Create 60 points from class 1
+        - Create 70 points from class 2
+        - Create 80 points from class 3
+!*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samples;
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> labels;
+
+        <font color='#009900'>// First, get our labeled set of training data
+</font>        <font color='#BB00BB'>generate_data</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>samples.size(): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        <font color='#009900'>// The main object in this example program is the one_vs_one_trainer.  It is essentially 
+</font>        <font color='#009900'>// a container class for regular binary classifier trainer objects.  In particular, it 
+</font>        <font color='#009900'>// uses the any_trainer object to store any kind of trainer object that implements a 
+</font>        <font color='#009900'>// .train(samples,labels) function which returns some kind of learned decision function.  
+</font>        <font color='#009900'>// It uses these binary classifiers to construct a voting multiclass classifier.  If 
+</font>        <font color='#009900'>// there are N classes then it trains N*(N-1)/2 binary classifiers, one for each pair of 
+</font>        <font color='#009900'>// labels, which then vote on the label of a sample.
+</font>        <font color='#009900'>//
+</font>        <font color='#009900'>// In this example program we will work with a one_vs_one_trainer object which stores any 
+</font>        <font color='#009900'>// kind of trainer that uses our sample_type samples.
+</font>        <font color='#0000FF'>typedef</font> one_vs_one_trainer<font color='#5555FF'>&lt;</font>any_trainer<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> ovo_trainer;
+
+
+        <font color='#009900'>// Finally, make the one_vs_one_trainer.
+</font>        ovo_trainer trainer;
+
+
+        <font color='#009900'>// Next, we will make two different binary classification trainer objects.  One
+</font>        <font color='#009900'>// which uses kernel ridge regression and RBF kernels and another which uses a
+</font>        <font color='#009900'>// support vector machine and polynomial kernels.  The particular details don't matter.
+</font>        <font color='#009900'>// The point of this part of the example is that you can use any kind of trainer object
+</font>        <font color='#009900'>// with the one_vs_one_trainer.
+</font>        <font color='#0000FF'>typedef</font> polynomial_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> poly_kernel;
+        <font color='#0000FF'>typedef</font> radial_basis_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> rbf_kernel;
+
+        <font color='#009900'>// make the binary trainers and set some parameters
+</font>        krr_trainer<font color='#5555FF'>&lt;</font>rbf_kernel<font color='#5555FF'>&gt;</font> rbf_trainer;
+        svm_nu_trainer<font color='#5555FF'>&lt;</font>poly_kernel<font color='#5555FF'>&gt;</font> poly_trainer;
+        poly_trainer.<font color='#BB00BB'>set_kernel</font><font face='Lucida Console'>(</font><font color='#BB00BB'>poly_kernel</font><font face='Lucida Console'>(</font><font color='#979000'>0.1</font>, <font color='#979000'>1</font>, <font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        rbf_trainer.<font color='#BB00BB'>set_kernel</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rbf_kernel</font><font face='Lucida Console'>(</font><font color='#979000'>0.1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Now tell the one_vs_one_trainer that, by default, it should use the rbf_trainer
+</font>        <font color='#009900'>// to solve the individual binary classification subproblems.
+</font>        trainer.<font color='#BB00BB'>set_trainer</font><font face='Lucida Console'>(</font>rbf_trainer<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// We can also get more specific.  Here we tell the one_vs_one_trainer to use the
+</font>        <font color='#009900'>// poly_trainer to solve the class 1 vs class 2 subproblem.  All the others will
+</font>        <font color='#009900'>// still be solved with the rbf_trainer.
+</font>        trainer.<font color='#BB00BB'>set_trainer</font><font face='Lucida Console'>(</font>poly_trainer, <font color='#979000'>1</font>, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now let's do 5-fold cross-validation using the one_vs_one_trainer we just setup.
+</font>        <font color='#009900'>// As an aside, always shuffle the order of the samples before doing cross validation.  
+</font>        <font color='#009900'>// For a discussion of why this is a good idea see the <a href="svm_ex.cpp.html">svm_ex.cpp</a> example.
+</font>        <font color='#BB00BB'>randomize_samples</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>cross validation: \n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>cross_validate_multiclass_trainer</font><font face='Lucida Console'>(</font>trainer, samples, labels, <font color='#979000'>5</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#009900'>// The output is shown below.  It is the confusion matrix which describes the results.  Each row 
+</font>        <font color='#009900'>// corresponds to a class of data and each column to a prediction.  Reading from top to bottom, 
+</font>        <font color='#009900'>// the rows correspond to the class labels if the labels have been listed in sorted order.  So the
+</font>        <font color='#009900'>// top row corresponds to class 1, the middle row to class 2, and the bottom row to class 3.  The
+</font>        <font color='#009900'>// columns are organized similarly, with the left most column showing how many samples were predicted
+</font>        <font color='#009900'>// as members of class 1.
+</font>        <font color='#009900'>// 
+</font>        <font color='#009900'>// So in the results below we can see that, for the class 1 samples, 60 of them were correctly predicted
+</font>        <font color='#009900'>// to be members of class 1 and 0 were incorrectly classified.  Similarly, the other two classes of data
+</font>        <font color='#009900'>// are perfectly classified.
+</font>        <font color='#009900'>/*
+            cross validation: 
+            60  0  0 
+            0 70  0 
+            0  0 80 
+        */</font>
+
+        <font color='#009900'>// Next, if you wanted to obtain the decision rule learned by a one_vs_one_trainer you 
+</font>        <font color='#009900'>// would store it into a one_vs_one_decision_function.
+</font>        one_vs_one_decision_function<font color='#5555FF'>&lt;</font>ovo_trainer<font color='#5555FF'>&gt;</font> df <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>predicted label: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>samples[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>  <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>, true label: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> labels[<font color='#979000'>0</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>predicted label: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>samples[<font color='#979000'>90</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>, true label: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> labels[<font color='#979000'>90</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#009900'>// The output is:
+</font>        <font color='#009900'>/*
+            predicted label: 2, true label: 2
+            predicted label: 1, true label: 1
+        */</font>
+
+
+        <font color='#009900'>// If you want to save a one_vs_one_decision_function to disk, you can do
+</font>        <font color='#009900'>// so.  However, you must declare what kind of decision functions it contains. 
+</font>        one_vs_one_decision_function<font color='#5555FF'>&lt;</font>ovo_trainer, 
+        decision_function<font color='#5555FF'>&lt;</font>poly_kernel<font color='#5555FF'>&gt;</font>,  <font color='#009900'>// This is the output of the poly_trainer
+</font>        decision_function<font color='#5555FF'>&lt;</font>rbf_kernel<font color='#5555FF'>&gt;</font>    <font color='#009900'>// This is the output of the rbf_trainer
+</font>        <font color='#5555FF'>&gt;</font> df2, df3;
+
+
+        <font color='#009900'>// Put df into df2 and then save df2 to disk.  Note that we could have also said
+</font>        <font color='#009900'>// df2 = trainer.train(samples, labels);  But doing it this way avoids retraining.
+</font>        df2 <font color='#5555FF'>=</font> df;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>df.dat</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> df2;
+
+        <font color='#009900'>// load the function back in from disk and store it in df3.  
+</font>        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>df.dat</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> df3;
+
+
+        <font color='#009900'>// Test df3 to see that this worked.
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>predicted label: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>df3</font><font face='Lucida Console'>(</font>samples[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>  <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>, true label: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> labels[<font color='#979000'>0</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>predicted label: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>df3</font><font face='Lucida Console'>(</font>samples[<font color='#979000'>90</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>, true label: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> labels[<font color='#979000'>90</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#009900'>// Test df3 on the samples and labels and print the confusion matrix.
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test deserialized function: \n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test_multiclass_decision_function</font><font face='Lucida Console'>(</font>df3, samples, labels<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+
+
+
+        <font color='#009900'>// Finally, if you want to get the binary classifiers from inside a multiclass decision
+</font>        <font color='#009900'>// function you can do it by calling get_binary_decision_functions() like so:
+</font>        one_vs_one_decision_function<font color='#5555FF'>&lt;</font>ovo_trainer<font color='#5555FF'>&gt;</font>::binary_function_table functs;
+        functs <font color='#5555FF'>=</font> df.<font color='#BB00BB'>get_binary_decision_functions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>number of binary decision functions in df: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> functs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#009900'>// The functs object is a std::map which maps pairs of labels to binary decision
+</font>        <font color='#009900'>// functions.  So we can access the individual decision functions like so:
+</font>        decision_function<font color='#5555FF'>&lt;</font>poly_kernel<font color='#5555FF'>&gt;</font> df_1_2 <font color='#5555FF'>=</font> any_cast<font color='#5555FF'>&lt;</font>decision_function<font color='#5555FF'>&lt;</font>poly_kernel<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>functs[<font color='#BB00BB'>make_unordered_pair</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>]<font face='Lucida Console'>)</font>;
+        decision_function<font color='#5555FF'>&lt;</font>rbf_kernel<font color='#5555FF'>&gt;</font>  df_1_3 <font color='#5555FF'>=</font> any_cast<font color='#5555FF'>&lt;</font>decision_function<font color='#5555FF'>&lt;</font>rbf_kernel<font color='#5555FF'>&gt;</font>  <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>functs[<font color='#BB00BB'>make_unordered_pair</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>]<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// df_1_2 contains the binary decision function that votes for class 1 vs. 2.
+</font>        <font color='#009900'>// Similarly, df_1_3 contains the classifier that votes for 1 vs. 3.
+</font>
+        <font color='#009900'>// Note that the multiclass decision function doesn't know what kind of binary
+</font>        <font color='#009900'>// decision functions it contains.  So we have to use any_cast to explicitly cast
+</font>        <font color='#009900'>// them back into the concrete type.  If you make a mistake and try to any_cast a
+</font>        <font color='#009900'>// binary decision function into the wrong type of function any_cast will throw a
+</font>        <font color='#009900'>// bad_any_cast exception.
+</font>    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>exception thrown!</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='generate_data'></a>generate_data</b> <font face='Lucida Console'>(</font>
+    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> <font color='#979000'>50</font>;
+
+    sample_type m;
+
+    dlib::rand rnd;
+
+
+    <font color='#009900'>// make some samples near the origin
+</font>    <font color='#0000FF'><u>double</u></font> radius <font color='#5555FF'>=</font> <font color='#979000'>0.5</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num<font color='#5555FF'>+</font><font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>double</u></font> sign <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>
+            sign <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>radius<font color='#5555FF'>*</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>radius;
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> sign<font color='#5555FF'>*</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>radius<font color='#5555FF'>*</font>radius <font color='#5555FF'>-</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// add this sample to our set of training samples 
+</font>        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>// make some samples in a circle around the origin but far away
+</font>    radius <font color='#5555FF'>=</font> <font color='#979000'>10.0</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num<font color='#5555FF'>+</font><font color='#979000'>20</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>double</u></font> sign <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>
+            sign <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>radius<font color='#5555FF'>*</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>radius;
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> sign<font color='#5555FF'>*</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>radius<font color='#5555FF'>*</font>radius <font color='#5555FF'>-</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// add this sample to our set of training samples 
+</font>        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>// make some samples in a circle around the point (25,25) 
+</font>    radius <font color='#5555FF'>=</font> <font color='#979000'>4.0</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num<font color='#5555FF'>+</font><font color='#979000'>30</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>double</u></font> sign <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>
+            sign <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>radius<font color='#5555FF'>*</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>radius;
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> sign<font color='#5555FF'>*</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>radius<font color='#5555FF'>*</font>radius <font color='#5555FF'>-</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// translate this point away from the origin
+</font>        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>25</font>;
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>25</font>;
+
+        <font color='#009900'>// add this sample to our set of training samples 
+</font>        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

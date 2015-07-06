@@ -1,0 +1,234 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - gui_api_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use of the gui api from the dlib C++ Library.
+
+
+    This is a pretty simple example.  It makes a window with a user
+    defined widget (a draggable colored box) and a button.  You can drag the
+    box around or click the button which increments a counter. 
+*/</font>
+
+
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>gui_widgets.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>//  ----------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>class</font> <b><a name='color_box'></a>color_box</b> : <font color='#0000FF'>public</font> draggable 
+<b>{</b>
+    <font color='#009900'>/*
+        Here I am defining a custom drawable widget that is a colored box that
+        you can drag around on the screen.  draggable is a special kind of drawable
+        object that, as the name implies, is draggable by the user via the mouse.
+        To make my color_box draggable all I need to do is inherit from draggable.
+    */</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> red, green,blue;
+
+<font color='#0000FF'>public</font>:
+    <b><a name='color_box'></a>color_box</b> <font face='Lucida Console'>(</font>
+        drawable_window<font color='#5555FF'>&amp;</font> w,
+        rectangle area,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> red_,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> green_,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> blue_
+    <font face='Lucida Console'>)</font> :
+        draggable<font face='Lucida Console'>(</font>w<font face='Lucida Console'>)</font>,
+        red<font face='Lucida Console'>(</font>red_<font face='Lucida Console'>)</font>,
+        green<font face='Lucida Console'>(</font>green_<font face='Lucida Console'>)</font>,
+        blue<font face='Lucida Console'>(</font>blue_<font face='Lucida Console'>)</font>
+    <b>{</b>
+        rect <font color='#5555FF'>=</font> area;
+        <font color='#BB00BB'>set_draggable_area</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#979000'>10</font>,<font color='#979000'>10</font>,<font color='#979000'>400</font>,<font color='#979000'>400</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        
+        <font color='#009900'>// Whenever you make your own drawable widget (or inherit from any drawable widget 
+</font>        <font color='#009900'>// or interface such as draggable) you have to remember to call this function to 
+</font>        <font color='#009900'>// enable the events.  The idea here is that you can perform whatever setup you 
+</font>        <font color='#009900'>// need to do to get your object into a valid state without needing to worry about 
+</font>        <font color='#009900'>// event handlers triggering before you are ready.
+</font>        <font color='#BB00BB'>enable_events</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    ~<b><a name='color_box'></a>color_box</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// Disable all further events for this drawable object.  We have to do this 
+</font>        <font color='#009900'>// because we don't want any events (like draw()) coming to this object while or 
+</font>        <font color='#009900'>// after it has been destructed.
+</font>        <font color='#BB00BB'>disable_events</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        
+        <font color='#009900'>// Tell the parent window to redraw its area that previously contained this
+</font>        <font color='#009900'>// drawable object.
+</font>        parent.<font color='#BB00BB'>invalidate_rectangle</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#0000FF'>private</font>:
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw'></a>draw</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// The canvas is an object that represents a part of the parent window
+</font>        <font color='#009900'>// that needs to be redrawn.  
+</font>
+        <font color='#009900'>// The first thing I usually do is check if the draw call is for part
+</font>        <font color='#009900'>// of the window that overlaps with my widget.  We don't have to do this 
+</font>        <font color='#009900'>// but it is usually good to do as a speed hack.  Also, the reason
+</font>        <font color='#009900'>// I don't have it set to only give you draw calls when it does indeed
+</font>        <font color='#009900'>// overlap is because you might want to do some drawing outside of your
+</font>        <font color='#009900'>// widget's rectangle.  But usually you don't want to do that :)
+</font>        rectangle area <font color='#5555FF'>=</font> c.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+        <font color='#009900'>// This simple widget is just going to draw a box on the screen.   
+</font>        <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>c,rect,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font>red,green,blue<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>;
+
+<font color='#009900'>//  ----------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>class</font> <b><a name='win'></a>win</b> : <font color='#0000FF'>public</font> drawable_window 
+<b>{</b>
+    <font color='#009900'>/*
+        Here I am going to define our window.  In general, you can define as 
+        many window types as you like and make as many instances of them as you want.
+        In this example I am only making one though.
+    */</font>
+<font color='#0000FF'>public</font>:
+    <b><a name='win'></a>win</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> : <font color='#009900'>// All widgets take their parent window as an argument to their constructor.
+</font>        c<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        b<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        cb<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,rectangle<font face='Lucida Console'>(</font><font color='#979000'>100</font>,<font color='#979000'>100</font>,<font color='#979000'>200</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font>, <font color='#009900'>// the color_box will be blue and 101 pixels wide and tall
+</font>        mbar<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// tell our button to put itself at the position (10,60). 
+</font>        b.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>10</font>,<font color='#979000'>60</font><font face='Lucida Console'>)</font>;
+        b.<font color='#BB00BB'>set_name</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>button</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// let's put the label 5 pixels below the button
+</font>        c.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font>b.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,b.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// set which function should get called when the button gets clicked.  In this case we want
+</font>        <font color='#009900'>// the on_button_clicked member to be called on *this.
+</font>        b.<font color='#BB00BB'>set_click_handler</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::on_button_clicked<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Alternatively, if you have a compiler which supports the lambda functions from the
+</font>        <font color='#009900'>// new C++ standard then you can use a lambda function instead of telling the click
+</font>        <font color='#009900'>// handler to call one of the member functions.  So for example, you could do this
+</font>        <font color='#009900'>// instead (uncomment the code if you have C++0x support):
+</font>        <font color='#009900'>/*
+        b.set_click_handler([&amp;](){
+                ++counter;
+                ostringstream sout;
+                sout &lt;&lt; "Counter: " &lt;&lt; counter;
+                c.set_text(sout.str());
+                });
+        */</font>
+        <font color='#009900'>// In general, all the functions which register events can take either member 
+</font>        <font color='#009900'>// functions or lambda functions.
+</font>
+        
+        <font color='#009900'>// Let's also make a simple menu bar.  
+</font>        <font color='#009900'>// First we say how many menus we want in our menu bar.  In this example we only want 1.
+</font>        mbar.<font color='#BB00BB'>set_number_of_menus</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Now we set the name of our menu.  The 'M' means that the M in Menu will be underlined
+</font>        <font color='#009900'>// and the user will be able to select it by hitting alt+M
+</font>        mbar.<font color='#BB00BB'>set_menu_name</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,"<font color='#CC0000'>Menu</font>",'<font color='#FF0000'>M</font>'<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now we add some items to the menu.  Note that items in a menu are listed in the
+</font>        <font color='#009900'>// order in which they were added.
+</font>
+        <font color='#009900'>// First let's make a menu item that does the same thing as our button does when it is clicked.
+</font>        <font color='#009900'>// Again, the 'C' means the C in Click is underlined in the menu. 
+</font>        mbar.<font color='#BB00BB'>menu</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Click Button!</font>",<font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::on_button_clicked,'<font color='#FF0000'>C</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// let's add a separator (i.e. a horizontal separating line) to the menu
+</font>        mbar.<font color='#BB00BB'>menu</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_separator</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Now let's make a menu item that calls show_about when the user selects it.  
+</font>        mbar.<font color='#BB00BB'>menu</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>About</font>",<font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::show_about,'<font color='#FF0000'>A</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// set the size of this window
+</font>        <font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>430</font>,<font color='#979000'>380</font><font face='Lucida Console'>)</font>;
+
+        counter <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#BB00BB'>set_title</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>dlib gui example</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>show</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b> 
+
+    ~<b><a name='win'></a>win</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// You should always call close_window() in the destructor of window
+</font>        <font color='#009900'>// objects to ensure that no events will be sent to this window while 
+</font>        <font color='#009900'>// it is being destructed.  
+</font>        <font color='#BB00BB'>close_window</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#0000FF'>private</font>:
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_button_clicked'></a>on_button_clicked</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// when someone clicks our button it will increment the counter and 
+</font>        <font color='#009900'>// display it in our label c.
+</font>        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>counter;
+        ostringstream sout;
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>counter: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> counter;
+        c.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='show_about'></a>show_about</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>message_box</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>About</font>","<font color='#CC0000'>This is a dlib gui example program</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> counter;
+    label c;
+    button b;
+    color_box cb;
+    menu_bar mbar;
+<b>}</b>;
+
+<font color='#009900'>//  ----------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// create our window
+</font>    win my_window;
+
+
+    <font color='#009900'>// wait until the user closes this window before we let the program 
+</font>    <font color='#009900'>// terminate.
+</font>    my_window.<font color='#BB00BB'>wait_until_closed</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+<b>}</b>
+
+<font color='#009900'>//  ----------------------------------------------------------------------------
+</font>
+<font color='#009900'>// Normally, if you built this application on MS Windows in Visual Studio you
+</font><font color='#009900'>// would see a black console window pop up when you ran it.  The following
+</font><font color='#009900'>// #pragma directives tell Visual Studio to not include a console window along
+</font><font color='#009900'>// with your application.  However, if you prefer to have the console pop up as
+</font><font color='#009900'>// well then simply remove these #pragma statements.
+</font><font color='#0000FF'>#ifdef</font> _MSC_VER
+#   pragma <b><a name='comment'></a>comment</b><font face='Lucida Console'>(</font> linker, "<font color='#CC0000'>/entry:mainCRTStartup</font>" <font face='Lucida Console'>)</font>
+#   pragma <b><a name='comment'></a>comment</b><font face='Lucida Console'>(</font> linker, "<font color='#CC0000'>/SUBSYSTEM:WINDOWS</font>" <font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>//  ----------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

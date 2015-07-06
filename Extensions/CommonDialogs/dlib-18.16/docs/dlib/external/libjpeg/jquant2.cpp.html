@@ -1,0 +1,1313 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jquant2.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jquant2.c
+ *
+ * Copyright (C) 1991-1996, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains 2-pass color quantization (color mapping) routines.
+ * These routines provide selection of a custom color map for an image,
+ * followed by mapping of the image to that color map, with optional
+ * Floyd-Steinberg dithering.
+ * It is also possible to use just the second pass to map to an arbitrary
+ * externally-given color map.
+ *
+ * Note: ordered dithering is not supported, since there isn't any fast
+ * way to compute intercolor distances; it's unclear that ordered dither's
+ * fundamental assumptions even hold with an irregularly spaced color map.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+
+<font color='#0000FF'>#ifdef</font> QUANT_2PASS_SUPPORTED
+
+
+<font color='#009900'>/*
+ * This module implements the well-known Heckbert paradigm for color
+ * quantization.  Most of the ideas used here can be traced back to
+ * Heckbert's seminal paper
+ *   Heckbert, Paul.  "Color Image Quantization for Frame Buffer Display",
+ *   Proc. SIGGRAPH '82, Computer Graphics v.16 #3 (July 1982), pp 297-304.
+ *
+ * In the first pass over the image, we accumulate a histogram showing the
+ * usage count of each possible color.  To keep the histogram to a reasonable
+ * size, we reduce the precision of the input; typical practice is to retain
+ * 5 or 6 bits per color, so that 8 or 4 different input values are counted
+ * in the same histogram cell.
+ *
+ * Next, the color-selection step begins with a box representing the whole
+ * color space, and repeatedly splits the "largest" remaining box until we
+ * have as many boxes as desired colors.  Then the mean color in each
+ * remaining box becomes one of the possible output colors.
+ * 
+ * The second pass over the image maps each input pixel to the closest output
+ * color (optionally after applying a Floyd-Steinberg dithering correction).
+ * This mapping is logically trivial, but making it go fast enough requires
+ * considerable care.
+ *
+ * Heckbert-style quantizers vary a good deal in their policies for choosing
+ * the "largest" box and deciding where to cut it.  The particular policies
+ * used here have proved out well in experimental comparisons, but better ones
+ * may yet be found.
+ *
+ * In earlier versions of the IJG code, this module quantized in YCbCr color
+ * space, processing the raw upsampled data without a color conversion step.
+ * This allowed the color conversion math to be done only once per colormap
+ * entry, not once per pixel.  However, that optimization precluded other
+ * useful optimizations (such as merging color conversion with upsampling)
+ * and it also interfered with desired capabilities such as quantizing to an
+ * externally-supplied colormap.  We have therefore abandoned that approach.
+ * The present code works in the post-conversion color space, typically RGB.
+ *
+ * To improve the visual quality of the results, we actually work in scaled
+ * RGB space, giving G distances more weight than R, and R in turn more than
+ * B.  To do everything in integer math, we must use integer scale factors.
+ * The 2/3/1 scale factors used here correspond loosely to the relative
+ * weights of the colors in the NTSC grayscale equation.
+ * If you want to use this code to quantize a non-RGB color space, you'll
+ * probably need to change these scale factors.
+ */</font>
+
+<font color='#0000FF'>#define</font> R_SCALE <font color='#979000'>2</font>		<font color='#009900'>/* scale R distances by this much */</font>
+<font color='#0000FF'>#define</font> G_SCALE <font color='#979000'>3</font>		<font color='#009900'>/* scale G distances by this much */</font>
+<font color='#0000FF'>#define</font> B_SCALE <font color='#979000'>1</font>		<font color='#009900'>/* and B by this much */</font>
+
+<font color='#009900'>/* Relabel R/G/B as components 0/1/2, respecting the RGB ordering defined
+ * in jmorecfg.h.  As the code stands, it will do the right thing for R,G,B
+ * and B,G,R orders.  If you define some other weird order in jmorecfg.h,
+ * you'll get compile errors until you extend this logic.  In that case
+ * you'll probably want to tweak the histogram sizes too.
+ */</font>
+
+<font color='#0000FF'>#if</font> RGB_RED <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>
+<font color='#0000FF'>#define</font> C0_SCALE R_SCALE
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#if</font> RGB_BLUE <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>
+<font color='#0000FF'>#define</font> C0_SCALE B_SCALE
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#if</font> RGB_GREEN <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>
+<font color='#0000FF'>#define</font> C1_SCALE G_SCALE
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#if</font> RGB_RED <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>
+<font color='#0000FF'>#define</font> C2_SCALE R_SCALE
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#if</font> RGB_BLUE <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>
+<font color='#0000FF'>#define</font> C2_SCALE B_SCALE
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#009900'>/*
+ * First we have the histogram data structure and routines for creating it.
+ *
+ * The number of bits of precision can be adjusted by changing these symbols.
+ * We recommend keeping 6 bits for G and 5 each for R and B.
+ * If you have plenty of memory and cycles, 6 bits all around gives marginally
+ * better results; if you are short of memory, 5 bits all around will save
+ * some space but degrade the results.
+ * To maintain a fully accurate histogram, we'd need to allocate a "long"
+ * (preferably unsigned long) for each cell.  In practice this is overkill;
+ * we can get by with 16 bits per cell.  Few of the cell counts will overflow,
+ * and clamping those that do overflow to the maximum value will give close-
+ * enough results.  This reduces the recommended histogram size from 256Kb
+ * to 128Kb, which is a useful savings on PC-class machines.
+ * (In the second pass the histogram space is re-used for pixel mapping data;
+ * in that capacity, each cell must be able to store zero to the number of
+ * desired colors.  16 bits/cell is plenty for that too.)
+ * Since the JPEG code is intended to run in small memory model on 80x86
+ * machines, we can't just allocate the histogram in one chunk.  Instead
+ * of a true 3-D array, we use a row of pointers to 2-D arrays.  Each
+ * pointer corresponds to a C0 value (typically 2^5 = 32 pointers) and
+ * each 2-D array has 2^6*2^5 = 2048 or 2^6*2^6 = 4096 entries.  Note that
+ * on 80x86 machines, the pointer row is in near memory but the actual
+ * arrays are in far memory (same arrangement as we use for image arrays).
+ */</font>
+
+<font color='#0000FF'>#define</font> MAXNUMCOLORS  <font face='Lucida Console'>(</font>MAXJSAMPLE<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#009900'>/* maximum size of colormap */</font>
+
+<font color='#009900'>/* These will do the right thing for either R,G,B or B,G,R color order,
+ * but you may not like the results for other color orders.
+ */</font>
+<font color='#0000FF'>#define</font> HIST_C0_BITS  <font color='#979000'>5</font>		<font color='#009900'>/* bits of precision in R/B histogram */</font>
+<font color='#0000FF'>#define</font> HIST_C1_BITS  <font color='#979000'>6</font>		<font color='#009900'>/* bits of precision in G histogram */</font>
+<font color='#0000FF'>#define</font> HIST_C2_BITS  <font color='#979000'>5</font>		<font color='#009900'>/* bits of precision in B/R histogram */</font>
+
+<font color='#009900'>/* Number of elements along histogram axes. */</font>
+<font color='#0000FF'>#define</font> HIST_C0_ELEMS  <font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>HIST_C0_BITS<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> HIST_C1_ELEMS  <font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>HIST_C1_BITS<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> HIST_C2_ELEMS  <font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>HIST_C2_BITS<font face='Lucida Console'>)</font>
+
+<font color='#009900'>/* These are the amounts to shift an input value to get a histogram index. */</font>
+<font color='#0000FF'>#define</font> C0_SHIFT  <font face='Lucida Console'>(</font>BITS_IN_JSAMPLE<font color='#5555FF'>-</font>HIST_C0_BITS<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> C1_SHIFT  <font face='Lucida Console'>(</font>BITS_IN_JSAMPLE<font color='#5555FF'>-</font>HIST_C1_BITS<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> C2_SHIFT  <font face='Lucida Console'>(</font>BITS_IN_JSAMPLE<font color='#5555FF'>-</font>HIST_C2_BITS<font face='Lucida Console'>)</font>
+
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> histcell;	<font color='#009900'>/* histogram cell; prefer an unsigned type */</font>
+
+<font color='#0000FF'>typedef</font> histcell FAR <font color='#5555FF'>*</font> histptr;	<font color='#009900'>/* for pointers to histogram cells */</font>
+
+<font color='#0000FF'>typedef</font> histcell hist1d[HIST_C2_ELEMS]; <font color='#009900'>/* typedefs for the array */</font>
+<font color='#0000FF'>typedef</font> hist1d FAR <font color='#5555FF'>*</font> hist2d;	<font color='#009900'>/* type for the 2nd-level pointers */</font>
+<font color='#0000FF'>typedef</font> hist2d <font color='#5555FF'>*</font> hist3d;	<font color='#009900'>/* type for top-level pointer */</font>
+
+
+<font color='#009900'>/* Declarations for Floyd-Steinberg dithering.
+ *
+ * Errors are accumulated into the array fserrors[], at a resolution of
+ * 1/16th of a pixel count.  The error at a given pixel is propagated
+ * to its not-yet-processed neighbors using the standard F-S fractions,
+ *		...	(here)	7/16
+ *		3/16	5/16	1/16
+ * We work left-to-right on even rows, right-to-left on odd rows.
+ *
+ * We can get away with a single array (holding one row's worth of errors)
+ * by using it to store the current row's errors at pixel columns not yet
+ * processed, but the next row's errors at columns already processed.  We
+ * need only a few extra variables to hold the errors immediately around the
+ * current column.  (If we are lucky, those variables are in registers, but
+ * even if not, they're probably cheaper to access than array elements are.)
+ *
+ * The fserrors[] array has (#columns + 2) entries; the extra entry at
+ * each end saves us from special-casing the first and last pixels.
+ * Each entry is three values long, one value for each color component.
+ *
+ * Note: on a wide image, we might not have enough room in a PC's near data
+ * segment to hold the error array; so it is allocated with alloc_large.
+ */</font>
+
+<font color='#0000FF'>#if</font> BITS_IN_JSAMPLE <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>short</u></font> FSERROR;		<font color='#009900'>/* 16 bits should be enough */</font>
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>int</u></font> LOCFSERROR;		<font color='#009900'>/* use 'int' for calculation temps */</font>
+<font color='#0000FF'>#else</font>
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>long</u></font> FSERROR;		<font color='#009900'>/* may need more than 16 bits */</font>
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>long</u></font> LOCFSERROR;	<font color='#009900'>/* be sure calculation temps are big enough */</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>typedef</font> FSERROR FAR <font color='#5555FF'>*</font>FSERRPTR;	<font color='#009900'>/* pointer to error array (in FAR storage!) */</font>
+
+
+<font color='#009900'>/* Private subobject */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#0000FF'>struct</font> jpeg_color_quantizer pub; <font color='#009900'>/* public fields */</font>
+
+  <font color='#009900'>/* Space for the eventually created colormap is stashed here */</font>
+  JSAMPARRAY sv_colormap;	<font color='#009900'>/* colormap allocated at init time */</font>
+  <font color='#0000FF'><u>int</u></font> desired;			<font color='#009900'>/* desired # of colors = size of colormap */</font>
+
+  <font color='#009900'>/* Variables for accumulating image statistics */</font>
+  hist3d histogram;		<font color='#009900'>/* pointer to the histogram */</font>
+
+  <font color='#0000FF'><u>int</u></font> needs_zeroed;		<font color='#009900'>/* TRUE if next pass must zero histogram */</font>
+
+  <font color='#009900'>/* Variables for Floyd-Steinberg dithering */</font>
+  FSERRPTR fserrors;		<font color='#009900'>/* accumulated errors */</font>
+  <font color='#0000FF'><u>int</u></font> on_odd_row;		<font color='#009900'>/* flag to remember which row we are on */</font>
+  <font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font> error_limiter;		<font color='#009900'>/* table for clamping the applied error */</font>
+<b>}</b> my_cquantizer;
+
+<font color='#0000FF'>typedef</font> my_cquantizer <font color='#5555FF'>*</font> my_cquantize_ptr;
+
+
+<font color='#009900'>/*
+ * Prescan some rows of pixels.
+ * In this module the prescan simply updates the histogram, which has been
+ * initialized to zeroes by start_pass.
+ * An output_buf parameter is required by the method signature, but no data
+ * is actually output (in fact the buffer controller is probably passing a
+ * NULL pointer).
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='prescan_quantize'></a>prescan_quantize</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, JSAMPARRAY input_buf,
+		  JSAMPARRAY , <font color='#0000FF'><u>int</u></font> num_rows<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_cquantize_ptr cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+  <font color='#0000FF'>register</font> JSAMPROW ptr;
+  <font color='#0000FF'>register</font> histptr histp;
+  <font color='#0000FF'>register</font> hist3d histogram <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>histogram;
+  <font color='#0000FF'><u>int</u></font> row;
+  JDIMENSION col;
+  JDIMENSION width <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>row <font color='#5555FF'>=</font> <font color='#979000'>0</font>; row <font color='#5555FF'>&lt;</font> num_rows; row<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    ptr <font color='#5555FF'>=</font> input_buf[row];
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>col <font color='#5555FF'>=</font> width; col <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; col<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* get pixel value and index into the histogram */</font>
+      histp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font> histogram[<font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>ptr[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> C0_SHIFT]
+			 [<font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>ptr[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> C1_SHIFT]
+			 [<font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>ptr[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> C2_SHIFT];
+      <font color='#009900'>/* increment, check for overflow and undo increment if so. */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>histp<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+	<font face='Lucida Console'>(</font><font color='#5555FF'>*</font>histp<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+      ptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+    <b>}</b>
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Next we have the really interesting routines: selection of a colormap
+ * given the completed histogram.
+ * These routines work with a list of "boxes", each representing a rectangular
+ * subset of the input color space (to histogram precision).
+ */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#009900'>/* The bounds of the box (inclusive); expressed as histogram indexes */</font>
+  <font color='#0000FF'><u>int</u></font> c0min, c0max;
+  <font color='#0000FF'><u>int</u></font> c1min, c1max;
+  <font color='#0000FF'><u>int</u></font> c2min, c2max;
+  <font color='#009900'>/* The volume (actually 2-norm) of the box */</font>
+  <font color='#0000FF'><u>long</u></font> volume;
+  <font color='#009900'>/* The number of nonzero histogram cells within this box */</font>
+  <font color='#0000FF'><u>long</u></font> colorcount;
+<b>}</b> box;
+
+<font color='#0000FF'>typedef</font> box <font color='#5555FF'>*</font> boxptr;
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font>boxptr<font face='Lucida Console'>)</font>
+<b><a name='find_biggest_color_pop'></a>find_biggest_color_pop</b> <font face='Lucida Console'>(</font>boxptr boxlist, <font color='#0000FF'><u>int</u></font> numboxes<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Find the splittable box with the largest color population */</font>
+<font color='#009900'>/* Returns NULL if no splittable boxes remain */</font>
+<b>{</b>
+  <font color='#0000FF'>register</font> boxptr boxp;
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> i;
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>long</u></font> maxc <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  boxptr which <font color='#5555FF'>=</font> NULL;
+  
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>, boxp <font color='#5555FF'>=</font> boxlist; i <font color='#5555FF'>&lt;</font> numboxes; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, boxp<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colorcount <font color='#5555FF'>&gt;</font> maxc <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>volume <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+      which <font color='#5555FF'>=</font> boxp;
+      maxc <font color='#5555FF'>=</font> boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colorcount;
+    <b>}</b>
+  <b>}</b>
+  <font color='#0000FF'>return</font> which;
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font>boxptr<font face='Lucida Console'>)</font>
+<b><a name='find_biggest_volume'></a>find_biggest_volume</b> <font face='Lucida Console'>(</font>boxptr boxlist, <font color='#0000FF'><u>int</u></font> numboxes<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Find the splittable box with the largest (scaled) volume */</font>
+<font color='#009900'>/* Returns NULL if no splittable boxes remain */</font>
+<b>{</b>
+  <font color='#0000FF'>register</font> boxptr boxp;
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> i;
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>long</u></font> maxv <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  boxptr which <font color='#5555FF'>=</font> NULL;
+  
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>, boxp <font color='#5555FF'>=</font> boxlist; i <font color='#5555FF'>&lt;</font> numboxes; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, boxp<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>volume <font color='#5555FF'>&gt;</font> maxv<font face='Lucida Console'>)</font> <b>{</b>
+      which <font color='#5555FF'>=</font> boxp;
+      maxv <font color='#5555FF'>=</font> boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>volume;
+    <b>}</b>
+  <b>}</b>
+  <font color='#0000FF'>return</font> which;
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='update_box'></a>update_box</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, boxptr boxp<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Shrink the min/max bounds of a box to enclose only nonzero elements, */</font>
+<font color='#009900'>/* and recompute its volume and population */</font>
+<b>{</b>
+  my_cquantize_ptr cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+  hist3d histogram <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>histogram;
+  histptr histp;
+  <font color='#0000FF'><u>int</u></font> c0,c1,c2;
+  <font color='#0000FF'><u>int</u></font> c0min,c0max,c1min,c1max,c2min,c2max;
+  <font color='#0000FF'><u>long</u></font> dist0,dist1,dist2;
+  <font color='#0000FF'><u>long</u></font> ccount;
+  
+  c0min <font color='#5555FF'>=</font> boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c0min;  c0max <font color='#5555FF'>=</font> boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c0max;
+  c1min <font color='#5555FF'>=</font> boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c1min;  c1max <font color='#5555FF'>=</font> boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c1max;
+  c2min <font color='#5555FF'>=</font> boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c2min;  c2max <font color='#5555FF'>=</font> boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c2max;
+  
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c0max <font color='#5555FF'>&gt;</font> c0min<font face='Lucida Console'>)</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c0 <font color='#5555FF'>=</font> c0min; c0 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c0max; c0<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c1 <font color='#5555FF'>=</font> c1min; c1 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c1max; c1<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	histp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font> histogram[c0][c1][c2min];
+	<font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c2 <font color='#5555FF'>=</font> c2min; c2 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c2max; c2<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+	  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>histp<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+	    boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c0min <font color='#5555FF'>=</font> c0min <font color='#5555FF'>=</font> c0;
+	    <font color='#0000FF'>goto</font> have_c0min;
+	  <b>}</b>
+      <b>}</b>
+ have_c0min:
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c0max <font color='#5555FF'>&gt;</font> c0min<font face='Lucida Console'>)</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c0 <font color='#5555FF'>=</font> c0max; c0 <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> c0min; c0<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font>
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c1 <font color='#5555FF'>=</font> c1min; c1 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c1max; c1<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	histp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font> histogram[c0][c1][c2min];
+	<font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c2 <font color='#5555FF'>=</font> c2min; c2 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c2max; c2<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+	  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>histp<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+	    boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c0max <font color='#5555FF'>=</font> c0max <font color='#5555FF'>=</font> c0;
+	    <font color='#0000FF'>goto</font> have_c0max;
+	  <b>}</b>
+      <b>}</b>
+ have_c0max:
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c1max <font color='#5555FF'>&gt;</font> c1min<font face='Lucida Console'>)</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c1 <font color='#5555FF'>=</font> c1min; c1 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c1max; c1<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c0 <font color='#5555FF'>=</font> c0min; c0 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c0max; c0<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	histp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font> histogram[c0][c1][c2min];
+	<font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c2 <font color='#5555FF'>=</font> c2min; c2 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c2max; c2<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+	  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>histp<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+	    boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c1min <font color='#5555FF'>=</font> c1min <font color='#5555FF'>=</font> c1;
+	    <font color='#0000FF'>goto</font> have_c1min;
+	  <b>}</b>
+      <b>}</b>
+ have_c1min:
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c1max <font color='#5555FF'>&gt;</font> c1min<font face='Lucida Console'>)</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c1 <font color='#5555FF'>=</font> c1max; c1 <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> c1min; c1<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font>
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c0 <font color='#5555FF'>=</font> c0min; c0 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c0max; c0<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	histp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font> histogram[c0][c1][c2min];
+	<font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c2 <font color='#5555FF'>=</font> c2min; c2 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c2max; c2<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+	  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>histp<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+	    boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c1max <font color='#5555FF'>=</font> c1max <font color='#5555FF'>=</font> c1;
+	    <font color='#0000FF'>goto</font> have_c1max;
+	  <b>}</b>
+      <b>}</b>
+ have_c1max:
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c2max <font color='#5555FF'>&gt;</font> c2min<font face='Lucida Console'>)</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c2 <font color='#5555FF'>=</font> c2min; c2 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c2max; c2<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c0 <font color='#5555FF'>=</font> c0min; c0 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c0max; c0<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	histp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font> histogram[c0][c1min][c2];
+	<font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c1 <font color='#5555FF'>=</font> c1min; c1 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c1max; c1<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, histp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> HIST_C2_ELEMS<font face='Lucida Console'>)</font>
+	  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>histp <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+	    boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c2min <font color='#5555FF'>=</font> c2min <font color='#5555FF'>=</font> c2;
+	    <font color='#0000FF'>goto</font> have_c2min;
+	  <b>}</b>
+      <b>}</b>
+ have_c2min:
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c2max <font color='#5555FF'>&gt;</font> c2min<font face='Lucida Console'>)</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c2 <font color='#5555FF'>=</font> c2max; c2 <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> c2min; c2<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font>
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c0 <font color='#5555FF'>=</font> c0min; c0 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c0max; c0<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	histp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font> histogram[c0][c1min][c2];
+	<font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c1 <font color='#5555FF'>=</font> c1min; c1 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c1max; c1<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, histp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> HIST_C2_ELEMS<font face='Lucida Console'>)</font>
+	  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>histp <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+	    boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c2max <font color='#5555FF'>=</font> c2max <font color='#5555FF'>=</font> c2;
+	    <font color='#0000FF'>goto</font> have_c2max;
+	  <b>}</b>
+      <b>}</b>
+ have_c2max:
+
+  <font color='#009900'>/* Update box volume.
+   * We use 2-norm rather than real volume here; this biases the method
+   * against making long narrow boxes, and it has the side benefit that
+   * a box is splittable iff norm &gt; 0.
+   * Since the differences are expressed in histogram-cell units,
+   * we have to shift back to JSAMPLE units to get consistent distances;
+   * after which, we scale according to the selected distance scale factors.
+   */</font>
+  dist0 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>c0max <font color='#5555FF'>-</font> c0min<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C0_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C0_SCALE;
+  dist1 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>c1max <font color='#5555FF'>-</font> c1min<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C1_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C1_SCALE;
+  dist2 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>c2max <font color='#5555FF'>-</font> c2min<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C2_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C2_SCALE;
+  boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>volume <font color='#5555FF'>=</font> dist0<font color='#5555FF'>*</font>dist0 <font color='#5555FF'>+</font> dist1<font color='#5555FF'>*</font>dist1 <font color='#5555FF'>+</font> dist2<font color='#5555FF'>*</font>dist2;
+  
+  <font color='#009900'>/* Now scan remaining volume of box and compute population */</font>
+  ccount <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c0 <font color='#5555FF'>=</font> c0min; c0 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c0max; c0<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c1 <font color='#5555FF'>=</font> c1min; c1 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c1max; c1<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      histp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font> histogram[c0][c1][c2min];
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c2 <font color='#5555FF'>=</font> c2min; c2 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c2max; c2<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, histp<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+	<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>histp <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+	  ccount<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+	<b>}</b>
+    <b>}</b>
+  boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colorcount <font color='#5555FF'>=</font> ccount;
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='median_cut'></a>median_cut</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, boxptr boxlist, <font color='#0000FF'><u>int</u></font> numboxes,
+	    <font color='#0000FF'><u>int</u></font> desired_colors<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Repeatedly select and split the largest box until we have enough boxes */</font>
+<b>{</b>
+  <font color='#0000FF'><u>int</u></font> n,lb;
+  <font color='#0000FF'><u>int</u></font> c0,c1,c2,cmax;
+  <font color='#0000FF'>register</font> boxptr b1,b2;
+
+  <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>numboxes <font color='#5555FF'>&lt;</font> desired_colors<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Select box to split.
+     * Current algorithm: by population for first half, then by volume.
+     */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>numboxes<font color='#5555FF'>*</font><font color='#979000'>2</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> desired_colors<font face='Lucida Console'>)</font> <b>{</b>
+      b1 <font color='#5555FF'>=</font> <font color='#BB00BB'>find_biggest_color_pop</font><font face='Lucida Console'>(</font>boxlist, numboxes<font face='Lucida Console'>)</font>;
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      b1 <font color='#5555FF'>=</font> <font color='#BB00BB'>find_biggest_volume</font><font face='Lucida Console'>(</font>boxlist, numboxes<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>b1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>		<font color='#009900'>/* no splittable boxes left! */</font>
+      <font color='#0000FF'>break</font>;
+    b2 <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>boxlist[numboxes];	<font color='#009900'>/* where new box will go */</font>
+    <font color='#009900'>/* Copy the color bounds to the new box. */</font>
+    b2<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c0max <font color='#5555FF'>=</font> b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c0max; b2<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c1max <font color='#5555FF'>=</font> b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c1max; b2<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c2max <font color='#5555FF'>=</font> b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c2max;
+    b2<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c0min <font color='#5555FF'>=</font> b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c0min; b2<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c1min <font color='#5555FF'>=</font> b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c1min; b2<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c2min <font color='#5555FF'>=</font> b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c2min;
+    <font color='#009900'>/* Choose which axis to split the box on.
+     * Current algorithm: longest scaled axis.
+     * See notes in update_box about scaling distances.
+     */</font>
+    c0 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c0max <font color='#5555FF'>-</font> b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c0min<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C0_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C0_SCALE;
+    c1 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c1max <font color='#5555FF'>-</font> b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c1min<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C1_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C1_SCALE;
+    c2 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c2max <font color='#5555FF'>-</font> b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c2min<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C2_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C2_SCALE;
+    <font color='#009900'>/* We want to break any ties in favor of green, then red, blue last.
+     * This code does the right thing for R,G,B or B,G,R color orders only.
+     */</font>
+<font color='#0000FF'>#if</font> RGB_RED <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    cmax <font color='#5555FF'>=</font> c1; n <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c0 <font color='#5555FF'>&gt;</font> cmax<font face='Lucida Console'>)</font> <b>{</b> cmax <font color='#5555FF'>=</font> c0; n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <b>}</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c2 <font color='#5555FF'>&gt;</font> cmax<font face='Lucida Console'>)</font> <b>{</b> n <font color='#5555FF'>=</font> <font color='#979000'>2</font>; <b>}</b>
+<font color='#0000FF'>#else</font>
+    cmax <font color='#5555FF'>=</font> c1; n <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c2 <font color='#5555FF'>&gt;</font> cmax<font face='Lucida Console'>)</font> <b>{</b> cmax <font color='#5555FF'>=</font> c2; n <font color='#5555FF'>=</font> <font color='#979000'>2</font>; <b>}</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c0 <font color='#5555FF'>&gt;</font> cmax<font face='Lucida Console'>)</font> <b>{</b> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <b>}</b>
+<font color='#0000FF'>#endif</font>
+    <font color='#009900'>/* Choose split point along selected axis, and update box bounds.
+     * Current algorithm: split at halfway point.
+     * (Since the box has been shrunk to minimum volume,
+     * any split will produce two nonempty subboxes.)
+     * Note that lb value is max for lower box, so must be &lt; old max.
+     */</font>
+    <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>case</font> <font color='#979000'>0</font>:
+      lb <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c0max <font color='#5555FF'>+</font> b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c0min<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>2</font>;
+      b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c0max <font color='#5555FF'>=</font> lb;
+      b2<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c0min <font color='#5555FF'>=</font> lb<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+      <font color='#0000FF'>break</font>;
+    <font color='#0000FF'>case</font> <font color='#979000'>1</font>:
+      lb <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c1max <font color='#5555FF'>+</font> b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c1min<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>2</font>;
+      b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c1max <font color='#5555FF'>=</font> lb;
+      b2<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c1min <font color='#5555FF'>=</font> lb<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+      <font color='#0000FF'>break</font>;
+    <font color='#0000FF'>case</font> <font color='#979000'>2</font>:
+      lb <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c2max <font color='#5555FF'>+</font> b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c2min<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>2</font>;
+      b1<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c2max <font color='#5555FF'>=</font> lb;
+      b2<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c2min <font color='#5555FF'>=</font> lb<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+      <font color='#0000FF'>break</font>;
+    <b>}</b>
+    <font color='#009900'>/* Update stats for boxes */</font>
+    <font color='#BB00BB'>update_box</font><font face='Lucida Console'>(</font>cinfo, b1<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>update_box</font><font face='Lucida Console'>(</font>cinfo, b2<font face='Lucida Console'>)</font>;
+    numboxes<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+  <b>}</b>
+  <font color='#0000FF'>return</font> numboxes;
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='compute_color'></a>compute_color</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, boxptr boxp, <font color='#0000FF'><u>int</u></font> icolor<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Compute representative color for a box, put it in colormap[icolor] */</font>
+<b>{</b>
+  <font color='#009900'>/* Current algorithm: mean weighted by pixels (not colors) */</font>
+  <font color='#009900'>/* Note it is important to get the rounding correct! */</font>
+  my_cquantize_ptr cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+  hist3d histogram <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>histogram;
+  histptr histp;
+  <font color='#0000FF'><u>int</u></font> c0,c1,c2;
+  <font color='#0000FF'><u>int</u></font> c0min,c0max,c1min,c1max,c2min,c2max;
+  <font color='#0000FF'><u>long</u></font> count;
+  <font color='#0000FF'><u>long</u></font> total <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font color='#0000FF'><u>long</u></font> c0total <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font color='#0000FF'><u>long</u></font> c1total <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font color='#0000FF'><u>long</u></font> c2total <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  
+  c0min <font color='#5555FF'>=</font> boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c0min;  c0max <font color='#5555FF'>=</font> boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c0max;
+  c1min <font color='#5555FF'>=</font> boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c1min;  c1max <font color='#5555FF'>=</font> boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c1max;
+  c2min <font color='#5555FF'>=</font> boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c2min;  c2max <font color='#5555FF'>=</font> boxp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>c2max;
+  
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c0 <font color='#5555FF'>=</font> c0min; c0 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c0max; c0<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c1 <font color='#5555FF'>=</font> c1min; c1 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c1max; c1<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      histp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font> histogram[c0][c1][c2min];
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>c2 <font color='#5555FF'>=</font> c2min; c2 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c2max; c2<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>count <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>histp<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+	  total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> count;
+	  c0total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>c0 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C0_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>C0_SHIFT<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> count;
+	  c1total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>c1 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C1_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>C1_SHIFT<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> count;
+	  c2total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>c2 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C2_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>C2_SHIFT<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> count;
+	<b>}</b>
+      <b>}</b>
+    <b>}</b>
+  
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colormap[<font color='#979000'>0</font>][icolor] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>c0total <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>total<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> total<font face='Lucida Console'>)</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colormap[<font color='#979000'>1</font>][icolor] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>c1total <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>total<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> total<font face='Lucida Console'>)</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colormap[<font color='#979000'>2</font>][icolor] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>c2total <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>total<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> total<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='select_colors'></a>select_colors</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, <font color='#0000FF'><u>int</u></font> desired_colors<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Master routine for color selection */</font>
+<b>{</b>
+  boxptr boxlist;
+  <font color='#0000FF'><u>int</u></font> numboxes;
+  <font color='#0000FF'><u>int</u></font> i;
+
+  <font color='#009900'>/* Allocate workspace for box list */</font>
+  boxlist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>boxptr<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE, desired_colors <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>box<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Initialize one box containing whole space */</font>
+  numboxes <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+  boxlist[<font color='#979000'>0</font>].c0min <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  boxlist[<font color='#979000'>0</font>].c0max <font color='#5555FF'>=</font> MAXJSAMPLE <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> C0_SHIFT;
+  boxlist[<font color='#979000'>0</font>].c1min <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  boxlist[<font color='#979000'>0</font>].c1max <font color='#5555FF'>=</font> MAXJSAMPLE <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> C1_SHIFT;
+  boxlist[<font color='#979000'>0</font>].c2min <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  boxlist[<font color='#979000'>0</font>].c2max <font color='#5555FF'>=</font> MAXJSAMPLE <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> C2_SHIFT;
+  <font color='#009900'>/* Shrink it to actually-used volume and set its statistics */</font>
+  <font color='#BB00BB'>update_box</font><font face='Lucida Console'>(</font>cinfo, <font color='#5555FF'>&amp;</font> boxlist[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Perform median-cut to produce final box list */</font>
+  numboxes <font color='#5555FF'>=</font> <font color='#BB00BB'>median_cut</font><font face='Lucida Console'>(</font>cinfo, boxlist, numboxes, desired_colors<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Compute the representative color for each box, fill colormap */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> numboxes; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>compute_color</font><font face='Lucida Console'>(</font>cinfo, <font color='#5555FF'>&amp;</font> boxlist[i], i<font face='Lucida Console'>)</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>actual_number_of_colors <font color='#5555FF'>=</font> numboxes;
+  <font color='#BB00BB'>TRACEMS1</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>1</font>, JTRC_QUANT_SELECTED, numboxes<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * These routines are concerned with the time-critical task of mapping input
+ * colors to the nearest color in the selected colormap.
+ *
+ * We re-use the histogram space as an "inverse color map", essentially a
+ * cache for the results of nearest-color searches.  All colors within a
+ * histogram cell will be mapped to the same colormap entry, namely the one
+ * closest to the cell's center.  This may not be quite the closest entry to
+ * the actual input color, but it's almost as good.  A zero in the cache
+ * indicates we haven't found the nearest color for that cell yet; the array
+ * is cleared to zeroes before starting the mapping pass.  When we find the
+ * nearest color for a cell, its colormap index plus one is recorded in the
+ * cache for future use.  The pass2 scanning routines call fill_inverse_cmap
+ * when they need to use an unfilled entry in the cache.
+ *
+ * Our method of efficiently finding nearest colors is based on the "locally
+ * sorted search" idea described by Heckbert and on the incremental distance
+ * calculation described by Spencer W. Thomas in chapter III.1 of Graphics
+ * Gems II (James Arvo, ed.  Academic Press, 1991).  Thomas points out that
+ * the distances from a given colormap entry to each cell of the histogram can
+ * be computed quickly using an incremental method: the differences between
+ * distances to adjacent cells themselves differ by a constant.  This allows a
+ * fairly fast implementation of the "brute force" approach of computing the
+ * distance from every colormap entry to every histogram cell.  Unfortunately,
+ * it needs a work array to hold the best-distance-so-far for each histogram
+ * cell (because the inner loop has to be over cells, not colormap entries).
+ * The work array elements have to be INT32s, so the work array would need
+ * 256Kb at our recommended precision.  This is not feasible in DOS machines.
+ *
+ * To get around these problems, we apply Thomas' method to compute the
+ * nearest colors for only the cells within a small subbox of the histogram.
+ * The work array need be only as big as the subbox, so the memory usage
+ * problem is solved.  Furthermore, we need not fill subboxes that are never
+ * referenced in pass2; many images use only part of the color gamut, so a
+ * fair amount of work is saved.  An additional advantage of this
+ * approach is that we can apply Heckbert's locality criterion to quickly
+ * eliminate colormap entries that are far away from the subbox; typically
+ * three-fourths of the colormap entries are rejected by Heckbert's criterion,
+ * and we need not compute their distances to individual cells in the subbox.
+ * The speed of this approach is heavily influenced by the subbox size: too
+ * small means too much overhead, too big loses because Heckbert's criterion
+ * can't eliminate as many colormap entries.  Empirically the best subbox
+ * size seems to be about 1/512th of the histogram (1/8th in each direction).
+ *
+ * Thomas' article also describes a refined method which is asymptotically
+ * faster than the brute-force method, but it is also far more complex and
+ * cannot efficiently be applied to small subboxes.  It is therefore not
+ * useful for programs intended to be portable to DOS machines.  On machines
+ * with plenty of memory, filling the whole histogram in one shot with Thomas'
+ * refined method might be faster than the present code --- but then again,
+ * it might not be any faster, and it's certainly more complicated.
+ */</font>
+
+
+<font color='#009900'>/* log2(histogram cells in update box) for each axis; this can be adjusted */</font>
+<font color='#0000FF'>#define</font> BOX_C0_LOG  <font face='Lucida Console'>(</font>HIST_C0_BITS<font color='#5555FF'>-</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> BOX_C1_LOG  <font face='Lucida Console'>(</font>HIST_C1_BITS<font color='#5555FF'>-</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> BOX_C2_LOG  <font face='Lucida Console'>(</font>HIST_C2_BITS<font color='#5555FF'>-</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>#define</font> BOX_C0_ELEMS  <font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>BOX_C0_LOG<font face='Lucida Console'>)</font> <font color='#009900'>/* # of hist cells in update box */</font>
+<font color='#0000FF'>#define</font> BOX_C1_ELEMS  <font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>BOX_C1_LOG<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> BOX_C2_ELEMS  <font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>BOX_C2_LOG<font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>#define</font> BOX_C0_SHIFT  <font face='Lucida Console'>(</font>C0_SHIFT <font color='#5555FF'>+</font> BOX_C0_LOG<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> BOX_C1_SHIFT  <font face='Lucida Console'>(</font>C1_SHIFT <font color='#5555FF'>+</font> BOX_C1_LOG<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> BOX_C2_SHIFT  <font face='Lucida Console'>(</font>C2_SHIFT <font color='#5555FF'>+</font> BOX_C2_LOG<font face='Lucida Console'>)</font>
+
+
+<font color='#009900'>/*
+ * The next three routines implement inverse colormap filling.  They could
+ * all be folded into one big routine, but splitting them up this way saves
+ * some stack space (the mindist[] and bestdist[] arrays need not coexist)
+ * and may allow some compilers to produce better code by registerizing more
+ * inner-loop variables.
+ */</font>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='find_nearby_colors'></a>find_nearby_colors</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, <font color='#0000FF'><u>int</u></font> minc0, <font color='#0000FF'><u>int</u></font> minc1, <font color='#0000FF'><u>int</u></font> minc2,
+		    JSAMPLE colorlist[]<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Locate the colormap entries close enough to an update box to be candidates
+ * for the nearest entry to some cell(s) in the update box.  The update box
+ * is specified by the center coordinates of its first cell.  The number of
+ * candidate colormap entries is returned, and their colormap indexes are
+ * placed in colorlist[].
+ * This routine uses Heckbert's "locally sorted search" criterion to select
+ * the colors that need further consideration.
+ */</font>
+<b>{</b>
+  <font color='#0000FF'><u>int</u></font> numcolors <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>actual_number_of_colors;
+  <font color='#0000FF'><u>int</u></font> maxc0, maxc1, maxc2;
+  <font color='#0000FF'><u>int</u></font> centerc0, centerc1, centerc2;
+  <font color='#0000FF'><u>int</u></font> i, x, ncolors;
+  <font color='#0000FF'><u>long</u></font> minmaxdist, min_dist, max_dist, tdist;
+  <font color='#0000FF'><u>long</u></font> mindist[MAXNUMCOLORS];	<font color='#009900'>/* min distance to colormap entry i */</font>
+
+  <font color='#009900'>/* Compute true coordinates of update box's upper corner and center.
+   * Actually we compute the coordinates of the center of the upper-corner
+   * histogram cell, which are the upper bounds of the volume we care about.
+   * Note that since "&gt;&gt;" rounds down, the "center" values may be closer to
+   * min than to max; hence comparisons to them must be "&lt;=", not "&lt;".
+   */</font>
+  maxc0 <font color='#5555FF'>=</font> minc0 <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> BOX_C0_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C0_SHIFT<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  centerc0 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>minc0 <font color='#5555FF'>+</font> maxc0<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>1</font>;
+  maxc1 <font color='#5555FF'>=</font> minc1 <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> BOX_C1_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C1_SHIFT<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  centerc1 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>minc1 <font color='#5555FF'>+</font> maxc1<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>1</font>;
+  maxc2 <font color='#5555FF'>=</font> minc2 <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> BOX_C2_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C2_SHIFT<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  centerc2 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>minc2 <font color='#5555FF'>+</font> maxc2<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>1</font>;
+
+  <font color='#009900'>/* For each color in colormap, find:
+   *  1. its minimum squared-distance to any point in the update box
+   *     (zero if color is within update box);
+   *  2. its maximum squared-distance to any point in the update box.
+   * Both of these can be found by considering only the corners of the box.
+   * We save the minimum distance for each color in mindist[];
+   * only the smallest maximum distance is of interest.
+   */</font>
+  minmaxdist <font color='#5555FF'>=</font> <font color='#979000'>0x7FFFFFFFL</font>;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> numcolors; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* We compute the squared-c0-distance term, then add in the other two. */</font>
+    x <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colormap[<font color='#979000'>0</font>][i]<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>&lt;</font> minc0<font face='Lucida Console'>)</font> <b>{</b>
+      tdist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> minc0<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C0_SCALE;
+      min_dist <font color='#5555FF'>=</font> tdist<font color='#5555FF'>*</font>tdist;
+      tdist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> maxc0<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C0_SCALE;
+      max_dist <font color='#5555FF'>=</font> tdist<font color='#5555FF'>*</font>tdist;
+    <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>&gt;</font> maxc0<font face='Lucida Console'>)</font> <b>{</b>
+      tdist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> maxc0<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C0_SCALE;
+      min_dist <font color='#5555FF'>=</font> tdist<font color='#5555FF'>*</font>tdist;
+      tdist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> minc0<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C0_SCALE;
+      max_dist <font color='#5555FF'>=</font> tdist<font color='#5555FF'>*</font>tdist;
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      <font color='#009900'>/* within cell range so no contribution to min_dist */</font>
+      min_dist <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> centerc0<font face='Lucida Console'>)</font> <b>{</b>
+	tdist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> maxc0<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C0_SCALE;
+	max_dist <font color='#5555FF'>=</font> tdist<font color='#5555FF'>*</font>tdist;
+      <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+	tdist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> minc0<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C0_SCALE;
+	max_dist <font color='#5555FF'>=</font> tdist<font color='#5555FF'>*</font>tdist;
+      <b>}</b>
+    <b>}</b>
+
+    x <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colormap[<font color='#979000'>1</font>][i]<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>&lt;</font> minc1<font face='Lucida Console'>)</font> <b>{</b>
+      tdist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> minc1<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C1_SCALE;
+      min_dist <font color='#5555FF'>+</font><font color='#5555FF'>=</font> tdist<font color='#5555FF'>*</font>tdist;
+      tdist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> maxc1<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C1_SCALE;
+      max_dist <font color='#5555FF'>+</font><font color='#5555FF'>=</font> tdist<font color='#5555FF'>*</font>tdist;
+    <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>&gt;</font> maxc1<font face='Lucida Console'>)</font> <b>{</b>
+      tdist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> maxc1<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C1_SCALE;
+      min_dist <font color='#5555FF'>+</font><font color='#5555FF'>=</font> tdist<font color='#5555FF'>*</font>tdist;
+      tdist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> minc1<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C1_SCALE;
+      max_dist <font color='#5555FF'>+</font><font color='#5555FF'>=</font> tdist<font color='#5555FF'>*</font>tdist;
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      <font color='#009900'>/* within cell range so no contribution to min_dist */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> centerc1<font face='Lucida Console'>)</font> <b>{</b>
+	tdist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> maxc1<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C1_SCALE;
+	max_dist <font color='#5555FF'>+</font><font color='#5555FF'>=</font> tdist<font color='#5555FF'>*</font>tdist;
+      <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+	tdist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> minc1<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C1_SCALE;
+	max_dist <font color='#5555FF'>+</font><font color='#5555FF'>=</font> tdist<font color='#5555FF'>*</font>tdist;
+      <b>}</b>
+    <b>}</b>
+
+    x <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colormap[<font color='#979000'>2</font>][i]<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>&lt;</font> minc2<font face='Lucida Console'>)</font> <b>{</b>
+      tdist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> minc2<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C2_SCALE;
+      min_dist <font color='#5555FF'>+</font><font color='#5555FF'>=</font> tdist<font color='#5555FF'>*</font>tdist;
+      tdist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> maxc2<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C2_SCALE;
+      max_dist <font color='#5555FF'>+</font><font color='#5555FF'>=</font> tdist<font color='#5555FF'>*</font>tdist;
+    <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>&gt;</font> maxc2<font face='Lucida Console'>)</font> <b>{</b>
+      tdist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> maxc2<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C2_SCALE;
+      min_dist <font color='#5555FF'>+</font><font color='#5555FF'>=</font> tdist<font color='#5555FF'>*</font>tdist;
+      tdist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> minc2<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C2_SCALE;
+      max_dist <font color='#5555FF'>+</font><font color='#5555FF'>=</font> tdist<font color='#5555FF'>*</font>tdist;
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      <font color='#009900'>/* within cell range so no contribution to min_dist */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> centerc2<font face='Lucida Console'>)</font> <b>{</b>
+	tdist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> maxc2<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C2_SCALE;
+	max_dist <font color='#5555FF'>+</font><font color='#5555FF'>=</font> tdist<font color='#5555FF'>*</font>tdist;
+      <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+	tdist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> minc2<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C2_SCALE;
+	max_dist <font color='#5555FF'>+</font><font color='#5555FF'>=</font> tdist<font color='#5555FF'>*</font>tdist;
+      <b>}</b>
+    <b>}</b>
+
+    mindist[i] <font color='#5555FF'>=</font> min_dist;	<font color='#009900'>/* save away the results */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>max_dist <font color='#5555FF'>&lt;</font> minmaxdist<font face='Lucida Console'>)</font>
+      minmaxdist <font color='#5555FF'>=</font> max_dist;
+  <b>}</b>
+
+  <font color='#009900'>/* Now we know that no cell in the update box is more than minmaxdist
+   * away from some colormap entry.  Therefore, only colors that are
+   * within minmaxdist of some part of the box need be considered.
+   */</font>
+  ncolors <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> numcolors; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>mindist[i] <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> minmaxdist<font face='Lucida Console'>)</font>
+      colorlist[ncolors<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> i;
+  <b>}</b>
+  <font color='#0000FF'>return</font> ncolors;
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='find_best_colors'></a>find_best_colors</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, <font color='#0000FF'><u>int</u></font> minc0, <font color='#0000FF'><u>int</u></font> minc1, <font color='#0000FF'><u>int</u></font> minc2,
+		  <font color='#0000FF'><u>int</u></font> numcolors, JSAMPLE colorlist[], JSAMPLE bestcolor[]<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Find the closest colormap entry for each cell in the update box,
+ * given the list of candidate colors prepared by find_nearby_colors.
+ * Return the indexes of the closest entries in the bestcolor[] array.
+ * This routine uses Thomas' incremental distance calculation method to
+ * find the distance from a colormap entry to successive cells in the box.
+ */</font>
+<b>{</b>
+  <font color='#0000FF'><u>int</u></font> ic0, ic1, ic2;
+  <font color='#0000FF'><u>int</u></font> i, icolor;
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>long</u></font> <font color='#5555FF'>*</font> bptr;	<font color='#009900'>/* pointer into bestdist[] array */</font>
+  JSAMPLE <font color='#5555FF'>*</font> cptr;		<font color='#009900'>/* pointer into bestcolor[] array */</font>
+  <font color='#0000FF'><u>long</u></font> dist0, dist1;		<font color='#009900'>/* initial distance values */</font>
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>long</u></font> dist2;		<font color='#009900'>/* current distance in inner loop */</font>
+  <font color='#0000FF'><u>long</u></font> xx0, xx1;		<font color='#009900'>/* distance increments */</font>
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>long</u></font> xx2;
+  <font color='#0000FF'><u>long</u></font> inc0, inc1, inc2;	<font color='#009900'>/* initial values for increments */</font>
+  <font color='#009900'>/* This array holds the distance to the nearest-so-far color for each cell */</font>
+  <font color='#0000FF'><u>long</u></font> bestdist[BOX_C0_ELEMS <font color='#5555FF'>*</font> BOX_C1_ELEMS <font color='#5555FF'>*</font> BOX_C2_ELEMS];
+
+  <font color='#009900'>/* Initialize best-distance for each cell of the update box */</font>
+  bptr <font color='#5555FF'>=</font> bestdist;
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> BOX_C0_ELEMS<font color='#5555FF'>*</font>BOX_C1_ELEMS<font color='#5555FF'>*</font>BOX_C2_ELEMS<font color='#5555FF'>-</font><font color='#979000'>1</font>; i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; i<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font>
+    <font color='#5555FF'>*</font>bptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#979000'>0x7FFFFFFFL</font>;
+  
+  <font color='#009900'>/* For each color selected by find_nearby_colors,
+   * compute its distance to the center of each cell in the box.
+   * If that's less than best-so-far, update best distance and color number.
+   */</font>
+  
+  <font color='#009900'>/* Nominal steps between cell centers ("x" in Thomas article) */</font>
+<font color='#0000FF'>#define</font> STEP_C0  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C0_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C0_SCALE<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> STEP_C1  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C1_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C1_SCALE<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> STEP_C2  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C2_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C2_SCALE<font face='Lucida Console'>)</font>
+  
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> numcolors; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    icolor <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>colorlist[i]<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Compute (square of) distance from minc0/c1/c2 to this color */</font>
+    inc0 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>minc0 <font color='#5555FF'>-</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colormap[<font color='#979000'>0</font>][icolor]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C0_SCALE;
+    dist0 <font color='#5555FF'>=</font> inc0<font color='#5555FF'>*</font>inc0;
+    inc1 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>minc1 <font color='#5555FF'>-</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colormap[<font color='#979000'>1</font>][icolor]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C1_SCALE;
+    dist0 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> inc1<font color='#5555FF'>*</font>inc1;
+    inc2 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>minc2 <font color='#5555FF'>-</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colormap[<font color='#979000'>2</font>][icolor]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> C2_SCALE;
+    dist0 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> inc2<font color='#5555FF'>*</font>inc2;
+    <font color='#009900'>/* Form the initial difference increments */</font>
+    inc0 <font color='#5555FF'>=</font> inc0 <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font color='#979000'>2</font> <font color='#5555FF'>*</font> STEP_C0<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> STEP_C0 <font color='#5555FF'>*</font> STEP_C0;
+    inc1 <font color='#5555FF'>=</font> inc1 <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font color='#979000'>2</font> <font color='#5555FF'>*</font> STEP_C1<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> STEP_C1 <font color='#5555FF'>*</font> STEP_C1;
+    inc2 <font color='#5555FF'>=</font> inc2 <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font color='#979000'>2</font> <font color='#5555FF'>*</font> STEP_C2<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> STEP_C2 <font color='#5555FF'>*</font> STEP_C2;
+    <font color='#009900'>/* Now loop over all cells in box, updating distance per Thomas method */</font>
+    bptr <font color='#5555FF'>=</font> bestdist;
+    cptr <font color='#5555FF'>=</font> bestcolor;
+    xx0 <font color='#5555FF'>=</font> inc0;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ic0 <font color='#5555FF'>=</font> BOX_C0_ELEMS<font color='#5555FF'>-</font><font color='#979000'>1</font>; ic0 <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; ic0<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+      dist1 <font color='#5555FF'>=</font> dist0;
+      xx1 <font color='#5555FF'>=</font> inc1;
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ic1 <font color='#5555FF'>=</font> BOX_C1_ELEMS<font color='#5555FF'>-</font><font color='#979000'>1</font>; ic1 <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; ic1<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+	dist2 <font color='#5555FF'>=</font> dist1;
+	xx2 <font color='#5555FF'>=</font> inc2;
+	<font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ic2 <font color='#5555FF'>=</font> BOX_C2_ELEMS<font color='#5555FF'>-</font><font color='#979000'>1</font>; ic2 <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; ic2<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+	  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dist2 <font color='#5555FF'>&lt;</font> <font color='#5555FF'>*</font>bptr<font face='Lucida Console'>)</font> <b>{</b>
+	    <font color='#5555FF'>*</font>bptr <font color='#5555FF'>=</font> dist2;
+	    <font color='#5555FF'>*</font>cptr <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> icolor;
+	  <b>}</b>
+	  dist2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> xx2;
+	  xx2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>*</font> STEP_C2 <font color='#5555FF'>*</font> STEP_C2;
+	  bptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+	  cptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+	<b>}</b>
+	dist1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> xx1;
+	xx1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>*</font> STEP_C1 <font color='#5555FF'>*</font> STEP_C1;
+      <b>}</b>
+      dist0 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> xx0;
+      xx0 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>*</font> STEP_C0 <font color='#5555FF'>*</font> STEP_C0;
+    <b>}</b>
+  <b>}</b>
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='fill_inverse_cmap'></a>fill_inverse_cmap</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, <font color='#0000FF'><u>int</u></font> c0, <font color='#0000FF'><u>int</u></font> c1, <font color='#0000FF'><u>int</u></font> c2<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Fill the inverse-colormap entries in the update box that contains */</font>
+<font color='#009900'>/* histogram cell c0/c1/c2.  (Only that one cell MUST be filled, but */</font>
+<font color='#009900'>/* we can fill as many others as we wish.) */</font>
+<b>{</b>
+  my_cquantize_ptr cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+  hist3d histogram <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>histogram;
+  <font color='#0000FF'><u>int</u></font> minc0, minc1, minc2;	<font color='#009900'>/* lower left corner of update box */</font>
+  <font color='#0000FF'><u>int</u></font> ic0, ic1, ic2;
+  <font color='#0000FF'>register</font> JSAMPLE <font color='#5555FF'>*</font> cptr;	<font color='#009900'>/* pointer into bestcolor[] array */</font>
+  <font color='#0000FF'>register</font> histptr cachep;	<font color='#009900'>/* pointer into main cache array */</font>
+  <font color='#009900'>/* This array lists the candidate colormap indexes. */</font>
+  JSAMPLE colorlist[MAXNUMCOLORS];
+  <font color='#0000FF'><u>int</u></font> numcolors;		<font color='#009900'>/* number of candidate colors */</font>
+  <font color='#009900'>/* This array holds the actually closest colormap index for each cell. */</font>
+  JSAMPLE bestcolor[BOX_C0_ELEMS <font color='#5555FF'>*</font> BOX_C1_ELEMS <font color='#5555FF'>*</font> BOX_C2_ELEMS];
+
+  <font color='#009900'>/* Convert cell coordinates to update box ID */</font>
+  c0 <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> BOX_C0_LOG;
+  c1 <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> BOX_C1_LOG;
+  c2 <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> BOX_C2_LOG;
+
+  <font color='#009900'>/* Compute true coordinates of update box's origin corner.
+   * Actually we compute the coordinates of the center of the corner
+   * histogram cell, which are the lower bounds of the volume we care about.
+   */</font>
+  minc0 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>c0 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> BOX_C0_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C0_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+  minc1 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>c1 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> BOX_C1_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C1_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+  minc2 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>c2 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> BOX_C2_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C2_SHIFT<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+  
+  <font color='#009900'>/* Determine which colormap entries are close enough to be candidates
+   * for the nearest entry to some cell in the update box.
+   */</font>
+  numcolors <font color='#5555FF'>=</font> <font color='#BB00BB'>find_nearby_colors</font><font face='Lucida Console'>(</font>cinfo, minc0, minc1, minc2, colorlist<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Determine the actually nearest colors. */</font>
+  <font color='#BB00BB'>find_best_colors</font><font face='Lucida Console'>(</font>cinfo, minc0, minc1, minc2, numcolors, colorlist,
+		   bestcolor<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Save the best color numbers (plus 1) in the main cache array */</font>
+  c0 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> BOX_C0_LOG;		<font color='#009900'>/* convert ID back to base cell indexes */</font>
+  c1 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> BOX_C1_LOG;
+  c2 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> BOX_C2_LOG;
+  cptr <font color='#5555FF'>=</font> bestcolor;
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ic0 <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ic0 <font color='#5555FF'>&lt;</font> BOX_C0_ELEMS; ic0<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ic1 <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ic1 <font color='#5555FF'>&lt;</font> BOX_C1_ELEMS; ic1<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      cachep <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font> histogram[c0<font color='#5555FF'>+</font>ic0][c1<font color='#5555FF'>+</font>ic1][c2];
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ic2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ic2 <font color='#5555FF'>&lt;</font> BOX_C2_ELEMS; ic2<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#5555FF'>*</font>cachep<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>histcell<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+      <b>}</b>
+    <b>}</b>
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Map some rows of pixels to the output colormapped representation.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='pass2_no_dither'></a>pass2_no_dither</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+		 JSAMPARRAY input_buf, JSAMPARRAY output_buf, <font color='#0000FF'><u>int</u></font> num_rows<font face='Lucida Console'>)</font>
+<font color='#009900'>/* This version performs no dithering */</font>
+<b>{</b>
+  my_cquantize_ptr cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+  hist3d histogram <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>histogram;
+  <font color='#0000FF'>register</font> JSAMPROW inptr, outptr;
+  <font color='#0000FF'>register</font> histptr cachep;
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> c0, c1, c2;
+  <font color='#0000FF'><u>int</u></font> row;
+  JDIMENSION col;
+  JDIMENSION width <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>row <font color='#5555FF'>=</font> <font color='#979000'>0</font>; row <font color='#5555FF'>&lt;</font> num_rows; row<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    inptr <font color='#5555FF'>=</font> input_buf[row];
+    outptr <font color='#5555FF'>=</font> output_buf[row];
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>col <font color='#5555FF'>=</font> width; col <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; col<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* get pixel value and index into the cache */</font>
+      c0 <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> C0_SHIFT;
+      c1 <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> C1_SHIFT;
+      c2 <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>inptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> C2_SHIFT;
+      cachep <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font> histogram[c0][c1][c2];
+      <font color='#009900'>/* If we have not seen this color before, find nearest colormap entry */</font>
+      <font color='#009900'>/* and update the cache */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cachep <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+	<font color='#BB00BB'>fill_inverse_cmap</font><font face='Lucida Console'>(</font>cinfo, c0,c1,c2<font face='Lucida Console'>)</font>;
+      <font color='#009900'>/* Now emit the colormap index for this cell */</font>
+      <font color='#5555FF'>*</font>outptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cachep <font color='#5555FF'>-</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+  <b>}</b>
+<b>}</b>
+
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='pass2_fs_dither'></a>pass2_fs_dither</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+		 JSAMPARRAY input_buf, JSAMPARRAY output_buf, <font color='#0000FF'><u>int</u></font> num_rows<font face='Lucida Console'>)</font>
+<font color='#009900'>/* This version performs Floyd-Steinberg dithering */</font>
+<b>{</b>
+  my_cquantize_ptr cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+  hist3d histogram <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>histogram;
+  <font color='#0000FF'>register</font> LOCFSERROR cur0, cur1, cur2;	<font color='#009900'>/* current error or pixel value */</font>
+  LOCFSERROR belowerr0, belowerr1, belowerr2; <font color='#009900'>/* error for pixel below cur */</font>
+  LOCFSERROR bpreverr0, bpreverr1, bpreverr2; <font color='#009900'>/* error for below/prev col */</font>
+  <font color='#0000FF'>register</font> FSERRPTR errorptr;	<font color='#009900'>/* =&gt; fserrors[] at column before current */</font>
+  JSAMPROW inptr;		<font color='#009900'>/* =&gt; current input pixel */</font>
+  JSAMPROW outptr;		<font color='#009900'>/* =&gt; current output pixel */</font>
+  histptr cachep;
+  <font color='#0000FF'><u>int</u></font> dir;			<font color='#009900'>/* +1 or -1 depending on direction */</font>
+  <font color='#0000FF'><u>int</u></font> dir3;			<font color='#009900'>/* 3*dir, for advancing inptr &amp; errorptr */</font>
+  <font color='#0000FF'><u>int</u></font> row;
+  JDIMENSION col;
+  JDIMENSION width <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width;
+  JSAMPLE <font color='#5555FF'>*</font>range_limit <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sample_range_limit;
+  <font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font>error_limit <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>error_limiter;
+  JSAMPROW colormap0 <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colormap[<font color='#979000'>0</font>];
+  JSAMPROW colormap1 <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colormap[<font color='#979000'>1</font>];
+  JSAMPROW colormap2 <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colormap[<font color='#979000'>2</font>];
+  SHIFT_TEMPS
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>row <font color='#5555FF'>=</font> <font color='#979000'>0</font>; row <font color='#5555FF'>&lt;</font> num_rows; row<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    inptr <font color='#5555FF'>=</font> input_buf[row];
+    outptr <font color='#5555FF'>=</font> output_buf[row];
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>on_odd_row<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* work right to left in this row */</font>
+      inptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>width<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#979000'>3</font>;	<font color='#009900'>/* so point to rightmost pixel */</font>
+      outptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> width<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+      dir <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+      dir3 <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>3</font>;
+      errorptr <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fserrors <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>width<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>3</font>; <font color='#009900'>/* =&gt; entry after last column */</font>
+      cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>on_odd_row <font color='#5555FF'>=</font> FALSE; <font color='#009900'>/* flip for next time */</font>
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      <font color='#009900'>/* work left to right in this row */</font>
+      dir <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+      dir3 <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+      errorptr <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fserrors; <font color='#009900'>/* =&gt; entry before first real column */</font>
+      cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>on_odd_row <font color='#5555FF'>=</font> TRUE; <font color='#009900'>/* flip for next time */</font>
+    <b>}</b>
+    <font color='#009900'>/* Preset error values: no error propagated to first pixel from left */</font>
+    cur0 <font color='#5555FF'>=</font> cur1 <font color='#5555FF'>=</font> cur2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#009900'>/* and no error propagated to row below yet */</font>
+    belowerr0 <font color='#5555FF'>=</font> belowerr1 <font color='#5555FF'>=</font> belowerr2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    bpreverr0 <font color='#5555FF'>=</font> bpreverr1 <font color='#5555FF'>=</font> bpreverr2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>col <font color='#5555FF'>=</font> width; col <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; col<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* curN holds the error propagated from the previous pixel on the
+       * current line.  Add the error propagated from the previous line
+       * to form the complete error correction term for this pixel, and
+       * round the error term (which is expressed * 16) to an integer.
+       * RIGHT_SHIFT rounds towards minus infinity, so adding 8 is correct
+       * for either sign of the error value.
+       * Note: errorptr points to *previous* column's array entry.
+       */</font>
+      cur0 <font color='#5555FF'>=</font> <font color='#BB00BB'>RIGHT_SHIFT</font><font face='Lucida Console'>(</font>cur0 <font color='#5555FF'>+</font> errorptr[dir3<font color='#5555FF'>+</font><font color='#979000'>0</font>] <font color='#5555FF'>+</font> <font color='#979000'>8</font>, <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+      cur1 <font color='#5555FF'>=</font> <font color='#BB00BB'>RIGHT_SHIFT</font><font face='Lucida Console'>(</font>cur1 <font color='#5555FF'>+</font> errorptr[dir3<font color='#5555FF'>+</font><font color='#979000'>1</font>] <font color='#5555FF'>+</font> <font color='#979000'>8</font>, <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+      cur2 <font color='#5555FF'>=</font> <font color='#BB00BB'>RIGHT_SHIFT</font><font face='Lucida Console'>(</font>cur2 <font color='#5555FF'>+</font> errorptr[dir3<font color='#5555FF'>+</font><font color='#979000'>2</font>] <font color='#5555FF'>+</font> <font color='#979000'>8</font>, <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+      <font color='#009900'>/* Limit the error using transfer function set by init_error_limit.
+       * See comments with init_error_limit for rationale.
+       */</font>
+      cur0 <font color='#5555FF'>=</font> error_limit[cur0];
+      cur1 <font color='#5555FF'>=</font> error_limit[cur1];
+      cur2 <font color='#5555FF'>=</font> error_limit[cur2];
+      <font color='#009900'>/* Form pixel value + error, and range-limit to 0..MAXJSAMPLE.
+       * The maximum error is +- MAXJSAMPLE (or less with error limiting);
+       * this sets the required size of the range_limit array.
+       */</font>
+      cur0 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>inptr[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+      cur1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>inptr[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+      cur2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>inptr[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font>;
+      cur0 <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>range_limit[cur0]<font face='Lucida Console'>)</font>;
+      cur1 <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>range_limit[cur1]<font face='Lucida Console'>)</font>;
+      cur2 <font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>range_limit[cur2]<font face='Lucida Console'>)</font>;
+      <font color='#009900'>/* Index into the cache with adjusted pixel value */</font>
+      cachep <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font> histogram[cur0<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font>C0_SHIFT][cur1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font>C1_SHIFT][cur2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font>C2_SHIFT];
+      <font color='#009900'>/* If we have not seen this color before, find nearest colormap */</font>
+      <font color='#009900'>/* entry and update the cache */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cachep <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+	<font color='#BB00BB'>fill_inverse_cmap</font><font face='Lucida Console'>(</font>cinfo, cur0<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font>C0_SHIFT,cur1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font>C1_SHIFT,cur2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font>C2_SHIFT<font face='Lucida Console'>)</font>;
+      <font color='#009900'>/* Now emit the colormap index for this cell */</font>
+      <b>{</b> <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> pixcode <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>cachep <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+	<font color='#5555FF'>*</font>outptr <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font> pixcode;
+	<font color='#009900'>/* Compute representation error for this pixel */</font>
+	cur0 <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>colormap0[pixcode]<font face='Lucida Console'>)</font>;
+	cur1 <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>colormap1[pixcode]<font face='Lucida Console'>)</font>;
+	cur2 <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>GETJSAMPLE</font><font face='Lucida Console'>(</font>colormap2[pixcode]<font face='Lucida Console'>)</font>;
+      <b>}</b>
+      <font color='#009900'>/* Compute error fractions to be propagated to adjacent pixels.
+       * Add these into the running sums, and simultaneously shift the
+       * next-line error sums left by 1 column.
+       */</font>
+      <b>{</b> <font color='#0000FF'>register</font> LOCFSERROR bnexterr, delta;
+
+	bnexterr <font color='#5555FF'>=</font> cur0;	<font color='#009900'>/* Process component 0 */</font>
+	delta <font color='#5555FF'>=</font> cur0 <font color='#5555FF'>*</font> <font color='#979000'>2</font>;
+	cur0 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> delta;		<font color='#009900'>/* form error * 3 */</font>
+	errorptr[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FSERROR<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>bpreverr0 <font color='#5555FF'>+</font> cur0<font face='Lucida Console'>)</font>;
+	cur0 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> delta;		<font color='#009900'>/* form error * 5 */</font>
+	bpreverr0 <font color='#5555FF'>=</font> belowerr0 <font color='#5555FF'>+</font> cur0;
+	belowerr0 <font color='#5555FF'>=</font> bnexterr;
+	cur0 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> delta;		<font color='#009900'>/* form error * 7 */</font>
+	bnexterr <font color='#5555FF'>=</font> cur1;	<font color='#009900'>/* Process component 1 */</font>
+	delta <font color='#5555FF'>=</font> cur1 <font color='#5555FF'>*</font> <font color='#979000'>2</font>;
+	cur1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> delta;		<font color='#009900'>/* form error * 3 */</font>
+	errorptr[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FSERROR<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>bpreverr1 <font color='#5555FF'>+</font> cur1<font face='Lucida Console'>)</font>;
+	cur1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> delta;		<font color='#009900'>/* form error * 5 */</font>
+	bpreverr1 <font color='#5555FF'>=</font> belowerr1 <font color='#5555FF'>+</font> cur1;
+	belowerr1 <font color='#5555FF'>=</font> bnexterr;
+	cur1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> delta;		<font color='#009900'>/* form error * 7 */</font>
+	bnexterr <font color='#5555FF'>=</font> cur2;	<font color='#009900'>/* Process component 2 */</font>
+	delta <font color='#5555FF'>=</font> cur2 <font color='#5555FF'>*</font> <font color='#979000'>2</font>;
+	cur2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> delta;		<font color='#009900'>/* form error * 3 */</font>
+	errorptr[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FSERROR<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>bpreverr2 <font color='#5555FF'>+</font> cur2<font face='Lucida Console'>)</font>;
+	cur2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> delta;		<font color='#009900'>/* form error * 5 */</font>
+	bpreverr2 <font color='#5555FF'>=</font> belowerr2 <font color='#5555FF'>+</font> cur2;
+	belowerr2 <font color='#5555FF'>=</font> bnexterr;
+	cur2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> delta;		<font color='#009900'>/* form error * 7 */</font>
+      <b>}</b>
+      <font color='#009900'>/* At this point curN contains the 7/16 error value to be propagated
+       * to the next pixel on the current line, and all the errors for the
+       * next line have been shifted over.  We are therefore ready to move on.
+       */</font>
+      inptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> dir3;		<font color='#009900'>/* Advance pixel pointers to next column */</font>
+      outptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> dir;
+      errorptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> dir3;		<font color='#009900'>/* advance errorptr to current column */</font>
+    <b>}</b>
+    <font color='#009900'>/* Post-loop cleanup: we must unload the final error values into the
+     * final fserrors[] entry.  Note we need not unload belowerrN because
+     * it is for the dummy column before or after the actual array.
+     */</font>
+    errorptr[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FSERROR<font face='Lucida Console'>)</font> bpreverr0; <font color='#009900'>/* unload prev errs into array */</font>
+    errorptr[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FSERROR<font face='Lucida Console'>)</font> bpreverr1;
+    errorptr[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FSERROR<font face='Lucida Console'>)</font> bpreverr2;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Initialize the error-limiting transfer function (lookup table).
+ * The raw F-S error computation can potentially compute error values of up to
+ * +- MAXJSAMPLE.  But we want the maximum correction applied to a pixel to be
+ * much less, otherwise obviously wrong pixels will be created.  (Typical
+ * effects include weird fringes at color-area boundaries, isolated bright
+ * pixels in a dark area, etc.)  The standard advice for avoiding this problem
+ * is to ensure that the "corners" of the color cube are allocated as output
+ * colors; then repeated errors in the same direction cannot cause cascading
+ * error buildup.  However, that only prevents the error from getting
+ * completely out of hand; Aaron Giles reports that error limiting improves
+ * the results even with corner colors allocated.
+ * A simple clamping of the error values to about +- MAXJSAMPLE/8 works pretty
+ * well, but the smoother transfer function used below is even better.  Thanks
+ * to Aaron Giles for this idea.
+ */</font>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='init_error_limit'></a>init_error_limit</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Allocate and fill in the error_limiter table */</font>
+<b>{</b>
+  my_cquantize_ptr cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+  <font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font> table;
+  <font color='#0000FF'><u>int</u></font> in, out;
+
+  table <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE, <font face='Lucida Console'>(</font>MAXJSAMPLE<font color='#5555FF'>*</font><font color='#979000'>2</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  table <font color='#5555FF'>+</font><font color='#5555FF'>=</font> MAXJSAMPLE;		<font color='#009900'>/* so can index -MAXJSAMPLE .. +MAXJSAMPLE */</font>
+  cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>error_limiter <font color='#5555FF'>=</font> table;
+
+<font color='#0000FF'>#define</font> STEPSIZE <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>MAXJSAMPLE<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>16</font><font face='Lucida Console'>)</font>
+  <font color='#009900'>/* Map errors 1:1 up to +- MAXJSAMPLE/16 */</font>
+  out <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>in <font color='#5555FF'>=</font> <font color='#979000'>0</font>; in <font color='#5555FF'>&lt;</font> STEPSIZE; in<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, out<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    table[in] <font color='#5555FF'>=</font> out; table[<font color='#5555FF'>-</font>in] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>out;
+  <b>}</b>
+  <font color='#009900'>/* Map errors 1:2 up to +- 3*MAXJSAMPLE/16 */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; in <font color='#5555FF'>&lt;</font> STEPSIZE<font color='#5555FF'>*</font><font color='#979000'>3</font>; in<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, out <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>in<font color='#5555FF'>&amp;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> ? <font color='#979000'>0</font> : <font color='#979000'>1</font><font face='Lucida Console'>)</font> <b>{</b>
+    table[in] <font color='#5555FF'>=</font> out; table[<font color='#5555FF'>-</font>in] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>out;
+  <b>}</b>
+  <font color='#009900'>/* Clamp the rest to final out value (which is (MAXJSAMPLE+1)/8) */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; in <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> MAXJSAMPLE; in<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    table[in] <font color='#5555FF'>=</font> out; table[<font color='#5555FF'>-</font>in] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>out;
+  <b>}</b>
+<font color='#0000FF'>#undef</font> STEPSIZE
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Finish up at the end of each pass.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='finish_pass1'></a>finish_pass1</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_cquantize_ptr cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+
+  <font color='#009900'>/* Select the representative colors and fill in cinfo-&gt;colormap */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colormap <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sv_colormap;
+  <font color='#BB00BB'>select_colors</font><font face='Lucida Console'>(</font>cinfo, cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>desired<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Force next pass to zero the color index table */</font>
+  cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>needs_zeroed <font color='#5555FF'>=</font> TRUE;
+<b>}</b>
+
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='finish_pass2'></a>finish_pass2</b> <font face='Lucida Console'>(</font>j_decompress_ptr <font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#009900'>/* no work */</font>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Initialize for each processing pass.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='start_pass_2_quant'></a>start_pass_2_quant</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, <font color='#0000FF'><u>int</u></font> is_pre_scan<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_cquantize_ptr cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+  hist3d histogram <font color='#5555FF'>=</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>histogram;
+  <font color='#0000FF'><u>int</u></font> i;
+
+  <font color='#009900'>/* Only F-S dithering or no dithering is supported. */</font>
+  <font color='#009900'>/* If user asks for ordered dither, give him F-S. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dither_mode <font color='#5555FF'>!</font><font color='#5555FF'>=</font> JDITHER_NONE<font face='Lucida Console'>)</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dither_mode <font color='#5555FF'>=</font> JDITHER_FS;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_pre_scan<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Set up method pointers */</font>
+    cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.color_quantize <font color='#5555FF'>=</font> prescan_quantize;
+    cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.finish_pass <font color='#5555FF'>=</font> finish_pass1;
+    cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>needs_zeroed <font color='#5555FF'>=</font> TRUE; <font color='#009900'>/* Always zero histogram */</font>
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    <font color='#009900'>/* Set up method pointers */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dither_mode <font color='#5555FF'>=</font><font color='#5555FF'>=</font> JDITHER_FS<font face='Lucida Console'>)</font>
+      cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.color_quantize <font color='#5555FF'>=</font> pass2_fs_dither;
+    <font color='#0000FF'>else</font>
+      cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.color_quantize <font color='#5555FF'>=</font> pass2_no_dither;
+    cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.finish_pass <font color='#5555FF'>=</font> finish_pass2;
+
+    <font color='#009900'>/* Make sure color count is acceptable */</font>
+    i <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>actual_number_of_colors;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_QUANT_FEW_COLORS, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&gt;</font> MAXNUMCOLORS<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_QUANT_MANY_COLORS, MAXNUMCOLORS<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dither_mode <font color='#5555FF'>=</font><font color='#5555FF'>=</font> JDITHER_FS<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'><u>size_t</u></font> arraysize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width <font color='#5555FF'>+</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font>
+				   <font face='Lucida Console'>(</font><font color='#979000'>3</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>FSERROR<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+      <font color='#009900'>/* Allocate Floyd-Steinberg workspace if we didn't already. */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fserrors <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+	cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fserrors <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FSERRPTR<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_large<font face='Lucida Console'>)</font>
+	  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE, arraysize<font face='Lucida Console'>)</font>;
+      <font color='#009900'>/* Initialize the propagated errors to zero. */</font>
+      <font color='#BB00BB'>jzero_far</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fserrors, arraysize<font face='Lucida Console'>)</font>;
+      <font color='#009900'>/* Make the error-limit table if we didn't already. */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>error_limiter <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+	<font color='#BB00BB'>init_error_limit</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+      cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>on_odd_row <font color='#5555FF'>=</font> FALSE;
+    <b>}</b>
+
+  <b>}</b>
+  <font color='#009900'>/* Zero the histogram or inverse color map, if necessary */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>needs_zeroed<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> HIST_C0_ELEMS; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#BB00BB'>jzero_far</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> histogram[i],
+		HIST_C1_ELEMS<font color='#5555FF'>*</font>HIST_C2_ELEMS <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>histcell<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>needs_zeroed <font color='#5555FF'>=</font> FALSE;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Switch to a new external colormap between output passes.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='new_color_map_2_quant'></a>new_color_map_2_quant</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_cquantize_ptr cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize;
+
+  <font color='#009900'>/* Reset the inverse color map */</font>
+  cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>needs_zeroed <font color='#5555FF'>=</font> TRUE;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Module initialization routine for 2-pass color quantization.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jinit_2pass_quantizer'></a>jinit_2pass_quantizer</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_cquantize_ptr cquantize;
+  <font color='#0000FF'><u>int</u></font> i;
+
+  cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_cquantize_ptr<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				<font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>my_cquantizer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cquantize <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> jpeg_color_quantizer <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> cquantize;
+  cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.start_pass <font color='#5555FF'>=</font> start_pass_2_quant;
+  cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.new_color_map <font color='#5555FF'>=</font> new_color_map_2_quant;
+  cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fserrors <font color='#5555FF'>=</font> NULL;	<font color='#009900'>/* flag optional arrays not allocated */</font>
+  cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>error_limiter <font color='#5555FF'>=</font> NULL;
+
+  <font color='#009900'>/* Make sure jdmaster didn't give me a case I can't handle */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_components <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_NOTIMPL<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Allocate the histogram/inverse colormap storage */</font>
+  cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>histogram <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>hist3d<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE, HIST_C0_ELEMS <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>hist2d<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> HIST_C0_ELEMS; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>histogram[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>hist2d<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_large<font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+       HIST_C1_ELEMS<font color='#5555FF'>*</font>HIST_C2_ELEMS <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>histcell<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b>}</b>
+  cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>needs_zeroed <font color='#5555FF'>=</font> TRUE; <font color='#009900'>/* histogram is garbage now */</font>
+
+  <font color='#009900'>/* Allocate storage for the completed colormap, if required.
+   * We do this now since it is FAR storage and may affect
+   * the memory manager's space calculations.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_2pass_quant<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Make sure color count is acceptable */</font>
+    <font color='#0000FF'><u>int</u></font> desired <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>desired_number_of_colors;
+    <font color='#009900'>/* Lower bound on # of colors ... somewhat arbitrary as long as &gt; 0 */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>desired <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_QUANT_FEW_COLORS, <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Make sure colormap indexes can be represented by JSAMPLEs */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>desired <font color='#5555FF'>&gt;</font> MAXNUMCOLORS<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_QUANT_MANY_COLORS, MAXNUMCOLORS<font face='Lucida Console'>)</font>;
+    cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sv_colormap <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_sarray<font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo,JPOOL_IMAGE, <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> desired, <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>desired <font color='#5555FF'>=</font> desired;
+  <b>}</b> <font color='#0000FF'>else</font>
+    cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sv_colormap <font color='#5555FF'>=</font> NULL;
+
+  <font color='#009900'>/* Only F-S dithering or no dithering is supported. */</font>
+  <font color='#009900'>/* If user asks for ordered dither, give him F-S. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dither_mode <font color='#5555FF'>!</font><font color='#5555FF'>=</font> JDITHER_NONE<font face='Lucida Console'>)</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dither_mode <font color='#5555FF'>=</font> JDITHER_FS;
+
+  <font color='#009900'>/* Allocate Floyd-Steinberg workspace if necessary.
+   * This isn't really needed until pass 2, but again it is FAR storage.
+   * Although we will cope with a later change in dither_mode,
+   * we do not promise to honor max_memory_to_use if dither_mode changes.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dither_mode <font color='#5555FF'>=</font><font color='#5555FF'>=</font> JDITHER_FS<font face='Lucida Console'>)</font> <b>{</b>
+    cquantize<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fserrors <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FSERRPTR<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_large<font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+       <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_width <font color='#5555FF'>+</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font color='#979000'>3</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>FSERROR<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Might as well create the error-limiting table too. */</font>
+    <font color='#BB00BB'>init_error_limit</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* QUANT_2PASS_SUPPORTED */</font>
+
+</pre></body></html>

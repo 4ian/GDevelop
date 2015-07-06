@@ -1,0 +1,327 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - load_image_dataset.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_LOAD_IMAGE_DaTASET_Hh_
+<font color='#0000FF'>#define</font> DLIB_LOAD_IMAGE_DaTASET_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='load_image_dataset_abstract.h.html'>load_image_dataset_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../misc_api.h.html'>../misc_api.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../dir_nav.h.html'>../dir_nav.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_io.h.html'>../image_io.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array.h.html'>../array.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='image_dataset_metadata.h.html'>image_dataset_metadata.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>set<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/full_object_detection.h.html'>../image_processing/full_object_detection.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='image_dataset_file'></a>image_dataset_file</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='image_dataset_file'></a>image_dataset_file</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename<font face='Lucida Console'>)</font>
+        <b>{</b>
+            _skip_empty_images <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            _have_parts <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            _filename <font color='#5555FF'>=</font> filename;
+        <b>}</b>
+
+        image_dataset_file <b><a name='boxes_match_label'></a>boxes_match_label</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> label
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            image_dataset_file <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+            temp._labels.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>label<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+        image_dataset_file <b><a name='skip_empty_images'></a>skip_empty_images</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            image_dataset_file <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+            temp._skip_empty_images <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+        image_dataset_file <b><a name='boxes_have_parts'></a>boxes_have_parts</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            image_dataset_file <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+            temp._have_parts <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='should_load_box'></a>should_load_box</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_dataset_metadata::box<font color='#5555FF'>&amp;</font> box
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>_have_parts <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> box.parts.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>_labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>_labels.<font color='#BB00BB'>count</font><font face='Lucida Console'>(</font>box.label<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='get_filename'></a>get_filename</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> _filename; <b>}</b>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='should_skip_empty_images'></a>should_skip_empty_images</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> _skip_empty_images; <b>}</b>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='should_boxes_have_parts'></a>should_boxes_have_parts</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> _have_parts; <b>}</b>
+        <font color='#0000FF'>const</font> std::set<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_selected_box_labels'></a>get_selected_box_labels</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> _labels; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        std::string _filename;
+        std::set<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font> _labels;
+        <font color='#0000FF'><u>bool</u></font> _skip_empty_images;
+        <font color='#0000FF'><u>bool</u></font> _have_parts;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type, 
+        <font color='#0000FF'>typename</font> MM
+        <font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='load_image_dataset'></a>load_image_dataset</b> <font face='Lucida Console'>(</font>
+        array<font color='#5555FF'>&lt;</font>image_type,MM<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> images,
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> object_locations,
+        <font color='#0000FF'>const</font> image_dataset_file<font color='#5555FF'>&amp;</font> source
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        images.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        object_locations.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> std::string old_working_dir <font color='#5555FF'>=</font> <font color='#BB00BB'>get_current_dir</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> ignored_rects;
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib::image_dataset_metadata;
+        dataset data;
+        <font color='#BB00BB'>load_image_dataset_metadata</font><font face='Lucida Console'>(</font>data, source.<font color='#BB00BB'>get_filename</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Set the current directory to be the one that contains the
+</font>        <font color='#009900'>// metadata file. We do this because the file might contain
+</font>        <font color='#009900'>// file paths which are relative to this folder.
+</font>        <font color='#BB00BB'>set_current_dir</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_parent_directory</font><font face='Lucida Console'>(</font><font color='#BB00BB'>file</font><font face='Lucida Console'>(</font>source.<font color='#BB00BB'>get_filename</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+
+
+        image_type img;
+        std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> rects, ignored;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> data.images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            rects.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            ignored.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> data.images[i].boxes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>source.<font color='#BB00BB'>should_load_box</font><font face='Lucida Console'>(</font>data.images[i].boxes[j]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data.images[i].boxes[j].ignore<font face='Lucida Console'>)</font>
+                        ignored.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>data.images[i].boxes[j].rect<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>else</font>
+                        rects.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>data.images[i].boxes[j].rect<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>source.<font color='#BB00BB'>should_skip_empty_images</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                object_locations.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>rects<font face='Lucida Console'>)</font>;
+                ignored_rects.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>ignored<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>load_image</font><font face='Lucida Console'>(</font>img, data.images[i].filename<font face='Lucida Console'>)</font>;
+                images.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#BB00BB'>set_current_dir</font><font face='Lucida Console'>(</font>old_working_dir<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> ignored_rects;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// ******* THIS FUNCTION IS DEPRECATED, you should use another version of load_image_dataset() *******
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type, 
+        <font color='#0000FF'>typename</font> MM
+        <font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='load_image_dataset'></a>load_image_dataset</b> <font face='Lucida Console'>(</font>
+        array<font color='#5555FF'>&lt;</font>image_type,MM<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> images,
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> object_locations,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> label,
+        <font color='#0000FF'><u>bool</u></font> skip_empty_images <font color='#5555FF'>=</font> <font color='#979000'>false</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        image_dataset_file <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>filename<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>label.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            f <font color='#5555FF'>=</font> f.<font color='#BB00BB'>boxes_match_label</font><font face='Lucida Console'>(</font>label<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>skip_empty_images<font face='Lucida Console'>)</font>
+            f <font color='#5555FF'>=</font> f.<font color='#BB00BB'>skip_empty_images</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>load_image_dataset</font><font face='Lucida Console'>(</font>images, object_locations, f<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type, 
+        <font color='#0000FF'>typename</font> MM
+        <font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='load_image_dataset'></a>load_image_dataset</b> <font face='Lucida Console'>(</font>
+        array<font color='#5555FF'>&lt;</font>image_type,MM<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> images,
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> object_locations,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>load_image_dataset</font><font face='Lucida Console'>(</font>images, object_locations, <font color='#BB00BB'>image_dataset_file</font><font face='Lucida Console'>(</font>filename<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type, 
+        <font color='#0000FF'>typename</font> MM
+        <font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='load_image_dataset'></a>load_image_dataset</b> <font face='Lucida Console'>(</font>
+        array<font color='#5555FF'>&lt;</font>image_type,MM<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> images,
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> object_locations,
+        <font color='#0000FF'>const</font> image_dataset_file<font color='#5555FF'>&amp;</font> source,
+        std::vector<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> parts_list
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        parts_list.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        images.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        object_locations.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> std::string old_working_dir <font color='#5555FF'>=</font> <font color='#BB00BB'>get_current_dir</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib::image_dataset_metadata;
+        dataset data;
+        <font color='#BB00BB'>load_image_dataset_metadata</font><font face='Lucida Console'>(</font>data, source.<font color='#BB00BB'>get_filename</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Set the current directory to be the one that contains the
+</font>        <font color='#009900'>// metadata file. We do this because the file might contain
+</font>        <font color='#009900'>// file paths which are relative to this folder.
+</font>        <font color='#BB00BB'>set_current_dir</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_parent_directory</font><font face='Lucida Console'>(</font><font color='#BB00BB'>file</font><font face='Lucida Console'>(</font>source.<font color='#BB00BB'>get_filename</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        std::set<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font> all_parts;
+
+        <font color='#009900'>// find out what parts are being used in the dataset.  Store results in all_parts.
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> data.images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> data.images[i].boxes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>source.<font color='#BB00BB'>should_load_box</font><font face='Lucida Console'>(</font>data.images[i].boxes[j]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> std::map<font color='#5555FF'>&lt;</font>std::string,point<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> parts <font color='#5555FF'>=</font> data.images[i].boxes[j].parts;
+                    std::map<font color='#5555FF'>&lt;</font>std::string,point<font color='#5555FF'>&gt;</font>::const_iterator itr;
+
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>itr <font color='#5555FF'>=</font> parts.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; itr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> parts.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>itr<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        all_parts.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>itr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// make a mapping between part names and the integers [0, all_parts.size())
+</font>        std::map<font color='#5555FF'>&lt;</font>std::string,<font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> parts_idx;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>std::set<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font>::iterator i <font color='#5555FF'>=</font> all_parts.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> all_parts.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            parts_idx[<font color='#5555FF'>*</font>i] <font color='#5555FF'>=</font> parts_list.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            parts_list.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> ignored_rects;
+        std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> ignored;
+        image_type img;
+        std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> object_dets;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> data.images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            object_dets.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            ignored.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> data.images[i].boxes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>source.<font color='#BB00BB'>should_load_box</font><font face='Lucida Console'>(</font>data.images[i].boxes[j]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data.images[i].boxes[j].ignore<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        ignored.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>data.images[i].boxes[j].rect<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        std::vector<font color='#5555FF'>&lt;</font>point<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>partlist</font><font face='Lucida Console'>(</font>parts_idx.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, OBJECT_PART_NOT_PRESENT<font face='Lucida Console'>)</font>;
+
+                        <font color='#009900'>// populate partlist with all the parts present in this box.
+</font>                        <font color='#0000FF'>const</font> std::map<font color='#5555FF'>&lt;</font>std::string,point<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> parts <font color='#5555FF'>=</font> data.images[i].boxes[j].parts;
+                        std::map<font color='#5555FF'>&lt;</font>std::string,point<font color='#5555FF'>&gt;</font>::const_iterator itr;
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>itr <font color='#5555FF'>=</font> parts.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; itr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> parts.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>itr<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            partlist[parts_idx[itr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first]] <font color='#5555FF'>=</font> itr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+                        <b>}</b>
+
+                        object_dets.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>full_object_detection</font><font face='Lucida Console'>(</font>data.images[i].boxes[j].rect, partlist<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>source.<font color='#BB00BB'>should_skip_empty_images</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> object_dets.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                object_locations.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>object_dets<font face='Lucida Console'>)</font>;
+                ignored_rects.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>ignored<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>load_image</font><font face='Lucida Console'>(</font>img, data.images[i].filename<font face='Lucida Console'>)</font>;
+                images.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#BB00BB'>set_current_dir</font><font face='Lucida Console'>(</font>old_working_dir<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> ignored_rects;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type, 
+        <font color='#0000FF'>typename</font> MM
+        <font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='load_image_dataset'></a>load_image_dataset</b> <font face='Lucida Console'>(</font>
+        array<font color='#5555FF'>&lt;</font>image_type,MM<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> images,
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> object_locations,
+        <font color='#0000FF'>const</font> image_dataset_file<font color='#5555FF'>&amp;</font> source 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::vector<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font> parts_list;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>load_image_dataset</font><font face='Lucida Console'>(</font>images, object_locations, source, parts_list<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type, 
+        <font color='#0000FF'>typename</font> MM
+        <font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='load_image_dataset'></a>load_image_dataset</b> <font face='Lucida Console'>(</font>
+        array<font color='#5555FF'>&lt;</font>image_type,MM<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> images,
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> object_locations,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::vector<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font> parts_list;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>load_image_dataset</font><font face='Lucida Console'>(</font>images, object_locations, <font color='#BB00BB'>image_dataset_file</font><font face='Lucida Console'>(</font>filename<font face='Lucida Console'>)</font>, parts_list<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LOAD_IMAGE_DaTASET_Hh_
+</font>
+
+</pre></body></html>

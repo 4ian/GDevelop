@@ -5,13 +5,12 @@ Copyright (c) 2011-2012 Thomas Flecy
 This project is released under the MIT License.
 */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/wx.h> //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #endif
 #include <SFML/Graphics.hpp>
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/Object.h"
-
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/Position.h"
@@ -175,14 +174,19 @@ void SoundObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 
 bool SoundObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
 {
+#if !defined(GD_NO_WX_GUI)
     thumbnail = wxBitmap("CppPlatform/Extensions/soundicon24.png", wxBITMAP_TYPE_ANY);
+#endif
+
     return true;
 }
 
 void SoundObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
+#if !defined(GD_NO_WX_GUI)
     SoundObjectEditor dialog(parent, game, *this);
     dialog.ShowModal();
+#endif
 }
 
 void RuntimeSoundObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const

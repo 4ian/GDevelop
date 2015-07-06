@@ -1,0 +1,236 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - unicode_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net), and Nils Labugt
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_UNICODe_ABSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_UNICODe_ABSTRACT_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../error.h.html'>../error.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// a typedef for an unsigned 32bit integer to hold our UNICODE characters 
+</font>    <font color='#0000FF'>typedef</font> uint32 unichar;
+
+    <font color='#009900'>// a typedef for a string object to hold our UNICODE strings
+</font>    <font color='#0000FF'>typedef</font> std::basic_string<font color='#5555FF'>&lt;</font>unichar<font color='#5555FF'>&gt;</font> ustring;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_combining_char'></a>is_combining_char</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T ch_
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - if (ch_ is a unicode combining character) then
+                - returns true
+            - else
+                - returns false
+    !*/</font>
+
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_surrogate'></a>is_surrogate</b><font face='Lucida Console'>(</font>
+        unichar ch
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - if (ch is a unicode surrogate character) then
+                - returns true
+            - else
+                - returns false
+    !*/</font>
+
+    unichar <b><a name='surrogate_pair_to_unichar'></a>surrogate_pair_to_unichar</b><font face='Lucida Console'>(</font>
+        unichar first, 
+        unichar second
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0xD800 &lt;= first &lt; 0xDC00
+            - 0xDC00 &lt;= second &lt; 0xE000
+            - is_surrogate(first) == true
+            - is_surrogate(second) == true
+        ensures
+            - converts two surrogates into one unicode character
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='unichar_to_surrogate_pair'></a>unichar_to_surrogate_pair</b><font face='Lucida Console'>(</font>
+        unichar ch, 
+        unichar<font color='#5555FF'>&amp;</font> first, 
+        unichar<font color='#5555FF'>&amp;</font> second
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - ch &gt;= 0x10000 (i.e. is not in Basic Multilingual Plane) 
+        ensures
+            - surrogate_pair_to_unichar(#first,#second) == ch
+              (i.e. converts ch into two surrogate characters)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='invalid_utf8_error'></a>invalid_utf8_error</b> : <font color='#0000FF'>public</font> error
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='invalid_utf8_error'></a>invalid_utf8_error</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>:error<font face='Lucida Console'>(</font>EUTF8_TO_UTF32<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>const</font> ustring <b><a name='convert_utf8_to_utf32'></a>convert_utf8_to_utf32</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> str
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - if (str is a valid UTF-8 encoded string) then
+                - returns a copy of str that has been converted into a
+                  unichar string
+            - else
+                - throws invalid_utf8_error
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> ustring <b><a name='convert_wstring_to_utf32'></a>convert_wstring_to_utf32</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::wstring <font color='#5555FF'>&amp;</font>wstr
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - wstr is a valid UTF-16 string when sizeof(wchar_t) == 2
+            - wstr is a valid UTF-32 string when sizeof(wchar_t) == 4
+        ensures
+            - converts wstr into UTF-32 string
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> std::wstring <b><a name='convert_utf32_to_wstring'></a>convert_utf32_to_wstring</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> ustring <font color='#5555FF'>&amp;</font>str
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - str is a valid UTF-32 encoded string
+        ensures
+            - converts str into wstring whose encoding is UTF-16 when sizeof(wchar_t) == 2
+            - converts str into wstring whose encoding is UTF-32 when sizeof(wchar_t) == 4
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> std::wstring <b><a name='convert_mbstring_to_wstring'></a>convert_mbstring_to_wstring</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string <font color='#5555FF'>&amp;</font>str
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - str is a valid multibyte string whose encoding is same as current locale setting
+        ensures
+            - converts str into wstring whose encoding is UTF-16 when sizeof(wchar_t) == 2
+            - converts str into wstring whose encoding is UTF-32 when sizeof(wchar_t) == 4
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> std::string <b><a name='convert_wstring_to_mbstring'></a>convert_wstring_to_mbstring</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::wstring <font color='#5555FF'>&amp;</font>src
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - str is a valid wide character string string whose encoding is same as current 
+              locale setting
+        ensures
+            - returns a multibyte encoded version of the given string
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='basic_utf8_ifstream'></a>basic_utf8_ifstream</b> : <font color='#0000FF'>public</font> std::basic_istream<font color='#5555FF'>&lt;</font>charT<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents an input file stream much like the
+                normal std::ifstream except that it knows how to read UTF-8 
+                data.  So when you read characters out of this stream it will
+                automatically convert them from the UTF-8 multibyte encoding
+                into a fixed width wide character encoding.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='basic_utf8_ifstream'></a>basic_utf8_ifstream</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - constructs an input stream that isn't yet associated with
+                  a file.
+        !*/</font>
+
+        <b><a name='basic_utf8_ifstream'></a>basic_utf8_ifstream</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> file_name,
+            std::ios_base::openmode mode <font color='#5555FF'>=</font> std::ios::in 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - tries to open the given file for reading by this stream
+                - mode is interpreted exactly the same was as the open mode
+                  argument used by std::ifstream.
+        !*/</font>
+
+        <b><a name='basic_utf8_ifstream'></a>basic_utf8_ifstream</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name,
+            std::ios_base::openmode mode <font color='#5555FF'>=</font> std::ios::in 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - tries to open the given file for reading by this stream
+                - mode is interpreted exactly the same was as the open mode
+                  argument used by std::ifstream.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='open'></a>open</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name,
+            std::ios_base::openmode mode <font color='#5555FF'>=</font> std::ios::in 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - tries to open the given file for reading by this stream
+                - mode is interpreted exactly the same was as the open mode
+                  argument used by std::ifstream.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='open'></a>open</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> file_name,
+            std::ios_base::openmode mode <font color='#5555FF'>=</font> std::ios::in 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - tries to open the given file for reading by this stream
+                - mode is interpreted exactly the same was as the open mode
+                  argument used by std::ifstream.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='close'></a>close</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - any file opened by this stream has been closed
+        !*/</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>typedef</font> basic_utf8_ifstream<font color='#5555FF'>&lt;</font>unichar<font color='#5555FF'>&gt;</font> utf8_uifstream;
+    <font color='#0000FF'>typedef</font> basic_utf8_ifstream<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>wchar_t</u></font><font color='#5555FF'>&gt;</font> utf8_wifstream;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_UNICODe_ABSTRACT_H_
+</font>
+
+
+</pre></body></html>

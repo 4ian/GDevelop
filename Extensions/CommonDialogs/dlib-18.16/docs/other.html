@@ -1,0 +1,503 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html xmlns:gcse="googleCustomSearch"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="shortcut icon" href="dlib-icon.ico"><meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I="><meta name="google-site-verification" content="DGSSJMKDomaDaDTIRJ8jDkv0YMx9Cz7OESbXHjjr6Jw"><title>dlib C++ Library
+   - Miscellaneous</title><script language="JavaScript">
+
+// ---------------------------------------------
+// --- Name:    Easy DHTML Treeview           --
+// --- Author:  D.D. de Kerf                  --
+// --- Version: 0.2          Date: 13-6-2001  --
+// ---------------------------------------------
+function Toggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "minus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "plus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+function BigToggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigminus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigplus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+</script><style type="text/css">
+   body {margin:0px;}
+   pre {margin:0px;}
+
+   ul.tree  li { list-style: none;  margin-left:10px;} 
+   ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
+   ul.tree  li ul { margin-left:10px; padding:0px; }
+
+   li#term { list-style: none; }
+
+   div.component {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      padding: 0.7em;
+   }
+
+   div.question {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      margin-bottom: 90%;
+      padding: 0.7em;
+   }
+
+   div.function {
+      background-color:white; 
+      border: 2px solid rgb(102,102,255); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.class {
+      background-color:white; 
+      border: 2px solid rgb(255,102,102); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.extension {
+      background-color:#FDFDFD; 
+      border: 1px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.0em;
+      padding: 0.7em;
+   }
+
+   div.logb {
+      text-align:left;
+      padding: 0.0em;
+      float: left;
+      background-color:#c0c0c0; 
+      border: double ; 
+      margin: 0.5em;
+   }
+
+   div.name {
+      float: left;
+   }
+   div.line1 {
+      float:left;
+      width:100%;
+      background-color:#dfdfdf; 
+   }
+   div.line2 {
+      float:left;
+      width:100%;
+   }
+   div.inc {
+      float: right;
+   }
+
+
+   .code_box
+   {
+      color: black;
+      margin: 1em 0.25in;
+      padding: 0.5em;
+      background: rgb(240,240,240);
+      border-top: black dotted 1px;
+      border-left: black dotted 1px;
+      border-right: black solid 2px;
+      border-bottom: black solid 2px;
+   }
+
+
+
+   .bdotted {border-bottom: 1px dotted}
+   .bdashed {border-bottom: 1px dashed}
+   .bsolid {border-bottom: 1px solid}
+   .bdouble {border-bottom: 1px double}
+   .bgroove {border-bottom: 1px groove}
+   .bridge {border-bottom: 1px ridge}
+   .binset {border-bottom: 1px inset}
+   .boutset {border-bottom: 1px outset}
+
+   div.row1 {
+      background-color:#dfdfdf; 
+   }
+   div.row2 {
+      background-color:#f2f2f2; 
+   }
+
+   div.typedefs {
+      margin-left: 1.5em;
+      margin-top: 0.2em;
+      border: 1px dotted;
+      width: 52em;
+   }
+
+   div.tdn {
+      width: 10em;
+   }
+
+   .fullhr {
+      clear: both;
+   }
+
+   body {
+      text-align: center;
+   }
+
+   div.entire_page_header {
+      width:62.5em;  
+      text-align: left;
+      margin-top: 0.4em;
+      margin-left: auto;
+      margin-right: auto;
+   }
+   div.entire_page {
+      width:62.5em;  
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      clear:both;
+   }
+</style></head><body bgcolor="#EDF3EE"><a name="top"></a><div class="entire_page_header"><a href="http://dlib.net"><img src="dlib-logo.png"></a></div><div class="entire_page"><table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px"><tr height="100%"><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="145" height="100%"><tr><td VALIGN="TOP"><b>The Library</b><ul class="tree"><li><a href="algorithms.html">Algorithms</a></li><li><a href="api.html">API Wrappers</a></li><li><a href="bayes.html">Bayesian Nets</a></li><li><a href="compression.html">Compression</a></li><li><a href="containers.html">Containers</a></li><li><a href="graph_tools.html">Graph Tools</a></li><li><a href="imaging.html">Image Processing</a></li><li><a href="linear_algebra.html">Linear Algebra</a></li><li><a href="ml.html">Machine Learning</a></li><li><a href="metaprogramming.html">Metaprogramming</a></li><li><a href="other.html">Miscellaneous</a></li><li><a href="network.html">Networking</a></li><li><a href="optimization.html">Optimization</a></li><li><a href="parsing.html">Parsing</a></li></ul><br><b>Help/Info</b><ul class="tree"><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: C++</u></font></a><ul style="display:none;"><li><a href="3d_point_cloud_ex.cpp.html">3D_Point_Cloud</a></li><li><a href="assignment_learning_ex.cpp.html">Assignment_Learning</a></li><li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li><li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li><li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li><li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li><li><a href="bridge_ex.cpp.html">Bridge</a></li><li><a href="bsp_ex.cpp.html">BSP</a></li><li><a href="svm_c_ex.cpp.html">C-Support_Vector_Machine</a></li><li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li><li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li><li><a href="config_reader_ex.cpp.html">Config_File_Reader</a></li><li><a href="custom_trainer_ex.cpp.html">Custom_Trainers</a></li><li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li><li><a href="empirical_kernel_map_ex.cpp.html">Empirical_Kernel_Map</a></li><li><a href="face_detection_ex.cpp.html">Face_Detection</a></li><li><a href="face_landmark_detection_ex.cpp.html">Face_Landmark_Detection</a></li><li><a href="fhog_ex.cpp.html">FHOG_Feature_Extraction</a></li><li><a href="fhog_object_detector_ex.cpp.html">FHOG_Object_Detection</a></li><li><a href="graph_labeling_ex.cpp.html">Graph_Labeling</a></li><li><a href="gui_api_ex.cpp.html">GUI</a></li><li><a href="hough_transform_ex.cpp.html">Hough_Transform</a></li><li><a href="server_http_ex.cpp.html">HTTP_Server</a></li><li><a href="image_ex.cpp.html">Image</a></li><li><a href="iosockstream_ex.cpp.html">IO Socket Streams</a></li><li><a href="server_iostream_ex.cpp.html">IO Streams Server</a></li><li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li><li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li><li><a href="krr_regression_ex.cpp.html">Kernel_Ridge_Regression</a></li><li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li><li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li><li><a href="krr_classification_ex.cpp.html">KRR_Classification</a></li><li><a href="learning_to_track_ex.cpp.html">Learning_to_Track</a></li><li><a href="max_cost_assignment_ex.cpp.html">Linear_Assignment_Problems</a></li><li><a href="linear_manifold_regularizer_ex.cpp.html">Linear_Manifold_Regularizer</a></li><li><a href="mpc_ex.cpp.html">Linear_Model_Predictive_Control</a></li><li><a href="logger_ex.cpp.html">Logger</a></li><li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li><li><a href="logger_custom_output_ex.cpp.html">Logger_Custom_Output</a></li><li><a href="matrix_ex.cpp.html">Matrix</a></li><li><a href="matrix_expressions_ex.cpp.html">Matrix_Expressions</a></li><li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li><li><a href="model_selection_ex.cpp.html">Model_Selection</a></li><li><a href="multiclass_classification_ex.cpp.html">Multiclass_Classification</a></li><li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li><li><a href="mlp_ex.cpp.html">Neural_Network</a></li><li><a href="least_squares_ex.cpp.html">Non-Linear Least Squares</a></li><li><a href="svm_ex.cpp.html">Nu-Support_Vector_Machine</a></li><li><a href="integrate_function_adapt_simp_ex.cpp.html">Numerical_Integration</a></li><li><a href="object_detector_ex.cpp.html">Object_Detector</a></li><li><a href="object_detector_advanced_ex.cpp.html">Object_Detector_Advanced</a></li><li><a href="one_class_classifiers_ex.cpp.html">One_Class_Classifiers</a></li><li><a href="svm_pegasos_ex.cpp.html">Online_SVM</a></li><li><a href="optimization_ex.cpp.html">Optimization</a></li><li><a href="parallel_for_ex.cpp.html">Parallel_For_Loops</a></li><li><a href="pipe_ex.cpp.html">Pipe</a></li><li><a href="pipe_ex_2.cpp.html">Pipe_2</a></li><li><a href="quantum_computing_ex.cpp.html">Quantum_Computing</a></li><li><a href="queue_ex.cpp.html">Queue</a></li><li><a href="rank_features_ex.cpp.html">Rank_Features</a></li><li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li><li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li><li><a href="running_stats_ex.cpp.html">Running_Stats</a></li><li><a href="sequence_labeler_ex.cpp.html">Sequence_Labeling</a></li><li><a href="sequence_segmenter_ex.cpp.html">Sequence_Segmentation</a></li><li><a href="sockets_ex.cpp.html">Sockets</a></li><li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li><li><a href="svm_sparse_ex.cpp.html">Sparse_Vectors</a></li><li><a href="sqlite_ex.cpp.html">SQLite</a></li><li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li><li><a href="svm_struct_ex.cpp.html">Structural_Support_Vector_Machines</a></li><li><a href="svr_ex.cpp.html">Support_Vector_Regression</a></li><li><a href="surf_ex.cpp.html">SURF</a></li><li><a href="svm_rank_ex.cpp.html">SVM-Rank</a></li><li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li><li><a href="threads_ex.cpp.html">Threads</a></li><li><a href="thread_function_ex.cpp.html">Thread_Function</a></li><li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li><li><a href="timer_ex.cpp.html">Timer</a></li><li><a href="train_object_detector.cpp.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor_ex.cpp.html">Train_Shape_Predictor</a></li><li><a href="using_custom_kernels_ex.cpp.html">Using_Custom_Kernels</a></li><li><a href="video_tracking_ex.cpp.html">Video_Object_Tracking</a></li><li><a href="webcam_face_pose_ex.cpp.html">Webcam_Face_Pose_Estimation</a></li><li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: Python</u></font></a><ul style="display:none;"><li><a href="face_detector.py.html">Face_Detector</a></li><li><a href="face_landmark_detection.py.html">Face_Landmark_Detection</a></li><li><a href="find_candidate_object_locations.py.html">find_candidate_object_locations</a></li><li><a href="max_cost_assignment.py.html">Linear_Assignment_Problems</a></li><li><a href="sequence_segmenter.py.html">Sequence_Segmenter</a></li><li><a href="svm_struct.py.html">Structural_Support_Vector_Machines</a></li><li><a href="svm_rank.py.html">SVM-Rank</a></li><li><a href="train_object_detector.py.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor.py.html">Train_Shape_Predictor</a></li><li><a href="correlation_tracker.py.html">Video_Object_Tracking</a></li></ul></li><li><a href="faq.html">FAQ</a></li><li><a href="index.html">Home</a></li><li><a href="compile.html">How to compile</a></li><li><a href="howto_contribute.html">How to contribute</a></li><li><a href="term_index.html">Index</a></li><li><a href="intro.html">Introduction</a></li><li><a href="license.html">License</a></li><li><a href="python/index.html">Python API</a></li><li><a href="books.html">Suggested Books</a></li></ul><br><b>Current Release</b><ul class="tree"><li><a href="change_log.html">Change Log</a></li><li><a href="release_notes.html">Release Notes</a></li><li>Version: 18.16</li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"><br><br><br><br><br><br><br><br><br>
+      Last Modified:<br>Jan 29, 2015<br><br></td></tr></table></td><td VALIGN="TOP" width="100%" style="border: 1px solid rgb(102,102,102);"><center><h1>Miscellaneous</h1></center><br><br><p>
+
+         This page documents library components that don't really fit in anywhere else.  
+         They all follow the same conventions as the rest of the library. 
+         </p></td><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="200" height="100%"><tr><td VALIGN="TOP"><b>Objects</b><ul class="tree"><li><a href="#bit_stream">bit_stream</a></li><li><a href="#bound_function_pointer">bound_function_pointer</a></li><li><a href="#byte_orderer">byte_orderer</a></li><li><a href="#console_progress_indicator">console_progress_indicator</a></li><li><a href="#copy_functor">copy_functor</a></li><li><a href="#default_memory_manager">default_memory_manager</a></li><li><a href="#error">error</a></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Fixed_width_integers</u></font></a><ul style="display:none;"><li><a href="#int16">int16</a></li><li><a href="#int32">int32</a></li><li><a href="#int64">int64</a></li><li><a href="#int8">int8</a></li><li><a href="#uint16">uint16</a></li><li><a href="#uint32">uint32</a></li><li><a href="#uint64">uint64</a></li><li><a href="#uint8">uint8</a></li></ul></li><li><a href="#logger">logger</a></li><li><a href="#member_function_pointer">member_function_pointer</a></li><li><a href="#memory_manager">memory_manager</a></li><li><a href="#memory_manager_global">memory_manager_global</a></li><li><a href="#memory_manager_stateless">memory_manager_stateless</a></li><li><a href="#pipe">pipe</a></li><li><a href="#std_allocator">std_allocator</a></li><li><a href="#sync_extension">sync_extension</a></li><li><a href="#timeout">timeout</a></li><li><a href="#timer">timer</a></li><li><a href="#vectorstream">vectorstream</a></li></ul><br><b>Global Functions</b><ul class="tree"><li><a href="#deserialize">deserialize</a></li><li><a href="#make_mfp">make_mfp</a></li><li><a href="#serialize">serialize</a></li><li><a href="#TIME_THIS">TIME_THIS</a></li><li><a href="#timing%20code%20blocks">timing code blocks</a></li><li><a href="#zero_extend_cast">zero_extend_cast</a></li></ul><br><b>SQLite</b><ul class="tree"><li><a href="#database">database</a></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>simple_queries</u></font></a><ul style="display:none;"><li><a href="dlib/sqlite/sqlite_tools_abstract.h.html#query_blob">query_blob</a></li><li><a href="dlib/sqlite/sqlite_tools_abstract.h.html#query_double">query_double</a></li><li><a href="dlib/sqlite/sqlite_tools_abstract.h.html#query_int64">query_int64</a></li><li><a href="dlib/sqlite/sqlite_tools_abstract.h.html#query_int">query_int</a></li><li><a href="dlib/sqlite/sqlite_tools_abstract.h.html#query_object">query_object</a></li><li><a href="dlib/sqlite/sqlite_tools_abstract.h.html#query_text">query_text</a></li></ul></li><li><a href="#statement">statement</a></li><li><a href="#transaction">transaction</a></li></ul><br><b>Other</b><ul class="tree"><li><a href="#dlib_testing_suite">dlib_testing_suite</a></li><li><a href="#MATLAB">MATLAB</a></li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"></td></tr></table></td></tr></table><a name="bit_stream"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">bit_stream</h1><BR><BR>
+            This object represents a middle man between a user and the iostream classes that allows single
+             bits to be read/written easily from/to the iostream classes         
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/bit_stream.h&gt;</tt></font></B><BR><b><a href="dlib/bit_stream/bit_stream_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/bit_stream/bit_stream_kernel_1.h.html">bit_stream_kernel_1</a>:
+                  <br> 
+                  This implementation is done by buffering single bits in the obvious way.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for bit_stream_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><br><center><h1>Extensions to bit_stream</h1></center><div class="extension"><a name="bit_stream_multi"><B><font size="5">bit_stream_multi</font></B></a><Br><BR>This extension gives a bit_stream object the ability to read/write multiple bits at a time.<BR><BR><b><a href="dlib/bit_stream/bit_stream_multi_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/bit_stream/bit_stream_multi_1.h.html">bit_stream_multi_1</a>:
+                  <br>This implementation is done by calling the read/write functions in the bit_stream kernel.<div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">multi_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for bit_stream_kernel_1 extended by bit_stream_multi_1</td></tr><tr><td valign="top"><div class="tdn">multi_1a_c</div></td><td width="100%"> 
+                  is a typedef for multi_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote></div><center></center></div></a><a name="bound_function_pointer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">bound_function_pointer</h1><BR><BR>
+            This object represents a function with all its arguments bound to specific objects. 
+
+            <p>
+               This implementation is done using type erasure and placement new.  This
+               means that it never allocates memory on the heap and instead stores everything
+               on the stack.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/bound_function_pointer.h&gt;</tt></font></B><BR><b><a href="dlib/bound_function_pointer/bound_function_pointer_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="byte_orderer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">byte_orderer</h1><BR><BR>
+            This object provides a simple type safe mechanism to convert data 
+                to and from network and host byte orders.  I.e. to convert things
+                between big and little endian byte ordering.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/byte_orderer.h&gt;</tt></font></B><BR><b><a href="dlib/byte_orderer/byte_orderer_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="console_progress_indicator"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">console_progress_indicator</h1><BR><BR>
+               This object is a tool for reporting how long a task will take
+               to complete.   
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/console_progress_indicator.h&gt;</tt></font></B><BR><b><a href="dlib/console_progress_indicator.h.html#console_progress_indicator"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="copy_functor"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">copy_functor</h1><BR><BR>
+            This is a templated function object that makes copies of something. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/algs.h&gt;</tt></font></B><BR><b><a href="dlib/algs.h.html#copy_functor"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="database"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">database</h1><BR><BR>
+                This object is a C++ wrapper around a SQLite database connection 
+                handle and therefore represents a <a href="http://www.sqlite.org">SQLite</a> database file. 
+
+               <p>
+                Note that this wrapper is targeted at SQLite Version 3.  To use it
+                you must make sure you link your application with SQLite.  However,
+               if you use CMake and dlib's default CMakeLists.txt file then it will get setup
+               automatically.  This is assuming sqlite3 is properly installed on your system.
+               On ubuntu you can get it by installing the libsqlite3-dev package.  Or you can always
+               download the <a href="http://www.sqlite.org/download.html">SQLite source</a>
+               and compile it straight into your application (download the amalgamation). 
+               </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/sqlite.h&gt;</tt></font></B><BR><b><a href="dlib/sqlite/sqlite_abstract.h.html#database"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="sqlite_ex.cpp.html">sqlite_ex.cpp</a><br><br><center></center></div></a><a name="default_memory_manager"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">default_memory_manager</h1><BR><BR>
+            This is a memory manager object which simply calls new and delete directly (i.e.
+            it doesn't really do anything).  It is the default memory manager used by most 
+            of the objects in dlib.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/algs.h&gt;</tt></font></B><BR><b><a href="dlib/algs.h.html#default_memory_manager"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="deserialize"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">deserialize</h1><BR><BR>
+            This is actually a set of overloaded functions which provide the ability to restore an object's state
+            from an input stream.  Currently all dlib container classes, non pointer C++ intrinsics, std::string, 
+            std::vector, std::map, std::set, std::complex, dlib::bigint, dlib::uint64, dlib::int64, C style arrays, and dlib::vector objects are serializable.  
+            <p>
+               You can also use serialize() and deserialize() to read/write Google protocol buffer objects.  However, 
+               note that dlib::serialize() writes additional delimiting bytes at the start of each protocol buffer message.  
+               We do this because Google protocol buffers are not 
+               <a href="https://developers.google.com/protocol-buffers/docs/techniques#streaming">self-delimiting</a>
+               on their own.  This means that you can't write more than one protocol buffer object to an output stream 
+               unless you include some kind of delimiter between the messages.  
+               So dlib takes care of this for you by prefixing each message with its length in bytes.  In particular,
+               the number of bytes is encoded as a 32bit little endian integer.  
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/serialize.h&gt;</tt></font></B><BR><b><a href="dlib/serialize.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="dlib_testing_suite"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">dlib_testing_suite</h1><BR><BR><p>
+      This library comes with a command line driven regression test suite.  All the testing code
+      is located in the dlib/test folder.  If you want to build it and test the library on your 
+      system you can use the makefile at <a href="dlib/test/makefile">dlib/test/makefile</a> (you may
+      have to edit it to make it work on your system) or use the CMake CMakeLists.txt file at 
+      <a href="dlib/test/CMakeLists.txt.html">dlib/test/CMakeLists.txt</a> to build it.  
+      </p><p>
+         What you may find more useful however is the testing framework itself.  It uses a fairly simple
+         and modular design.  Each test is contained in its own cpp file and when compiled into the
+         program it automatically shows up in the list of tests to run.  If you want to use the
+         testing framework all you need to do is add the files <a href="dlib/test/tester.h.html">dlib/test/tester.h</a>,
+         <a href="dlib/test/tester.cpp.html">dlib/test/tester.cpp</a>, and <a href="dlib/test/main.cpp.html">dlib/test/main.cpp</a>
+         to your project and then add cpp files that contain your tests (see 
+         <a href="dlib/test/example.cpp.html">dlib/test/example.cpp</a> and 
+         <a href="dlib/test/example_args.cpp.html">dlib/test/example_args.cpp</a> 
+         for some examples).
+      </p><p>
+         From the command line you can choose to run all the installed tests, enable or disable the loggers, 
+         set various logging levels, specify how many times to run the tests, or pick just one or two tests
+         to run at a time rather than the entire suite.
+         The output of the program, that is, its return value from main() is the number of
+         failed tests.  So if every test succeeds then it returns 0.
+      </p><br><br><center></center></div></a><a name="error"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">error</h1><BR><BR>
+            This is the base exception class from which all exceptions in this 
+            library inherit.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/error.h&gt;</tt></font></B><BR><b><a href="dlib/error.h.html#error"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="int16"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">int16</h1><BR><BR>
+            This is just a typedef for a 16 bit integer.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/uintn.h&gt;</tt></font></B><BR><b><a href="dlib/uintn.h.html#int16"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="int32"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">int32</h1><BR><BR>
+            This is just a typedef for a 32 bit integer.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/uintn.h&gt;</tt></font></B><BR><b><a href="dlib/uintn.h.html#int32"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="int64"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">int64</h1><BR><BR>
+            This is just a typedef for a 64 bit integer.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/uintn.h&gt;</tt></font></B><BR><b><a href="dlib/uintn.h.html#int64"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="int8"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">int8</h1><BR><BR>
+            This is just a typedef for an 8 bit integer.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/uintn.h&gt;</tt></font></B><BR><b><a href="dlib/uintn.h.html#int8"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="logger"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">logger</h1><BR><BR>
+                This component is a logging output stream in the style of the log4j
+                logger available for Java.                  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/logger.h&gt;</tt></font></B><BR><b><a href="dlib/logger/logger_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="logger_ex.cpp.html">logger_ex.cpp</a>,
+               <a href="logger_ex_2.cpp.html">logger_ex_2.cpp</a>,
+               <a href="logger_custom_output_ex.cpp.html">logger_custom_output_ex.cpp</a>,
+               <a href="pipe_ex.cpp.html">pipe_ex.cpp</a><br><br><br><center><h1>Extensions to logger</h1></center><div class="extension"><a name="config_file"><B><font size="5">config_file</font></B></a><Br><BR>This extension provides the configure_loggers_from_file() function
+               which reads a configuration file from disk that sets up all your loggers.<BR><BR><b><a href="dlib/logger/logger_config_file.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b></div><div class="extension"><a name="extra_logger_headers"><B><font size="5">extra_logger_headers</font></B></a><Br><BR>This extension contains additional logger headers you may chose to use instead of the
+                  default one. <BR><BR><b><a href="dlib/logger/extra_logger_headers.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b></div><center></center></div></a><a name="make_mfp"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">make_mfp</h1><BR><BR>
+            This function is a simple factory for creating <a href="#member_function_pointer">member_function_pointer</a>
+            objects without needing to know the necessary template arguments for the member_function_pointer.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/member_function_pointer.h&gt;</tt></font></B><BR><b><a href="dlib/member_function_pointer/make_mfp_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="MATLAB"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">MATLAB</h1><BR><BR>
+            dlib contains a tool that makes it easy to call C++ code from MATLAB.  It's
+            documented in the examples in the dlib/matlab folder.  In particular, the
+            <a href="dlib/matlab/example_mex_function.cpp.html">dlib/matlab/example_mex_function.cpp</a> and
+            <a href="dlib/matlab/example_mex_callback.cpp.html">dlib/matlab/example_mex_callback.cpp</a> examples.
+            You can also easily compile these files using CMake.  See the instructions in the README file
+            in the dlib/matlab folder for further details.
+         <br><br><center></center></div></a><a name="member_function_pointer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">member_function_pointer</h1><BR><BR>
+            This object represents a member function pointer.  It is useful because
+            instances of this object can be created without needing to know the type
+            of object whose member function we will be calling.
+            <p>
+                  The implementation of this object is done using type erasure and placement new.  This
+                  means that it never allocates memory on the heap and instead stores everything
+                  on the stack.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/member_function_pointer.h&gt;</tt></font></B><BR><b><a href="dlib/member_function_pointer/member_function_pointer_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="member_function_pointer_ex.cpp.html">member_function_pointer_ex.cpp</a><br><br><center></center></div></a><a name="memory_manager"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">memory_manager</h1><BR><BR>
+                This object represents a memory pool. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/memory_manager.h&gt;</tt></font></B><BR><b><a href="dlib/memory_manager/memory_manager_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/memory_manager/memory_manager_kernel_1.h.html">memory_manager_kernel_1</a>:
+                  <br> 
+                  This memory manager implementation allocates objects one at a time when there are
+                  allocation requests.  Then when there is a deallocate request the returning object
+                  is placed into a list of free blocks if that list has less than max_pool_size 
+                  blocks in it.  Subsequent allocation requests will be serviced by drawing from the
+                  free list whenever it isn't empty.  Array allocations, on the other hand, are not 
+                  managed at all but are passed directly on to new and delete.
+               <p>
+                  When this object's max_pool_size template parameter is set to 0 it simply calls
+                  new and delete directly and doesn't function as a memory pool.  
+               </p><div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for memory_manager_kernel_1 with a max_pool_size of 0</td></tr><tr><td valign="top"><div class="tdn">kernel_1b</div></td><td width="100%">is a typedef for memory_manager_kernel_1 with a max_pool_size of 10</td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1c</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for memory_manager_kernel_1 with a max_pool_size of 100</td></tr><tr><td valign="top"><div class="tdn">kernel_1d</div></td><td width="100%">is a typedef for memory_manager_kernel_1 with a max_pool_size of 1000</td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1e</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for memory_manager_kernel_1 with a max_pool_size of 10000</td></tr><tr><td valign="top"><div class="tdn">kernel_1f</div></td><td width="100%">is a typedef for memory_manager_kernel_1 with a max_pool_size of 100000</td></tr></table></div></blockquote><blockquote><a href="dlib/memory_manager/memory_manager_kernel_2.h.html">memory_manager_kernel_2</a>:
+                  <br> 
+                This memory manager implementation allocates memory in blocks of chunk_size*sizeof(T)
+                bytes.  All the sizeof(T) sub-blocks are kept in a linked list of free memory blocks
+                and are given out whenever an allocation request occurs.  Also, memory is not freed
+                until this object is destructed.  
+                Also note that array allocations are not managed at all but are passed directly 
+                on to new and delete.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for memory_manager_kernel_2 with a chunk_size of 10</td></tr><tr><td valign="top"><div class="tdn">kernel_2b</div></td><td width="100%">is a typedef for memory_manager_kernel_2 with a chunk_size of 100</td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2c</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for memory_manager_kernel_2 with a chunk_size of 1000</td></tr><tr><td valign="top"><div class="tdn">kernel_2d</div></td><td width="100%">is a typedef for memory_manager_kernel_2 with a chunk_size of 10000</td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2e</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for memory_manager_kernel_2 with a chunk_size of 100000</td></tr></table></div></blockquote><blockquote><a href="dlib/memory_manager/memory_manager_kernel_3.h.html">memory_manager_kernel_3</a>:
+                  <br> 
+                This memory manager implementation allocates memory in blocks of chunk_size*sizeof(T)
+                bytes.  All the sizeof(T) sub-blocks are kept in a linked list of free memory blocks
+                and are given out whenever an allocation request occurs.  Note that array allocations 
+                are managed.  So this object is just like kernel_2 but it also pools memory from 
+                array allocations (chunk_size has no effect with respect to array allocations, each array
+                is allocated one at a time). 
+                Also, memory is not freed until this object is destructed.  
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_3a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for memory_manager_kernel_3 with a chunk_size of 10</td></tr><tr><td valign="top"><div class="tdn">kernel_3b</div></td><td width="100%">is a typedef for memory_manager_kernel_3 with a chunk_size of 100</td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_3c</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for memory_manager_kernel_3 with a chunk_size of 1000</td></tr><tr><td valign="top"><div class="tdn">kernel_3d</div></td><td width="100%">is a typedef for memory_manager_kernel_3 with a chunk_size of 10000</td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_3e</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for memory_manager_kernel_3 with a chunk_size of 100000</td></tr></table></div></blockquote><center></center></div></a><a name="memory_manager_global"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">memory_manager_global</h1><BR><BR>
+                This object represents some kind of global memory manager or memory pool.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/memory_manager_global.h&gt;</tt></font></B><BR><b><a href="dlib/memory_manager_global/memory_manager_global_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/memory_manager_global/memory_manager_global_kernel_1.h.html">memory_manager_global_kernel_1</a>:
+                  <br> 
+                  This is implemented in the obvious way.  See the code for details.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for memory_manager_global_kernel_1</td></tr></table></div></blockquote><center></center></div></a><a name="memory_manager_stateless"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">memory_manager_stateless</h1><BR><BR>
+                This object represents some kind of stateless memory manager or memory pool.  
+                Stateless means that all instances (instances of the same type that is) 
+                of this object are identical and can be used interchangeably.  Note that 
+                implementations are allowed to have some shared global state such as a 
+                global memory pool.  This object is also thread safe.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/memory_manager_stateless.h&gt;</tt></font></B><BR><b><a href="dlib/memory_manager_stateless/memory_manager_stateless_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/memory_manager_stateless/memory_manager_stateless_kernel_1.h.html">memory_manager_stateless_kernel_1</a>:
+                  <br> 
+                  This implementation just calls new and delete.  So it doesn't do anything special.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for memory_manager_stateless_kernel_1</td></tr></table></div></blockquote><blockquote><a href="dlib/memory_manager_stateless/memory_manager_stateless_kernel_2.h.html">memory_manager_stateless_kernel_2</a>:
+                  <br> 
+                  This implementation uses a global instance of a <a href="#memory_manager">memory_manager</a> object
+                  guarded by a mutex as its implementation.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for memory_manager_stateless_kernel_2 that uses memory_manager_1a</td></tr><tr><td valign="top"><div class="tdn">kernel_2_1b</div></td><td width="100%">is a typedef for memory_manager_stateless_kernel_2 that uses memory_manager_1b</td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2_1c</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for memory_manager_stateless_kernel_2 that uses memory_manager_1c</td></tr><tr><td valign="top"><div class="tdn">kernel_2_1d</div></td><td width="100%">is a typedef for memory_manager_stateless_kernel_2 that uses memory_manager_1d</td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2_1e</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for memory_manager_stateless_kernel_2 that uses memory_manager_1e</td></tr><tr><td valign="top"><div class="tdn">kernel_2_1f</div></td><td width="100%">is a typedef for memory_manager_stateless_kernel_2 that uses memory_manager_1f</td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2_2a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for memory_manager_stateless_kernel_2 that uses memory_manager_2a</td></tr><tr><td valign="top"><div class="tdn">kernel_2_2b</div></td><td width="100%">is a typedef for memory_manager_stateless_kernel_2 that uses memory_manager_2b</td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2_2c</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for memory_manager_stateless_kernel_2 that uses memory_manager_2c</td></tr><tr><td valign="top"><div class="tdn">kernel_2_2d</div></td><td width="100%">is a typedef for memory_manager_stateless_kernel_2 that uses memory_manager_2d</td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2_2e</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for memory_manager_stateless_kernel_2 that uses memory_manager_2e</td></tr><tr><td valign="top"><div class="tdn">kernel_2_3a</div></td><td width="100%">is a typedef for memory_manager_stateless_kernel_2 that uses memory_manager_3a</td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2_3b</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for memory_manager_stateless_kernel_2 that uses memory_manager_3b</td></tr><tr><td valign="top"><div class="tdn">kernel_2_3c</div></td><td width="100%">is a typedef for memory_manager_stateless_kernel_2 that uses memory_manager_3c</td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2_3d</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for memory_manager_stateless_kernel_2 that uses memory_manager_3d</td></tr><tr><td valign="top"><div class="tdn">kernel_2_3e</div></td><td width="100%">is a typedef for memory_manager_stateless_kernel_2 that uses memory_manager_3e</td></tr></table></div></blockquote><center></center></div></a><a name="pipe"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">pipe</h1><BR><BR>
+                This is a first in first out queue with a fixed maximum size.  
+                It is suitable for passing objects between threads.
+
+               <p>
+                  This object is optimized for speed, therefore, it uses
+                  global <tt>swap()</tt> to create a zero-copy method for moving objects
+                  around.  For example, on a computer running Ubuntu 12.04 with
+                  a 2.67GHz Intel i7 920 CPU it is possible to pass over 4.4
+                  million <tt>std::vector&lt;int&gt;</tt> objects a second between two
+                  threads.  This is regardless of the number of ints in the <tt>std::vector</tt>
+                  objects.  In particular, this test was done with 100,000 
+                  ints in each <tt>std::vector</tt>.
+               </p><p>
+                  Finally, note that you can use the pipe as an efficient method to pass
+                  messages between two networked computers by using the <a href="network.html#bridge">bridge</a>.
+               </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/pipe.h&gt;</tt></font></B><BR><b><a href="dlib/pipe/pipe_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="pipe_ex.cpp.html">pipe_ex.cpp</a>,
+               <a href="pipe_ex_2.cpp.html">pipe_ex_2.cpp</a>,
+               <a href="bridge_ex.cpp.html">bridge_ex.cpp</a><br><br><center></center></div></a><a name="serialize"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">serialize</h1><BR><BR>
+            This is actually a set of overloaded functions which provide the ability to save an object's state
+            to an output stream.  Currently all dlib container classes, non pointer C++ intrinsics, std::string, 
+            std::vector, std::map, std::set, std::complex, dlib::bigint, dlib::uint64, dlib::int64, C style arrays, and dlib::vector objects are serializable.   
+            <p>
+               You can also use serialize() and deserialize() to read/write Google protocol buffer objects.  However, 
+               note that dlib::serialize() writes additional delimiting bytes at the start of each protocol buffer message.  
+               We do this because Google protocol buffers are not 
+               <a href="https://developers.google.com/protocol-buffers/docs/techniques#streaming">self-delimiting</a>
+               on their own.  This means that you can't write more than one protocol buffer object to an output stream 
+               unless you include some kind of delimiter between the messages.  
+               So dlib takes care of this for you by prefixing each message with its length in bytes.  In particular,
+               the number of bytes is encoded as a 32bit little endian integer.  
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/serialize.h&gt;</tt></font></B><BR><b><a href="dlib/serialize.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="statement"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">statement</h1><BR><BR>
+                This object represents a SQL statement which can be executed
+                against a <a href="#database">database</a> object.  In particular, this object is a
+                C++ wrapper around a <a href="http://www.sqlite.org">SQLite</a> prepared statement.
+               <p>
+                Note that this wrapper is targeted at SQLite Version 3.  To use it
+                you must make sure you link your application with SQLite.  
+               </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/sqlite.h&gt;</tt></font></B><BR><b><a href="dlib/sqlite/sqlite_abstract.h.html#statement"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="sqlite_ex.cpp.html">sqlite_ex.cpp</a><br><br><center></center></div></a><a name="std_allocator"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">std_allocator</h1><BR><BR>
+                This object is an implementation of an allocator that conforms to the C++ standard 
+                requirements for allocator objects.  The M template argument is one of the dlib
+                memory manager objects and this allocator implementation will do all of its memory allocations
+                using whatever dlib memory manager you supply.   
+
+                  <p>
+                Thus, using this allocator object you can use any of the dlib memory manager objects with
+                the containers in the STL or with any other object that requires an STL style allocator object.
+                  </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/std_allocator.h&gt;</tt></font></B><BR><b><a href="dlib/std_allocator.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="std_allocator_ex.cpp.html">std_allocator_ex.cpp</a><br><br><center></center></div></a><a name="sync_extension"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">sync_extension</h1><BR><BR>
+            
+                This object represents a general extension to any object.  This object gives any object which it extends 
+                an integrated rmutex and rsignaler object.  The extended object will 
+                then be able to be treated as if it was also a <a href="dlib/threads/rmutex_extension_abstract.h.html#rmutex">rmutex</a> and 
+                <a href="dlib/threads/rsignaler_extension_abstract.h.html#rsignaler">rsignaler</a>.
+   
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/sync_extension.h&gt;</tt></font></B><BR><b><a href="dlib/sync_extension/sync_extension_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/sync_extension/sync_extension_kernel_1.h.html">sync_extension_kernel_1</a>:
+                  <br> 
+                  This is implemented using a <a href="dlib/threads/rmutex_extension_abstract.h.html#rmutex">rmutex</a> 
+                  and <a href="dlib/threads/rsignaler_extension_abstract.h.html#rsignaler">rsignaler</a> in the obvious way.  
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for sync_extension_kernel_1</td></tr></table></div></blockquote><center></center></div></a><a name="timeout"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">timeout</h1><BR><BR>
+            This object provides a simple way to implement a timeout. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/timeout.h&gt;</tt></font></B><BR><b><a href="dlib/timeout/timeout_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="timer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">timer</h1><BR><BR>
+                This object represents a timer that will call a given member function 
+                repeatedly at regular intervals.
+                <p>
+                  The implementation of this object has a single master thread
+                  that does all the waiting.  This master thread creates and
+                  dispatches threads to specific timer objects when they need
+                  to run their action functions.  When a timer object isn't
+                  executing its action function then it doesn't have any thread
+                  allocated to it at all.  So it is fairly efficient.
+                </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/timer.h&gt;</tt></font></B><BR><b><a href="dlib/timer/timer_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="timer_ex.cpp.html">timer_ex.cpp</a><br><br><center></center></div></a><a name="TIME_THIS"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">TIME_THIS</h1><BR><BR><p>
+            This is a macro function for timing blocks of code.  Its form is <tt>TIME_THIS(whatever you want to time)</tt>
+            It's pretty straight forward. It just prints the time it took to std::cout.
+            </p><p>
+            There is another version of this function called TIME_THIS_TO which takes as a parameter an ostream
+            object to write its output to.  Its form is <tt>TIME_THIS_TO(what you want to time, the output stream)</tt>;
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/time_this.h&gt;</tt></font></B><BR><b><a href="dlib/time_this.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="timing%20code%20blocks"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">timing code blocks</h1><BR><BR>        
+               This is a set of set of functions for timing blocks of code.  Unlike
+               <a href="#TIME_THIS">TIME_THIS</a>, it can be used to find the cumulative
+               time spent on a block which is executed multiple times.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/timing.h&gt;</tt></font></B><BR><b><a href="dlib/timing.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="transaction"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">transaction</h1><BR><BR>
+                This object is a tool for creating exception safe
+                <a href="#database">database</a> transactions.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/sqlite.h&gt;</tt></font></B><BR><b><a href="dlib/sqlite/sqlite_tools_abstract.h.html#transaction"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="sqlite_ex.cpp.html">sqlite_ex.cpp</a><br><br><center></center></div></a><a name="uint16"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">uint16</h1><BR><BR>
+            This is just a typedef for a 16 bit unsigned integer.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/uintn.h&gt;</tt></font></B><BR><b><a href="dlib/uintn.h.html#uint16"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="uint32"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">uint32</h1><BR><BR>
+            This is just a typedef for a 32 bit unsigned integer.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/uintn.h&gt;</tt></font></B><BR><b><a href="dlib/uintn.h.html#uint32"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="uint64"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">uint64</h1><BR><BR>
+            This is just a typedef for a 64 bit unsigned integer.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/uintn.h&gt;</tt></font></B><BR><b><a href="dlib/uintn.h.html#uint64"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="uint8"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">uint8</h1><BR><BR>
+            This is just a typedef for an 8 bit unsigned integer.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/uintn.h&gt;</tt></font></B><BR><b><a href="dlib/uintn.h.html#uint8"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="vectorstream"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">vectorstream</h1><BR><BR>
+                This is an iostream object that reads and writes from an in-memory buffer.
+                It functions very much the same way as the std::stringstream object.
+                However, while the std::stringstream holds its buffer internally and it can
+                only be accessed by copying it out, the vectorstream uses an external
+                std::vector&lt;char&gt; as its buffer.  That is, it holds a reference to an
+                external vector and does not contain any internal buffers of its own.  
+
+               <p>
+                This object is useful as a slightly more efficient alternative to the
+                std::stringstream since you can avoid the overhead of copying buffer
+                contents to and from the stream.  This is particularly useful when used as
+                a source or target for <a href="#serialize">serialization</a> routines.
+               </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/vectorstream.h&gt;</tt></font></B><BR><b><a href="dlib/vectorstream/vectorstream_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="zero_extend_cast"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">zero_extend_cast</h1><BR><BR>
+            This is a global function that performs a zero extending cast
+            from one integral type to another integral type.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/uintn.h&gt;</tt></font></B><BR><b><a href="dlib/uintn.h.html#zero_extend_cast"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a></div></body></html>

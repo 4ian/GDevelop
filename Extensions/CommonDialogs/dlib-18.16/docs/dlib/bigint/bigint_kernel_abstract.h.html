@@ -1,0 +1,670 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bigint_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_BIGINT_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_BIGINT_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iosfwd<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib::relational_operators; <font color='#009900'>// defined in algs.h
+</font>
+    <font color='#0000FF'>class</font> <b><a name='bigint'></a>bigint</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                *this == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents an arbitrary precision unsigned integer
+
+                the following operators are supported:
+                operator +
+                operator +=
+                operator -
+                operator -=
+                operator *
+                operator *=
+                operator /
+                operator /=
+                operator %
+                operator %=
+                operator ==
+                operator &lt;
+                operator =
+                operator &lt;&lt; (for writing to ostreams)
+                operator &gt;&gt; (for reading from istreams)
+                operator++       // pre increment
+                operator++(int)  // post increment
+                operator--       // pre decrement
+                operator--(int)  // post decrement
+
+
+                the other comparason operators(&gt;, !=, &lt;=, and &gt;=) are 
+                available and come from the templates in dlib::relational_operators
+
+            THREAD SAFETY
+                bigint may be reference counted so it is very unthread safe.
+                use with care in a multithreaded program
+
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='bigint'></a>bigint</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is properly initialized
+            throws
+                - std::bad_alloc
+                    if this is thrown the bigint will be unusable but 
+                    will not leak memory
+        !*/</font>
+
+        <b><a name='bigint'></a>bigint</b> <font face='Lucida Console'>(</font>
+            uint32 value
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - value &lt;= (2^32)-1
+            ensures
+                - #*this is properly initialized
+                - #*this == value
+            throws
+                - std::bad_alloc
+                    if this is thrown the bigint will be unusable but 
+                    will not leak memory
+        !*/</font>
+
+        <b><a name='bigint'></a>bigint</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is properly initialized 
+                - #*this == value
+            throws
+                - std::bad_alloc
+                    if this is thrown the bigint will be unusable but 
+                    will not leak memory
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='bigint'></a>bigint</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources associated with #*this have been released
+        !*/</font>
+
+        <font color='#0000FF'>const</font> bigint <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the result of adding rhs to *this
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        bigint<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this == *this + rhs
+                - returns #*this
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect                                        
+        !*/</font>
+
+        <font color='#0000FF'>const</font> bigint <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - *this &gt;= rhs
+            ensures
+                - returns the result of subtracting rhs from *this
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        bigint<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - *this &gt;= rhs            
+            ensures
+                - #*this == *this - rhs
+                - returns #*this
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        <font color='#0000FF'>const</font> bigint <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the result of multiplying *this and rhs
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        bigint<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this == *this * rhs
+                - returns #*this
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        <font color='#0000FF'>const</font> bigint <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - rhs != 0
+            ensures
+                - returns the result of dividing *this by rhs
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        bigint<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - rhs != 0
+            ensures
+                - #*this == *this / rhs
+                - returns #*this
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        <font color='#0000FF'>const</font> bigint <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - rhs != 0
+            ensures
+                - returns the result of *this mod rhs
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        bigint<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - rhs != 0
+            ensures
+                - #*this == *this % rhs
+                - returns #*this
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if *this is less than rhs 
+                - returns false otherwise
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if *this and rhs represent the same number 
+                - returns false otherwise
+        !*/</font>
+
+        bigint<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this == rhs
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+
+        <font color='#0000FF'>friend</font> std::ostream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+            std::ostream<font color='#5555FF'>&amp;</font> out,
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - the number in *this has been written to #out as a base ten number
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect (nothing
+                    is written to out)
+        !*/</font>
+
+        <font color='#0000FF'>friend</font> std::istream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in,
+            bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - reads a number from in and puts it into #*this 
+                - if (there is no positive base ten number on the input stream ) then 
+                    - #in.fail() == true
+            throws
+                - std::bad_alloc
+                    if this function throws the value in rhs is undefined and some
+                    characters may have been read from in.  rhs is still usable though,
+                    its value is just unknown.
+        !*/</font>
+
+
+        bigint<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this == *this + 1 
+                - returns #*this
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        <font color='#0000FF'>const</font> bigint <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this == *this + 1
+                - returns *this
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        bigint<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*! 
+            requires
+                - *this != 0
+            ensures
+                - #*this == *this - 1
+                - returns #*this
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        <font color='#0000FF'>const</font> bigint <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - *this != 0
+            ensures
+                - #*this == *this - 1
+                - returns *this
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            bigint<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font> 
+
+
+        <font color='#009900'>// ------------------------------------------------------------------
+</font>        <font color='#009900'>// ----    The following functions are identical to the above   -----
+</font>        <font color='#009900'>// ----  but take uint16 as one of their arguments. They  ---
+</font>        <font color='#009900'>// ----  exist only to allow for a more efficient implementation  ---
+</font>        <font color='#009900'>// ------------------------------------------------------------------
+</font>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - lhs &lt;= 65535
+            ensures
+                - returns the result of adding rhs to lhs
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - rhs &lt;= 65535
+            ensures
+                - returns the result of adding rhs to lhs
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        bigint<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - rhs &lt;= 65535
+            ensures
+                - #*this == *this + rhs                
+                - returns #this
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - lhs &gt;= rhs 
+                - lhs &lt;= 65535
+            ensures
+                - returns the result of subtracting rhs from lhs
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - lhs &gt;= rhs 
+                - rhs &lt;= 65535
+            ensures
+                - returns the result of subtracting rhs from lhs
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        bigint<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - *this &gt;= rhs 
+                - rhs &lt;= 65535
+            ensures
+                - #*this == *this - rhs
+                - returns #*this
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - lhs &lt;= 65535
+            ensures
+                - returns the result of multiplying lhs and rhs
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - rhs &lt;= 65535
+            ensures
+                - returns the result of multiplying lhs and rhs
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        bigint<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - rhs &lt;= 65535
+            ensures
+                - #*this == *this * rhs
+                - returns #*this
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font> <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - rhs != 0 
+                - lhs &lt;= 65535
+            ensures
+                - returns the result of dividing lhs by rhs
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - rhs != 0 
+                - rhs &lt;= 65535
+            ensures
+                - returns the result of dividing lhs by rhs
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        bigint<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - rhs != 0 
+                - rhs &lt;= 65535
+            ensures
+                - #*this == *this / rhs
+                - returns #*this
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font> <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - rhs != 0 
+                - lhs &lt;= 65535
+            ensures
+                - returns the result of lhs mod rhs
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>const</font> bigint <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - rhs != 0 
+                - rhs &lt;= 65535
+            ensures
+                - returns the result of lhs mod rhs
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+        bigint<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>%</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - rhs != 0 
+                - rhs &lt;= 65535
+            ensures
+                - #*this == *this % rhs
+                - returns #*this
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - lhs &lt;= 65535
+            ensures
+                - returns true if lhs is less than rhs 
+                - returns false otherwise
+        !*/</font>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - rhs &lt;= 65535
+            ensures
+                - returns true if lhs is less than rhs 
+                - returns false otherwise
+        !*/</font>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> lhs,
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - rhs &lt;= 65535
+            ensures
+                - returns true if lhs and rhs represent the same number 
+                - returns false otherwise
+        !*/</font>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            uint16 lhs,
+            <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - lhs &lt;= 65535
+            ensures
+                - returns true if lhs and rhs represent the same number 
+                - returns false otherwise
+        !*/</font>
+
+        bigint<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            uint16 rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - rhs &lt;= 65535
+            ensures
+                - #*this == rhs
+                - returns #*this
+            throws
+                - std::bad_alloc
+                    if this function throws then it has no effect
+        !*/</font>
+
+    <b>}</b>;   
+   
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        bigint<font color='#5555FF'>&amp;</font> a, 
+        bigint<font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bigint<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        bigint<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BIGINT_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,144 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - linker_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_LINKER_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_LINKER_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads/threads_kernel_abstract.h.html'>../threads/threads_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sockets/sockets_kernel_abstract.h.html'>../sockets/sockets_kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='linker'></a>linker</b> 
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                is_running() == false
+
+               
+            WHAT THIS OBJECT REPRESENTS
+                This object represents something that takes two connections and lets
+                them talk to each other.  i.e. any incoming data from one connection is
+                passed unaltered to the other and vice versa.
+
+                note that linker objects are not swappable.
+
+                Also note that when one connection is closed shutdown_outgoing()
+                is called on the other to signal that no more data will be sent
+                in that direction on the connection.
+                (i.e. the FIN packet is effectively also forwarded by the linker object)
+
+            THREAD SAFETY
+                all member functions are thread-safe.
+
+        !*/</font>
+
+        <font color='#0000FF'>public</font>:
+
+            <b><a name='linker'></a>linker</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures 
+                    - #*this is properly initialized
+                throws
+                    - std::bad_alloc
+                    - dlib::thread_error
+            !*/</font>
+
+            <b><a name='linker'></a>linker</b> <font face='Lucida Console'>(</font>
+                connection<font color='#5555FF'>&amp;</font> a,
+                connection<font color='#5555FF'>&amp;</font> b
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures 
+                    - #*this is properly initialized
+                    - immediately invokes link(a,b); 
+                      (i.e. using this constructor is the same as creating a linker with
+                      the default constructor and then immediately invoking link() on it)
+                throws
+                    - std::bad_alloc
+                    - dlib::thread_error
+            !*/</font>
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='linker'></a>linker</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>; 
+            <font color='#009900'>/*!
+                ensures
+                    - all resources associated with *this have been released
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - #*this has its initial value 
+                    - if (is_running()) then 
+                        - the two connections being linked will be shutdown()
+                throws
+                    - std::bad_alloc
+                        if this exception is thrown then the linker object is unusable
+                        until clear() is called and succeeds and
+                        if is_running() then the connections will STILL be shutdown() 
+                        even though an exception is being thrown
+            !*/</font>
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='is_running'></a>is_running</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - returns true if link() is running else
+                    - returns false if link() is not running or has released all its 
+                      resources and is about to terminate
+                throws
+                    - std::bad_alloc
+            !*/</font>
+
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='link'></a>link</b> <font face='Lucida Console'>(</font>
+                connection<font color='#5555FF'>&amp;</font> a,
+                connection<font color='#5555FF'>&amp;</font> b
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - is_running() == false
+                ensures
+                    - all incoming data from connection a will be forwarded to b 
+                    - all incoming data from connection b will be forwarded to a 
+                    - #a and #b will have been shutdown() 
+                    - link() will block until both of the connections have ended
+                      or an error occurs                     
+                throws
+                    - std::bad_alloc
+                        link() may throw this exception and if it does then the object 
+                        will be unusable until clear() is called and succeeds and
+                        connections a and b will be shutdown()
+                    - dlib::socket_error
+                        link() will throw a this exception if one of the connections
+                        returns an error value (being shutdown is not an error). 
+                        If this happens then the linker object will be cleared and 
+                        have its initial value.  note that if this happens then the 
+                        connections being linked will be shutdown()
+                    - dlib::thread_error
+                        link() will throw a this exception if there is a problem 
+                        creating new threads.  Or it may throw this exception if there
+                        is a problem creating threading objects. If this happens 
+                        then the linker object will be cleared and have its initial value.
+                        note that if this happens then the connections being linked will
+                        be shutdown().
+            !*/</font>
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='linker'></a>linker</b><font face='Lucida Console'>(</font>linker<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>            linker<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>linker<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LINKER_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,37 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - integrate_function_adapt_simpson_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013 Steve Taylor (steve98654@gmail.com)
+</font><font color='#009900'>// License: Boost Software License  See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_INTEGRATE_FUNCTION_ADAPT_SIMPSON_ABSTRACTh_
+<font color='#0000FF'>#ifdef</font> DLIB_INTEGRATE_FUNCTION_ADAPT_SIMPSON_ABSTRACTh_
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> funct<font color='#5555FF'>&gt;</font>
+    T <b><a name='integrate_function_adapt_simp'></a>integrate_function_adapt_simp</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        T a, 
+        T b, 
+        T tol <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires 
+            - b &gt; a
+            - tol &gt; 0
+            - T should be either float, double, or long double
+            - The expression f(a) should be a valid expression that evaluates to a T.
+              I.e. f() should be a real valued function of a single variable.
+        ensures
+            - returns an approximation of the integral of f over the domain [a,b] using the
+              adaptive Simpson method outlined in Gander, W. and W. Gautshi, "Adaptive
+              Quadrature -- Revisited" BIT, Vol. 40, (2000), pp.84-101
+            - tol is a tolerance parameter that determines the overall accuracy of
+              approximated integral.  We suggest a default value of 1e-10 for tol. 
+    !*/</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_INTEGRATE_FUNCTION_ADAPT_SIMPSON_ABSTRACTh_
+</font>
+
+</pre></body></html>

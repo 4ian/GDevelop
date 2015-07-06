@@ -1,0 +1,317 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html xmlns:gcse="googleCustomSearch"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="shortcut icon" href="dlib-icon.ico"><meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I="><meta name="google-site-verification" content="DGSSJMKDomaDaDTIRJ8jDkv0YMx9Cz7OESbXHjjr6Jw"><title>dlib C++ Library
+   - Change Log</title><script language="JavaScript">
+
+// ---------------------------------------------
+// --- Name:    Easy DHTML Treeview           --
+// --- Author:  D.D. de Kerf                  --
+// --- Version: 0.2          Date: 13-6-2001  --
+// ---------------------------------------------
+function Toggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "minus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "plus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+function BigToggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigminus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigplus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+</script><style type="text/css">
+   body {margin:0px;}
+   pre {margin:0px;}
+
+   ul.tree  li { list-style: none;  margin-left:10px;} 
+   ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
+   ul.tree  li ul { margin-left:10px; padding:0px; }
+
+   li#term { list-style: none; }
+
+   div.component {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      padding: 0.7em;
+   }
+
+   div.question {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      margin-bottom: 90%;
+      padding: 0.7em;
+   }
+
+   div.function {
+      background-color:white; 
+      border: 2px solid rgb(102,102,255); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.class {
+      background-color:white; 
+      border: 2px solid rgb(255,102,102); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.extension {
+      background-color:#FDFDFD; 
+      border: 1px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.0em;
+      padding: 0.7em;
+   }
+
+   div.logb {
+      text-align:left;
+      padding: 0.0em;
+      float: left;
+      background-color:#c0c0c0; 
+      border: double ; 
+      margin: 0.5em;
+   }
+
+   div.name {
+      float: left;
+   }
+   div.line1 {
+      float:left;
+      width:100%;
+      background-color:#dfdfdf; 
+   }
+   div.line2 {
+      float:left;
+      width:100%;
+   }
+   div.inc {
+      float: right;
+   }
+
+
+   .code_box
+   {
+      color: black;
+      margin: 1em 0.25in;
+      padding: 0.5em;
+      background: rgb(240,240,240);
+      border-top: black dotted 1px;
+      border-left: black dotted 1px;
+      border-right: black solid 2px;
+      border-bottom: black solid 2px;
+   }
+
+
+
+   .bdotted {border-bottom: 1px dotted}
+   .bdashed {border-bottom: 1px dashed}
+   .bsolid {border-bottom: 1px solid}
+   .bdouble {border-bottom: 1px double}
+   .bgroove {border-bottom: 1px groove}
+   .bridge {border-bottom: 1px ridge}
+   .binset {border-bottom: 1px inset}
+   .boutset {border-bottom: 1px outset}
+
+   div.row1 {
+      background-color:#dfdfdf; 
+   }
+   div.row2 {
+      background-color:#f2f2f2; 
+   }
+
+   div.typedefs {
+      margin-left: 1.5em;
+      margin-top: 0.2em;
+      border: 1px dotted;
+      width: 52em;
+   }
+
+   div.tdn {
+      width: 10em;
+   }
+
+   .fullhr {
+      clear: both;
+   }
+
+   body {
+      text-align: center;
+   }
+
+   div.entire_page_header {
+      width:62.5em;  
+      text-align: left;
+      margin-top: 0.4em;
+      margin-left: auto;
+      margin-right: auto;
+   }
+   div.entire_page {
+      width:62.5em;  
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      clear:both;
+   }
+</style></head><body bgcolor="#EDF3EE"><a name="top"></a><div class="entire_page_header"><a href="http://dlib.net"><img src="dlib-logo.png"></a></div><div class="entire_page"><table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px"><tr height="100%"><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="145" height="100%"><tr><td VALIGN="TOP"><b>The Library</b><ul class="tree"><li><a href="algorithms.html">Algorithms</a></li><li><a href="api.html">API Wrappers</a></li><li><a href="bayes.html">Bayesian Nets</a></li><li><a href="compression.html">Compression</a></li><li><a href="containers.html">Containers</a></li><li><a href="graph_tools.html">Graph Tools</a></li><li><a href="imaging.html">Image Processing</a></li><li><a href="linear_algebra.html">Linear Algebra</a></li><li><a href="ml.html">Machine Learning</a></li><li><a href="metaprogramming.html">Metaprogramming</a></li><li><a href="other.html">Miscellaneous</a></li><li><a href="network.html">Networking</a></li><li><a href="optimization.html">Optimization</a></li><li><a href="parsing.html">Parsing</a></li></ul><br><b>Help/Info</b><ul class="tree"><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: C++</u></font></a><ul style="display:none;"><li><a href="3d_point_cloud_ex.cpp.html">3D_Point_Cloud</a></li><li><a href="assignment_learning_ex.cpp.html">Assignment_Learning</a></li><li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li><li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li><li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li><li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li><li><a href="bridge_ex.cpp.html">Bridge</a></li><li><a href="bsp_ex.cpp.html">BSP</a></li><li><a href="svm_c_ex.cpp.html">C-Support_Vector_Machine</a></li><li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li><li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li><li><a href="config_reader_ex.cpp.html">Config_File_Reader</a></li><li><a href="custom_trainer_ex.cpp.html">Custom_Trainers</a></li><li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li><li><a href="empirical_kernel_map_ex.cpp.html">Empirical_Kernel_Map</a></li><li><a href="face_detection_ex.cpp.html">Face_Detection</a></li><li><a href="face_landmark_detection_ex.cpp.html">Face_Landmark_Detection</a></li><li><a href="fhog_ex.cpp.html">FHOG_Feature_Extraction</a></li><li><a href="fhog_object_detector_ex.cpp.html">FHOG_Object_Detection</a></li><li><a href="graph_labeling_ex.cpp.html">Graph_Labeling</a></li><li><a href="gui_api_ex.cpp.html">GUI</a></li><li><a href="hough_transform_ex.cpp.html">Hough_Transform</a></li><li><a href="server_http_ex.cpp.html">HTTP_Server</a></li><li><a href="image_ex.cpp.html">Image</a></li><li><a href="iosockstream_ex.cpp.html">IO Socket Streams</a></li><li><a href="server_iostream_ex.cpp.html">IO Streams Server</a></li><li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li><li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li><li><a href="krr_regression_ex.cpp.html">Kernel_Ridge_Regression</a></li><li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li><li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li><li><a href="krr_classification_ex.cpp.html">KRR_Classification</a></li><li><a href="learning_to_track_ex.cpp.html">Learning_to_Track</a></li><li><a href="max_cost_assignment_ex.cpp.html">Linear_Assignment_Problems</a></li><li><a href="linear_manifold_regularizer_ex.cpp.html">Linear_Manifold_Regularizer</a></li><li><a href="mpc_ex.cpp.html">Linear_Model_Predictive_Control</a></li><li><a href="logger_ex.cpp.html">Logger</a></li><li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li><li><a href="logger_custom_output_ex.cpp.html">Logger_Custom_Output</a></li><li><a href="matrix_ex.cpp.html">Matrix</a></li><li><a href="matrix_expressions_ex.cpp.html">Matrix_Expressions</a></li><li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li><li><a href="model_selection_ex.cpp.html">Model_Selection</a></li><li><a href="multiclass_classification_ex.cpp.html">Multiclass_Classification</a></li><li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li><li><a href="mlp_ex.cpp.html">Neural_Network</a></li><li><a href="least_squares_ex.cpp.html">Non-Linear Least Squares</a></li><li><a href="svm_ex.cpp.html">Nu-Support_Vector_Machine</a></li><li><a href="integrate_function_adapt_simp_ex.cpp.html">Numerical_Integration</a></li><li><a href="object_detector_ex.cpp.html">Object_Detector</a></li><li><a href="object_detector_advanced_ex.cpp.html">Object_Detector_Advanced</a></li><li><a href="one_class_classifiers_ex.cpp.html">One_Class_Classifiers</a></li><li><a href="svm_pegasos_ex.cpp.html">Online_SVM</a></li><li><a href="optimization_ex.cpp.html">Optimization</a></li><li><a href="parallel_for_ex.cpp.html">Parallel_For_Loops</a></li><li><a href="pipe_ex.cpp.html">Pipe</a></li><li><a href="pipe_ex_2.cpp.html">Pipe_2</a></li><li><a href="quantum_computing_ex.cpp.html">Quantum_Computing</a></li><li><a href="queue_ex.cpp.html">Queue</a></li><li><a href="rank_features_ex.cpp.html">Rank_Features</a></li><li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li><li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li><li><a href="running_stats_ex.cpp.html">Running_Stats</a></li><li><a href="sequence_labeler_ex.cpp.html">Sequence_Labeling</a></li><li><a href="sequence_segmenter_ex.cpp.html">Sequence_Segmentation</a></li><li><a href="sockets_ex.cpp.html">Sockets</a></li><li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li><li><a href="svm_sparse_ex.cpp.html">Sparse_Vectors</a></li><li><a href="sqlite_ex.cpp.html">SQLite</a></li><li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li><li><a href="svm_struct_ex.cpp.html">Structural_Support_Vector_Machines</a></li><li><a href="svr_ex.cpp.html">Support_Vector_Regression</a></li><li><a href="surf_ex.cpp.html">SURF</a></li><li><a href="svm_rank_ex.cpp.html">SVM-Rank</a></li><li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li><li><a href="threads_ex.cpp.html">Threads</a></li><li><a href="thread_function_ex.cpp.html">Thread_Function</a></li><li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li><li><a href="timer_ex.cpp.html">Timer</a></li><li><a href="train_object_detector.cpp.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor_ex.cpp.html">Train_Shape_Predictor</a></li><li><a href="using_custom_kernels_ex.cpp.html">Using_Custom_Kernels</a></li><li><a href="video_tracking_ex.cpp.html">Video_Object_Tracking</a></li><li><a href="webcam_face_pose_ex.cpp.html">Webcam_Face_Pose_Estimation</a></li><li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: Python</u></font></a><ul style="display:none;"><li><a href="face_detector.py.html">Face_Detector</a></li><li><a href="face_landmark_detection.py.html">Face_Landmark_Detection</a></li><li><a href="find_candidate_object_locations.py.html">find_candidate_object_locations</a></li><li><a href="max_cost_assignment.py.html">Linear_Assignment_Problems</a></li><li><a href="sequence_segmenter.py.html">Sequence_Segmenter</a></li><li><a href="svm_struct.py.html">Structural_Support_Vector_Machines</a></li><li><a href="svm_rank.py.html">SVM-Rank</a></li><li><a href="train_object_detector.py.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor.py.html">Train_Shape_Predictor</a></li><li><a href="correlation_tracker.py.html">Video_Object_Tracking</a></li></ul></li><li><a href="faq.html">FAQ</a></li><li><a href="index.html">Home</a></li><li><a href="compile.html">How to compile</a></li><li><a href="howto_contribute.html">How to contribute</a></li><li><a href="term_index.html">Index</a></li><li><a href="intro.html">Introduction</a></li><li><a href="license.html">License</a></li><li><a href="python/index.html">Python API</a></li><li><a href="books.html">Suggested Books</a></li></ul><br><b>Current Release</b><ul class="tree"><li><a href="change_log.html">Change Log</a></li><li><a href="release_notes.html">Release Notes</a></li><li>Version: 18.16</li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"><br><br><br><br><br><br><br><br><br>
+      Last Modified:<br>Jun 03, 2015<br><br></td></tr></table></td><td VALIGN="TOP" width="100%" style="border: 1px solid rgb(102,102,102);"><center><h1>Change Log</h1></center><u>Revision</u>: 23126937a8fcf180<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: Jun 03, 2015
+         (13:33:55 UTC)
+      <br><p style="margin:0.4em">A minor change to avoid a compiler warning</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">dlib/gui_widgets/widgets.cpp</div></div><hr class="fullhr"><u>Revision</u>: 7d7177e01aedbc4d<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: Jun 03, 2015
+         (03:53:43 UTC)
+      <br><p style="margin:0.4em">Improved the depth testing for the perspective_display.</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">dlib/gui_widgets/widgets.cpp</div><div class="row1">dlib/gui_widgets/widgets.h</div></div><hr class="fullhr"><u>Revision</u>: 28abe009aa5d735e<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: Jun 02, 2015
+         (14:06:29 UTC)
+      <br><p style="margin:0.4em">Made the camera_transform output the point's distance.</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">dlib/geometry/point_transforms.h</div><div class="row1">dlib/geometry/point_transforms_abstract.h</div></div><hr class="fullhr"><u>Revision</u>: ebb86f164b019b01<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: Jun 02, 2015
+         (13:47:46 UTC)
+      <br><p style="margin:0.4em">fleshed out this example with comments</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">examples/mpc_ex.cpp</div></div><hr class="fullhr"><u>Revision</u>: 8ccb4f0960025452<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: Jun 02, 2015
+         (04:12:28 UTC)
+      <br><p style="margin:0.4em">Made the solver use an SMO type iteration in the beginning before
+switching to projected gradient steps.</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">dlib/control/mpc.h</div></div><hr class="fullhr"><u>Revision</u>: c3dc175bb53d89ab<br><u>Author</u>: <a href="mailto:fabiovmp@gmail.com">Fabio Perez</a><br><u>Date</u>: May 30, 2015
+         (19:00:36 UTC)
+      <br><p style="margin:0.4em">Revise help message</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">examples/train_object_detector.cpp</div></div><hr class="fullhr"><u>Revision</u>: 3235c08650b3b29e<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: May 30, 2015
+         (15:04:50 UTC)
+      <br><p style="margin:0.4em">Added initial version of model predictive control example program.</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">examples/CMakeLists.txt</div></div><div class="logb"><div class="bsolid"><b><font color="blue">Added</font></b></div><div class="row2">examples/mpc_ex.cpp</div></div><hr class="fullhr"><u>Revision</u>: 48f7630ad62694f8<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: May 30, 2015
+         (15:03:06 UTC)
+      <br><p style="margin:0.4em">Fixed compile time bug and also made it so you can set all the targets at once.</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">dlib/control/mpc.h</div><div class="row1">dlib/control/mpc_abstract.h</div></div><hr class="fullhr"><u>Revision</u>: 8689a8d7332eb19f<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: May 30, 2015
+         (03:05:11 UTC)
+      <br><p style="margin:0.4em">Made cmake check which version of python is currently in the user's path
+and try to link against that one rather than whatever might be installed
+system wide.</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">dlib/add_python_module</div></div><hr class="fullhr"><u>Revision</u>: 90665d94d4161f65<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: May 29, 2015
+         (14:00:42 UTC)
+      <br><p style="margin:0.4em">Cleaned up this code, filled out spec, added asserts.</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">dlib/control/mpc.h</div><div class="row1">dlib/control/mpc_abstract.h</div></div><hr class="fullhr"><u>Revision</u>: ce6f655678a8c3a1<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: May 27, 2015
+         (14:04:04 UTC)
+      <br><p style="margin:0.4em">more cleanup of the spec</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">dlib/control/mpc.h</div><div class="row1">dlib/control/mpc_abstract.h</div></div><hr class="fullhr"><u>Revision</u>: 7ae267ba9c239473<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: May 27, 2015
+         (13:38:39 UTC)
+      <br><p style="margin:0.4em">Added tests for the MPC tool</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">dlib/control/mpc.h</div><div class="row1">dlib/test/CMakeLists.txt</div><div class="row2">dlib/test/makefile</div></div><div class="logb"><div class="bsolid"><b><font color="blue">Added</font></b></div><div class="row2">dlib/test/mpc.cpp</div></div><hr class="fullhr"><u>Revision</u>: f1b5644487908634<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: May 27, 2015
+         (04:10:29 UTC)
+      <br><p style="margin:0.4em">Added initial version of linear mpc</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">dlib/control.h</div></div><div class="logb"><div class="bsolid"><b><font color="blue">Added</font></b></div><div class="row2">dlib/control/mpc.h</div><div class="row1">dlib/control/mpc_abstract.h</div></div><hr class="fullhr"><u>Revision</u>: f7d8ab94f249d249<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: May 25, 2015
+         (10:43:04 UTC)
+      <br><p style="margin:0.4em">Added messages saying how to install Boost on UNIX systems if it isn't
+installed already.</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">dlib/add_python_module</div></div><hr class="fullhr"><u>Revision</u>: c8611bf0f879f809<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: May 25, 2015
+         (10:32:37 UTC)
+      <br><p style="margin:0.4em">minor change to avoid compiler warning</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">tools/python/src/shape_predictor.cpp</div></div><hr class="fullhr"><u>Revision</u>: 7d215ec3a772e652<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: May 25, 2015
+         (09:39:53 UTC)
+      <br><p style="margin:0.4em">Fixed a bug where the last column of data in a file wasn't loaded on
+some OS X machines when load_libsvm_formatted_data() was called.</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">dlib/data_io/libsvm_io.h</div></div><hr class="fullhr"><u>Revision</u>: 47aa9d3725c19df1<br><u>Author</u>: <a href="mailto:patricksnape@gmail.com">Patrick Snape</a><br><u>Date</u>: May 20, 2015
+         (13:25:28 UTC)
+      <br><p style="margin:0.4em">Add example of python correlation tracker
+
+This replicates the c++ example.</p><div class="logb"><div class="bsolid"><b><font color="blue">Added</font></b></div><div class="row2">python_examples/correlation_tracker.py</div></div><hr class="fullhr"><u>Revision</u>: c582796a37c8b302<br><u>Author</u>: <a href="mailto:patricksnape@gmail.com">Patrick Snape</a><br><u>Date</u>: May 20, 2015
+         (13:24:42 UTC)
+      <br><p style="margin:0.4em">Add overlay overload for drectangle
+
+This is useful for visualizing the tracking results.</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">tools/python/src/gui.cpp</div></div><hr class="fullhr"><u>Revision</u>: 1e01940b9d1b090d<br><u>Author</u>: <a href="mailto:patricksnape@gmail.com">Patrick Snape</a><br><u>Date</u>: May 20, 2015
+         (12:52:29 UTC)
+      <br><p style="margin:0.4em">Update docs on corr tracker, return side lobe
+
+Added the missing documentation for the correlation tracker.
+Didn't realise that the tracker returned the side lobe ratio,
+so fixed the API to return it properly.</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">tools/python/src/correlation_tracker.cpp</div></div><hr class="fullhr"><u>Revision</u>: 608620bacb43072a<br><u>Author</u>: <a href="mailto:patricksnape@gmail.com">Patrick Snape</a><br><u>Date</u>: May 20, 2015
+         (12:29:14 UTC)
+      <br><p style="margin:0.4em">Add an API for the correlation tracker
+
+This aids an API for the correlation based tracker that Davis
+recently added to Dlib. I've made sure to allow overrides for
+passing normal rectangles rather than drectangles (which isn't
+currently supported in the Dlib C++ API). This is mostly
+because I imagine people might initialize the tracking using
+something like a bounding box from a detector (e.g.
+load_frontal_face_detector).</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">tools/python/CMakeLists.txt</div><div class="row1">tools/python/src/dlib.cpp</div></div><div class="logb"><div class="bsolid"><b><font color="blue">Added</font></b></div><div class="row2">tools/python/src/correlation_tracker.cpp</div></div><hr class="fullhr"><u>Revision</u>: 31cc62914027fc76<br><u>Author</u>: <a href="mailto:patricksnape@gmail.com">Patrick Snape</a><br><u>Date</u>: May 20, 2015
+         (11:46:01 UTC)
+      <br><p style="margin:0.4em">Preparing for correlation tracker - add drectangle
+
+The correlation tracker deals with the drectangle
+(double rectangle) class which currently isn't wrapped. Therefore,
+I add the drectangle class and refactor rectangles into their
+own file. I also added a load of methods on rectangle that might
+be useful such as intersection/contains/area etc.</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">tools/python/CMakeLists.txt</div><div class="row1">tools/python/src/dlib.cpp</div><div class="row2">tools/python/src/object_detection.cpp</div></div><div class="logb"><div class="bsolid"><b><font color="blue">Added</font></b></div><div class="row2">tools/python/src/rectangles.cpp</div></div><hr class="fullhr"><u>Revision</u>: d637958fc4e177aa<br><u>Author</u>: <a href="mailto:patricksnape@gmail.com">Patrick Snape</a><br><u>Date</u>: May 20, 2015
+         (10:37:33 UTC)
+      <br><p style="margin:0.4em">Incorrect IFDEF name for shape predictor
+
+The word detector didn't make much sense!</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">tools/python/src/shape_predictor.h</div></div><hr class="fullhr"><u>Revision</u>: baa8393d923f263f<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: May 05, 2015
+         (14:01:52 UTC)
+      <br><p style="margin:0.4em">Added a max iterations option to the sequence labeling and segmentation
+learning tools.</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">dlib/svm/structural_sequence_labeling_trainer.h</div><div class="row1">dlib/svm/structural_sequence_labeling_trainer_abstract.h</div><div class="row2">dlib/svm/structural_sequence_segmentation_trainer.h</div><div class="row1">dlib/svm/structural_sequence_segmentation_trainer_abstract.h</div></div><hr class="fullhr"><u>Revision</u>: cd3a20837ae2ea18<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: May 05, 2015
+         (13:54:04 UTC)
+      <br><p style="margin:0.4em">Added a max iterations option to the svm_multiclass_linear_trainer.</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">dlib/svm/svm_multiclass_linear_trainer.h</div><div class="row1">dlib/svm/svm_multiclass_linear_trainer_abstract.h</div></div><hr class="fullhr"><u>Revision</u>: c7b9646c27fd7922<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: May 05, 2015
+         (13:46:56 UTC)
+      <br><p style="margin:0.4em">Added an optional hard limit on the number of iterations in the
+structural SVM solver.</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">dlib/svm/structural_svm_distributed.h</div><div class="row1">dlib/svm/structural_svm_distributed_abstract.h</div><div class="row2">dlib/svm/structural_svm_problem.h</div><div class="row1">dlib/svm/structural_svm_problem_abstract.h</div></div><hr class="fullhr"><u>Revision</u>: 29fc1bf2291b0cfd<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: May 05, 2015
+         (04:15:12 UTC)
+      <br><p style="margin:0.4em">fixed typo in assert message</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">dlib/optimization/optimization_solve_qp_using_smo.h</div></div><hr class="fullhr"><u>Revision</u>: 381955c89c121b5d<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: May 03, 2015
+         (10:30:18 UTC)
+      <br><p style="margin:0.4em">Added checks to avoid redefining #defines that already exist.</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">dlib/simd/simd_check.h</div></div><hr class="fullhr"><u>Revision</u>: 019711d780a4e9c8<br><u>Author</u>: <a href="mailto:davis@dlib.net">Davis King</a><br><u>Date</u>: Apr 30, 2015
+         (04:25:08 UTC)
+      <br><p style="margin:0.4em">Fixed a bug in the eigenvalue_decomposition which could occur when
+a symmetric matrix was used along with the LAPACK bindings.</p><div class="logb"><div class="bsolid"><b><font color="black">Modified</font></b></div><div class="row2">dlib/matrix/matrix_eigenvalue.h</div><div class="row1">dlib/test/matrix_eig.cpp</div></div><hr class="fullhr"><br><center><a href="old_change_log.html">Old Change Logs</a></center><br></td></tr></table></div></body></html>

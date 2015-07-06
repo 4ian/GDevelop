@@ -1,0 +1,92 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - stack_trace.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_STACK_TRACE_CPp_
+<font color='#0000FF'>#define</font> DLIB_STACK_TRACE_CPp_
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>DLIB_ENABLE_STACK_TRACE<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>defined<font face='Lucida Console'>(</font>NO_MAKEFILE<font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstring<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='stack_trace.h.html'>stack_trace.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads.h.html'>threads.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='stack.h.html'>stack.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='memory_manager.h.html'>memory_manager.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> 
+    <b>{</b>
+        <font color='#0000FF'>struct</font> <b><a name='stack_tracer_data'></a>stack_tracer_data</b>
+        <b>{</b>
+            <b><a name='stack_tracer_data'></a>stack_tracer_data</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> :  funct_name<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                 file_name<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                 line_number<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b><b>}</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> funct_name;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> file_name;
+            <font color='#0000FF'><u>int</u></font> line_number;
+        <b>}</b>;
+
+        thread_specific_data<font color='#5555FF'>&lt;</font>stack<font color='#5555FF'>&lt;</font>stack_tracer_data,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_1a<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_dlib_stack_trace_stack'></a>get_dlib_stack_trace_stack</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>static</font> thread_specific_data<font color='#5555FF'>&lt;</font>stack<font color='#5555FF'>&lt;</font>stack_tracer_data,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_1a<font color='#5555FF'>&gt;</font> a;
+            <font color='#0000FF'>return</font> a;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    stack_tracer::
+    <b><a name='stack_tracer'></a>stack_tracer</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> funct_name,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> file_name,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> line_number
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        stack_tracer_data data;
+        data.funct_name <font color='#5555FF'>=</font> funct_name;
+        data.file_name <font color='#5555FF'>=</font> file_name;
+        data.line_number <font color='#5555FF'>=</font> line_number;
+
+        <font color='#009900'>// pop the info onto the function stack trace
+</font>        <font color='#BB00BB'>get_dlib_stack_trace_stack</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>data</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>push</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    stack_tracer::
+    ~<b><a name='stack_tracer'></a>stack_tracer</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        stack_tracer_data temp;
+        <font color='#BB00BB'>get_dlib_stack_trace_stack</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>data</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>pop</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> std::string <b><a name='get_stack_trace'></a>get_stack_trace</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::ostringstream sout;
+        <font color='#BB00BB'>get_dlib_stack_trace_stack</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>data</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>get_dlib_stack_trace_stack</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>data</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            stack_tracer_data data <font color='#5555FF'>=</font> <font color='#BB00BB'>get_dlib_stack_trace_stack</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>data</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> data.file_name <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>:</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> data.line_number <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> data.funct_name <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>";
+        <b>}</b>
+        <font color='#0000FF'>return</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_STACK_TRACE_CPp_
+</font>
+
+
+</pre></body></html>

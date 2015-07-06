@@ -1,0 +1,96 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - threads_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font>
+<font color='#009900'>/*
+
+    This is an example illustrating the use of the threading api from the dlib
+    C++ Library.
+
+
+    This is a very simple example.  It makes some threads and just waits for
+    them to terminate.  It should be noted that this example shows how to use
+    the lowest level of the dlib threading API.  Often, other higher level tools
+    are more appropriate.  For examples of higher level tools see the
+    documentation on the pipe, thread_pool, thread_function, or 
+    threaded_object.
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>threads.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>misc_api.h<font color='#5555FF'>&gt;</font>  <font color='#009900'>// for dlib::sleep
+</font>
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#0000FF'><u>int</u></font> thread_count <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+dlib::mutex count_mutex; <font color='#009900'>// This is a mutex we will use to guard the thread_count variable.  Note that the mutex doesn't know
+</font>                   <font color='#009900'>// anything about the thread_count variable.  Only our usage of a mutex determines what it guards.  
+</font>                   <font color='#009900'>// In this case we are going to make sure this mutex is always locked before we touch the
+</font>                   <font color='#009900'>// thread_count variable.
+</font>
+signaler <b><a name='count_signaler'></a>count_signaler</b><font face='Lucida Console'>(</font>count_mutex<font face='Lucida Console'>)</font>;  <font color='#009900'>// This is a signaler we will use to signal when
+</font>                                       <font color='#009900'>// the thread_count variable is changed.  Note that it is
+</font>                                       <font color='#009900'>// associated with the count_mutex.  This means that
+</font>                                       <font color='#009900'>// when you call count_signaler.wait() it will automatically 
+</font>                                       <font color='#009900'>// unlock count_mutex for you. 
+</font>
+
+<font color='#0000FF'><u>void</u></font> <b><a name='thread'></a>thread</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// just sleep for a second
+</font>    dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Now signal that this thread is ending.  First we should get a lock on the
+</font>    <font color='#009900'>// count_mutex so we can safely mess with thread_count.  A convenient way to do this
+</font>    <font color='#009900'>// is to use an auto_mutex object.  Its constructor takes a mutex object and locks
+</font>    <font color='#009900'>// it right away, it then unlocks the mutex when the auto_mutex object is destructed.
+</font>    <font color='#009900'>// Note that this happens even if an exception is thrown.  So it ensures that you 
+</font>    <font color='#009900'>// don't somehow quit your function without unlocking your mutex.
+</font>    auto_mutex <font color='#BB00BB'>locker</font><font face='Lucida Console'>(</font>count_mutex<font face='Lucida Console'>)</font>;
+    <font color='#5555FF'>-</font><font color='#5555FF'>-</font>thread_count;
+    <font color='#009900'>// Now we signal this change.  This will cause one thread that is currently waiting
+</font>    <font color='#009900'>// on a call to count_signaler.wait() to unblock.  
+</font>    count_signaler.<font color='#BB00BB'>signal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// At the end of this function locker goes out of scope and gets destructed, thus
+</font>    <font color='#009900'>// unlocking count_mutex for us.
+</font><b>}</b>
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Create some threads</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> thread_count; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// Create some threads.  This 0 we are passing in here is the argument that gets 
+</font>        <font color='#009900'>// passed to the thread function (a void pointer) but we aren't using it in this 
+</font>        <font color='#009900'>// example program so i'm just using 0.
+</font>        <font color='#BB00BB'>create_new_thread</font><font face='Lucida Console'>(</font>thread,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Done creating threads, now we wait for them to end</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+    <font color='#009900'>// Again we use an auto_mutex to get a lock.  We don't have to do it this way
+</font>    <font color='#009900'>// but it is convenient.  Also note that we can name the auto_mutex object anything. 
+</font>    auto_mutex <font color='#BB00BB'>some_random_unused_name</font><font face='Lucida Console'>(</font>count_mutex<font face='Lucida Console'>)</font>;
+    
+    <font color='#009900'>// Now we wait in a loop for thread_count to be 0.  Note that it is important to do this in a
+</font>    <font color='#009900'>// loop because it is possible to get spurious wakeups from calls to wait() on some 
+</font>    <font color='#009900'>// platforms.  So this guards against that and it also makes the code easy to understand.
+</font>    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>thread_count <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        count_signaler.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#009900'>// This puts this thread to sleep until we get a signal to look at the 
+</font>                               <font color='#009900'>// thread_count variable.  It also unlocks the count_mutex before it 
+</font>                               <font color='#009900'>// goes to sleep and then relocks it when it wakes back up.  Again,
+</font>                               <font color='#009900'>// note that it is possible for wait() to return even if no one signals you. 
+</font>                               <font color='#009900'>// This is just weird junk you have to deal with on some platforms.  So 
+</font>                               <font color='#009900'>// don't try to be clever and write code that depends on the number of 
+</font>                               <font color='#009900'>// times wait() returns because it won't always work.
+</font>
+
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>All threads done, ending program</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+<b>}</b>
+
+
+
+</pre></body></html>

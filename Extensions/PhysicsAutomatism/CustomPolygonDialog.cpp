@@ -7,11 +7,11 @@ This project is released under the MIT License.*/
  * This file was originally written by Victor Levasseur.
  */
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "CustomPolygonDialog.h"
 
 #include "PhysicsAutomatism.h"
 
-#if defined(GD_IDE_ONLY)
 
 //(*InternalHeaders(CustomPolygonDialog)
 #include <wx/font.h>
@@ -515,6 +515,4 @@ void CustomPolygonDialog::OnButton4Click(wxCommandEvent& event)
     pointsEdit->SetValue(wxString(PhysicsAutomatism::GetStringFromCoordsVector(pointList)));
 }
 
-
 #endif
-

@@ -17,7 +17,9 @@ KeyboardExtension::KeyboardExtension()
 
     #if defined(GD_IDE_ONLY)
     GetAllConditions()["KeyPressed"].SetFunctionName("IsKeyPressed").SetIncludeFile("GDCpp/BuiltinExtensions/KeyboardTools.h");
+    GetAllConditions()["KeyReleased"].SetFunctionName("WasKeyReleased").SetIncludeFile("GDCpp/BuiltinExtensions/KeyboardTools.h");
     GetAllConditions()["KeyFromTextPressed"].SetFunctionName("IsKeyPressed").SetIncludeFile("GDCpp/BuiltinExtensions/KeyboardTools.h");
+    GetAllConditions()["KeyFromTextReleased"].SetFunctionName("WasKeyReleased").SetIncludeFile("GDCpp/BuiltinExtensions/KeyboardTools.h");
     GetAllConditions()["AnyKeyPressed"].SetFunctionName("AnyKeyIsPressed").SetIncludeFile("GDCpp/BuiltinExtensions/KeyboardTools.h");
     GetAllStrExpressions()["LastPressedKey"].SetFunctionName("LastPressedKey").SetIncludeFile("GDCpp/BuiltinExtensions/KeyboardTools.h");
     #endif

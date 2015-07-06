@@ -1,0 +1,132 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - image_saver_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_IMAGE_SAVEr_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_IMAGE_SAVEr_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iosfwd<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/generic_image.h.html'>../image_processing/generic_image.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>class</font> <b><a name='image_save_error'></a>image_save_error</b> : <font color='#0000FF'>public</font> dlib::error 
+    <b>{</b> 
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an exception used to indicate a failure to save an image.
+                Its type member variable will be set to EIMAGE_SAVE.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='save_bmp'></a>save_bmp</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> image,
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h or any kind of matrix expression.
+        ensures
+            - writes the image to the out stream in the Microsoft Windows BMP format.
+            - image[0][0] will be in the upper left corner of the image.
+            - image[image.nr()-1][image.nc()-1] will be in the lower right
+              corner of the image.
+            - This routine can save images containing any type of pixel. However, it 
+              will convert all color pixels into rgb_pixel and grayscale pixels into 
+              uint8 type before saving to disk.
+        throws
+            - image_save_error
+                This exception is thrown if there is an error that prevents us
+                from saving the image.  
+            - std::bad_alloc 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='save_bmp'></a>save_bmp</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> image,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h or any kind of matrix expression.
+        ensures
+            - opens the file indicated by file_name with an output file stream named fout
+              and performs:
+              save_bmp(image,fout);
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>/*!
+        dlib dng file format:
+            This is a file format I created for this library.  It is a lossless 
+            compressed image format that is similar to the PNG format but uses
+            the dlib PPM compression algorithms instead of the DEFLATE algorithm.
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='save_dng'></a>save_dng</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> image,
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h or any kind of matrix expression.
+        ensures
+            - writes the image to the out stream in the dlib dng format.
+            - image[0][0] will be in the upper left corner of the image.
+            - image[image.nr()-1][image.nc()-1] will be in the lower right
+              corner of the image.
+            - This routine can save images containing any type of pixel.  However, the DNG
+              format can natively store only the following pixel types: rgb_pixel,
+              hsi_pixel, rgb_alpha_pixel, uint8, uint16, float, and double.
+              All other pixel types will be converted into one of these types as
+              appropriate before being saved to disk.
+        throws
+            - image_save_error
+                This exception is thrown if there is an error that prevents us
+                from saving the image.  
+            - std::bad_alloc 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='save_dng'></a>save_dng</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> image,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h or any kind of matrix expression.
+        ensures
+            - opens the file indicated by file_name with an output file stream named fout 
+              and performs:
+              save_dng(image,fout);
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_IMAGE_SAVEr_ABSTRACT_
+</font>
+
+
+</pre></body></html>

@@ -6,10 +6,11 @@ This project is released under the MIT License.
 */
 
 #include "TileSet.h"
+#include "GDCore/Tools/Localization.h"
 
 #include <algorithm>
 #include <iostream>
-#ifdef GD_IDE_ONLY
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/file.h>
 #include <wx/filefn.h>
 #include <wx/filename.h>
@@ -17,7 +18,7 @@ This project is released under the MIT License.
 #endif
 #include <GDCore/CommonTools.h>
 
-#ifdef GD_IDE_ONLY
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 wxBitmap TileSet::m_invalidBitmap = wxBitmap();
 #endif
 
@@ -112,18 +113,18 @@ void TileSet::LoadResources(gd::Project &game)
     {
         gd::ImageResource & image = dynamic_cast<gd::ImageResource&>(game.GetResourcesManager().GetResource(textureName));
         //Load the resource into a wxBitmap (IDE only) and also get its SFMLTextureWrapper
-#ifdef GD_IDE_ONLY
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
         //Force to change the working directory to make it work
         wxString oldWorkingDir = wxGetCwd();
-        std::cout << "Old WD : " << oldWorkingDir << std::endl;
         wxSetWorkingDirectory(wxFileName::FileName(game.GetProjectFile()).GetPath());
 #endif
+
         m_tilesetTexture = game.GetImageManager()->GetSFMLTexture(textureName);
-#ifdef GD_IDE_ONLY
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
         wxSetWorkingDirectory(oldWorkingDir);
         if ( wxFileExists(image.GetAbsoluteFile(game)) )
         {
-            std::cout << "Loading for tileset : " << image.GetAbsoluteFile(game) << std::endl;
             wxBitmap bmp( image.GetAbsoluteFile(game), wxBITMAP_TYPE_ANY);
             m_tilesetBitmap = bmp;
         }
@@ -207,13 +208,11 @@ int TileSet::GetTileIDFromCell(int col, int row)
     return (row * columns + col);
 }
 
-#ifdef GD_IDE_ONLY
-
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 const wxBitmap& TileSet::GetWxBitmap() const
 {
     return m_tilesetBitmap;
 }
-
 #endif
 
 sf::Texture& TileSet::GetTexture()

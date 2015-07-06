@@ -1,0 +1,381 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - fine_hog_image.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_FINE_HOG_IMaGE_Hh_
+<font color='#0000FF'>#define</font> DLIB_FINE_HOG_IMaGE_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='fine_hog_image_abstract.h.html'>fine_hog_image_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array2d.h.html'>../array2d.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='hog.h.html'>hog.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> cell_size_,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> block_size_,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pixel_stride_,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> num_orientation_bins_,
+        <font color='#0000FF'><u>int</u></font>           gradient_type_
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='fine_hog_image'></a>fine_hog_image</b> : noncopyable
+    <b>{</b>
+        <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font>cell_size_ <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font>block_size_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font>pixel_stride_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font>num_orientation_bins_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font> gradient_type_ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> hog_signed_gradient <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                             gradient_type_ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> hog_unsigned_gradient<font face='Lucida Console'>)</font>;
+
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> cell_size <font color='#5555FF'>=</font> cell_size_;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> block_size <font color='#5555FF'>=</font> block_size_;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pixel_stride <font color='#5555FF'>=</font> pixel_stride_;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_orientation_bins <font color='#5555FF'>=</font> num_orientation_bins_;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font>           gradient_type <font color='#5555FF'>=</font> gradient_type_;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> min_size <font color='#5555FF'>=</font> cell_size<font color='#5555FF'>*</font>block_size<font color='#5555FF'>+</font><font color='#979000'>2</font>;
+
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, block_size<font color='#5555FF'>*</font>block_size<font color='#5555FF'>*</font>num_orientation_bins, <font color='#979000'>1</font><font color='#5555FF'>&gt;</font> descriptor_type;
+
+        <b><a name='fine_hog_image'></a>fine_hog_image</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> : 
+            num_block_rows<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            num_block_cols<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            num_block_rows <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            num_block_cols <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            hist_counts.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='copy_configuration'></a>copy_configuration</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> fine_hog_image<font color='#5555FF'>&amp;</font>
+        <font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='load'></a>load</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font>::pixel_type<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>load_impl</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='unload'></a>unload</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_block_rows; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_block_cols; <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='get_num_dimensions'></a>get_num_dimensions</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> block_size<font color='#5555FF'>*</font>block_size<font color='#5555FF'>*</font>num_orientation_bins;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> descriptor_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> row,
+            <font color='#0000FF'><u>long</u></font> col
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> row <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> row <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                         <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> col <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> col <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\t descriptor_type fine_hog_image::operator()()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid row or col argument</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t row:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> row
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t col:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> col 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            row <font color='#5555FF'>*</font><font color='#5555FF'>=</font> pixel_stride;
+            col <font color='#5555FF'>*</font><font color='#5555FF'>=</font> pixel_stride;
+
+            des <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> off <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> block_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> block_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> rr <font color='#5555FF'>=</font> <font color='#979000'>0</font>; rr <font color='#5555FF'>&lt;</font> cell_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>rr<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> cc <font color='#5555FF'>=</font> <font color='#979000'>0</font>; cc <font color='#5555FF'>&lt;</font> cell_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>cc<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>const</font> histogram_count<font color='#5555FF'>&amp;</font> hist <font color='#5555FF'>=</font> hist_counts[row <font color='#5555FF'>+</font> r<font color='#5555FF'>*</font>cell_size <font color='#5555FF'>+</font> rr][col <font color='#5555FF'>+</font> c<font color='#5555FF'>*</font>cell_size <font color='#5555FF'>+</font> cc];
+                            <font color='#BB00BB'>des</font><font face='Lucida Console'>(</font>off <font color='#5555FF'>+</font> hist.quantized_angle_lower<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> hist.lower_strength;
+                            <font color='#BB00BB'>des</font><font face='Lucida Console'>(</font>off <font color='#5555FF'>+</font> hist.quantized_angle_upper<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> hist.upper_strength;
+                        <b>}</b>
+                    <b>}</b>
+
+                    off <font color='#5555FF'>+</font><font color='#5555FF'>=</font> num_orientation_bins;
+                <b>}</b>
+            <b>}</b>
+
+            des <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>des<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>8</font>;
+
+            <font color='#0000FF'>return</font> des;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> rectangle <b><a name='get_block_rect'></a>get_block_rect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> row,
+            <font color='#0000FF'><u>long</u></font> col
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            row <font color='#5555FF'>*</font><font color='#5555FF'>=</font> pixel_stride;
+            col <font color='#5555FF'>*</font><font color='#5555FF'>=</font> pixel_stride;
+
+            <font color='#009900'>// do this to account for the 1 pixel padding we use all around the image
+</font>            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>row;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>col;
+
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>col, row, col<font color='#5555FF'>+</font>cell_size<font color='#5555FF'>*</font>block_size<font color='#5555FF'>-</font><font color='#979000'>1</font>, row<font color='#5555FF'>+</font>cell_size<font color='#5555FF'>*</font>block_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> point <b><a name='image_to_feat_space'></a>image_to_feat_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> border_size <font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>+</font> cell_size<font color='#5555FF'>*</font>block_size<font color='#5555FF'>/</font><font color='#979000'>2</font>;
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>p<font color='#5555FF'>-</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>border_size,border_size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>pixel_stride;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> rectangle <b><a name='image_to_feat_space'></a>image_to_feat_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#BB00BB'>image_to_feat_space</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>image_to_feat_space</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> point <b><a name='feat_to_image_space'></a>feat_to_image_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> border_size <font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>+</font> cell_size<font color='#5555FF'>*</font>block_size<font color='#5555FF'>/</font><font color='#979000'>2</font>;
+            <font color='#0000FF'>return</font> p<font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>pixel_stride <font color='#5555FF'>+</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>border_size,border_size<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> rectangle <b><a name='feat_to_image_space'></a>feat_to_image_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#BB00BB'>feat_to_image_space</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>feat_to_image_space</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+
+        <font color='#009900'>// these _PRIVATE_ functions are only here as a workaround for a bug in visual studio 2005.  
+</font>        <font color='#0000FF'><u>void</u></font> <b><a name='_PRIVATE_serialize'></a>_PRIVATE_serialize</b> <font face='Lucida Console'>(</font>std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// serialize hist_counts
+</font>            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>hist_counts.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>hist_counts.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>;
+            hist_counts.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>hist_counts.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                hist_counts.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>out<font face='Lucida Console'>)</font>;
+            hist_counts.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>num_block_rows, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>num_block_cols, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='_PRIVATE_deserialize'></a>_PRIVATE_deserialize</b> <font face='Lucida Console'>(</font>std::istream<font color='#5555FF'>&amp;</font> in <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// deserialize item.hist_counts
+</font>            <font color='#0000FF'><u>long</u></font> nc, nr;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>nc,in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>nr,in<font face='Lucida Console'>)</font>;
+            hist_counts.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>nr,nc<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>hist_counts.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                hist_counts.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>; 
+            hist_counts.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>num_block_rows, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>num_block_cols, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='load_impl'></a>load_impl</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// Note that we keep a border of 1 pixel all around the image so that we don't have
+</font>            <font color='#009900'>// to worry about running outside the image when computing the horizontal and vertical 
+</font>            <font color='#009900'>// gradients.
+</font>
+
+
+            <font color='#009900'>// check if the window is just too small
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> min_size <font color='#5555FF'>|</font><font color='#5555FF'>|</font> img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> min_size<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// If the image is smaller than our windows then there aren't any descriptors at all!
+</font>                num_block_rows <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                num_block_cols <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                hist_counts.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font>;
+            <b>}</b>
+
+            hist_counts.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>2</font>, img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+
+
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> hist_counts.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> hist_counts.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left; 
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right;
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> top;   
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> bottom; 
+
+                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>left,   <font color='#BB00BB'>img</font><font face='Lucida Console'>(</font>r<font color='#5555FF'>+</font><font color='#979000'>1</font>,c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>right,  <font color='#BB00BB'>img</font><font face='Lucida Console'>(</font>r<font color='#5555FF'>+</font><font color='#979000'>1</font>,c<font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>top,    <font color='#BB00BB'>img</font><font face='Lucida Console'>(</font>r  ,c<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>bottom, <font color='#BB00BB'>img</font><font face='Lucida Console'>(</font>r<font color='#5555FF'>+</font><font color='#979000'>2</font>,c<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'><u>double</u></font> grad_x <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>right<font color='#5555FF'>-</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>left;
+                    <font color='#0000FF'><u>double</u></font> grad_y <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>top<font color='#5555FF'>-</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>bottom;
+
+                    <font color='#009900'>// obtain the angle of the gradient.  Make sure it is scaled between 0 and 1.
+</font>                    <font color='#0000FF'><u>double</u></font> angle <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#979000'>0.0</font>, std::<font color='#BB00BB'>atan2</font><font face='Lucida Console'>(</font>grad_y, grad_x<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>pi <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>gradient_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> hog_unsigned_gradient<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        angle <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>angle <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                            angle <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                    <b>}</b>
+
+
+                    <font color='#009900'>// now scale angle to between 0 and num_orientation_bins
+</font>                    angle <font color='#5555FF'>*</font><font color='#5555FF'>=</font> num_orientation_bins;
+
+
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> strength <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>grad_y<font color='#5555FF'>*</font>grad_y <font color='#5555FF'>+</font> grad_x<font color='#5555FF'>*</font>grad_x<font face='Lucida Console'>)</font>;
+
+
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> quantized_angle_lower <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>floor</font><font face='Lucida Console'>(</font>angle<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> quantized_angle_upper <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>ceil</font><font face='Lucida Console'>(</font>angle<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                    quantized_angle_lower <font color='#5555FF'>%</font><font color='#5555FF'>=</font> num_orientation_bins;
+                    quantized_angle_upper <font color='#5555FF'>%</font><font color='#5555FF'>=</font> num_orientation_bins;
+
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> angle_split <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>angle<font color='#5555FF'>-</font>std::<font color='#BB00BB'>floor</font><font face='Lucida Console'>(</font>angle<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> upper_strength <font color='#5555FF'>=</font> angle_split<font color='#5555FF'>*</font>strength;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> lower_strength <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>-</font>angle_split<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>strength;
+
+                    <font color='#009900'>// Stick into gradient counts.  Note that we linearly interpolate between neighboring
+</font>                    <font color='#009900'>// histogram buckets.
+</font>                    hist_counts[r][c].quantized_angle_lower <font color='#5555FF'>=</font> quantized_angle_lower;
+                    hist_counts[r][c].quantized_angle_upper <font color='#5555FF'>=</font> quantized_angle_upper;
+                    hist_counts[r][c].lower_strength <font color='#5555FF'>=</font> lower_strength;
+                    hist_counts[r][c].upper_strength <font color='#5555FF'>=</font> upper_strength;
+
+                <b>}</b>
+            <b>}</b>
+
+
+            <font color='#009900'>// Now figure out how many feature extraction blocks we should have.  
+</font>            num_block_rows <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>hist_counts.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> block_size<font color='#5555FF'>*</font>cell_size <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>pixel_stride; 
+            num_block_cols <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>hist_counts.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> block_size<font color='#5555FF'>*</font>cell_size <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>pixel_stride; 
+
+        <b>}</b>
+
+        <font color='#0000FF'>struct</font> <b><a name='histogram_count'></a>histogram_count</b>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> quantized_angle_lower;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> quantized_angle_upper;
+            <font color='#0000FF'><u>float</u></font> lower_strength;
+            <font color='#0000FF'><u>float</u></font> upper_strength;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font>std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>quantized_angle_lower, out<font face='Lucida Console'>)</font>;
+                dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>quantized_angle_upper, out<font face='Lucida Console'>)</font>;
+                dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>lower_strength, out<font face='Lucida Console'>)</font>;
+                dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>upper_strength, out<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font> 
+            <b>{</b>
+                dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>quantized_angle_lower, in<font face='Lucida Console'>)</font>;
+                dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>quantized_angle_upper, in<font face='Lucida Console'>)</font>;
+                dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>lower_strength, in<font face='Lucida Console'>)</font>;
+                dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>upper_strength, in<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+
+        array2d<font color='#5555FF'>&lt;</font>histogram_count<font color='#5555FF'>&gt;</font> hist_counts;
+
+        <font color='#0000FF'>mutable</font> descriptor_type des;
+
+        <font color='#0000FF'><u>long</u></font> num_block_rows;
+        <font color='#0000FF'><u>long</u></font> num_block_cols;
+
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> T1,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> T2,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> T3,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> T4,
+        <font color='#0000FF'><u>int</u></font>           T5
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> fine_hog_image<font color='#5555FF'>&lt;</font>T1,T2,T3,T4,T5<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        item.<font color='#BB00BB'>_PRIVATE_serialize</font><font face='Lucida Console'>(</font>out<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> T1,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> T2,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> T3,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> T4,
+        <font color='#0000FF'><u>int</u></font>           T5
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        fine_hog_image<font color='#5555FF'>&lt;</font>T1,T2,T3,T4,T5<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        item.<font color='#BB00BB'>_PRIVATE_deserialize</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_FINE_HOG_IMaGE_Hh_
+</font>
+
+</pre></body></html>

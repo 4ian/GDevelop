@@ -1,0 +1,495 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - fonts_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net), Nils Labugt, Keita Mochizuki
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_FONTs_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_FONTs_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../gui_core.h.html'>../gui_core.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../unicode.h.html'>../unicode.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='letter'></a>letter</b> 
+    <b>{</b>    
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a letter in a font.  It tells you the nominal 
+                width of the letter and which pixels form the letter.
+
+            THREAD SAFETY
+                const versions of this object are thread safe but if you are going to
+                be modifying it then you must serialize access to it.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>struct</font> <b><a name='point'></a>point</b> 
+        <b>{</b>
+            <font color='#009900'>/*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object represents one of the pixels of a letter.  
+                    
+                    The origin (i.e. (0,0)) of the coordinate plane is at the left 
+                    side of the letter's baseline.  Also note that y is negative when 
+                    above the baseline and positive below (it is zero on the baseline 
+                    itself).
+
+                    The x value is positive going to the right and negative to the left.
+                    The meaning of a negative x value is that any points with a negative
+                    x value will overlap with the preceding letter.
+            !*/</font>
+
+            <b><a name='point'></a>point</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - This constructor does nothing.  The value of x and y 
+                      are undefined after its execution.
+            !*/</font>
+
+            <b><a name='point'></a>point</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font> x_,
+                <font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font> y_
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - #x == x_
+                    - #y == y_
+            !*/</font>
+
+
+            <font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font> x;
+            <font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font> y;
+        <b>}</b>;
+
+        <font color='#009900'>// ---------------------------------
+</font>
+        <b><a name='letter'></a>letter</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #width() == 0 
+                - #num_of_points() == 0 
+        !*/</font>
+
+        <b><a name='letter'></a>letter</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> width_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> point_count
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #width() == width_
+                - #num_of_points() == point_count
+        !*/</font>
+
+        ~<b><a name='letter'></a>letter</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - any resources used by *this have been freed
+        !*/</font>
+            
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> <b><a name='width'></a>width</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the width reserved for this letter in pixels.  This is the 
+                  number of pixels that are reserved for this letter between adjoining 
+                  letters.  It isn't necessarily the width of the actual letter itself.  
+                  (for example, you can make a letter with a width less than how wide it 
+                  actually is so that it overlaps with its neighbor letters.)
+        !*/</font>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> <b><a name='num_of_points'></a>num_of_points</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of pixels that make up this letter.
+        !*/</font>
+
+        point<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> i
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - i &lt; num_of_points()
+            ensures
+                - returns a non-const reference to the ith point in this letter.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> i
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - i &lt; num_of_points()
+            ensures
+                - returns a const reference to the ith point in this letter.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            letter<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this with item
+        !*/</font>
+    
+        <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='letter'></a>letter</b><font face='Lucida Console'>(</font>letter<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        letter<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>letter<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        letter<font color='#5555FF'>&amp;</font> a,
+        letter<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> letter<font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides serialization support for letter objects
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        letter<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support for letter objects
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='font'></a>font</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object defines an interface for a font type.  It provides metrics
+                for the font and functions to help you draw strings on a canvas object.
+
+            THREAD SAFETY
+                All the functions in this class are thread safe.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='has_character'></a>has_character</b> <font face='Lucida Console'>(</font>
+            unichar ch
+        <font face='Lucida Console'>)</font><font color='#0000FF'>const</font><font color='#5555FF'>=</font><font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (this font has a glyph for the given character) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='has_character'></a>has_character</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> ch<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>    <b>{</b> <font color='#0000FF'>return</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>has_character</font><font face='Lucida Console'>(</font>zero_extend_cast<font color='#5555FF'>&lt;</font>unichar<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='has_character'></a>has_character</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>wchar_t</u></font> ch<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>has_character</font><font face='Lucida Console'>(</font>zero_extend_cast<font color='#5555FF'>&lt;</font>unichar<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#009900'>/* Cast char and wchar_t to unichar correctly when char or wchar_t is a signed type */</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'>const</font> letter<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            unichar ch
+        <font face='Lucida Console'>)</font><font color='#0000FF'>const</font><font color='#5555FF'>=</font><font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (has_character(ch) == true) then
+                    - returns a letter object that tells you how to draw this character.
+                - else
+                    - returns some default glyph for characters that aren't in this font.
+        !*/</font>
+        <font color='#0000FF'>const</font> letter<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> ch<font face='Lucida Console'>)</font>    <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>[zero_extend_cast<font color='#5555FF'>&lt;</font>unichar<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>]; <b>}</b>;
+        <font color='#0000FF'>const</font> letter<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font><font color='#0000FF'><u>wchar_t</u></font> ch<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>[zero_extend_cast<font color='#5555FF'>&lt;</font>unichar<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>]; <b>}</b>;
+        <font color='#009900'>/* Cast char and wchar_t to unichar correctly when char or wchar_t is a signed type */</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='height'></a>height</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the height in pixels of the tallest letter in the font                
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='ascender'></a>ascender</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the height() minus the number of pixels below the baseline used
+                  by the letter that hangs the lowest below the baseline.
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='left_overflow'></a>left_overflow</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*! 
+            ensures
+                - returns how far outside and to the left of its width a letter
+                  from this font may set pixels.  (i.e. how many extra pixels to its
+                  left may a font use)
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='right_overflow'></a>right_overflow</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*! 
+            ensures
+                - returns how far outside and to the right of its width a letter
+                  from this font may set pixels.  (i.e. how many extra pixels to its
+                  right may a font use)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> traits, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='compute_size'></a>compute_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>T,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> width,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> height,
+            <font color='#0000FF'>typename</font> std::basic_string<font color='#5555FF'>&lt;</font>T,traits,alloc<font color='#5555FF'>&gt;</font>::size_type first <font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            <font color='#0000FF'>typename</font> std::basic_string<font color='#5555FF'>&lt;</font>T,traits,alloc<font color='#5555FF'>&gt;</font>::size_type last <font color='#5555FF'>=</font> std::basic_string<font color='#5555FF'>&lt;</font>T,traits,alloc<font color='#5555FF'>&gt;</font>::npos
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - if (last != std::basic_string&lt;T,traits,alloc&gt;::npos) then
+                    - first &lt;= last
+                    - last &lt; str.size()
+            ensures
+                - all characters in str with an index &lt; first are ignored by this
+                  function.
+                - if (last != std::basic_string&lt;T,traits,alloc&gt;::npos) then
+                    - all characters in str with an index &gt; last are ignored by 
+                      this function.
+                - if (str.size() == 0) then
+                    - #width == 0
+                    - #height == 0
+                - else
+                    - #width == sum of the widths of the characters in the widest 
+                      line in str + left_overflow() + right_overflow(). 
+                    - #height == (count(str.begin(),str.end(),'\n')+1)*height()
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> traits, <font color='#0000FF'>typename</font> alloc, <font color='#0000FF'>typename</font> pixel_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='draw_string'></a>draw_string</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>T,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+            <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> color <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            <font color='#0000FF'>typename</font> std::basic_string<font color='#5555FF'>&lt;</font>T,traits,alloc<font color='#5555FF'>&gt;</font>::size_type first <font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            <font color='#0000FF'>typename</font> std::basic_string<font color='#5555FF'>&lt;</font>T,traits,alloc<font color='#5555FF'>&gt;</font>::size_type last <font color='#5555FF'>=</font> std::basic_string<font color='#5555FF'>&lt;</font>T,traits,alloc<font color='#5555FF'>&gt;</font>::npos,
+            <font color='#0000FF'>const</font> rectangle area <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>infinity,<font color='#5555FF'>-</font>infinity,infinity,infinity<font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - if (last != std::basic_string&lt;T,traits,alloc&gt;::npos) then
+                    - first &lt;= last
+                    - last &lt; str.size()
+            ensures
+                - all characters in str with an index &lt; first are ignored by this
+                  function.
+                - if (last != std::basic_string&lt;T,traits,alloc&gt;::npos) then
+                    - all characters in str with an index &gt; last are ignored by 
+                      this function.
+                - if (str.size() == 0) then
+                    - does nothing
+                - else
+                    - draws str on the given canvas at the position defined by rect.  
+                      Also uses the given pixel colors for the font color.
+                - If the string is too big to fit in rect then the right and
+                  bottom sides of it will be clipped to make it fit.                  
+                - only the part of the string that is contained inside the area
+                  rectangle will be drawn
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> traits, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> rectangle <b><a name='compute_cursor_rect'></a>compute_cursor_rect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>T,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index,
+            <font color='#0000FF'>typename</font> std::basic_string<font color='#5555FF'>&lt;</font>T,traits,alloc<font color='#5555FF'>&gt;</font>::size_type first <font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            <font color='#0000FF'>typename</font> std::basic_string<font color='#5555FF'>&lt;</font>T,traits,alloc<font color='#5555FF'>&gt;</font>::size_type last <font color='#5555FF'>=</font> std::basic_string<font color='#5555FF'>&lt;</font>T,traits,alloc<font color='#5555FF'>&gt;</font>::npos
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - if (last != std::basic_string&lt;T,traits,alloc&gt;::npos) then
+                    - first &lt;= last
+                    - last &lt; str.size()
+            ensures
+                - the returned rectangle has a width of 1 and a 
+                  height of this-&gt;height().
+                - computes the location of the cursor that would sit just before
+                  the character str[index] if str were drawn on the screen by
+                  draw_string(rect,str,...,first,last).  The cursor location is
+                  returned in the form of a rectangle.
+                - if (index &lt; first) then
+                    - the returned cursor will be just before the character str[first].
+                - if (last != std::basic_string&lt;T,traits,alloc&gt;::npos &amp;&amp; index &gt; last) then
+                    - the returned cursor will be just after the character str[last]
+                - if (str.size() == 0) then
+                    - the returned cursor will be just at the start of the rectangle where
+                      str would be drawn if it wasn't empty.
+                - if (index &gt; str.size()-1) then
+                    - the returned cursor will be just after the character str[str.size()-1]
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> traits, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='compute_cursor_pos'></a>compute_cursor_pos</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>T,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+            <font color='#0000FF'><u>long</u></font> x,
+            <font color='#0000FF'><u>long</u></font> y,
+            <font color='#0000FF'>typename</font> std::basic_string<font color='#5555FF'>&lt;</font>T,traits,alloc<font color='#5555FF'>&gt;</font>::size_type first <font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            <font color='#0000FF'>typename</font> std::basic_string<font color='#5555FF'>&lt;</font>T,traits,alloc<font color='#5555FF'>&gt;</font>::size_type last <font color='#5555FF'>=</font> std::basic_string<font color='#5555FF'>&lt;</font>T,traits,alloc<font color='#5555FF'>&gt;</font>::npos
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - if (last != std::basic_string&lt;T,traits,alloc&gt;::npos) then
+                    - first &lt;= last
+                    - last &lt; str.size()
+            ensures
+                - returns a number idx that has the following properties:
+                    - if (first &lt; str.size()) then
+                        - first &lt;= idx
+                    - else
+                        - idx == str.size()
+                    - if (last != std::basic_string&lt;T,traits,alloc&gt;::npos) then
+                        - idx &lt;= last + 1
+                    - compute_cursor_rect(rect,str,idx,first,last) == the cursor
+                      position that is closest to the pixel (x,y)
+        !*/</font>
+
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='font'></a>font</b><font face='Lucida Console'>(</font>font<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        font<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>font<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='default_font'></a>default_font</b> : <font color='#0000FF'>public</font> font
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the Helvetica 12 point font.
+
+            THREAD SAFETY
+                It is safe to call get_font() and access the returned font from any 
+                thread and no synchronization is needed as long as it is called 
+                after the main() function has been entered.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>font<font color='#5555FF'>&gt;</font> <b><a name='get_font'></a>get_font</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns an instance of this font.
+            throws
+                - std::bad_alloc
+                    This exception is thrown if there is a problem gathering the needed
+                    memory for the font object.
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='default_font'></a>default_font</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// normal constructor
+</font>        <b><a name='default_font'></a>default_font</b><font face='Lucida Console'>(</font>default_font<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        default_font<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>default_font<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator   
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='bdf_font'></a>bdf_font</b> : <font color='#0000FF'>public</font> font
+    <b>{</b>
+    
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a font object that is capable of loading of loading BDF (Glyph 
+                Bitmap Distribution Format) font files.
+
+            THREAD SAFETY
+                If you only access this object via the functions in the parent class font 
+                then this object is thread safe.  But if you need to call any of the
+                functions introduced in this derived class then you need to serialize 
+                access to this object while you call these functions.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='bdf_font'></a>bdf_font</b><font face='Lucida Console'>(</font> 
+            <font color='#0000FF'><u>long</u></font> default_char <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font> 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - for all x:
+                    - #has_character(x) == false
+                      (i.e. this font starts out empty.  You have to call read_bdf_file()
+                      to load it with data)
+                - if (default_char == -1) then
+                    - the letter returned by (*this)[ch] for values of
+                      ch where has_character(ch) == false will be the
+                      default glyph defined in the bdf file.
+                - else
+                    - the letter returned by (*this)[ch] for values of
+                      ch where has_character(ch) == false will be the
+                      letter (*this)[default_char].
+        !*/</font>
+    
+        <font color='#0000FF'><u>long</u></font> <b><a name='read_bdf_file'></a>read_bdf_file</b><font face='Lucida Console'>(</font> 
+            std::istream<font color='#5555FF'>&amp;</font> in, 
+            unichar max_enc, 
+            unichar min_enc <font color='#5555FF'>=</font> <font color='#979000'>0</font> 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - attempts to read the font data from the given input stream into
+                  *this.  The input stream is expected to contain a valid BDF file.
+                - reads in characters with encodings in the range min_enc to max_enc
+                  into this font.  All characters in the font file outside this range
+                  are ignored.
+                - returns the number of characters loaded into this font from the
+                  given input stream.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='adjust_metrics'></a>adjust_metrics</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - Computes metrics based on actual glyphs loaded, instead of using 
+                  the values in the bdf file header. (May be useful if loading glyphs 
+                  from more than one file or a small part of a file.)
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+    
+        <b><a name='bdf_font'></a>bdf_font</b><font face='Lucida Console'>(</font> bdf_font<font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font>;      <font color='#009900'>// copy constructor
+</font>        bdf_font<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font> bdf_font<font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font>;  <font color='#009900'>// assignment operator
+</font>    
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>font<font color='#5555FF'>&gt;</font> <b><a name='get_native_font'></a>get_native_font</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a font object that uses the local font
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_FONTs_ABSTRACT_
+</font>
+
+</pre></body></html>

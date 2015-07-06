@@ -40,6 +40,7 @@ std::vector<gd::String> ProjectResourcesAdder::GetAllUselessResources(gd::Projec
 
     //Search for used images
     gd::ImagesUsedInventorizer inventorizer;
+    
     project.ExposeResources(inventorizer);
     std::set<gd::String> & usedImages = inventorizer.GetAllUsedImages();
 

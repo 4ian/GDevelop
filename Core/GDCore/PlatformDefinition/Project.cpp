@@ -63,10 +63,8 @@ Project::Project() :
     windowHeight(600),
     maxFPS(60),
     minFPS(10),
-    verticalSync(false)
-    #if !defined(GD_NO_WX_GUI)
-    ,imageManager(std::shared_ptr<gd::ImageManager>(new ImageManager))
-    #endif
+    verticalSync(false),
+    imageManager(std::shared_ptr<gd::ImageManager>(new ImageManager))
     #if defined(GD_IDE_ONLY)
     ,useExternalSourceFiles(false),
     currentPlatform(NULL),
@@ -75,9 +73,7 @@ Project::Project() :
     dirty(false)
     #endif
 {
-    #if !defined(GD_NO_WX_GUI)
     imageManager->SetGame(this);
-    #endif
     #if defined(GD_IDE_ONLY)
     //Game use builtin extensions by default
     extensionsUsed.push_back("BuiltinObject");
@@ -116,8 +112,8 @@ std::shared_ptr<gd::Object> Project::CreateObject(const gd::String & type, const
     {
         if ( !platformName.empty() && platforms[i]->GetName() != platformName ) continue;
 
-        std::shared_ptr<gd::Object> object = platforms[i]->CreateObject(type, name);
-        if ( object ) return object;
+        std::shared_ptr<gd::Object> object = platforms[i]->CreateObject(type, name); //Create a base object if the type can't be found in the platform
+        if ( object && object->GetType() == type ) return object; //If the object is valid and has the good type (not a base object), return it
     }
 
     return std::shared_ptr<gd::Object>();
@@ -976,8 +972,9 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
     #endif
 
     //Add global objects resources
-    for (unsigned int j = 0;j<GetObjectsCount();++j)
+    for (unsigned int j = 0;j<GetObjectsCount();++j) {
         GetObject(j).ExposeResources(worker);
+    }
 
     #if !defined(GD_NO_WX_GUI)
     gd::SafeYield::Do();
@@ -1168,10 +1165,8 @@ void Project::Init(const gd::Project & game)
 
     //Resources
     resourcesManager = game.resourcesManager;
-    #if !defined(GD_NO_WX_GUI)
     imageManager = std::shared_ptr<ImageManager>(new ImageManager(*game.imageManager));
     imageManager->SetGame(this);
-    #endif
 
     GetObjects().clear();
     for (unsigned int i =0;i<game.GetObjects().size();++i)

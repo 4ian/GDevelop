@@ -1,0 +1,144 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - linker_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_LINKER_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_LINKER_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='linker_kernel_abstract.h.html'>linker_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads.h.html'>../threads.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sockets.h.html'>../sockets.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='linker'></a>linker</b> 
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                running             == false
+                A                   == 0
+                B                   == 0
+                running_mutex       == a mutex 
+                running_signaler    == a signaler associated with running_mutex
+                cons_mutex          == a mutex
+                service_connection_running          == false
+                service_connection_running_mutex    == a mutex
+                service_connection_running_signaler == a signaler associated with 
+                                                       service_connection_running_mutex
+
+                service_connection_error        == false
+                service_connection_error_mutex  == a mutex
+
+               
+
+            CONVENTION
+                running             == is_running()
+                running_mutex       == a mutex for running
+                running_signaler    == a signaler for signaling when
+                                       running becomes false and is associated with
+                                       running_mutex
+                cons_mutex          == a mutex for A and B
+
+                service_connection_running          == true when service_connection() is
+                                                       running or is about to run else
+                                                       false
+                service_connection_running_mutex    == a mutex for service_connection_running
+                service_connection_running_signaler == a signaler associated with 
+                                                       service_connection_running_mutex
+
+                if (running) then
+                    A               == address of a from link()
+                    B               == address of b from link()
+                else
+                    A               == 0
+                    B               == 0
+
+                service_connection_error        == service_connection uses this bool
+                                                   to indicate if it terminated due to 
+                                                   an error or not
+                service_connection_error_mutex  == a mutex for service_connection_error
+
+
+        !*/</font>
+
+        <font color='#0000FF'>public</font>:
+
+            <font color='#009900'>// These two typedefs are here for backwards compatibility with previous
+</font>            <font color='#009900'>// versions of dlib.
+</font>            <font color='#0000FF'>typedef</font> linker kernel_1a;
+            <font color='#0000FF'>typedef</font> linker kernel_1a_c;
+
+            <b><a name='linker'></a>linker</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <b><a name='linker'></a>linker</b> <font face='Lucida Console'>(</font>
+                connection<font color='#5555FF'>&amp;</font> a,
+                connection<font color='#5555FF'>&amp;</font> b
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='linker'></a>linker</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>; 
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='is_running'></a>is_running</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='link'></a>link</b> <font face='Lucida Console'>(</font>
+                connection<font color='#5555FF'>&amp;</font> a,
+                connection<font color='#5555FF'>&amp;</font> b
+            <font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#0000FF'>static</font> <font color='#0000FF'><u>void</u></font> <b><a name='service_connection'></a>service_connection</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> param
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    param == pointer to a linker object
+                ensures
+                    waits for data from b and forwards it to a and
+                    if (b closes normally or is shutdown()) service_connection ends and
+                    if (b closes normally) then a.shutdown_outgoing() is called and
+                    if (a or b returns an error) then a and b are shutdown() 
+            !*/</font>
+
+
+            <font color='#009900'>// data members
+</font>            <font color='#0000FF'><u>bool</u></font> running;
+            mutex running_mutex;
+            signaler running_signaler;
+            connection<font color='#5555FF'>*</font> A;
+            connection<font color='#5555FF'>*</font> B;
+            mutex cons_mutex;
+
+            <font color='#0000FF'><u>bool</u></font> service_connection_running;
+            mutex service_connection_running_mutex;
+            signaler service_connection_running_signaler;
+
+            <font color='#0000FF'><u>bool</u></font> service_connection_error;
+            mutex service_connection_error_mutex;
+
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='linker'></a>linker</b><font face='Lucida Console'>(</font>linker<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>            linker<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>linker<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+
+
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='linker_kernel_1.cpp.html'>linker_kernel_1.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LINKER_KERNEl_1_
+</font>
+
+</pre></body></html>

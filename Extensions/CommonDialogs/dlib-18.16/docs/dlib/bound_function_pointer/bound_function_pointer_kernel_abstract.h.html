@@ -1,0 +1,459 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bound_function_pointer_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_BOUND_FUNCTION_POINTER_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_BOUND_FUNCTION_POINTER_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='bound_function_pointer'></a>bound_function_pointer</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                is_set() == false
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a function with all its arguments bound to 
+                specific objects.  For example:
+
+                    void test(int&amp; var) { var = var+1; }
+
+                    bound_function_pointer funct;
+
+                    int a = 4; 
+                    funct.set(test,a); // bind the variable a to the first argument of the test() function 
+
+                    // at this point a == 4
+                    funct();
+                    // after funct() is called a == 5
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='bound_function_pointer'></a>bound_function_pointer</b> <font face='Lucida Console'>(</font>  
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures                
+                - #*this is properly initialized
+        !*/</font>
+
+        <b><a name='bound_function_pointer'></a>bound_function_pointer</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bound_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - *this == item
+        !*/</font>
+
+        ~<b><a name='bound_function_pointer'></a>bound_function_pointer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - any resources associated with *this have been released
+        !*/</font>
+
+        bound_function_pointer<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bound_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - *this == item
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this has its initial value
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_set'></a>is_set</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (this-&gt;set() has been called) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <b><a name='operator'></a>operator</b> <b><a name='some_undefined_pointer_type'></a>some_undefined_pointer_type</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (is_set()) then
+                    - returns a non 0 value
+                - else
+                    - returns a 0 value
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns !is_set()
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_set() == true
+            ensures
+                - calls the bound function on the object(s) specified by the last 
+                  call to this-&gt;set()
+            throws
+                - any exception thrown by the function specified by
+                  the previous call to this-&gt;set().
+                    If any of these exceptions are thrown then the call to this 
+                    function will have no effect on *this.                  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            bound_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font> 
+
+        <font color='#009900'>// ----------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> function_object
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - function_object() is a valid expression 
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call function_object()
+                  (This seems pointless but it is a useful base case)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct == a valid member function pointer for class T
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call (object.*funct)()
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#0000FF'>const</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct == a valid bound function pointer for class T
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call (object.*funct)()
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct == a valid function pointer 
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call funct()
+        !*/</font>
+
+        <font color='#009900'>// ----------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> A1 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> function_object,
+            A1<font color='#5555FF'>&amp;</font> arg1
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - function_object(arg1) is a valid expression 
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call function_object(arg1)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1<font face='Lucida Console'>)</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct == a valid member function pointer for class T
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call (object.*funct)(arg1)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1<font face='Lucida Console'>)</font><font color='#0000FF'>const</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct == a valid bound function pointer for class T
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call (object.*funct)(arg1)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1<font face='Lucida Console'>)</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct == a valid function pointer 
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call funct(arg1)
+        !*/</font>
+
+        <font color='#009900'>// ----------------------
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> function_object,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - function_object(arg1,arg2) is a valid expression 
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call function_object(arg1,arg2)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                               <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2<font face='Lucida Console'>)</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct == a valid member function pointer for class T
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call (object.*funct)(arg1,arg2)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1, 
+                               <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2<font face='Lucida Console'>)</font><font color='#0000FF'>const</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct == a valid bound function pointer for class T
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call (object.*funct)(arg1,arg2)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                  <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2<font face='Lucida Console'>)</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct == a valid function pointer 
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call funct(arg1,arg2)
+        !*/</font>
+
+        <font color='#009900'>// ----------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> function_object,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2,
+            A3<font color='#5555FF'>&amp;</font> arg3
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - function_object(arg1,arg2,arg3) is a valid expression 
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call function_object(arg1,arg2,arg3)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                               <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+                               <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2,T3<font face='Lucida Console'>)</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2,
+            A3<font color='#5555FF'>&amp;</font> arg3
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct == a valid member function pointer for class T
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call (object.*funct)(arg1,arg2,arg3)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                               <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+                               <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2,T3<font face='Lucida Console'>)</font><font color='#0000FF'>const</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2,
+            A3<font color='#5555FF'>&amp;</font> arg3
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct == a valid bound function pointer for class T
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call (object.*funct)(arg1,arg2,arg3)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                  <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+                  <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2,T3<font face='Lucida Console'>)</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2,
+            A3<font color='#5555FF'>&amp;</font> arg3
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct == a valid function pointer 
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call funct(arg1,arg2,arg3)
+        !*/</font>
+
+        <font color='#009900'>// ----------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3, <font color='#0000FF'>typename</font> A4<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> function_object,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2,
+            A3<font color='#5555FF'>&amp;</font> arg3,
+            A4<font color='#5555FF'>&amp;</font> arg4
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - function_object(arg1,arg2,arg3,arg4) is a valid expression 
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call function_object(arg1,arg2,arg3,arg4)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                               <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+                               <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3,
+                               <font color='#0000FF'>typename</font> T4, <font color='#0000FF'>typename</font> A4<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2,T3,T4<font face='Lucida Console'>)</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2,
+            A3<font color='#5555FF'>&amp;</font> arg3,
+            A4<font color='#5555FF'>&amp;</font> arg4
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct == a valid member function pointer for class T
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call (object.*funct)(arg1,arg2,arg3,arg4)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                               <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+                               <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3,
+                               <font color='#0000FF'>typename</font> T4, <font color='#0000FF'>typename</font> A4<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2,T3,T4<font face='Lucida Console'>)</font><font color='#0000FF'>const</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2,
+            A3<font color='#5555FF'>&amp;</font> arg3,
+            A4<font color='#5555FF'>&amp;</font> arg4
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct == a valid bound function pointer for class T
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call (object.*funct)(arg1,arg2,arg3,arg4)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> A1,
+                  <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> A2,
+                  <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> A3,
+                  <font color='#0000FF'>typename</font> T4, <font color='#0000FF'>typename</font> A4<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T1,T2,T3,T4<font face='Lucida Console'>)</font>,
+            A1<font color='#5555FF'>&amp;</font> arg1,
+            A2<font color='#5555FF'>&amp;</font> arg2,
+            A3<font color='#5555FF'>&amp;</font> arg3,
+            A4<font color='#5555FF'>&amp;</font> arg4
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct == a valid function pointer 
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call funct(arg1,arg2,arg3,arg4)
+        !*/</font>
+
+    <b>}</b>;    
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        bound_function_pointer<font color='#5555FF'>&amp;</font> a,
+        bound_function_pointer<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BOUND_FUNCTION_POINTER_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

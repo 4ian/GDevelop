@@ -1,0 +1,160 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - optimization_stop_strategies_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_OPTIMIZATIOn_STOP_STRATEGIES_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_OPTIMIZATIOn_STOP_STRATEGIES_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='objective_delta_stop_strategy'></a>objective_delta_stop_strategy</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a strategy for deciding if an optimization
+                algorithm should terminate.   This particular object looks at the 
+                change in the objective function from one iteration to the next and 
+                bases its decision on how large this change is.  If the change
+                is below a user given threshold then the search stops.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>explicit</font> <b><a name='objective_delta_stop_strategy'></a>objective_delta_stop_strategy</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> min_delta <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - min_delta &gt;= 0
+            ensures
+                - This stop strategy object will only consider a search to be complete
+                  if a change in an objective function from one iteration to the next
+                  is less than min_delta.
+        !*/</font>
+
+        <b><a name='objective_delta_stop_strategy'></a>objective_delta_stop_strategy</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> min_delta,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - min_delta &gt;= 0
+                - max_iter &gt; 0
+            ensures
+                - This stop strategy object will only consider a search to be complete
+                  if a change in an objective function from one iteration to the next
+                  is less than min_delta or more than max_iter iterations has been
+                  executed.
+        !*/</font>
+
+        objective_delta_stop_strategy<font color='#5555FF'>&amp;</font> <b><a name='be_verbose'></a>be_verbose</b><font face='Lucida Console'>(</font> 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - causes this object to print status messages to standard out 
+                  every time should_continue_search() is called.
+                - returns *this
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='should_continue_search'></a>should_continue_search</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> funct_value,
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct_derivative
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - this function is only called once per search iteration
+                - for some objective function f():
+                    - x == the search point for the current iteration
+                    - funct_value == f(x)
+                    - funct_derivative == derivative(f)(x)
+            ensures
+                - returns true if the point x doest not satisfy the stopping condition and
+                  false otherwise.
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='gradient_norm_stop_strategy'></a>gradient_norm_stop_strategy</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a strategy for deciding if an optimization
+                algorithm should terminate.   This particular object looks at the 
+                norm (i.e. the length) of the current gradient vector and stops 
+                if it is smaller than a user given threshold.  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>explicit</font> <b><a name='gradient_norm_stop_strategy'></a>gradient_norm_stop_strategy</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> min_norm <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - min_norm &gt;= 0
+            ensures
+                - This stop strategy object will only consider a search to be complete
+                  if the current gradient norm is less than min_norm
+        !*/</font>
+
+        <b><a name='gradient_norm_stop_strategy'></a>gradient_norm_stop_strategy</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> min_norm,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - min_norm &gt;= 0
+                - max_iter &gt; 0
+            ensures
+                - This stop strategy object will only consider a search to be complete
+                  if the current gradient norm is less than min_norm or more than 
+                  max_iter iterations has been executed.
+        !*/</font>
+
+        gradient_norm_stop_strategy<font color='#5555FF'>&amp;</font> <b><a name='be_verbose'></a>be_verbose</b><font face='Lucida Console'>(</font> 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - causes this object to print status messages to standard out 
+                  every time should_continue_search() is called.
+                - returns *this
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='should_continue_search'></a>should_continue_search</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> funct_value,
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct_derivative
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - this function is only called once per search iteration
+                - for some objective function f():
+                    - x == the search point for the current iteration
+                    - funct_value == f(x)
+                    - funct_derivative == derivative(f)(x)
+            ensures
+                - returns true if the point x doest not satisfy the stopping condition and
+                  false otherwise.
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_OPTIMIZATIOn_STOP_STRATEGIES_ABSTRACT_
+</font>
+
+</pre></body></html>

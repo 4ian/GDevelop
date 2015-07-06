@@ -1,0 +1,266 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - lz77_buffer_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2004  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_LZ77_BUFFER_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_LZ77_BUFFER_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='lz77_buffer_kernel_abstract.h.html'>lz77_buffer_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sliding_buffer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='lz77_buffer_kernel_1'></a>lz77_buffer_kernel_1</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON sliding_buffer
+                sliding_buffer must be an implementation of sliding_buffer/sliding_buffer_kernel_abstract.h
+
+            INITIAL VALUE
+                history_limit == defined by constructor arguments
+                lookahead_limit == defined by constructor arguments
+                history_size == 0
+                lookahead_size == 0
+                buffer.size() == history_limit + lookahead_limit
+
+
+            CONVENTION           
+                history_limit == get_history_buffer_limit()
+                lookahead_limit == get_lookahead_buffer_limit()
+                history_size == get_history_buffer_size()
+                lookahead_limit == get_lookahead_buffer_size()
+                              
+                buffer.size() == history_limit + lookahead_limit
+
+                lookahead_buffer(i) == buffer[lookahead_limit-1-i]
+                history_buffer(i) == buffer[lookahead_limit+i]
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='lz77_buffer_kernel_1'></a>lz77_buffer_kernel_1</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total_limit_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> lookahead_limit_  
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='lz77_buffer_kernel_1'></a>lz77_buffer_kernel_1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> symbol
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='find_match'></a>find_match</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> index,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> length,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> min_match_length
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_history_buffer_limit'></a>get_history_buffer_limit</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> history_limit; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_lookahead_buffer_limit'></a>get_lookahead_buffer_limit</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> lookahead_limit; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_history_buffer_size'></a>get_history_buffer_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> history_size; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_lookahead_buffer_size'></a>get_lookahead_buffer_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> lookahead_size; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <b><a name='lookahead_buffer'></a>lookahead_buffer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> buffer[lookahead_limit<font color='#5555FF'>-</font><font color='#979000'>1</font><font color='#5555FF'>-</font>index]; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <b><a name='history_buffer'></a>history_buffer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> buffer[lookahead_limit<font color='#5555FF'>+</font>index]; <b>}</b>
+
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='shift_buffers'></a>shift_buffers</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> N
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>shift_buffer</font><font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='shift_buffer'></a>shift_buffer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> N
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            requires
+                - N &lt;= lookahead_size
+            ensuers
+                - #lookahead_size == lookahead_size - N
+                - if (history_size+N &lt; history_limit) then
+                    - #history_size == history_size+N
+                - else
+                    - #history_size == history_limit
+                - for all i where 0 &lt;= i &lt; N:
+                  #history_buffer(N-1-i) == lookahead_buffer(i)
+                - for all i where 0 &lt;= i &lt; #history_size-N:
+                  #history_buffer(N+i) == history_buffer(i)
+                - for all i where 0 &lt;= i &lt; #lookahead_size
+                  #lookahead_buffer(i) == lookahead_buffer(N+i)                
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> history_size<font color='#5555FF'>+</font>N;
+            buffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font>;
+            lookahead_size <font color='#5555FF'>-</font><font color='#5555FF'>=</font> N;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&lt;</font> history_limit<font face='Lucida Console'>)</font>
+                history_size <font color='#5555FF'>=</font> temp;
+            <font color='#0000FF'>else</font>
+                history_size <font color='#5555FF'>=</font> history_limit;
+        <b>}</b>
+
+
+        <font color='#009900'>// member data        
+</font>        sliding_buffer buffer;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> lookahead_limit;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> history_limit;
+        
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> lookahead_size;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> history_size;
+
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='lz77_buffer_kernel_1'></a>lz77_buffer_kernel_1</b><font face='Lucida Console'>(</font>lz77_buffer_kernel_1<font color='#5555FF'>&lt;</font>sliding_buffer<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        lz77_buffer_kernel_1<font color='#5555FF'>&lt;</font>sliding_buffer<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>lz77_buffer_kernel_1<font color='#5555FF'>&lt;</font>sliding_buffer<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;   
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sliding_buffer
+        <font color='#5555FF'>&gt;</font>
+    lz77_buffer_kernel_1<font color='#5555FF'>&lt;</font>sliding_buffer<font color='#5555FF'>&gt;</font>::
+    <b><a name='lz77_buffer_kernel_1'></a>lz77_buffer_kernel_1</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total_limit_,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> lookahead_limit_  
+    <font face='Lucida Console'>)</font> :        
+        lookahead_size<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, 
+        history_size<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        buffer.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>total_limit_<font face='Lucida Console'>)</font>;
+        lookahead_limit <font color='#5555FF'>=</font> lookahead_limit_;
+        history_limit <font color='#5555FF'>=</font> buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> lookahead_limit_;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sliding_buffer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> lz77_buffer_kernel_1<font color='#5555FF'>&lt;</font>sliding_buffer<font color='#5555FF'>&gt;</font>::
+    <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        lookahead_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        history_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sliding_buffer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> lz77_buffer_kernel_1<font color='#5555FF'>&lt;</font>sliding_buffer<font color='#5555FF'>&gt;</font>::
+    <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> symbol
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lookahead_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> lookahead_limit<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>shift_buffer</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;            
+        <b>}</b>
+        buffer[lookahead_limit<font color='#5555FF'>-</font><font color='#979000'>1</font><font color='#5555FF'>-</font>lookahead_size] <font color='#5555FF'>=</font> symbol;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>lookahead_size;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sliding_buffer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> lz77_buffer_kernel_1<font color='#5555FF'>&lt;</font>sliding_buffer<font color='#5555FF'>&gt;</font>::
+    <b><a name='find_match'></a>find_match</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> index,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> length,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> min_match_length
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> hpos <font color='#5555FF'>=</font> history_size;  <font color='#009900'>// current position in the history buffer
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> lpos <font color='#5555FF'>=</font> <font color='#979000'>0</font>;             <font color='#009900'>// current position in the lookahead buffer
+</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> match_length <font color='#5555FF'>=</font> <font color='#979000'>0</font>;   <font color='#009900'>// the length of the longest match we find
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> match_index <font color='#5555FF'>=</font> <font color='#979000'>0</font>;    <font color='#009900'>// the index of the longest match we find
+</font>
+        <font color='#009900'>// try to find a match
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>hpos <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>hpos;
+            <font color='#009900'>// if we are finding a match
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>history_buffer</font><font face='Lucida Console'>(</font>hpos<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>lookahead_buffer</font><font face='Lucida Console'>(</font>lpos<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>lpos;   
+                <font color='#009900'>// if we have found a match that is as long as the lookahead buffer
+</font>                <font color='#009900'>// then we are done
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lpos <font color='#5555FF'>=</font><font color='#5555FF'>=</font> lookahead_size<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+            <b>}</b>
+            <font color='#009900'>// else if we found the end of a match
+</font>            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lpos <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// if this match is longer than the last match we saw
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lpos <font color='#5555FF'>&gt;</font> match_length<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    match_length <font color='#5555FF'>=</font> lpos;
+                    match_index <font color='#5555FF'>=</font> hpos <font color='#5555FF'>+</font> lpos;
+                <b>}</b>
+                lpos <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+        <b>}</b> <font color='#009900'>// while (hpos != 0)
+</font>
+        <font color='#009900'>// if we found a match at the end of the loop that is greater than 
+</font>        <font color='#009900'>// the match in match_index
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lpos <font color='#5555FF'>&gt;</font> match_length<font face='Lucida Console'>)</font>
+        <b>{</b>
+            match_length <font color='#5555FF'>=</font> lpos;
+            match_index <font color='#5555FF'>=</font> hpos <font color='#5555FF'>+</font> lpos <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+
+        <font color='#009900'>// if we found a match that was long enough then report it
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>match_length <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> min_match_length<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>shift_buffer</font><font face='Lucida Console'>(</font>match_length<font face='Lucida Console'>)</font>;
+            index <font color='#5555FF'>=</font> match_index;
+            length <font color='#5555FF'>=</font> match_length;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            length <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LZ77_BUFFER_KERNEl_1_
+</font>
+
+</pre></body></html>

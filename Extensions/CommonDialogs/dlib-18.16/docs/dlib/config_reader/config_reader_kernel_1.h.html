@@ -1,0 +1,741 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - config_reader_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_CONFIG_READER_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_CONFIG_READER_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='config_reader_kernel_abstract.h.html'>config_reader_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../stl_checked/std_vector_c.h.html'>../stl_checked/std_vector_c.h</a>"
+
+<font color='#0000FF'>#ifndef</font> DLIB_ISO_CPP_ONLY
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='config_reader_thread_safe_1.h.html'>config_reader_thread_safe_1.h</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_string_string,
+        <font color='#0000FF'>typename</font> map_string_void,
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='config_reader_kernel_1'></a>config_reader_kernel_1</b> 
+    <b>{</b>
+
+        <font color='#009900'>/*!                
+            REQUIREMENTS ON map_string_string
+                is an implementation of map/map_kernel_abstract.h that maps std::string to std::string
+
+            REQUIREMENTS ON map_string_void 
+                is an implementation of map/map_kernel_abstract.h that maps std::string to void*
+
+            REQUIREMENTS ON tokenizer
+                is an implementation of tokenizer/tokenizer_kernel_abstract.h 
+
+            CONVENTION
+                key_table.is_in_domain(x) == is_key_defined(x)
+                block_table.is_in_domain(x) == is_block_defined(x)
+
+                key_table[x] == operator[](x)
+                block_table[x] == (void*)&amp;block(x)
+        !*/</font>
+        
+    <font color='#0000FF'>public</font>:
+
+        <font color='#009900'>// These two typedefs are defined for backwards compatibility with older versions of dlib.
+</font>        <font color='#0000FF'>typedef</font> config_reader_kernel_1 kernel_1a;
+<font color='#0000FF'>#ifndef</font> DLIB_ISO_CPP_ONLY
+        <font color='#0000FF'>typedef</font> config_reader_thread_safe_1<font color='#5555FF'>&lt;</font>
+            config_reader_kernel_1,
+            map_string_void 
+            <font color='#5555FF'>&gt;</font> thread_safe_1a;
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ISO_CPP_ONLY
+</font>
+
+        <b><a name='config_reader_kernel_1'></a>config_reader_kernel_1</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>class</font> <b><a name='config_reader_error'></a>config_reader_error</b> : <font color='#0000FF'>public</font> dlib::error 
+        <b>{</b>
+            <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> config_reader_kernel_1;
+            <b><a name='config_reader_error'></a>config_reader_error</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> ln, 
+                <font color='#0000FF'><u>bool</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>false</font>
+            <font face='Lucida Console'>)</font> : 
+                dlib::error<font face='Lucida Console'>(</font>ECONFIG_READER<font face='Lucida Console'>)</font>,
+                line_number<font face='Lucida Console'>(</font>ln<font face='Lucida Console'>)</font>, 
+                redefinition<font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::ostringstream sout;
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Error in config_reader while parsing at line number </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> line_number <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.</font>";
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>redefinition<font face='Lucida Console'>)</font>
+                    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nThe identifier on this line has already been defined in this scope.</font>";
+                <font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>info<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> line_number;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> redefinition;
+        <b>}</b>;
+
+        <font color='#0000FF'>class</font> <b><a name='file_not_found'></a>file_not_found</b> : <font color='#0000FF'>public</font> dlib::error 
+        <b>{</b>
+            <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> config_reader_kernel_1;
+            <b><a name='file_not_found'></a>file_not_found</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name_
+            <font face='Lucida Console'>)</font> : 
+                dlib::error<font face='Lucida Console'>(</font>ECONFIG_READER, "<font color='#CC0000'>Error in config_reader, unable to open file </font>" <font color='#5555FF'>+</font> file_name_<font face='Lucida Console'>)</font>,
+                file_name<font face='Lucida Console'>(</font>file_name_<font face='Lucida Console'>)</font>
+            <b>{</b><b>}</b>
+
+            ~<b><a name='file_not_found'></a>file_not_found</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>const</font> std::string file_name;
+        <b>}</b>;
+
+        <font color='#0000FF'>class</font> <b><a name='config_reader_access_error'></a>config_reader_access_error</b> : <font color='#0000FF'>public</font> dlib::error
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='config_reader_access_error'></a>config_reader_access_error</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> block_name_,
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> key_name_
+            <font face='Lucida Console'>)</font> : 
+                dlib::error<font face='Lucida Console'>(</font>ECONFIG_READER<font face='Lucida Console'>)</font>,
+                block_name<font face='Lucida Console'>(</font>block_name_<font face='Lucida Console'>)</font>, 
+                key_name<font face='Lucida Console'>(</font>key_name_<font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::ostringstream sout;
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Error in config_reader.\n</font>";
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>block_name.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   A block with the name '</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> block_name <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>' was expected but not found.</font>";
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>key_name.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   A key with the name '</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> key_name <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>' was expected but not found.</font>";
+
+                <font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>info<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            ~<b><a name='config_reader_access_error'></a>config_reader_access_error</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>const</font> std::string block_name;
+            <font color='#0000FF'>const</font> std::string key_name;
+        <b>}</b>;
+
+        <b><a name='config_reader_kernel_1'></a>config_reader_kernel_1</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> config_file 
+        <font face='Lucida Console'>)</font>;
+
+        <b><a name='config_reader_kernel_1'></a>config_reader_kernel_1</b><font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='config_reader_kernel_1'></a>config_reader_kernel_1</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='load_from'></a>load_from</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='load_from'></a>load_from</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> config_file
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_key_defined'></a>is_key_defined</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> key
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_block_defined'></a>is_block_defined</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> name
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>typedef</font> config_reader_kernel_1 this_type;
+        <font color='#0000FF'>const</font> this_type<font color='#5555FF'>&amp;</font> <b><a name='block'></a>block</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> name
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> key
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> queue_of_strings
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_keys'></a>get_keys</b> <font face='Lucida Console'>(</font>
+            queue_of_strings<font color='#5555FF'>&amp;</font> keys
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> alloc 
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_keys'></a>get_keys</b> <font face='Lucida Console'>(</font>
+            std::vector<font color='#5555FF'>&lt;</font>std::string,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> keys
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> alloc 
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_keys'></a>get_keys</b> <font face='Lucida Console'>(</font>
+            std_vector_c<font color='#5555FF'>&lt;</font>std::string,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> keys
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> queue_of_strings
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_blocks'></a>get_blocks</b> <font face='Lucida Console'>(</font>
+            queue_of_strings<font color='#5555FF'>&amp;</font> blocks
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> alloc 
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_blocks'></a>get_blocks</b> <font face='Lucida Console'>(</font>
+            std::vector<font color='#5555FF'>&lt;</font>std::string,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> blocks
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> alloc 
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_blocks'></a>get_blocks</b> <font face='Lucida Console'>(</font>
+            std_vector_c<font color='#5555FF'>&lt;</font>std::string,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> blocks
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>static</font> <font color='#0000FF'><u>void</u></font> <b><a name='parse_config_file'></a>parse_config_file</b> <font face='Lucida Console'>(</font>
+            config_reader_kernel_1<font color='#5555FF'>&amp;</font> cr,
+            tokenizer<font color='#5555FF'>&amp;</font> tok,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> line_number,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> top_of_recursion <font color='#5555FF'>=</font> <font color='#979000'>true</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - line_number == 1
+                - cr == *this
+                - top_of_recursion == true
+            ensures
+                - parses the data coming from tok and puts it into cr.
+            throws
+                - config_reader_error
+        !*/</font>
+
+        map_string_string key_table;
+        map_string_void block_table;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='config_reader_kernel_1'></a>config_reader_kernel_1</b><font face='Lucida Console'>(</font>config_reader_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;     
+        config_reader_kernel_1<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>config_reader_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_string_string,
+        <font color='#0000FF'>typename</font> map_string_void,
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    config_reader_kernel_1<font color='#5555FF'>&lt;</font>map_string_string,map_string_void,tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='config_reader_kernel_1'></a>config_reader_kernel_1</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_string_string,
+        <font color='#0000FF'>typename</font> map_string_void,
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> config_reader_kernel_1<font color='#5555FF'>&lt;</font>map_string_string,map_string_void,tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// free all our blocks
+</font>        block_table.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>block_table.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>delete</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>config_reader_kernel_1<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>block_table.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        block_table.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        key_table.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_string_string,
+        <font color='#0000FF'>typename</font> map_string_void,
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> config_reader_kernel_1<font color='#5555FF'>&lt;</font>map_string_string,map_string_void,tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='load_from'></a>load_from</b><font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        tokenizer tok;
+        tok.<font color='#BB00BB'>set_stream</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>;
+        tok.<font color='#BB00BB'>set_identifier_token</font><font face='Lucida Console'>(</font>
+            tok.<font color='#BB00BB'>lowercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> tok.<font color='#BB00BB'>uppercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            tok.<font color='#BB00BB'>lowercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> tok.<font color='#BB00BB'>uppercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> tok.<font color='#BB00BB'>numbers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> "<font color='#CC0000'>_-.</font>"
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> line_number <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>parse_config_file</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,tok,line_number<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>throw</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_string_string,
+        <font color='#0000FF'>typename</font> map_string_void,
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> config_reader_kernel_1<font color='#5555FF'>&lt;</font>map_string_string,map_string_void,tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='load_from'></a>load_from</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> config_file
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        std::ifstream <font color='#BB00BB'>fin</font><font face='Lucida Console'>(</font>config_file.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>fin<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>file_not_found</font><font face='Lucida Console'>(</font>config_file<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>load_from</font><font face='Lucida Console'>(</font>fin<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_string_string,
+        <font color='#0000FF'>typename</font> map_string_void,
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    config_reader_kernel_1<font color='#5555FF'>&lt;</font>map_string_string,map_string_void,tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='config_reader_kernel_1'></a>config_reader_kernel_1</b><font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>load_from</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_string_string,
+        <font color='#0000FF'>typename</font> map_string_void,
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    config_reader_kernel_1<font color='#5555FF'>&lt;</font>map_string_string,map_string_void,tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='config_reader_kernel_1'></a>config_reader_kernel_1</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> config_file
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>load_from</font><font face='Lucida Console'>(</font>config_file<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_string_string,
+        <font color='#0000FF'>typename</font> map_string_void,
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> config_reader_kernel_1<font color='#5555FF'>&lt;</font>map_string_string,map_string_void,tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='parse_config_file'></a>parse_config_file</b><font face='Lucida Console'>(</font>
+        config_reader_kernel_1<font color='#5555FF'>&lt;</font>map_string_string,map_string_void,tokenizer<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> cr,
+        tokenizer<font color='#5555FF'>&amp;</font> tok,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> line_number,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> top_of_recursion
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>int</u></font> type;
+        std::string token;
+        <font color='#0000FF'><u>bool</u></font> in_comment <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'><u>bool</u></font> seen_identifier <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        std::string identifier;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            tok.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// ignore white space
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tokenizer::WHITE_SPACE<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>continue</font>;
+
+            <font color='#009900'>// basically ignore end of lines
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tokenizer::END_OF_LINE<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>line_number;
+                in_comment <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>continue</font>;
+            <b>}</b>
+
+            <font color='#009900'>// we are in a comment still so ignore this
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in_comment<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>continue</font>;
+
+            <font color='#009900'>// if this is the start of a comment
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tokenizer::CHAR <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> token[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>#</font>'<font face='Lucida Console'>)</font>
+            <b>{</b>
+                in_comment <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <font color='#0000FF'>continue</font>;
+            <b>}</b>
+
+            <font color='#009900'>// if this is the case then we have just finished parsing a block so we should
+</font>            <font color='#009900'>// quit this function
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tokenizer::CHAR <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> token[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>}</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>top_of_recursion<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                 <font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tokenizer::END_OF_FILE <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> top_of_recursion<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>break</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>seen_identifier<font face='Lucida Console'>)</font>
+            <b>{</b>
+                seen_identifier <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <font color='#009900'>// the next character should be either a '=' or a '{'
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>type <font color='#5555FF'>!</font><font color='#5555FF'>=</font> tokenizer::CHAR <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>token[<font color='#979000'>0</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>=</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> token[<font color='#979000'>0</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>{</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>config_reader_error</font><font face='Lucida Console'>(</font>line_number<font face='Lucida Console'>)</font>;
+                
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>token[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>=</font>'<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// we should parse the value out now
+</font>                    <font color='#009900'>// first discard any white space
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tok.<font color='#BB00BB'>peek_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tokenizer::WHITE_SPACE<font face='Lucida Console'>)</font>
+                        tok.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+
+                    std::string value;
+                    type <font color='#5555FF'>=</font> tok.<font color='#BB00BB'>peek_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    token <font color='#5555FF'>=</font> tok.<font color='#BB00BB'>peek_token</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tokenizer::END_OF_FILE <font color='#5555FF'>|</font><font color='#5555FF'>|</font> type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tokenizer::END_OF_LINE<font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>break</font>;
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tokenizer::CHAR <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> token[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\\</font>'<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            tok.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tok.<font color='#BB00BB'>peek_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tokenizer::CHAR <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                                tok.<font color='#BB00BB'>peek_token</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>#</font>'<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                tok.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+                                value <font color='#5555FF'>+</font><font color='#5555FF'>=</font> '<font color='#FF0000'>#</font>';
+                            <b>}</b>
+                            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tok.<font color='#BB00BB'>peek_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tokenizer::CHAR <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                                tok.<font color='#BB00BB'>peek_token</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>}</font>'<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                tok.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+                                value <font color='#5555FF'>+</font><font color='#5555FF'>=</font> '<font color='#FF0000'>}</font>';
+                            <b>}</b>
+                            <font color='#0000FF'>else</font>
+                            <b>{</b>
+                                value <font color='#5555FF'>+</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\\</font>';
+                            <b>}</b>
+                        <b>}</b>
+                        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tokenizer::CHAR <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                                 <font face='Lucida Console'>(</font>token[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>#</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> token[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>}</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>break</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            value <font color='#5555FF'>+</font><font color='#5555FF'>=</font> token;
+                            tok.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        type <font color='#5555FF'>=</font> tok.<font color='#BB00BB'>peek_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        token <font color='#5555FF'>=</font> tok.<font color='#BB00BB'>peek_token</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <b>}</b> <font color='#009900'>// while(true)
+</font>
+                    <font color='#009900'>// strip of any tailing white space from value
+</font>                    std::string::size_type pos <font color='#5555FF'>=</font> value.<font color='#BB00BB'>find_last_not_of</font><font face='Lucida Console'>(</font>"<font color='#CC0000'> \t\r\n</font>"<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pos <font color='#5555FF'>=</font><font color='#5555FF'>=</font> std::string::npos<font face='Lucida Console'>)</font>
+                        value.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>else</font>
+                        value.<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font>pos<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// make sure this key isn't already in the key_table
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cr.key_table.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>identifier<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>throw</font> <font color='#BB00BB'>config_reader_error</font><font face='Lucida Console'>(</font>line_number,<font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// add this key/value pair to the key_table
+</font>                    cr.key_table.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>identifier,value<font face='Lucida Console'>)</font>;
+
+                <b>}</b>
+                <font color='#0000FF'>else</font>  <font color='#009900'>// when token[0] == '{'
+</font>                <b>{</b>
+                    <font color='#009900'>// make sure this identifier isn't already in the block_table
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cr.block_table.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>identifier<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>throw</font> <font color='#BB00BB'>config_reader_error</font><font face='Lucida Console'>(</font>line_number,<font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+
+                    config_reader_kernel_1<font color='#5555FF'>*</font> new_cr <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> config_reader_kernel_1;
+                    <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> vtemp <font color='#5555FF'>=</font> new_cr;
+                    <font color='#0000FF'>try</font> <b>{</b> cr.block_table.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>identifier,vtemp<font face='Lucida Console'>)</font>; <b>}</b>
+                    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>delete</font> new_cr; <font color='#0000FF'>throw</font>; <b>}</b>
+
+                    <font color='#009900'>// now parse this block 
+</font>                    <font color='#BB00BB'>parse_config_file</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>new_cr,tok,line_number,<font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// the next thing should be an identifier but if it isn't this is an error
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>type <font color='#5555FF'>!</font><font color='#5555FF'>=</font> tokenizer::IDENTIFIER<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>config_reader_error</font><font face='Lucida Console'>(</font>line_number<font face='Lucida Console'>)</font>;
+
+                seen_identifier <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                identifier <font color='#5555FF'>=</font> token;
+            <b>}</b>
+        <b>}</b> <font color='#009900'>// while (true) 
+</font>    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_string_string,
+        <font color='#0000FF'>typename</font> map_string_void,
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    config_reader_kernel_1<font color='#5555FF'>&lt;</font>map_string_string,map_string_void,tokenizer<font color='#5555FF'>&gt;</font>::
+    ~<b><a name='config_reader_kernel_1'></a>config_reader_kernel_1</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_string_string,
+        <font color='#0000FF'>typename</font> map_string_void,
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> config_reader_kernel_1<font color='#5555FF'>&lt;</font>map_string_string,map_string_void,tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='is_key_defined'></a>is_key_defined</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> key
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> key_table.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>key<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_string_string,
+        <font color='#0000FF'>typename</font> map_string_void,
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> config_reader_kernel_1<font color='#5555FF'>&lt;</font>map_string_string,map_string_void,tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='is_block_defined'></a>is_block_defined</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> name
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> block_table.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>name<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> mss,
+        <font color='#0000FF'>typename</font> msv,
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> config_reader_kernel_1<font color='#5555FF'>&lt;</font>mss,msv,tokenizer<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> config_reader_kernel_1<font color='#5555FF'>&lt;</font>mss,msv,tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='block'></a>block</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> name
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_block_defined</font><font face='Lucida Console'>(</font>name<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>config_reader_access_error</font><font face='Lucida Console'>(</font>name,"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>config_reader_kernel_1<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>block_table[name]<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_string_string,
+        <font color='#0000FF'>typename</font> map_string_void,
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> config_reader_kernel_1<font color='#5555FF'>&lt;</font>map_string_string,map_string_void,tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> key
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>key<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>config_reader_access_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>",key<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> key_table[key];
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_string_string,
+        <font color='#0000FF'>typename</font> map_string_void,
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> queue_of_strings
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> config_reader_kernel_1<font color='#5555FF'>&lt;</font>map_string_string,map_string_void,tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_keys'></a>get_keys</b> <font face='Lucida Console'>(</font>
+        queue_of_strings<font color='#5555FF'>&amp;</font> keys
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        keys.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        key_table.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        std::string temp;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>key_table.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            temp <font color='#5555FF'>=</font> key_table.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            keys.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_string_string,
+        <font color='#0000FF'>typename</font> map_string_void,
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> alloc 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> config_reader_kernel_1<font color='#5555FF'>&lt;</font>map_string_string,map_string_void,tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_keys'></a>get_keys</b> <font face='Lucida Console'>(</font>
+        std::vector<font color='#5555FF'>&lt;</font>std::string,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> keys
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        keys.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        key_table.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>key_table.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            keys.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>key_table.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_string_string,
+        <font color='#0000FF'>typename</font> map_string_void,
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> alloc 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> config_reader_kernel_1<font color='#5555FF'>&lt;</font>map_string_string,map_string_void,tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_keys'></a>get_keys</b> <font face='Lucida Console'>(</font>
+        std_vector_c<font color='#5555FF'>&lt;</font>std::string,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> keys
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        keys.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        key_table.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>key_table.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            keys.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>key_table.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_string_string,
+        <font color='#0000FF'>typename</font> map_string_void,
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> queue_of_strings
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> config_reader_kernel_1<font color='#5555FF'>&lt;</font>map_string_string,map_string_void,tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_blocks'></a>get_blocks</b> <font face='Lucida Console'>(</font>
+        queue_of_strings<font color='#5555FF'>&amp;</font> blocks
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        blocks.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        block_table.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        std::string temp;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>block_table.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            temp <font color='#5555FF'>=</font> block_table.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            blocks.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_string_string,
+        <font color='#0000FF'>typename</font> map_string_void,
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> alloc 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> config_reader_kernel_1<font color='#5555FF'>&lt;</font>map_string_string,map_string_void,tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_blocks'></a>get_blocks</b> <font face='Lucida Console'>(</font>
+        std::vector<font color='#5555FF'>&lt;</font>std::string,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> blocks
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        blocks.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        block_table.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>block_table.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            blocks.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>block_table.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_string_string,
+        <font color='#0000FF'>typename</font> map_string_void,
+        <font color='#0000FF'>typename</font> tokenizer
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> alloc 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> config_reader_kernel_1<font color='#5555FF'>&lt;</font>map_string_string,map_string_void,tokenizer<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_blocks'></a>get_blocks</b> <font face='Lucida Console'>(</font>
+        std_vector_c<font color='#5555FF'>&lt;</font>std::string,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> blocks
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        blocks.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        block_table.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>block_table.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            blocks.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>block_table.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CONFIG_READER_KERNEl_1_
+</font>
+
+</pre></body></html>

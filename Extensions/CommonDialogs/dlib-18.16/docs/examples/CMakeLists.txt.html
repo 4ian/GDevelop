@@ -1,0 +1,134 @@
+<html><head><title>
+examples/CMakeLists.txt
+</title></head><body bgcolor='white'><pre>
+<font color='#009900'>#</font>
+<font color='#009900'># This is a CMake makefile.  You can find the cmake utility and</font>
+<font color='#009900'># information about it at http://www.cmake.org</font>
+<font color='#009900'>#</font>
+
+
+<font color='blue'>cmake_minimum_required</font>(VERSION 2.8.4)
+
+<font color='blue'>PROJECT</font>(examples)
+
+<font color='blue'>include</font>(../dlib/cmake)
+
+<font color='#009900'># Tell CMake to compile a program.  We do this with the ADD_EXECUTABLE()</font>
+<font color='#009900'># statement which takes the name of the output executable and then a list of</font>
+<font color='#009900'># .cpp files to compile.  Here each example consists of only one .cpp file but</font>
+<font color='#009900'># in general you will make programs that const of many .cpp files.</font>
+<font color='blue'>ADD_EXECUTABLE</font>(assignment_learning_ex assignment_learning_ex.cpp)
+<font color='#009900'># Then we tell it to link with dlib.</font>
+<font color='blue'>TARGET_LINK_LIBRARIES</font>(assignment_learning_ex dlib)
+
+
+
+
+<font color='#009900'># Since there are a lot of examples I'm going to use a macro to simply this</font>
+<font color='#009900'># CMakeLists.txt file.  However, usually you will create only one executable in</font>
+<font color='#009900'># your cmake projects and use the syntax shown above.</font>
+<font color='blue'>MACRO</font>(add_example name)
+<font color='blue'>   ADD_EXECUTABLE</font>(${<font color='#BB00BB'>name</font>} ${<font color='#BB00BB'>name</font>}.cpp)
+<font color='blue'>   TARGET_LINK_LIBRARIES</font>(${<font color='#BB00BB'>name</font>} dlib )
+<font color='blue'>ENDMACRO</font>()
+
+
+<font color='#009900'>#here we apply our macros </font>
+<font color='blue'>add_example</font>(3d_point_cloud_ex)
+<font color='blue'>add_example</font>(bayes_net_ex)
+<font color='blue'>add_example</font>(bayes_net_from_disk_ex)
+<font color='blue'>add_example</font>(bayes_net_gui_ex)
+<font color='blue'>add_example</font>(bridge_ex)
+<font color='blue'>add_example</font>(bsp_ex)
+<font color='blue'>add_example</font>(compress_stream_ex)
+<font color='blue'>add_example</font>(config_reader_ex)
+<font color='blue'>add_example</font>(custom_trainer_ex)
+<font color='blue'>add_example</font>(dir_nav_ex)
+<font color='blue'>add_example</font>(empirical_kernel_map_ex)
+<font color='blue'>add_example</font>(face_detection_ex)
+<font color='blue'>add_example</font>(face_landmark_detection_ex)
+<font color='blue'>add_example</font>(fhog_ex)
+<font color='blue'>add_example</font>(fhog_object_detector_ex)
+<font color='blue'>add_example</font>(file_to_code_ex)
+<font color='blue'>add_example</font>(graph_labeling_ex)
+<font color='blue'>add_example</font>(gui_api_ex)
+<font color='blue'>add_example</font>(hough_transform_ex)
+<font color='blue'>add_example</font>(image_ex)
+<font color='blue'>add_example</font>(integrate_function_adapt_simp_ex)
+<font color='blue'>add_example</font>(iosockstream_ex)
+<font color='blue'>add_example</font>(kcentroid_ex)
+<font color='blue'>add_example</font>(kkmeans_ex)
+<font color='blue'>add_example</font>(krls_ex)
+<font color='blue'>add_example</font>(krls_filter_ex)
+<font color='blue'>add_example</font>(krr_classification_ex)
+<font color='blue'>add_example</font>(krr_regression_ex)
+<font color='blue'>add_example</font>(learning_to_track_ex)
+<font color='blue'>add_example</font>(least_squares_ex)
+<font color='blue'>add_example</font>(linear_manifold_regularizer_ex)
+<font color='blue'>add_example</font>(logger_custom_output_ex)
+<font color='blue'>add_example</font>(logger_ex)
+<font color='blue'>add_example</font>(logger_ex_2)
+<font color='blue'>add_example</font>(matrix_ex)
+<font color='blue'>add_example</font>(matrix_expressions_ex)
+<font color='blue'>add_example</font>(max_cost_assignment_ex)
+<font color='blue'>add_example</font>(member_function_pointer_ex)
+<font color='blue'>add_example</font>(mlp_ex)
+<font color='blue'>add_example</font>(model_selection_ex)
+<font color='blue'>add_example</font>(mpc_ex)
+<font color='blue'>add_example</font>(multiclass_classification_ex)
+<font color='blue'>add_example</font>(multithreaded_object_ex)
+<font color='blue'>add_example</font>(object_detector_advanced_ex)
+<font color='blue'>add_example</font>(object_detector_ex)
+<font color='blue'>add_example</font>(one_class_classifiers_ex)
+<font color='blue'>add_example</font>(optimization_ex)
+<font color='blue'>add_example</font>(parallel_for_ex)
+<font color='blue'>add_example</font>(pipe_ex)
+<font color='blue'>add_example</font>(pipe_ex_2)
+<font color='blue'>add_example</font>(quantum_computing_ex)
+<font color='blue'>add_example</font>(queue_ex)
+<font color='blue'>add_example</font>(rank_features_ex)
+<font color='blue'>add_example</font>(running_stats_ex)
+<font color='blue'>add_example</font>(rvm_ex)
+<font color='blue'>add_example</font>(rvm_regression_ex)
+<font color='blue'>add_example</font>(sequence_labeler_ex)
+<font color='blue'>add_example</font>(sequence_segmenter_ex)
+<font color='blue'>add_example</font>(server_http_ex)
+<font color='blue'>add_example</font>(server_iostream_ex)
+<font color='blue'>add_example</font>(sockets_ex)
+<font color='blue'>add_example</font>(sockstreambuf_ex)
+<font color='blue'>add_example</font>(std_allocator_ex)
+<font color='blue'>add_example</font>(surf_ex)
+<font color='blue'>add_example</font>(svm_c_ex)
+<font color='blue'>add_example</font>(svm_ex)
+<font color='blue'>add_example</font>(svm_pegasos_ex)
+<font color='blue'>add_example</font>(svm_rank_ex)
+<font color='blue'>add_example</font>(svm_sparse_ex)
+<font color='blue'>add_example</font>(svm_struct_ex)
+<font color='blue'>add_example</font>(svr_ex)
+<font color='blue'>add_example</font>(thread_function_ex)
+<font color='blue'>add_example</font>(thread_pool_ex)
+<font color='blue'>add_example</font>(threaded_object_ex)
+<font color='blue'>add_example</font>(threads_ex)
+<font color='blue'>add_example</font>(timer_ex)
+<font color='blue'>add_example</font>(train_object_detector)
+<font color='blue'>add_example</font>(train_shape_predictor_ex)
+<font color='blue'>add_example</font>(using_custom_kernels_ex)
+<font color='blue'>add_example</font>(video_tracking_ex)
+<font color='blue'>add_example</font>(xml_parser_ex)
+
+
+<font color='blue'>find_package</font>(OpenCV)
+<font color='blue'>if </font>(OpenCV_FOUND)
+<font color='blue'>   include_directories</font>(${<font color='#BB00BB'>OpenCV_INCLUDE_DIRS</font>})
+
+<font color='blue'>   ADD_EXECUTABLE</font>(webcam_face_pose_ex webcam_face_pose_ex.cpp)
+<font color='blue'>   TARGET_LINK_LIBRARIES</font>(webcam_face_pose_ex dlib ${<font color='#BB00BB'>OpenCV_LIBS</font>} )
+<font color='blue'>endif</font>()
+
+
+<font color='blue'>if </font>(DLIB_LINK_WITH_SQLITE3)
+<font color='blue'>   add_example</font>(sqlite_ex)
+<font color='blue'>endif</font>()
+
+
+</pre></body></html>

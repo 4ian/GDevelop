@@ -1,0 +1,498 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sockets_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SOCKETS_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_SOCKETS_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads.h.html'>../threads.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>/*!
+        GENERAL COMMENTS:
+            Nothing in here will throw exceptions.   
+            
+            All ip address strings in this file refer to IPv4 addresses.  For 
+            example "192.168.1.1"
+
+            Timeouts:
+                All timeout values are measured in milliseconds but you are not 
+                guaranteed to have that level of resolution.  The actual resolution
+                is implementation defined.
+
+            GENERAL WARNING
+                Don't call any of these functions or make any of these objects 
+                before main() has been entered.  
+
+        EXCEPTIONS
+            Unless specified otherwise, nothing in this file throws exceptions.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// LOOKUP FUNCTIONS
+</font>
+    <font color='#009900'>// all lookup functions are thread-safe
+</font>
+    <font color='#0000FF'><u>int</u></font> <b><a name='get_local_hostname'></a>get_local_hostname</b> <font face='Lucida Console'>(</font>
+        std::string<font color='#5555FF'>&amp;</font> hostname
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - if (#get_local_hostname() == 0) then
+                - #hostname == a string containing the hostname of the local computer 
+
+            - returns 0 upon success
+            - returns OTHER_ERROR upon failure and in this case #hostname's value 
+              is undefined
+    !*/</font> 
+
+<font color='#009900'>// -----------------
+</font>
+    <font color='#0000FF'><u>int</u></font> <b><a name='hostname_to_ip'></a>hostname_to_ip</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> hostname,
+        std::string<font color='#5555FF'>&amp;</font> ip,
+        <font color='#0000FF'><u>int</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - n &gt;= 0
+        ensures
+            - if (#hostname_to_ip() == 0) then
+                - #ip == string containing the nth ip address associated with the hostname
+
+            - returns 0 upon success 
+            - returns OTHER_ERROR upon failure  
+    !*/</font>
+
+<font color='#009900'>// -----------------
+</font>
+    <font color='#0000FF'><u>int</u></font> <b><a name='ip_to_hostname'></a>ip_to_hostname</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ip,
+        std::string<font color='#5555FF'>&amp;</font> hostname
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - if (#ip_to_hostname() == 0) then
+                - #hostname == string containing the hostname associated with ip
+
+            - returns 0 upon success 
+            - returns OTHER_ERROR upon failure 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>//
+</font>    <font color='#009900'>// socket creation functions
+</font>    <font color='#009900'>// 
+</font>    <font color='#009900'>// The following functions are guaranteed to be thread-safe
+</font>    <font color='#009900'>//
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------    
+</font>
+    <font color='#0000FF'><u>int</u></font> <b><a name='create_listener'></a>create_listener</b> <font face='Lucida Console'>(</font>
+        listener<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> new_listener,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ip <font color='#5555FF'>=</font> "<font color='#CC0000'></font>"
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt;= port &lt;= 65535
+        ensures
+            - if (#create_listener() == 0) then
+                - #new_listener == a pointer to a listener object that is listening on 
+                  the specified port and ip for an incoming connection 
+                - if (ip == "") then 
+                    - the new listener will be listening on all interfaces 
+                - if (port == 0) then 
+                    - the operating system will assign a free port to listen on 
+
+
+            - returns 0 if create_listener was successful 
+            - returns PORTINUSE if the specified local port was already in use 
+            - returns OTHER_ERROR if some other error occurred
+    !*/</font>
+
+    <font color='#0000FF'><u>int</u></font> <b><a name='create_listener'></a>create_listener</b> <font face='Lucida Console'>(</font>
+        scoped_ptr<font color='#5555FF'>&lt;</font>listener<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> new_listener,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ip <font color='#5555FF'>=</font> "<font color='#CC0000'></font>"
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        This function is just an overload of the above function but it gives you a
+        scoped_ptr smart pointer instead of a C pointer.
+    !*/</font>
+
+    <font color='#0000FF'><u>int</u></font> <b><a name='create_connection'></a>create_connection</b> <font face='Lucida Console'>(</font> 
+        connection<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> new_connection,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> foreign_port, 
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> foreign_ip, 
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> local_port <font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> local_ip <font color='#5555FF'>=</font> "<font color='#CC0000'></font>"
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt;  foreign_port &lt;= 65535 
+            - 0 &lt;= local_port   &lt;= 65535
+        ensures
+            - if (#create_connection() == 0) then
+                - #new_connection  == a pointer to a connection object that is connected 
+                  to foreign_ip on port foreign_port and is using the local interface 
+                  local_ip and local port local_port
+                - #new_connection-&gt;user_data == 0
+                - if (local_ip == "") then 
+                    - the operating system will chose this for you
+                - if (local_port == 0) then 
+                    - the operating system will chose this for you
+
+            - returns 0 if create_connection was successful 
+            - returns PORTINUSE if the specified local port was already in use 
+            - returns OTHER_ERROR if some other error occurred
+        !*/</font>
+
+    <font color='#0000FF'><u>int</u></font> <b><a name='create_connection'></a>create_connection</b> <font face='Lucida Console'>(</font> 
+        scoped_ptr<font color='#5555FF'>&lt;</font>connection<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> new_connection,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> foreign_port, 
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> foreign_ip, 
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> local_port <font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> local_ip <font color='#5555FF'>=</font> "<font color='#CC0000'></font>"
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        This function is just an overload of the above function but it gives you a
+        scoped_ptr smart pointer instead of a C pointer.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// connection object
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='connection'></a>connection</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a TCP connection.
+
+                Instances of this class can only be created by using the 
+                create_connection function or listener class defined below.
+
+                NOTE:  
+                    A connection object must ALWAYS be closed (delete the pointer to the 
+                    connection) or it will cause a resource leak.  
+
+                    Note also that all errors indicated by a return code of OTHER_ERROR
+                    are fatal so if one occurs the connection should just be closed.
+
+            CLOSING A CONNECTION
+                Note that if ~connection() or shutdown() is called before the remote client 
+                has received all sent data it is possible that the data will be lost.  To 
+                avoid this you should call the close_gracefully() function to close your 
+                connections (unless you actually do want to immediately dispose of a 
+                connection and don't care about the data).
+                (example: close_gracefully(con); // close con gracefully but force it closed
+                                                   // if it takes more than 500 milliseconds.)
+
+            THREAD SAFETY
+                - It is always safe to call shutdown() or shutdown_outgoing().   
+                - you may NOT call any function more than once at a time (except the 
+                  shutdown functions).
+                - do not call read() more than once at a time
+                - do not call write() more than once at a time
+                - You can safely call shutdown or shutdown_outgoing in conjunction with 
+                  the read/write functions.
+                    This is helpful if you want to unblock another thread that is 
+                    blocking on a read/write operation.  Shutting down the connection 
+                    will cause the read/write functions to return a value of SHUTDOWN.
+
+            OUT-OF-BAND DATA:
+                All out-of-band data will be put inline into the normal data stream.
+                This means that you can read any out-of-band data via calls to read(). 
+                (i.e. the SO_OOBINLINE socket option will be set) 
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        ~<b><a name='connection'></a>connection</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - no other threads are using this connection object 
+            ensures
+                - closes the connection (this is an abrupt non-graceful close) 
+                - frees the resources used by this object
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> user_data;
+        <font color='#009900'>/*!
+            This pointer is provided so that the client programmer may easily associate
+            some data with a connection object.  You can really do whatever you want
+            with it.  Initially user_data is 0.
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='write'></a>write</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> buf, 
+            <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - num &gt; 0 
+                - buf points to an array of at least num bytes
+            ensures
+                - will block until ONE of the following occurs:
+                    - num bytes from buf have been written to the connection 
+                    - an error has occurred
+                    - the outgoing channel of the connection has been shutdown locally
+
+                - returns num if write succeeded 
+                - returns OTHER_ERROR if there was an error (this could be due to a 
+                  connection close)
+                - returns SHUTDOWN if the outgoing channel of the connection has been 
+                  shutdown locally
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='read'></a>read</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> buf, 
+            <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - num &gt; 0 
+                - buf points to an array of at least num bytes
+            ensures
+                - read() will not read more than num bytes of data into #buf 
+                - read blocks until ONE of the following happens:
+                    - there is some data available and it has been written into #buf 
+                    - the remote end of the connection is closed 
+                    - an error has occurred
+                    - the connection has been shutdown locally
+
+                - returns the number of bytes read into #buf if there was any data.
+                - returns 0 if the connection has ended/terminated and there is no more data.
+                - returns OTHER_ERROR if there was an error.
+                - returns SHUTDOWN if the connection has been shutdown locally
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='read'></a>read</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> buf, 
+            <font color='#0000FF'><u>long</u></font> num,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - num &gt; 0 
+                - buf points to an array of at least num bytes
+                - timeout &lt; 2000000                
+            ensures
+                - read() will not read more than num bytes of data into #buf 
+                - if (timeout &gt; 0) then read() blocks until ONE of the following happens:
+                    - there is some data available and it has been written into #buf 
+                    - the remote end of the connection is closed 
+                    - an error has occurred
+                    - the connection has been shutdown locally
+                    - timeout milliseconds has elapsed
+                - else
+                    - read() does not block
+
+                - returns the number of bytes read into #buf if there was any data.
+                - returns 0 if the connection has ended/terminated and there is no more data.
+                - returns TIMEOUT if timeout milliseconds elapsed before we got any data.
+                - returns OTHER_ERROR if there was an error.
+                - returns SHUTDOWN if the connection has been shutdown locally
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> <b><a name='get_local_port'></a>get_local_port</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the local port number for this connection
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> <b><a name='get_foreign_port'></a>get_foreign_port</b> <font face='Lucida Console'>(</font> 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the foreign port number for this connection
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='get_local_ip'></a>get_local_ip</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the IP of the local interface this connection is using
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='get_foreign_ip'></a>get_foreign_ip</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the IP of the foreign host for this connection
+        !*/</font>
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='shutdown'></a>shutdown</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (#shutdown() == 0 &amp;&amp; connection was still open) then
+                    - terminates the connection but does not free the resources for the 
+                      connection object 
+
+                - any read() or write() calls on this connection will return immediately 
+                  with the code SHUTDOWN.
+
+                - returns 0 upon success 
+                - returns OTHER_ERROR if there was an error
+        !*/</font>        
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='shutdown_outgoing'></a>shutdown_outgoing</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (#shutdown_outgoing() == 0 &amp;&amp; outgoing channel was still open) then
+                    - sends a FIN to indicate that no more data will be sent on this 
+                      connection but leaves the receive half of the connection open to 
+                      receive more data from the other host 
+
+                - any calls to write() will return immediately with the code SHUTDOWN.
+
+                - returns 0 upon success 
+                - returns OTHER_ERROR if there was an error 
+        !*/</font>
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='disable_nagle'></a>disable_nagle</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - Sets the TCP_NODELAY socket option to disable Nagle's algorithm.
+                  This can sometimes reduce transmission latency, however, in almost
+                  all normal cases you don't want to mess with this as the default
+                  setting is usually appropriate.  
+
+                - returns 0 upon success
+                - returns OTHER_ERROR if there was an error 
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> platform_specific_type socket_descriptor_type;
+        socket_descriptor_type <b><a name='get_socket_descriptor'></a>get_socket_descriptor</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the underlying socket descriptor for this connection
+                  object.  The reason you might want access to this is to 
+                  pass it to some other library that requires a socket file 
+                  descriptor.  However, if you do this then you probably shouldn't 
+                  use the dlib::connection read() and write() anymore since
+                  whatever you are doing with the socket descriptor is probably 
+                  doing I/O with the socket.
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='connection'></a>connection</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b><a name='connection'></a>connection</b><font face='Lucida Console'>(</font>connection<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        connection<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>connection<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>; 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// listener object
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='listener'></a>listener</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a TCP socket waiting for incoming connections.
+                Calling accept returns a pointer to any new incoming connections on its
+                port.
+
+                Instances of this class can only be created by using the 
+                create_listener function defined below.
+
+                NOTE:  
+                    A listener object must ALWAYS be closed (delete the pointer to it) or 
+                    it will cause a resource leak.  
+
+                    Note also that all errors indicated by a return code of OTHER_ERROR
+                    are fatal so if one occurs the listener should be closed.
+
+            THREAD SAFETY
+                None of the functions in this object are guaranteed to be thread-safe.
+                This means that you must serialize all access to this object.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        ~<b><a name='listener'></a>listener</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - no other threads are using this listener object 
+            ensures
+                - closes the listener 
+                - frees the resources used by this object
+        !*/</font>
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='accept'></a>accept</b> <font face='Lucida Console'>(</font>
+            connection<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> new_connection,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - timeout &lt; 2000000                
+            ensures
+                - blocks until a new connection is ready or timeout milliseconds have 
+                  elapsed.
+                - #new_connection == a pointer to the new connection object 
+                - #new_connection-&gt;user_data == 0
+                - if (timeout == 0) then 
+                    - the timeout argument is ignored
+
+                - returns 0 if accept() was successful                
+                - returns TIMEOUT if timeout milliseconds have elapsed 
+                - returns OTHER_ERROR if an error has occurred 
+        !*/</font>
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='accept'></a>accept</b> <font face='Lucida Console'>(</font>
+            scoped_ptr<font color='#5555FF'>&lt;</font>connection<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> new_connection,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            This function is just an overload of the above function but it gives you a
+            scoped_ptr smart pointer instead of a C pointer.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> <b><a name='get_listening_port'></a>get_listening_port</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the port number that this object is listening on
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='get_listening_ip'></a>get_listening_ip</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a string containing the IP (e.g. "127.0.0.1") of the 
+                  interface this object is listening on 
+                - returns "" if it is accepting connections on all interfaces
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='listener'></a>listener</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b><a name='listener'></a>listener</b><font face='Lucida Console'>(</font>listener<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        listener<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>listener<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SOCKETS_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

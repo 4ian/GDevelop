@@ -1,0 +1,158 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - tokenizer_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_TOKENIZER_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_TOKENIZER_KERNEl_1_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iosfwd<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>climits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tokenizer_kernel_abstract.h.html'>tokenizer_kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='tokenizer_kernel_1'></a>tokenizer_kernel_1</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - in == 0
+                - streambuf == 0
+                - have_peeked == false
+                - head == "_" + lowercase_letters() + uppercase_letters()
+                - body == "_" + lowercase_letters() + uppercase_letters() + numbers()
+                - headset == pointer to an array of UCHAR_MAX bools and set according 
+                  to the CONVENTION.
+                - bodyset == pointer to an array of UCHAR_MAX bools and set according 
+                  to the CONVENTION.
+
+            CONVENTION  
+                - if (stream_is_set()) then
+                    - get_stream() == *in
+                    - streambuf == in-&gt;rdbuf()
+                - else
+                    - in == 0
+                    - streambuf == 0
+
+                - body == get_identifier_body()
+                - head == get_identifier_head()
+
+                - if (the char x appears in head) then
+                    - headset[static_cast&lt;unsigned char&gt;(x)] == true
+                - else
+                    - headset[static_cast&lt;unsigned char&gt;(x)] == false
+
+                - if (the char x appears in body) then
+                    - bodyset[static_cast&lt;unsigned char&gt;(x)] == true
+                - else
+                    - bodyset[static_cast&lt;unsigned char&gt;(x)] == false
+
+                - if (have_peeked) then
+                    - next_token == the next token to be returned from get_token()
+                    - next_type == the type of token in peek_token
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#009900'>// The name of this enum is irrelevant but on some compilers (gcc on MAC OS X) not having it named
+</font>        <font color='#009900'>// causes an error for whatever reason
+</font>        <font color='#0000FF'>enum</font> <b><a name='some_random_name'></a>some_random_name</b>
+        <b>{</b>
+            END_OF_LINE,
+            END_OF_FILE,
+            IDENTIFIER,
+            CHAR,
+            NUMBER,
+            WHITE_SPACE
+        <b>}</b>;
+
+        <b><a name='tokenizer_kernel_1'></a>tokenizer_kernel_1</b> <font face='Lucida Console'>(</font>        
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='tokenizer_kernel_1'></a>tokenizer_kernel_1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_stream'></a>set_stream</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='stream_is_set'></a>stream_is_set</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        std::istream<font color='#5555FF'>&amp;</font> <b><a name='get_stream'></a>get_stream</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_token'></a>get_token</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> type,
+            std::string<font color='#5555FF'>&amp;</font> token
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            tokenizer_kernel_1<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_identifier_token'></a>set_identifier_token</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> head,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> body
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='peek_type'></a>peek_type</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='peek_token'></a>peek_token</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> std::string <b><a name='get_identifier_head'></a>get_identifier_head</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> std::string <b><a name='get_identifier_body'></a>get_identifier_body</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> std::string <b><a name='lowercase_letters'></a>lowercase_letters</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> std::string <b><a name='uppercase_letters'></a>uppercase_letters</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> std::string <b><a name='numbers'></a>numbers</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='tokenizer_kernel_1'></a>tokenizer_kernel_1</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> tokenizer_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        tokenizer_kernel_1<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> tokenizer_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+
+        <font color='#009900'>// data members
+</font>        std::istream<font color='#5555FF'>*</font> in;
+        std::streambuf<font color='#5555FF'>*</font> streambuf;
+        std::string head;
+        std::string body;
+        <font color='#0000FF'><u>bool</u></font><font color='#5555FF'>*</font> headset;
+        <font color='#0000FF'><u>bool</u></font><font color='#5555FF'>*</font> bodyset;
+
+        <font color='#0000FF'>mutable</font> std::string next_token;
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>int</u></font> next_type;
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>bool</u></font> have_peeked;
+    <b>}</b>;    
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        tokenizer_kernel_1<font color='#5555FF'>&amp;</font> a, 
+        tokenizer_kernel_1<font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tokenizer_kernel_1.cpp.html'>tokenizer_kernel_1.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_TOKENIZER_KERNEl_1
+</font>
+
+</pre></body></html>

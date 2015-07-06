@@ -1,0 +1,455 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sequence_segmenter_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SEQUENCE_SeGMENTER_ABSTRACT_H_h_
+<font color='#0000FF'>#ifdef</font> DLIB_SEQUENCE_SeGMENTER_ABSTRACT_H_h_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sequence_labeler_abstract.h.html'>sequence_labeler_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='example_feature_extractor'></a>example_feature_extractor</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object defines the interface a feature extractor must implement if it
+                is to be used with the sequence_segmenter defined at the bottom of this
+                file.  
+                
+                The model used by sequence_segmenter objects is the following.  Given an
+                input sequence x, predict an output label sequence y such that:
+                    y == argmax_Y dot(w, PSI(x,Y))
+                Where w is a parameter vector and the label sequence defines a segmentation
+                of x.
+
+                Recall that a sequence_segmenter uses the BIO or BILOU tagging model and is
+                also an instantiation of the dlib::sequence_labeler.  Selecting to use the
+                BIO model means that each element of the label sequence y takes on one of
+                three possible values (B, I, or O) and together these labels define a
+                segmentation of the sequence.  For example, to represent a segmentation of
+                the sequence of words "The dog ran to Bob Jones" where only "Bob Jones" was
+                segmented out we would use the label sequence OOOOBI.  The BILOU model is
+                similar except that it uses five different labels and each segment is
+                labeled as U, BL, BIL, BIIL, BIIIL, and so on depending on its length.
+                Therefore, the BILOU model is able to more explicitly model the ends of the
+                segments than the BIO model, but has more parameters to estimate.
+                
+                Keeping all this in mind, the purpose of a sequence_segmenter is to take
+                care of the bookkeeping associated with creating BIO/BILOU tagging models
+                for segmentation tasks.  In particular, it presents the user with a
+                simplified version of the interface used by the dlib::sequence_labeler.  It
+                does this by completely hiding the BIO/BILOU tags from the user and instead
+                exposes an explicit sub-segment based labeling representation.  It also
+                simplifies the construction of the PSI() feature vector. 
+
+                Like in the dlib::sequence_labeler, PSI() is a sum of feature vectors, each
+                derived from the entire input sequence x but only part of the label
+                sequence y.  In the case of the sequence_segmenter, we use an order one
+                Markov model.  This means that 
+                    PSI(x,y) == sum_i XI(x, y_{i-1}, y_{i}, i)
+                where the sum is taken over all the elements in the sequence.  At each
+                element we extract a feature vector, XI(), that is expected to encode
+                important details describing what the i-th position of the sequence looks
+                like in the context of the current and previous labels.  To do this, XI()
+                is allowed to look at any part of the input sequence x, the current and
+                previous labels, and of course it must also know the position in question, i.  
+                
+                The sequence_segmenter simplifies this further by decomposing XI() into
+                components which model the current window around each position as well as
+                the conjunction of the current window around each position and the previous
+                label.  In particular, the sequence_segmenter only asks a user to provide a
+                single feature vector which characterizes a position of the sequence
+                independent of any labeling.  We denote this feature vector by ZI(x,i), where
+                x is the sequence and i is the position in question.  
+                
+                For example, suppose we use a window size of 3 and BIO tags, then we can
+                put all this together and define XI() in terms of ZI().  To do this, we can
+                think of XI() as containing 12*3 slots which contain either a zero vector
+                or a ZI() vector.  Each combination of window position and labeling has a
+                different slot.  To explain further, consider the following examples where
+                we have annotated which parts of XI() correspond to each slot.  
+
+                If the previous and current label are both B and we use a window size of 3
+                then XI() would be instantiated as:
+                    XI(x, B, B, i) = [ZI(x,i-1)  \ 
+                                      ZI(x,i)     &gt; If current label is B
+                                      ZI(x,i+1)  /  
+                                      0          \                        
+                                      0           &gt; If current label is I 
+                                      0          /                        
+                                      0          \                        
+                                      0           &gt; If current label is O 
+                                      0          /  
+
+                                      ZI(x,i-1)  \ 
+                                      ZI(x,i)     &gt; If previous label is B and current label is B
+                                      ZI(x,i+1)  /  
+                                      0          \                        
+                                      0           &gt; If previous label is B and current label is I 
+                                      0          /                        
+                                      0          \                        
+                                      0           &gt; If previous label is B and current label is O 
+                                      0          /  
+
+                                      0          \ 
+                                      0           &gt; If previous label is I and current label is B
+                                      0          /  
+                                      0          \                        
+                                      0           &gt; If previous label is I and current label is I 
+                                      0          /                        
+                                      0          \                        
+                                      0           &gt; If previous label is I and current label is O 
+                                      0          /  
+
+                                      0          \ 
+                                      0           &gt; If previous label is O and current label is B
+                                      0          /  
+                                      0          \                        
+                                      0           &gt; If previous label is O and current label is I 
+                                      0          /                        
+                                      0          \                        
+                                      0           &gt; If previous label is O and current label is O 
+                                      0]         /  
+
+
+                If the previous label is I and the current label is O and we use a window
+                size of 3 then XI() would be instantiated as:
+                    XI(x, I, O, i) = [0          \ 
+                                      0           &gt; If current label is B
+                                      0          /  
+                                      0          \                        
+                                      0           &gt; If current label is I 
+                                      0          /                        
+                                      ZI(x,i-1)  \                        
+                                      ZI(x,i)     &gt; If current label is O 
+                                      ZI(x,i+1)  /  
+
+                                      0          \ 
+                                      0           &gt; If previous label is B and current label is B
+                                      0          /  
+                                      0          \                        
+                                      0           &gt; If previous label is B and current label is I 
+                                      0          /                        
+                                      0          \                        
+                                      0           &gt; If previous label is B and current label is O 
+                                      0          /  
+                                                                                                   
+                                      0          \ 
+                                      0           &gt; If previous label is I and current label is B
+                                      0          /  
+                                      0          \                        
+                                      0           &gt; If previous label is I and current label is I 
+                                      0          /                        
+                                      ZI(x,i-1)  \                        
+                                      ZI(x,i)     &gt; If previous label is I and current label is O 
+                                      ZI(x,i+1)  /  
+                                                                                                   
+                                      0          \ 
+                                      0           &gt; If previous label is O and current label is B
+                                      0          /  
+                                      0          \                        
+                                      0           &gt; If previous label is O and current label is I 
+                                      0          /                        
+                                      0          \                        
+                                      0           &gt; If previous label is O and current label is O 
+                                      0]         /  
+                    
+                    If we had instead used the BILOU tagging model the XI() vector would
+                    have been similarly defined except that there would be 30*3 slots for
+                    the various label combination instead of 12*3.
+
+                    Finally, while not shown here, we also include indicator features in
+                    XI() to model label transitions and individual label biases.  These are
+                    12 extra features in the case of the BIO tagging model and 30 extra in
+                    the case of the BILOU tagging model.
+
+            THREAD SAFETY
+                Instances of this object are required to be threadsafe, that is, it should
+                be safe for multiple threads to make concurrent calls to the member
+                functions of this object.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#009900'>// This should be the type used to represent an input sequence.  It can be
+</font>        <font color='#009900'>// anything so long as it has a .size() which returns the length of the sequence.
+</font>        <font color='#0000FF'>typedef</font> the_type_used_to_represent_a_sequence sequence_type;
+
+        <font color='#009900'>// If you want to use the BIO tagging model then set this bool to true.  Set it to
+</font>        <font color='#009900'>// false to use the BILOU tagging model.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> use_BIO_model <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+        <font color='#009900'>// In the WHAT THIS OBJECT REPRESENTS section above we discussed how we model the
+</font>        <font color='#009900'>// conjunction of the previous label and the window around each position.  Doing
+</font>        <font color='#009900'>// this greatly expands the size of the parameter vector w.  You can optionally
+</font>        <font color='#009900'>// disable these higher order features by setting the use_high_order_features bool
+</font>        <font color='#009900'>// to false.  This will cause XI() to include only slots which are independent of
+</font>        <font color='#009900'>// the previous label. 
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> use_high_order_features <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+        <font color='#009900'>// You use a tool like the structural_sequence_segmentation_trainer to learn the weight
+</font>        <font color='#009900'>// vector needed by a sequence_segmenter.  You can tell the trainer to force all the
+</font>        <font color='#009900'>// elements of the weight vector corresponding to ZI() to be non-negative.  This is all
+</font>        <font color='#009900'>// the elements of w except for the elements corresponding to the label transition and
+</font>        <font color='#009900'>// bias indicator features.  To do this, just set allow_negative_weights to false.  
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> allow_negative_weights <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+
+        <b><a name='example_feature_extractor'></a>example_feature_extractor</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_features'></a>num_features</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the dimensionality of the ZI() feature vector.  This number is
+                  always &gt;= 1
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='window_size'></a>window_size</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the size of the window ZI() vectors are extracted from.  This
+                  number is always &gt;= 1.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> feature_setter<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_features'></a>get_features</b> <font face='Lucida Console'>(</font>
+            feature_setter<font color='#5555FF'>&amp;</font> set_feature,
+            <font color='#0000FF'>const</font> sequence_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> position
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - position &lt; x.size()
+                - set_feature is a function object which allows expressions of the form:
+                    - set_features((unsigned long)feature_index, (double)feature_value);
+                    - set_features((unsigned long)feature_index);
+            ensures
+                - This function computes the ZI(x,position) feature vector.  This is a
+                  feature vector which should capture the properties of x[position] that
+                  are informative relative to the sequence segmentation task you are trying
+                  to perform.
+                - ZI(x,position) is returned as a sparse vector by invoking set_feature().
+                  For example, to set the feature with an index of 55 to the value of 1
+                  this method would call:
+                    set_feature(55);
+                  Or equivalently:
+                    set_feature(55,1);
+                  Therefore, the first argument to set_feature is the index of the feature
+                  to be set while the second argument is the value the feature should take.
+                  Additionally, note that calling set_feature() multiple times with the
+                  same feature index does NOT overwrite the old value, it adds to the
+                  previous value.  For example, if you call set_feature(55) 3 times then it
+                  will result in feature 55 having a value of 3.
+                - This function only calls set_feature() with feature_index values &lt; num_features()
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> example_feature_extractor<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>
+        example_feature_extractor<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='total_feature_vector_size'></a>total_feature_vector_size</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> fe
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - fe must be an object that implements an interface compatible with the
+              example_feature_extractor discussed above.
+        ensures
+            - returns the dimensionality of the PSI() vector defined by the given feature
+              extractor.  
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='sequence_segmenter'></a>sequence_segmenter</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON feature_extractor
+                It must be an object that implements an interface compatible with 
+                the example_feature_extractor discussed above.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for segmenting a sequence of objects into a set of
+                non-overlapping chunks.  An example sequence segmentation task is to take
+                English sentences and identify all the named entities.  In this example,
+                you would be using a sequence_segmenter to find all the chunks of
+                contiguous words which refer to proper names.
+
+                Internally, the sequence_segmenter uses the BIO (Begin, Inside, Outside) or
+                BILOU (Begin, Inside, Last, Outside, Unit) sequence tagging model.
+                Moreover, it is implemented using a dlib::sequence_labeler object and
+                therefore sequence_segmenter objects are examples of chain structured
+                conditional random field style sequence taggers. 
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    It is safe to call the const members of this object from multiple
+                    threads so long as the feature_extractor is also threadsafe.  This is
+                    because the const members are purely read-only operations.  However,
+                    any operation that modifies a sequence_segmenter is not threadsafe.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> feature_extractor::sequence_type sample_sequence_type;
+        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> segmented_sequence_type;
+
+        <b><a name='sequence_segmenter'></a>sequence_segmenter</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_feature_extractor() == feature_extractor() 
+                  (i.e. it will have its default value)
+                - #get_weights().size() == total_feature_vector_size(#get_feature_extractor())
+                - #get_weights() == 0
+        !*/</font>
+
+        <font color='#0000FF'>explicit</font> <b><a name='sequence_segmenter'></a>sequence_segmenter</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> weights
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - total_feature_vector_size(feature_extractor()) == weights.size()
+            ensures
+                - #get_feature_extractor() == feature_extractor() 
+                  (i.e. it will have its default value)
+                - #get_weights() == weights
+        !*/</font>
+
+        <b><a name='sequence_segmenter'></a>sequence_segmenter</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> weights,
+            <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> fe
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - total_feature_vector_size(fe) == weights.size()
+            ensures
+                - #get_feature_extractor() == fe
+                - #get_weights() == weights
+        !*/</font>
+
+        <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> <b><a name='get_feature_extractor'></a>get_feature_extractor</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the feature extractor used by this object.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_weights'></a>get_weights</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the parameter vector associated with this sequence segmenter. 
+                  The length of the vector is total_feature_vector_size(get_feature_extractor()).  
+        !*/</font>
+
+        segmented_sequence_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_sequence_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - Takes an input sequence and returns a list of detected segments within
+                  that sequence.
+                - None of the returned segments will overlap.
+                - The returned segments are listed in the order they appeared in the input sequence.
+                - To be precise, this function returns a std::vector Y of segments such that:
+                    - Y.size() == the number of segments detected in the input sequence x.
+                    - for all valid i:
+                        - Y[i].first  == the start of the i-th segment.
+                        - Y[i].second == one past the end of the i-th segment.
+                        - Therefore, the i-th detected segment in x is composed of the elements
+                          x[Y[i].first], x[Y[i].first+1], ..., x[Y[i].second-1]
+                        - Y[i].first &lt; x.size()
+                        - Y[i].second &lt;= x.size()
+                        - Y[i].first &lt; Y[i].second
+                          (i.e. This function never outputs empty segments)
+                        - Y[i].second &lt;= Y[i+1].first
+                          (i.e. the segments are listed in order of appearance and do not overlap)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='segment_sequence'></a>segment_sequence</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_sequence_type<font color='#5555FF'>&amp;</font> x,
+            segmented_sequence_type<font color='#5555FF'>&amp;</font> y
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #y == (*this)(x)
+                  (i.e. This is just another interface to the operator() routine
+                  above.  This one avoids returning the results by value and therefore
+                  might be a little faster in some cases)
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> sequence_segmenter<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        sequence_segmenter<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SEQUENCE_SeGMENTER_ABSTRACT_H_h_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,212 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - function_objects_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_MR_FUNCTION_ObJECTS_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_MR_FUNCTION_ObJECTS_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../svm/sparse_vector_abstract.h.html'>../svm/sparse_vector_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='squared_euclidean_distance'></a>squared_euclidean_distance</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple function object that computes squared euclidean distance
+                between two dlib::matrix objects. 
+
+            THREAD SAFETY
+                This object has no mutable members.  Therefore, it is safe to call
+                operator() on a single instance of this object simultaneously from multiple
+                threads.
+        !*/</font>
+
+        <b><a name='squared_euclidean_distance'></a>squared_euclidean_distance</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #lower == 0
+                - #upper == std::numeric_limits&lt;double&gt;::infinity()
+        !*/</font>
+
+        <b><a name='squared_euclidean_distance'></a>squared_euclidean_distance</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> l,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> u
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #lower == l
+                - #upper == u  
+        !*/</font>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> lower;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> upper;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> sample_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - sample_type should be a kind of dlib::matrix 
+            ensures
+                - let LEN = length_squared(a-b)
+                - if (lower &lt;= LEN &lt;= upper) then
+                    - returns LEN
+                - else
+                    - returns std::numeric_limits&lt;double&gt;::infinity()
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='cosine_distance'></a>cosine_distance</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple function object that computes the cosine of the angle
+                between two vectors and returns 1 - this quantity.   Moreover, this object
+                works for both sparse and dense vectors.
+
+            THREAD SAFETY
+                This object has no mutable members.  Therefore, it is safe to call
+                operator() on a single instance of this object simultaneously from multiple
+                threads.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> sample_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - sample_type is a dense vector (e.g. a dlib::matrix) or a sparse
+                  vector as defined at the top of dlib/svm/sparse_vector_abstract.h
+            ensures
+                - let theta = the angle between a and b.  
+                - returns 1 - cos(theta)
+                  (e.g. this function returns 0 when a and b have an angle of 0 between
+                  each other, 1 if they have a 90 degree angle, and a maximum of 2 if the
+                  vectors have a 180 degree angle between each other).
+                - zero length vectors are considered to have angles of 0 between all other
+                  vectors.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='negative_dot_product_distance'></a>negative_dot_product_distance</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple function object that computes the dot product between two
+                vectors and returns the negation of this value.  Moreover, this object
+                works for both sparse and dense vectors.
+
+            THREAD SAFETY
+                This object has no mutable members.  Therefore, it is safe to call
+                operator() on a single instance of this object simultaneously from multiple
+                threads.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> sample_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - sample_type is a dense vector (e.g. a dlib::matrix) or a sparse
+                  vector as defined at the top of dlib/svm/sparse_vector_abstract.h
+            ensures
+                - returns -dot(a,b)
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='use_weights_of_one'></a>use_weights_of_one</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple function object that takes a single argument
+                and always returns 1 
+
+            THREAD SAFETY
+                This object has no mutable members.  Therefore, it is safe to call
+                operator() on a single instance of this object simultaneously from multiple
+                threads.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> edge_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> edge_type<font color='#5555FF'>&amp;</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns 1
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='use_gaussian_weights'></a>use_gaussian_weights</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple function object that takes a single argument
+                which should be an object similar to dlib::sample_pair.  
+
+            THREAD SAFETY
+                This object has no mutable members.  Therefore, it is safe to call
+                operator() on a single instance of this object simultaneously from multiple
+                threads.
+        !*/</font>
+
+        <b><a name='use_gaussian_weights'></a>use_gaussian_weights</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #gamma == 0.1
+        !*/</font>
+
+        <b><a name='use_gaussian_weights'></a>use_gaussian_weights</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> g
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #gamma == g
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> gamma;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> edge_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> edge_type<font color='#5555FF'>&amp;</font> e
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - e.distance() must be a valid expression that returns a number
+                  (e.g. edge_type might be dlib::sample_pair)
+            ensures
+                - returns std::exp(-gamma*e.distance());
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MR_FUNCTION_ObJECTS_ABSTRACT_Hh_
+</font>
+
+
+
+</pre></body></html>

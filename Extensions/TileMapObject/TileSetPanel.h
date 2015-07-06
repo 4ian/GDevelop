@@ -5,6 +5,7 @@ Copyright (c) 2014-2015 Victor Levasseur (victorlevasseur52@gmail.com)
 This project is released under the MIT License.
 */
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef TILESETPANEL_H
 #define TILESETPANEL_H
 
@@ -61,4 +62,5 @@ private:
     void GetTileAt(wxPoint position, int &tileCol, int &tileRow);
 };
 
+#endif
 #endif
